@@ -4,7 +4,7 @@
 - Створено git-репозиторій і `.gitignore` (без `data/`, `transactions.beancount`, `report.html`, `.venv/`, `__pycache__/`).
 - Проведено інтервʼю з Олею, рішення записані в `PRD.md`: три питання, жовтень неповний, нові категорії, формула норми заощаджень, подушка безпеки поза межами.
 
+- Складено `IMPLEMENTATION_PLAN.md` (7 кроків).
+
 ## Далі
-- Написати `IMPLEMENTATION_PLAN.md` з кроками.
-- Додати в `rules.csv` правила для Rossmann, Decathlon, Play і відкрити нові рахунки в `main.beancount`.
-- Зробити імпорт виписки і перевірити `uv run bean-check main.beancount`.
+- Крок 1: каркас обліку (`main.beancount`, рахунки) і `bean-check`.
