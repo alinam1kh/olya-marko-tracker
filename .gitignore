@@ -1,0 +1,5 @@
+﻿data/
+transactions.beancount
+report.html
+.venv/
+__pycache__/
