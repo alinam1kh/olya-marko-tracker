@@ -37,6 +37,13 @@ ALLOW_HTTP = os.environ.get("TRACKER_ALLOW_HTTP") == "1"
 
 fava_app = create_app([ROOT / "marko.beancount", ROOT / "main.beancount"], load=True)
 
+# «/» — новий звіт (ui.py), «/fava» — Fava (журнал, запити, кнопка «+»). Вхід і HTTPS нижче діють для обох.
+from werkzeug.middleware.dispatcher import DispatcherMiddleware  # noqa: E402
+
+from ui import ui_app  # noqa: E402
+
+site = DispatcherMiddleware(ui_app, {"/fava": fava_app})
+
 
 def _authorized(environ):
     header = environ.get("HTTP_AUTHORIZATION", "")
@@ -65,7 +72,7 @@ def application(environ, start_response):
             ("Content-Length", str(len(body))),
         ])
         return [body]
-    return fava_app(environ, start_response)
+    return site(environ, start_response)
 
 
 app = application  # PythonAnywhere шукає змінну application; лишаємо й app
