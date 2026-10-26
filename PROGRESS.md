@@ -21,7 +21,9 @@
 
 - HW #3, частина 2: журнал Марка (`marko.beancount`, `import_marko.py`, виписка в `data/marko/`), 109 операцій, 0 без категорії, 3 звірки з банком. Контрольні змінні Марка збігаються: 1 855,57 / 2 432,83. Готівка з телефона пишеться в `marko-cash.beancount` (опція Fava insert-entry) і переживає повторний імпорт — перевірено локально через Fava API. `wsgi.py`: Fava з двома журналами, вхід за паролем зі змінних середовища, HTTP → HTTPS. `check.py` — одна команда перевірки, усе OK.
 
+- Опубліковано: https://github.com/alinam1kh/olya-marko-tracker (публічний, лише штучні дані).
+- Розгорнуто: https://alinam1kh.pythonanywhere.com (PythonAnywhere Beginner, Force HTTPS, вхід за паролем з .env). На сервері check.py — «УСЕ ЗБІГАЄТЬСЯ»; без пароля 401, HTTP → HTTPS. Тестова витрата 1 зл через «+» збереглась у marko-cash.beancount, bean-check мовчить. Вебзастосунок активний до 26.11.2026.
+
 ## Далі
-- Опублікувати репозиторій на GitHub (публічний, лише штучні дані).
-- Розгорнути на PythonAnywhere за README і перевірити з телефона: вхід, звіт, додавання витрати 1 зл.
+- Здати HW #3 на Eduworkspace до 26.10.2026 23:59.
 - Щомісяця: нова виписка в `data/`, потім `uv run python import.py`, `uv run bean-check main.beancount`, `uv run python report.py`.
