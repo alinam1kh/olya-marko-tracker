@@ -1,5 +1,9 @@
-﻿data/
+﻿# Генерують import.py / import_marko.py / report.py — завжди можна перебудувати
 transactions.beancount
+marko-transactions.beancount
 report.html
+# Логін і пароль трекера — лише на сервері, ніколи в git
+.env
 .venv/
 __pycache__/
+# data/ комітимо: там лише штучні виписки Олі й Марка з умови HW #3 (справжніх даних у репозиторії немає)

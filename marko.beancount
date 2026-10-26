@@ -1,0 +1,56 @@
+option "title" "Фінанси Марка"
+option "operating_currency" "PLN"
+
+; Рахунки Марка (кожен рахунок, що використовується, має бути відкритий тут)
+2026-07-31 open Assets:Банк PLN
+2026-07-31 open Assets:Готівка PLN
+2026-07-31 open Equity:Початковий-Залишок PLN
+
+2026-07-31 open Income:Зарплата PLN
+2026-07-31 open Income:Інше PLN
+
+2026-07-31 open Expenses:Продукти PLN
+2026-07-31 open Expenses:Кафе PLN
+2026-07-31 open Expenses:Доставка-Їжі PLN
+2026-07-31 open Expenses:Транспорт PLN
+2026-07-31 open Expenses:Підписки PLN
+2026-07-31 open Expenses:Краса-і-Побут PLN
+2026-07-31 open Expenses:Спорт PLN
+2026-07-31 open Expenses:Звязок PLN
+2026-07-31 open Expenses:Комунальні PLN
+2026-07-31 open Expenses:Розваги PLN
+2026-07-31 open Expenses:Покупки PLN
+2026-07-31 open Expenses:Без-Категорії PLN
+
+; Збережені запити (ті самі, що в журналі Олі, усі по місяцях)
+
+2026-07-31 query "1 Витрати за категоріями" "SELECT year AS \"рік\", month AS \"місяць\", account AS \"категорія\",
+          sum(number) AS \"сума\"
+   WHERE account ~ '^Expenses'
+   GROUP BY year, month, account
+   ORDER BY year, month, account"
+
+2026-07-31 query "2 Норма заощаджень" "SELECT year AS \"рік\", month AS \"місяць\",
+          round((sum(abs(number)) - sum(number)) / 2, 2) AS \"дохід\",
+          round((sum(abs(number)) + sum(number)) / 2, 2) AS \"витрати\",
+          round(-sum(number), 2) AS \"відкладено\",
+          round(-200 * sum(number) / (sum(abs(number)) - sum(number)), 1) AS \"відсоток\",
+          max(date) AS \"остання операція\"
+   WHERE account ~ '^(Income|Expenses)'
+   GROUP BY year, month
+   ORDER BY year, month"
+
+2026-07-31 query "3 Фіксовані і змінні" "SELECT year AS \"рік\", month AS \"місяць\",
+          ('fixed' IN tags) AS \"фіксовані\",
+          sum(number) AS \"сума\"
+   WHERE account ~ '^Expenses'
+   GROUP BY year, month, ('fixed' IN tags)
+   ORDER BY year, month, ('fixed' IN tags)"
+
+2026-07-31 query "4 Без категорії" "SELECT year AS \"рік\", month AS \"місяць\", date AS \"дата\",
+          narration AS \"опис\", number AS \"сума\"
+   WHERE account = 'Expenses:Без-Категорії'
+   ORDER BY date"
+
+include "marko-transactions.beancount"
+include "marko-cash.beancount"
