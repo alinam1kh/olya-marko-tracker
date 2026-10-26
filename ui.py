@@ -75,7 +75,48 @@ def add_cash():
         if len(after) > len(before):
             cash.write_bytes(original)
             return _fail("Журнал не прийняв запис, нічого не збережено")
-    return jsonify({"ok": True, "month": day.strftime("%Y-%m")})
+        # номер рядка нового запису — щоб тост міг одразу «Скасувати»
+        line = original.decode("utf-8").count("\n") + 2
+    return jsonify({"ok": True, "month": day.strftime("%Y-%m"), "line": line, "date": day.isoformat(), "title": title})
+
+
+@ui_app.post("/api/cash/delete")
+def delete_cash():
+    """Видаляє один готівковий запис із файлу готівки (лише його; виписку не чіпаємо).
+
+    Запис шукаємо за номером рядка й перевіряємо, що там справді та сама дата й опис —
+    щоб не видалити інший запис, якщо файл тим часом змінився.
+    """
+    origin = request.headers.get("Origin", "")
+    if not request.is_json or urlparse(origin).netloc != request.host:
+        return jsonify({"ok": False, "error": "Запит не з трекера"}), 403
+    body = request.get_json(silent=True) or {}
+    files = report_data.CASH_FILES.get(body.get("person"))
+    if not files:
+        return _fail("Готівку веде лише Марко")
+    ledger, cash = (report_data.ROOT / f for f in files)
+    try:
+        line = int(body.get("line"))
+    except (TypeError, ValueError):
+        return _fail("Невідомий запис")
+    expected = f'{body.get("date", "")} * "{body.get("title", "")}"'
+    _, before, _ = loader.load_file(str(ledger))
+    with _write_lock:
+        original = cash.read_bytes()
+        lines = original.decode("utf-8").split("\n")
+        i = line - 1
+        if not 0 <= i < len(lines) or lines[i].strip() != expected:
+            return _fail("Запис уже змінився, оновіть сторінку")
+        j = i + 1
+        while j < len(lines) and lines[j].startswith(" "):  # рядки проводок запису
+            j += 1
+        start = i - 1 if i > 0 and lines[i - 1].strip() == "" else i  # разом з порожнім рядком перед записом
+        cash.write_text("\n".join(lines[:start] + lines[j:]), encoding="utf-8", newline="\n")
+        _, errors, _ = loader.load_file(str(ledger))
+        if len(errors) > len(before):
+            cash.write_bytes(original)
+            return _fail("Журнал не прийняв зміну, нічого не видалено")
+    return jsonify({"ok": True, "month": body.get("date", "")[:7]})
 
 
 @ui_app.route("/")
@@ -103,10 +144,10 @@ PAGE = r"""<!doctype html>
   --ink: #111318; --ink2: #6B7180; --ink3: #4A5060; --ink4: #2A2E38; --mute: #C4C8D0;
   --blue: #1F63E6; --blue-g: linear-gradient(180deg, #3B82F6, #1D5FE0); --blue-soft: #EAF1FF; --blue-txt: #1F55C9; --blue-l: #A9C6F8;
   --good: #15803D; --good-bg: #E3F7EA; --bad: #C0261B; --bad-bg: #FDE8E6; --cash: #7A4E00; --cash-bg: #FFF2DB;
-  --hero-on: #DCE3F4; --glow: rgba(120, 160, 245, .62); --g1: #3A62C2; --g2: #1E3778; --g3: #0B132B;
+  --hero-on: #DCE3F4; --glow: rgba(120, 160, 245, .24); --g1: #3A62C2; --g2: #1E3778; --g3: #0B132B;
   --font: "Onest", "Outfit", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
-body.p-olya { --hero-on: #F1DDEA; --glow: rgba(214, 120, 182, .58); --g1: #9A4783; --g2: #5A2149; --g3: #1C0A17; }
+body.p-olya { --hero-on: #F1DDEA; --glow: rgba(214, 120, 182, .34); --g1: #9A4783; --g2: #5A2149; --g3: #1C0A17; }
 * { box-sizing: border-box; }
 html, body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.4 var(--font); -webkit-font-smoothing: antialiased; font-variant-numeric: tabular-nums; }
 .app { max-width: 440px; margin: 0 auto; padding: 8px 14px 130px; }
@@ -140,7 +181,7 @@ a { color: inherit; text-decoration: none; }
 .pop .opt[aria-checked="true"] { background: var(--blue-soft); }
 .pop .opt[aria-checked="true"] .radio { border: 6px solid var(--blue); }
 .pop .foot { margin: 6px 6px 4px; padding: 10px 6px 6px; border-top: 1px solid var(--soft); font-size: 12px; color: var(--ink2); line-height: 1.45; }
-.mmenu { right: 0; width: min(318px, calc(100vw - 28px)); padding: 16px; }
+.mmenu { right: 0; width: min(332px, calc(100vw - 28px)); padding: 16px; }
 .cal-head { display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; margin-bottom: 8px; }
 .cal-head b { text-align: center; font-size: 17px; font-weight: 500; }
 .cal-head button { width: 44px; height: 44px; display: grid; place-items: center; border: 0; border-radius: 22px; background: var(--soft); cursor: pointer; }
@@ -149,7 +190,7 @@ a { color: inherit; text-decoration: none; }
 .cal-wd, .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); }
 .cal-wd span { padding: 4px 0 6px; text-align: center; font-size: 12px; color: var(--ink2); }
 .cal-grid { row-gap: 2px; }
-.cal-grid button { position: relative; height: 44px; border: 0; border-radius: 22px; background: transparent; font-size: 14px; cursor: pointer; }
+.cal-grid button { position: relative; justify-self: center; width: 42px; height: 42px; padding: 0; border: 0; border-radius: 50%; background: transparent; font-size: 14px; cursor: pointer; }
 .cal-grid button:disabled { color: var(--mute); cursor: default; }
 .cal-grid button.has::after { content: ""; position: absolute; left: 50%; bottom: 6px; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: var(--blue); opacity: .55; }
 .cal-grid button:not(:disabled):hover { background: var(--soft); }
@@ -159,14 +200,14 @@ a { color: inherit; text-decoration: none; }
 .cal-note { margin: 10px 4px 0; font-size: 12px; color: var(--ink2); }
 
 /* головна картка: біла рамка, всередині наш градієнт у кольорі людини */
-.hero-wrap { margin-top: 12px; padding: 6px; border: 1px solid var(--border); border-radius: 30px; background: var(--card); }
+.hero-wrap { margin-top: 12px; }
 .hero { position: relative; padding: 22px 20px 20px; border-radius: 24px; color: #fff; overflow: hidden;
   background: radial-gradient(70% 55% at 0% 0%, var(--glow), transparent 72%), radial-gradient(45% 40% at 0% 78%, var(--glow), transparent 70%),
     linear-gradient(162deg, var(--g1) 0%, var(--g2) 48%, var(--g3) 100%); }
 .hero .lbl { font-size: 14px; }
 .hero .num { margin-top: 6px; font-size: 40px; font-weight: 500; letter-spacing: -.02em; line-height: 1.05; }
 .hero .sub { margin-top: 6px; font-size: 14px; }
-.hero .tag { position: absolute; top: 18px; right: 18px; height: 22px; padding: 0 8px; border-radius: 11px; background: rgba(255,255,255,.92); color: var(--ink3); font-size: 11px; font-weight: 500; display: flex; align-items: center; }
+.hero .tag { position: absolute; top: 18px; right: 18px; height: 24px; padding: 0 8px; border-radius: 12px; background: rgba(255,255,255,.92); color: var(--ink3); font-size: 12px; font-weight: 500; display: flex; align-items: center; }
 .hero .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.35); }
 .hero .cols a { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; min-height: 44px; }
 .hero .cols .t { font-size: 13px; }
@@ -177,10 +218,10 @@ a { color: inherit; text-decoration: none; }
 .hero .hint { display: flex; gap: 10px; align-items: flex-start; margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.35); font-size: 14px; line-height: 1.4; }
 .hero .hint svg { flex: none; width: 18px; height: 18px; margin-top: 1px; }
 /* бейджі: маленькі заокруглені плашки, стрілка діагональна */
-.bd { flex: none; display: inline-flex; align-items: center; gap: 3px; height: 22px; padding: 0 8px; border-radius: 11px; background: var(--soft); color: var(--ink3); font-size: 11px; font-weight: 500; white-space: nowrap; }
+.bd { flex: none; display: inline-flex; align-items: center; gap: 3px; height: 24px; padding: 0 8px; border-radius: 12px; background: var(--soft); color: var(--ink3); font-size: 12px; font-weight: 500; white-space: nowrap; }
 .bd.good { background: var(--good-bg); color: var(--good); }
 .bd.bad { background: var(--bad-bg); color: var(--bad); }
-.bd.blue { background: var(--blue-soft); color: var(--blue-txt); }
+.bd.blue { height: auto; padding: 0; background: none; color: var(--ink2); font-size: 13px; font-weight: 400; }
 .bd.new { background: var(--cash-bg); color: var(--cash); }
 .hero .bd:not(.good):not(.bad) { background: rgba(255,255,255,.92); color: #3A4050; }
 
@@ -191,12 +232,12 @@ a { color: inherit; text-decoration: none; }
 /* картки */
 .card { margin-top: 12px; padding: 16px; border: 1px solid var(--border); border-radius: 20px; background: var(--card); }
 .card.list { padding: 6px 16px 4px; }
-.ch { display: flex; justify-content: space-between; align-items: center; gap: 10px; min-height: 44px; }
-.ch h2 { margin: 0; font-size: 16px; font-weight: 500; white-space: nowrap; }
-.ch a { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-size: 14px; font-weight: 500; color: var(--blue); }
+.ch { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 6px 10px; min-height: 44px; }
+.ch h2 { margin: 0; font-size: 18px; font-weight: 500; white-space: nowrap; letter-spacing: -.01em; }
+.ch a { display: inline-flex; align-items: center; gap: 2px; min-height: 44px; font-size: 14px; font-weight: 500; color: var(--blue); }
 .ch .sub { font-size: 14px; color: var(--ink2); }
 .note { font-size: 13px; line-height: 1.45; color: var(--ink2); }
-.fx { display: inline-block; padding: 0 8px; border-radius: 10px; line-height: 20px; background: var(--soft); color: var(--ink3); font-size: 11px; }
+.fx { display: inline-block; padding: 0 8px; border-radius: 10px; line-height: 20px; background: var(--soft); color: var(--ink3); font-size: 12px; }
 .fx.cash { background: var(--cash-bg); color: var(--cash); }
 .fx.now { background: var(--blue); color: #fff; }
 /* «Вересень коротко» */
@@ -210,7 +251,7 @@ a { color: inherit; text-decoration: none; }
 .crow .am { font-size: 14px; font-weight: 500; }
 .crow .bar6 { grid-column: 2 / -1; height: 6px; border-radius: 999px; background: var(--track); overflow: hidden; }
 .crow .bar6 b { display: block; height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, #3B82F6, #1D5FE0); transition: width 1s cubic-bezier(.2,.8,.2,1); }
-.cic { flex: none; width: 36px; height: 36px; border-radius: 18px; display: grid; place-items: center; }
+.cic { flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--soft); }
 .cic svg { width: 18px; height: 18px; }
 .more { display: flex; justify-content: space-between; align-items: center; min-height: 48px; margin-top: 4px; border-top: 1px solid var(--soft); font-size: 15px; color: var(--ink2); }
 /* операції */
@@ -225,7 +266,15 @@ a { color: inherit; text-decoration: none; }
 .op .am { font-size: 15px; font-weight: 500; white-space: nowrap; }
 .op .am.inc { color: var(--good); }
 .op .dt { display: flex; align-items: center; gap: 4px; font-size: 13px; color: var(--ink2); }
-.op.fresh { margin: 0 -10px; padding: 10px; border-top-color: transparent; border-radius: 14px; background: var(--blue-soft); }
+/* видалення готівкового запису: кнопка-кошик у рядку журналу, а потім підтвердження в тому ж місці */
+.op .del { flex: none; width: 44px; height: 44px; margin-right: -10px; border: 0; border-radius: 22px; background: transparent; color: var(--ink2); display: grid; place-items: center; cursor: pointer; }
+.op .del:hover { background: var(--bad-bg); color: var(--bad); }
+.op .del svg { width: 18px; height: 18px; }
+.op .ask { flex: none; display: flex; gap: 6px; }
+.op .ask button { min-height: 44px; padding: 0 12px; border: 0; border-radius: 22px; background: var(--soft); font-size: 13px; font-weight: 500; cursor: pointer; }
+.op .ask button.yes { background: var(--bad); color: #fff; }
+.toast button { min-height: 36px; margin-left: 4px; padding: 0 12px; border: 0; border-radius: 18px; background: rgba(255,255,255,.16); color: #fff; font-size: 13px; font-weight: 500; cursor: pointer; }
+
 /* подушка безпеки (Оля) */
 .goal .gbig { display: flex; align-items: flex-start; gap: 10px; margin: 6px 0 14px; }
 .goal .gbig b { font-size: 32px; font-weight: 500; line-height: 1; color: var(--blue); }
@@ -233,7 +282,7 @@ a { color: inherit; text-decoration: none; }
 .segs { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
 .segs i { position: relative; height: 8px; border-radius: 4px; background: var(--track); overflow: hidden; }
 .segs i b { position: absolute; inset: 0; width: 0; border-radius: 4px; background: var(--blue-g); transition: width .9s cubic-bezier(.2,.8,.2,1); }
-.seglab { display: grid; grid-template-columns: repeat(6, 1fr); margin-top: 6px; font-size: 11px; color: var(--ink2); }
+.seglab { display: grid; grid-template-columns: repeat(6, 1fr); margin-top: 6px; font-size: 12px; color: var(--ink2); }
 .seglab span:last-child { text-align: right; }
 .gcols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0 12px; padding-top: 14px; border-top: 1px solid var(--soft); }
 .gcols span { display: block; font-size: 12px; color: var(--ink2); }
@@ -254,7 +303,7 @@ a { color: inherit; text-decoration: none; }
 
 /* капсульні графіки: сіра доріжка, синя заливка, неповний місяць — штрих */
 .chart { display: flex; gap: 8px; margin-top: 14px; }
-.ticks { display: flex; flex-direction: column; justify-content: space-between; height: 150px; min-width: 54px; font-size: 11px; color: var(--ink2); text-align: right; }
+.ticks { display: flex; flex-direction: column; justify-content: space-between; height: 150px; min-width: 54px; font-size: 12px; color: var(--ink2); text-align: right; }
 .ticks span { line-height: 1; }
 .caps { flex: 1; display: flex; justify-content: space-around; }
 .cap { display: flex; flex-direction: column; align-items: center; gap: 6px; }
@@ -265,8 +314,8 @@ a { color: inherit; text-decoration: none; }
 .cap .fill .main { flex: 1; background: var(--blue-g); }
 .cap.dim .fill .main { background: linear-gradient(180deg, #A9C6F8, #7FA9F1); }
 .cap.part .fill .main { background: repeating-linear-gradient(135deg, #A9C6F8 0 5px, #D7E4FC 5px 10px); }
-.cap .r1 { font-size: 11px; color: var(--ink3); }
-.cap .r2 { font-size: 11px; color: var(--ink2); }
+.cap .r1 { font-size: 12px; color: var(--ink3); }
+.cap .r2 { font-size: 12px; color: var(--ink2); }
 .cap.on .r1 { color: var(--ink); font-weight: 500; }
 /* фіксовані й змінні */
 .split { display: flex; gap: 3px; height: 10px; margin: 4px 0 14px; }
@@ -290,7 +339,7 @@ a { color: inherit; text-decoration: none; }
 .cmp .n { flex: 1; min-width: 0; }
 .cmp .v { color: var(--ink2); }
 .cmp .bd { min-width: 64px; justify-content: center; }
-.fava { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; margin: 10px 4px 0; font-size: 14px; font-weight: 500; color: var(--blue); }
+.fava { display: inline-flex; align-items: center; gap: 2px; min-height: 44px; margin: 10px 4px 0; font-size: 14px; font-weight: 500; color: var(--blue); }
 
 /* журнал */
 .filters { display: flex; gap: 8px; margin-top: 12px; overflow-x: auto; scrollbar-width: none; }
@@ -298,9 +347,12 @@ a { color: inherit; text-decoration: none; }
 .filters button { flex: none; min-height: 44px; padding: 0 16px; border: 1px solid var(--border); border-radius: 22px; background: var(--card); font-size: 14px; cursor: pointer; }
 .filters button[aria-pressed="true"] { border-color: transparent; background: var(--blue-g); color: #fff; font-weight: 500; }
 .jsum { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
-.jsum .card { margin: 0; padding: 12px 14px; }
+.jsum .card { margin: 0; padding: 12px 14px; display: flex; align-items: center; gap: 12px; }
+.jsum .ji { flex: none; width: 36px; height: 36px; border-radius: 18px; display: grid; place-items: center; }
+.jsum .ji svg { width: 18px; height: 18px; }
 .jsum span { display: block; font-size: 12px; color: var(--ink2); }
-.jsum b { display: block; margin-top: 2px; font-size: 18px; font-weight: 500; }
+.jsum b { display: block; margin-top: 2px; font-size: 17px; font-weight: 500; white-space: nowrap; }
+.jsum .card > div { min-width: 0; }
 .dh { display: flex; justify-content: space-between; gap: 10px; margin: 16px 4px 6px; font-size: 14px; }
 .dh b { font-weight: 500; }
 .dh b span { font-weight: 400; color: var(--ink2); }
@@ -336,7 +388,7 @@ a { color: inherit; text-decoration: none; }
 .field:focus { outline: 2px solid var(--blue); outline-offset: 0; }
 .dates { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
 .dates button { min-height: 52px; border: 0; border-radius: 14px; background: var(--soft); font-size: 14px; font-weight: 500; line-height: 1.2; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-.dates button small { font-size: 11px; font-weight: 400; color: var(--ink2); }
+.dates button small { font-size: 12px; font-weight: 400; color: var(--ink2); }
 .dates button.other { flex-direction: row; gap: 6px; }
 .dates button[aria-pressed="true"] { background: var(--blue-g); color: #fff; }
 .dates button[aria-pressed="true"] small { color: rgba(255,255,255,.8); }
@@ -356,7 +408,7 @@ a { color: inherit; text-decoration: none; }
 .nav { z-index: 20; position: fixed; left: 50%; bottom: calc(22px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); width: min(342px, calc(100vw - 48px)); height: 64px;
   display: flex; align-items: center; padding: 0 8px; border: 1px solid var(--border); border-radius: 32px; background: rgba(255,255,255,.96); box-shadow: 0 10px 30px rgba(17,19,24,.10); }
 .nav a { flex: 1; height: 48px; border-radius: 24px; display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--ink3); }
-.nav a.on { background: var(--blue-g); color: #fff; font-weight: 500; box-shadow: 0 6px 14px rgba(29,95,224,.35); }
+.nav a.on { background: var(--blue-soft); color: var(--blue); font-weight: 500; }
 @media (prefers-reduced-motion: reduce) { .cap .fill, .crow .bar6 b, .segs i b, .hero .meter b { transition: none; } .fadein { animation: none; } }
 </style>
 </head>
@@ -417,7 +469,10 @@ a { color: inherit; text-decoration: none; }
 
   <div id="v-journal" hidden>
     <div class="filters" id="j-filters" role="group" aria-label="Фільтр"></div>
-    <div class="jsum"><div class="card"><span>Операцій</span><b id="j-count"></b></div><div class="card"><span>Витрати</span><b id="j-sum"></b></div></div>
+    <div class="jsum">
+      <div class="card"><span class="ji" style="background:var(--blue-soft);color:var(--blue)" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg></span><div><span>Операцій</span><b id="j-count"></b></div></div>
+      <div class="card"><span class="ji" style="background:var(--bad-bg);color:var(--bad)" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg></span><div><span>Витрати</span><b id="j-sum"></b></div></div>
+    </div>
     <div id="j-list"></div>
   </div>
 
@@ -491,30 +546,48 @@ var CATS = {
   "Краса і Побут": ["#FDE8F4", "#BE185D", '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/>'],
   "Розваги": ["#EDE9FE", "#6D28D9", '<path d="M6 9h12a3 3 0 0 1 3 3v2a3 3 0 0 1-5.2 2L14 14h-4l-1.8 2A3 3 0 0 1 3 14v-2a3 3 0 0 1 3-3z"/><path d="M8 11v3M6.5 12.5h3"/>'],
   "Покупки": ["#FCE7F3", "#9D174D", '<path d="M6 7h12l1 13H5z"/><path d="M9 7a3 3 0 0 1 6 0"/>'],
-  "Інші": ["#F1F2F5", "#4A5060", '<circle cx="6" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18" cy="12" r="1.3"/>']
+  "Інші": ["#F1F2F5", "#6B7180", '<circle cx="6" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18" cy="12" r="1.3"/>']
 };
-function cic(name, big) { var c = CATS[name] || CATS["Інші"]; return '<span class="cic" style="background:' + c[0] + '">' + svgI(c[1], c[2], big ? 20 : 18) + "</span>"; }
+// малюнки іконок не завжди по центру квадрата 24×24 — один раз міряємо межі й зсуваємо до центру кола
+var SHIFT = {};
+(function () {
+  var ns = "http://www.w3.org/2000/svg", s = document.createElementNS(ns, "svg");
+  s.setAttribute("style", "position:absolute;width:24px;height:24px;visibility:hidden");
+  document.body.appendChild(s);
+  Object.keys(CATS).forEach(function (k) {
+    var g = document.createElementNS(ns, "g"); g.innerHTML = CATS[k][2]; s.appendChild(g);
+    var b = g.getBBox(); SHIFT[k] = [(12 - (b.x + b.width / 2)).toFixed(2), (12 - (b.y + b.height / 2)).toFixed(2)];
+  });
+  s.remove();
+})();
+// іконка категорії: світло-сірий круг, малюнок у кольорі категорії, по центру
+function cic(name, big) {
+  var k = CATS[name] ? name : "Інші", c = CATS[k], sh = SHIFT[k] || [0, 0];
+  return '<span class="cic">' + svgI(c[1], '<g transform="translate(' + sh[0] + " " + sh[1] + ')">' + c[2] + "</g>", big ? 20 : 18) + "</span>";
+}
 // стрілка зміни: діагональна вгору/вниз
 function arr(d) { return d > 0 ? "↗" : "↘"; }
 
 function lastFull(P) { for (var i = P.months.length - 1; i >= 0; i--) if (P.months[i].income > 0) return i; return P.months.length - 1; }
-var person = 0, month = lastFull(D.people[0]), trendMonth = null, filter = "all", metric = "exp", rentOut = true, amode = "month";
+var person = 0, month = lastFull(D.people[0]), trendMonth = null, filter = "all", metric = "exp", rentOut = false, amode = "month";
 var GOAL = { olya: { months: 6, deadline: [2027, 6], title: "Подушка безпеки" } };  // фіча 5 з роадмапу ДЗ
 var VIEWS = { report: 1, analytics: 1, journal: 1, add: 1 };
 var saved = null;  // після збереження готівки: сума й дата, щоб підсвітити новий запис
 (function () {
   var q = new URLSearchParams(location.search), pi = -1;
   D.people.forEach(function (p, i) { if (p.key === q.get("p")) pi = i; });
-  if (pi < 0) return;
+  if (pi < 0) { history.replaceState(null, "", location.pathname + location.hash); return; }
   person = pi;
   D.people[pi].months.forEach(function (m, i) { if (m.key === q.get("m")) month = i; });
   if (q.get("saved")) {
-    saved = { amount: +q.get("a") || 0, day: q.get("d") || "" };
+    saved = { amount: +q.get("a") || 0, day: q.get("d") || "", line: +q.get("l") || 0, title: q.get("t") || "" };
     setTimeout(function () {
-      var t = h("div", "toast", '<i aria-hidden="true">✓</i>Збережено: −' + zl(saved.amount)); t.setAttribute("role", "status");
-      document.body.appendChild(t); setTimeout(function () { t.remove(); }, 3200);
+      toast('<i aria-hidden="true">✓</i>Збережено: −' + zl(saved.amount), saved.line ? ["Скасувати", function () {
+        delCash(D.people[person], saved.line, saved.day, saved.title, "#report");
+      }] : null);
     }, 100);
   }
+  if (q.get("deleted")) setTimeout(function () { toast('<i aria-hidden="true">✓</i>Запис видалено'); }, 100);
   history.replaceState(null, "", location.pathname + location.hash);
 })();
 function view() {
@@ -603,11 +676,14 @@ function fixedCats(M) {
   return fx;
 }
 function nice(s) { return s === s.toUpperCase() ? s.toLowerCase().replace(/(^|[\s\/*.-])(\S)/g, function (_, a, b) { return a + b.toUpperCase(); }) : s; }
+var TRASH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>';
 function opRow(o, recent, fresh) {
   return '<div class="op' + (fresh ? " fresh" : "") + '">' + cic(o.income ? "Дохід" : o.cat, true) + '<div class="t"><div class="t1' + (recent ? " one" : "") + '">' + esc(nice(o.title)) + "</div>" +
     '<div class="t2"><span>' + esc(o.income ? "Дохід" : o.cat) + "</span>" + (o.fixed ? '<span class="fx">фіксована</span>' : "") + (o.cash ? '<span class="fx cash">готівка</span>' : "") +
     (fresh ? '<span class="fx now">щойно</span>' : "") + '</div></div><div class="r"><span class="am' + (o.income ? " inc" : "") + '">' + (o.income ? "+" : "−") + zl(o.amount) + "</span>" +
-    (recent ? '<span class="dt">' + CAL + o.date + "</span>" : "") + "</div></div>";
+    (recent ? '<span class="dt">' + CAL + o.date + "</span>" : "") + "</div>" +
+    // у журналі готівку з форми можна видалити (записи з банківської виписки — ні)
+    (!recent && o.line ? '<button type="button" class="del" data-line="' + o.line + '" data-day="' + o.day + '" data-title="' + esc(o.title) + '" aria-label="Видалити запис «' + esc(o.title) + '»">' + TRASH + "</button>" : "") + "</div>";
 }
 function catRows(M, limit) {
   var fx = fixedCats(M), shown = limit ? M.categories.slice(0, limit) : M.categories, out = "";
@@ -615,7 +691,7 @@ function catRows(M, limit) {
   shown.forEach(function (c) {
     var p = M.expenses ? c.amount / M.expenses * 100 : 0;
     out += '<div class="crow">' + cic(c.name) + '<span class="nm">' + esc(c.name) + (fx[c.name] ? '<span class="fx">фіксована</span>' : "") + '</span><span class="am">' + zl(c.amount) +
-      '</span><span class="bd blue">' + pct(c.amount) + '</span><div class="bar6"><b data-to="' + Math.max(p, 1) + '%"></b></div></div>';
+      '</span><span class="bd blue">' + pct(c.amount) + '</span><div class="bar6"><b style="background:' + (CATS[c.name] || CATS["Інші"])[1] + '" data-to="' + Math.max(p, 1) + '%"></b></div></div>';
   });
   var rest = M.categories.slice(shown.length);
   if (rest.length) {
@@ -625,9 +701,9 @@ function catRows(M, limit) {
   return out;
 }
 // частки категорій: 3 найбільші відтінками синього + «Інші»
-var SH = ["#1F63E6", "#7FA9F1", "#B7CEF7", "#DDE1E7"];
+var SH = ["", "", "", "#DDE1E7"];  // «Інші» — сірим
 function slices(M) {
-  var top = M.categories.slice(0, 3).map(function (c, i) { return { name: c.name, amount: c.amount, color: SH[i] }; });
+  var top = M.categories.slice(0, 3).map(function (c) { return { name: c.name, amount: c.amount, color: (CATS[c.name] || CATS["Інші"])[1] }; });
   var rest = M.categories.slice(3).reduce(function (s, c) { return s + c.amount; }, 0);
   if (rest > 0) top.push({ name: "Інші " + (M.categories.length - 3), amount: rest, color: SH[3] });
   return top;
@@ -767,7 +843,7 @@ function renderAnalytics(P) {
     if (o.cat === "Житло") { if (!useOut) { weeks[w] += o.amount; rentW[w] += o.amount; } } else weeks[w] += o.amount;
   });
   var rm = $("rent-mode"); rm.hidden = !rent.length; rm.innerHTML = "";
-  if (rent.length) [[true, "Без оренди"], [false, "Як є"]].forEach(function (x) {
+  if (rent.length) [[false, "З орендою"], [true, "Без оренди"]].forEach(function (x) {
     var b = h("button", "", x[1]); b.type = "button"; b.setAttribute("aria-pressed", x[0] === rentOut);
     b.onclick = function () { rentOut = x[0]; render(); };
     rm.appendChild(b);
@@ -863,6 +939,33 @@ function renderJournal(P) {
   });
   flush();
   $("j-list").innerHTML = html || '<section class="card empty">Тут поки порожньо</section>';
+  $("j-list").querySelectorAll(".del").forEach(function (b) {
+    b.onclick = function () {
+      // підтвердження прямо в рядку: «Видалити» / «Ні»
+      var ask = h("div", "ask", '<button type="button" class="no">Ні</button><button type="button" class="yes">Видалити</button>');
+      b.replaceWith(ask);
+      ask.querySelector(".no").focus();
+      ask.querySelector(".no").onclick = function () { render(); };
+      ask.querySelector(".yes").onclick = function () { delCash(P, +b.dataset.line, b.dataset.day, b.dataset.title, "#journal"); };
+    };
+  });
+}
+
+// видалення одного готівкового запису; після — перезавантаження зі свіжими даними і тостом
+function delCash(P, line, day, title, back) {
+  fetch("api/cash/delete", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "same-origin",
+    body: JSON.stringify({ person: P.key, line: line, date: day, title: title }) })
+    .then(function (r) { return r.json().catch(function () { return { ok: false, error: "Сервер не відповів" }; }); })
+    .then(function (res) {
+      if (!res.ok) throw new Error(res.error || "Не вдалося видалити");
+      location.href = location.pathname + "?p=" + P.key + "&m=" + res.month + "&deleted=1" + back;
+    })
+    .catch(function (err) { toast(err.message || "Немає звʼязку, спробуйте ще раз"); });
+}
+function toast(html, action) {
+  var t = h("div", "toast", html); t.setAttribute("role", "status");
+  if (action) { var b = h("button", "", action[0]); b.type = "button"; b.onclick = action[1]; t.appendChild(b); }
+  document.body.appendChild(t); setTimeout(function () { t.remove(); }, action ? 7000 : 3200);
 }
 
 // ---------- шторка «Витрата готівкою» ----------
@@ -913,7 +1016,8 @@ $("v-add").addEventListener("submit", function (e) {
     .then(function (r) { return r.json().catch(function () { return { ok: false, error: "Сервер не відповів" }; }); })
     .then(function (res) {
       if (!res.ok) throw new Error(res.error || "Не вдалося зберегти");
-      location.href = location.pathname + "?p=" + P.key + "&m=" + res.month + "&saved=1&a=" + amountValue() + "&d=" + $("a-date").value + "#report";
+      location.href = location.pathname + "?p=" + P.key + "&m=" + res.month + "&saved=1&a=" + amountValue() + "&d=" + res.date +
+        "&l=" + res.line + "&t=" + encodeURIComponent(res.title) + "#report";
     })
     .catch(function (err) { $("a-msg").textContent = err.message || "Немає звʼязку, спробуйте ще раз"; check(); });
 });

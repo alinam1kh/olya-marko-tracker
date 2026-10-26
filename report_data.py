@@ -34,6 +34,9 @@ def _ledger(path):
         m = months[(entry.date.year, entry.date.month)]
         fixed = "fixed" in (entry.tags or set())
         cash = any(p.account == "Assets:Готівка" for p in entry.postings)
+        # готівку з форми можна видалити: запамʼятовуємо рядок запису у файлі готівки
+        in_cash_file = Path(entry.meta.get("filename", "")).name in {f[1] for f in CASH_FILES.values()}
+        line = entry.meta.get("lineno") if in_cash_file else None
         touched = False
         for posting in entry.postings:
             number = posting.units.number
@@ -50,7 +53,7 @@ def _ledger(path):
             touched = True
             # Журнал: кожна операція доходу чи витрати, нові зверху.
             m["ops"].append({"date": entry.date.strftime("%d.%m"), "day": entry.date.isoformat(),
-                             "title": entry.narration or entry.payee or "", "fixed": fixed, "cash": cash, **op})
+                             "title": entry.narration or entry.payee or "", "fixed": fixed, "cash": cash, "line": line, **op})
         if touched and (m["last"] is None or entry.date > m["last"]):
             m["last"] = entry.date
     return errors, months, accounts
