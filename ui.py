@@ -46,14 +46,14 @@ button { font: inherit; color: inherit; }
 a { color: inherit; text-decoration: none; }
 
 /* верх */
-.top { display: grid; grid-template-columns: 40px 1fr 40px; align-items: center; height: 48px; }
+.top { display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; height: 52px; }
 .top h1 { margin: 0; text-align: center; font-size: 16px; font-weight: 500; }
-.circle { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--line); color: var(--ink); }
+.circle { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--line); color: var(--ink); }
 .circle svg { width: 16px; height: 16px; }
 
 /* перемикач людей — як Income / Expense */
 .seg { display: flex; padding: 4px; margin: 12px 0 18px; background: #DCD8CD; border-radius: 999px; }
-.seg button { flex: 1; border: 0; background: transparent; padding: 11px 0; border-radius: 999px; font-size: 15px; color: var(--ink2); cursor: pointer; transition: background .25s, color .25s; }
+.seg button { flex: 1; min-height: 44px; border: 0; background: transparent; padding: 11px 0; border-radius: 999px; font-size: 15px; color: var(--ink2); cursor: pointer; transition: background .25s, color .25s; }
 .seg button[aria-pressed="true"] { background: var(--card); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.06); }
 
 .label { font-size: 16px; color: var(--ink); font-weight: 400; }
@@ -70,7 +70,7 @@ a { color: inherit; text-decoration: none; }
 /* чипси місяців — як All / Savings */
 .chips { display: flex; gap: 2px; padding: 5px; margin: 18px 0; background: var(--card); border-radius: 999px; overflow-x: auto; scrollbar-width: none; }
 .chips::-webkit-scrollbar { display: none; }
-.chips button { flex: 1 0 auto; border: 0; background: transparent; padding: 9px 14px; border-radius: 999px; font-size: 14px; color: var(--ink); cursor: pointer; white-space: nowrap; transition: background .25s; }
+.chips button { flex: 1 0 auto; min-height: 44px; border: 0; background: transparent; padding: 9px 14px; border-radius: 999px; font-size: 14px; color: var(--ink); cursor: pointer; white-space: nowrap; transition: background .25s; }
 .chips button small { color: var(--muted); font-size: 12px; margin-left: 4px; }
 .chips button[aria-pressed="true"] { background: var(--yellow); }
 .chips button[aria-pressed="true"] small { color: var(--ink2); }
@@ -80,14 +80,23 @@ a { color: inherit; text-decoration: none; }
 .chart-head { display: flex; justify-content: space-between; align-items: flex-start; }
 .chart-head .t { font-size: 14px; color: var(--ink2); }
 .chart-head .v { font-size: 22px; font-weight: 500; margin-top: 2px; }
-.bars { display: grid; grid-template-columns: repeat(5, 1fr); grid-auto-rows: 150px; gap: 10px; align-items: end; margin-top: 34px; }
-.bar { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 150px; cursor: pointer; }
-.bar .col { position: relative; width: 26px; border-radius: 999px; height: 0; transition: height .9s cubic-bezier(.2,.8,.2,1);
-  background: repeating-linear-gradient(135deg, rgba(29,28,26,.55) 0 2px, transparent 2px 6px), #E9B12E; }
-.bar .col::before { content: ""; position: absolute; top: -9px; left: 50%; width: 10px; height: 10px; margin-left: -5px; border-radius: 50%; background: var(--yellow); border: 2px solid var(--dark); }
+.bars { display: grid; grid-template-columns: repeat(5, 1fr); grid-auto-rows: 160px; gap: 8px; align-items: end; margin-top: 40px; }
+.bar { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 160px; }
+/* стовпчик: обгортка росте, всередині світла підкладка-«тінь» і сам штрихований стовпчик */
+.stack { position: relative; width: 100%; max-width: 52px; height: 0; transition: height .9s cubic-bezier(.2,.8,.2,1); }
+.ghost { position: absolute; left: -5px; right: 5px; top: -9px; bottom: 0; border-radius: 16px 16px 6px 6px; background: #F2CC6B; }
+.col { position: absolute; inset: 0; border-radius: 14px 14px 6px 6px;
+  background: repeating-linear-gradient(45deg, rgba(29,28,26,.82) 0 3px, transparent 3px 9px), #DFA83C; }
+/* жовта крапка з темним обідком у верхньому лівому куті */
+.col::before { content: ""; position: absolute; top: -5px; left: 4px; width: 11px; height: 11px; border-radius: 50%;
+  background: var(--yellow); border: 2px solid #8C6516; }
 .bar.on .col { background: var(--dark); }
-.bar.on .col::before { display: none; }
-.bubble { position: absolute; bottom: calc(100% + 10px); left: 50%; transform: translateX(-50%); background: #fff; border-radius: 999px; padding: 4px 9px; font-size: 12px; white-space: nowrap; box-shadow: 0 2px 6px rgba(0,0,0,.08); }
+.bar.on .col::before { left: 50%; margin-left: -5.5px; top: -6px; border-color: var(--dark); }
+.bubble { position: absolute; bottom: calc(100% + 16px); left: 50%; transform: translateX(-50%); background: #fff; border-radius: 999px;
+  padding: 5px 10px; font-size: 12px; font-weight: 500; white-space: nowrap; box-shadow: 0 2px 6px rgba(0,0,0,.08); z-index: 3; }
+.bubble::after { content: ""; position: absolute; left: 50%; bottom: -5px; margin-left: -5px; border: 5px solid transparent; border-bottom: 0; border-top-color: #fff; }
+.chart-btn { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--dark); color: var(--yellow); }
+.chart-btn svg { width: 16px; height: 16px; }
 .wk { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 8px; text-align: center; font-size: 12px; color: var(--ink2); }
 
 /* секції */
@@ -112,8 +121,14 @@ a { color: inherit; text-decoration: none; }
 /* категорії — як Saving Goals */
 .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .cat { background: var(--card); border-radius: var(--r); padding: 14px; }
-.ico { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--dark); color: var(--yellow); box-shadow: 3px 2px 0 var(--yellow); margin-bottom: 14px; }
-.ico svg { width: 18px; height: 18px; }
+/* іконка: чорне коло в широкому напівпрозорому кільці, по якому жовтим заповнюється частка категорії */
+.ico { position: relative; width: 54px; height: 54px; margin-bottom: 12px; }
+.ico .ring { position: absolute; inset: 0; width: 54px; height: 54px; transform: rotate(-90deg); }
+.ico .ring circle { fill: none; stroke-width: 6; }
+.ico .ring .bg { stroke: rgba(29,28,26,.10); }
+.ico .ring .fg { stroke: var(--yellow); stroke-linecap: round; transition: stroke-dasharray 1.1s cubic-bezier(.2,.8,.2,1); }
+.ico .dot { position: absolute; inset: 7px; border-radius: 50%; display: grid; place-items: center; background: var(--dark); color: var(--yellow); }
+.ico .dot svg { width: 17px; height: 17px; }
 .cat .n { font-size: 17px; font-weight: 400; line-height: 1.2; }
 .cat .s { font-size: 12px; color: var(--ink2); margin: 4px 0 10px; }
 .cat .a { font-size: 14px; font-weight: 600; }
@@ -127,7 +142,7 @@ a { color: inherit; text-decoration: none; }
 .nav a { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; background: #fff; color: var(--ink); }
 .nav a.on { background: var(--yellow); }
 .nav svg { width: 19px; height: 19px; }
-@media (prefers-reduced-motion: reduce) { .bar .col, .track b { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .stack, .track b, .ring .fg { transition: none; } }
 </style>
 </head>
 <body>
@@ -148,7 +163,7 @@ a { color: inherit; text-decoration: none; }
   <div class="chips" id="months" role="group" aria-label="Місяць"></div>
 
   <section class="chart" aria-labelledby="ch">
-    <div class="chart-head"><div><div class="t" id="ch">Витрати за місяць</div><div class="v" id="spent"></div></div></div>
+    <div class="chart-head"><div><div class="t" id="ch">Витрати за місяць</div><div class="v" id="spent"></div></div><a class="chart-btn" id="chartq" href="fava/" aria-label="Запити у Fava"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></a></div>
     <div class="bars" id="bars"></div>
     <div class="wk"><span>1–7</span><span>8–14</span><span>15–21</span><span>22–28</span><span>29+</span></div>
   </section>
@@ -237,6 +252,7 @@ function render() {
   var link = FAVA[P.key];
   $("add").href = link + "journal/"; $("nava").href = link + "journal/";
   $("navq").href = link + "query/"; $("navj").href = link + "journal/";
+  $("chartq").href = link + "query/";
 
   var noIncome = !(M.income > 0);
   $("lbl").textContent = (noIncome ? "Витрачено у " : "Відкладено у ") + LOC[mi];
@@ -252,13 +268,14 @@ function render() {
   var bars = $("bars"); bars.innerHTML = "";
   M.weeks.forEach(function (w, i) {
     var b = h("div", "bar" + (i === top ? " on" : ""));
-    var col = h("div", "col"); col.dataset.to = Math.max(6, w / max * 100) + "%";
-    if (i === top) col.appendChild(h("div", "bubble", nf0.format(w) + " зл"));
-    b.appendChild(col);
+    var stack = h("div", "stack"); stack.dataset.to = Math.max(8, w / max * 100) + "%";
+    stack.appendChild(h("div", "ghost")); stack.appendChild(h("div", "col"));
+    if (i === top) stack.appendChild(h("div", "bubble", nf0.format(w) + " зл"));
+    b.appendChild(stack);
     b.title = zl(w);
     bars.appendChild(b);
   });
-  grow(".bar .col", "height");
+  grow(".bar .stack", "height");
 
   // фіксовані і змінні
   var total = M.fixed + M.variable;
@@ -282,13 +299,18 @@ function render() {
   M.categories.forEach(function (c) {
     var pct = M.expenses ? c.amount / M.expenses * 100 : 0;
     var e = h("div", "cat");
-    e.innerHTML = '<div class="ico">' + icon(c.name) + '</div><div class="n">' + esc(c.name) + '</div>' +
+    var C = 2 * Math.PI * 24;
+    e.innerHTML = '<div class="ico"><svg class="ring" viewBox="0 0 54 54" aria-hidden="true"><circle class="bg" cx="27" cy="27" r="24"/>' +
+      '<circle class="fg" cx="27" cy="27" r="24" style="stroke-dasharray: 0 ' + C + '" data-to="' + (Math.max(pct, 1.5) / 100 * C) + ' ' + C + '"/></svg>' +
+      '<span class="dot">' + icon(c.name) + '</span></div><div class="n">' + esc(c.name) + '</div>' +
       '<div class="s">' + nf0.format(pct) + ' % витрат місяця</div>' +
-      '<div class="a">' + nf2.format(c.amount) + '<i>/' + nf2.format(M.expenses) + '</i></div>' +
-      '<div class="track y"><b data-to="' + pct + '%"></b></div>';
+      '<div class="a">' + nf2.format(c.amount) + '<i>/' + nf2.format(M.expenses) + '</i></div>';
     grid.appendChild(e);
   });
   grow(".track b", "width");
+  requestAnimationFrame(function () { requestAnimationFrame(function () {
+    document.querySelectorAll(".ring .fg").forEach(function (c) { c.style.strokeDasharray = c.dataset.to; });
+  }); });
   $("note").textContent = P.ok ? "Облік звірено з банком (bean-check без помилок)" : "Увага: у журналі є помилки обліку";
 }
 render();
