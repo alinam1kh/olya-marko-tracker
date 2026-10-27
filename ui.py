@@ -1483,7 +1483,7 @@ function renderTrends(P) {
   capsules("mbars", "mticks", list.map(function (m, i) {
     var skip = metric !== "exp" && !(m.income > 0);
     return { v: skip ? 0 : val(m), label: m.name, part: m.incomplete, sub: skip ? "—" : nf0.format(val(m)) + " зл",
-      mark: sameDays !== null && i === trendMonth - 1 ? sameDays : 0 };
+      mark: 0 };
   }), ax.max, trendMonth, function (i) { trendMonth = i; render(); }, ax.n, avg);
   $("t-avg").innerHTML = avg ? '<i aria-hidden="true"></i><span>' + { exp: "Середні витрати за місяць", inc: "Середній дохід за місяць", saved: "У середньому лишається за місяць" }[metric] +
     "</span><b>" + nf0.format(Math.round(avg)) + " зл</b>" : "";
@@ -1503,7 +1503,7 @@ function renderTrends(P) {
   var right = "";
   if (!known) right = '<small class="vs-why">' + (metric === "inc" ? "зарплата ще не прийшла,<br>зазвичай " + (payDays(P) ? payDays(P) + " числа" : "наприкінці місяця") : "порахуємо,<br>коли прийде зарплата") + "</small>";
   else if (!prev) right = '<span class="bd">перший місяць</span><small>немає з чим порівняти</small>';
-  else if (S.incomplete && metric === "exp") right = cmpBadge(val(S), sameDays) + '<small><i class="dash" aria-hidden="true"></i>проти 1–' + upTo(S) + " " + GEN[mi(prev)] + "</small>";
+  else if (S.incomplete && metric === "exp") right = cmpBadge(val(S), sameDays) + '<small>проти 1–' + upTo(S) + " " + GEN[mi(prev)] + "</small>";
   else if (S.incomplete) right = '<small class="vs-why">місяць ще триває</small>';
   else right = cmpBadge(val(S), val(prev)) + "<small>проти " + GEN[mi(prev)] + "</small>";
   var sub = metric === "saved" && paid ? nf1.format(S.rate) + " % доходу" : "";
