@@ -257,41 +257,23 @@ a { color: inherit; text-decoration: none; }
 .hero-wrap { position: relative; isolation: isolate; margin-top: 12px; border-radius: 24px; overflow: hidden;
   background: linear-gradient(162deg, var(--g1) 0%, var(--g2) 48%, var(--g3) 100%); }
 .hero { position: relative; z-index: 1; padding: 22px 20px 20px; border-radius: 24px; color: #fff; }
-/* мʼякий темний край: світло з плям плавно тоне в найтемніший тон ближче до країв картки */
-.hero-wrap::after { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; border-radius: inherit;
-  background: radial-gradient(130% 115% at 45% 40%, transparent 50%, color-mix(in srgb, var(--g3) 50%, transparent) 80%, var(--g3) 100%); }
-/* «рідке» світло: три пари плям. Кожна пара пливе своїм шляхом (25–33 с), а дві плями в ній сходяться,
-   зливаються, розтягуються одна за одною й знову розходяться (11–15 с). Фільтр #melt мʼяко «склеює» плями,
-   коли вони близько, а сильне розмиття робить з цього переливи градієнта. Старт кожної пари — випадковий */
-.liquid { position: absolute; inset: -10%; z-index: 0; pointer-events: none; filter: blur(48px) saturate(1.4) brightness(1.1);
-  will-change: transform; animation: swirl 40s linear infinite; }
-@keyframes swirl { from { transform: rotate(0) scale(1.55); } to { transform: rotate(360deg) scale(1.55); } }
-.pair { position: absolute; width: 96%; height: 82%; will-change: transform; animation: var(--path) var(--pd) cubic-bezier(.37, 0, .63, 1) infinite; }
-.pair i { position: absolute; top: 10%; width: 66%; aspect-ratio: 2.1 / 1; border-radius: 50%; mix-blend-mode: screen; will-change: transform;
-  background: radial-gradient(closest-side, var(--c) 0%, var(--c) 22%, color-mix(in srgb, var(--c) 55%, transparent) 60%, transparent 100%); animation: apartL var(--sd) cubic-bezier(.37, 0, .63, 1) infinite; }
-.pair i:first-child { left: 0; transform-origin: 70% 50%; }
-.pair i:last-child { right: 0; transform-origin: 30% 50%; animation-name: apartR; }
-.pair:nth-child(1) { left: 34%; top: -34%; --path: pathA; --pd: 34s; --sd: 15s; }
-.pair:nth-child(1) i:first-child { --c: var(--h1); } .pair:nth-child(1) i:last-child { --c: var(--h3); }
-.pair:nth-child(2) { left: -52%; top: 14%; --path: pathB; --pd: 38s; --sd: 17s; }
-.pair:nth-child(2) i:first-child { --c: var(--h2); } .pair:nth-child(2) i:last-child { --c: var(--h4); mix-blend-mode: normal; }
-.pair:nth-child(3) { left: 30%; top: 40%; --path: pathC; --pd: 43s; --sd: 19s; }
-.pair:nth-child(3) i:first-child { --c: var(--h5); } .pair:nth-child(3) i:last-child { --c: var(--h6); }
-/* сходяться (злиття) → розтягуються одна за одною → розходяться → пауза окремо */
-@keyframes apartL {
-  0%, 100% { transform: translateX(-8%) rotate(-6deg) scale(1, 1); }
-  40% { transform: translateX(10%) rotate(4deg) scale(1.12, .9); }
-  70% { transform: translateX(2%) rotate(8deg) scale(1.05, .95); }
-}
-@keyframes apartR {
-  0%, 100% { transform: translateX(8%) rotate(6deg) scale(1, 1); }
-  40% { transform: translateX(-10%) rotate(-4deg) scale(1.12, .9); }
-  70% { transform: translateX(-2%) rotate(-8deg) scale(1.05, .95); }
-}
-
-@keyframes pathA { 0%, 100% { transform: translate(0, 0) rotate(0); } 25% { transform: translate(-8%, 6%) rotate(12deg); } 50% { transform: translate(-2%, 12%) rotate(24deg); } 75% { transform: translate(6%, 5%) rotate(10deg); } }
-@keyframes pathB { 0%, 100% { transform: translate(0, 0) rotate(0); } 30% { transform: translate(9%, 6%) rotate(-14deg); } 60% { transform: translate(5%, -6%) rotate(-26deg); } 80% { transform: translate(-2%, 3%) rotate(-10deg); } }
-@keyframes pathC { 0%, 100% { transform: translate(0, 0) rotate(0); } 33% { transform: translate(-8%, -9%) rotate(16deg); } 66% { transform: translate(6%, -5%) rotate(28deg); } }
+/* «рідке» світло як одна композиція: два великі кольорові кола (conic-gradient) повільно обертаються
+   назустріч одне одному, тож відтінки безперервно перетікають один в одний по всій картці й краях.
+   Темне «ядро» пливе під текстом — середина лишається глибокою, а світло живе ближче до країв */
+.liquid { position: absolute; inset: 0; z-index: 0; pointer-events: none; filter: blur(34px) saturate(1.35); }
+.liquid span { position: absolute; left: 50%; top: 50%; border-radius: 50%; will-change: transform; }
+.liquid .f1, .liquid .f2 { width: 190%; aspect-ratio: 1; margin: -95% 0 0 -95%; }
+.liquid .f1 { background: conic-gradient(from 0deg, var(--h1), var(--h4) 16%, var(--h6) 30%, var(--h4) 44%, var(--h3) 58%, var(--h2) 72%, var(--h4) 86%, var(--h1));
+  animation: spinA 18s linear infinite; }
+.liquid .f2 { width: 150%; margin: -75% 0 0 -75%; mix-blend-mode: screen; opacity: .6;
+  background: conic-gradient(from 90deg, var(--h4), var(--h5) 20%, var(--h4) 40%, var(--h6) 55%, var(--h4) 70%, var(--h2) 85%, var(--h4));
+  animation: spinB 23s linear infinite; }
+.liquid .core { width: 105%; aspect-ratio: 2 / 1; margin: -26% 0 0 -60%;
+  background: radial-gradient(closest-side, var(--g3) 0%, color-mix(in srgb, var(--g3) 70%, transparent) 45%, transparent 100%);
+  animation: coreDrift 19s cubic-bezier(.37, 0, .63, 1) infinite; }
+@keyframes spinA { from { transform: rotate(0) translate(5%, 3%); } to { transform: rotate(360deg) translate(5%, 3%); } }
+@keyframes spinB { from { transform: rotate(0) translate(-7%, 4%); } to { transform: rotate(-360deg) translate(-7%, 4%); } }
+@keyframes coreDrift { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(10%, 8%) scale(1.12, .92); } }
 /* легка тінь під білим текстом — підпис лишається читабельним, коли блік пропливає під ним */
 .hero .lbl, .hero .num, .hero .sub, .hero .lt, .hero .lg2 b { text-shadow: 0 1px 10px rgba(5, 10, 30, .28); }
 .hero .sub .inc { color: inherit; }
@@ -580,7 +562,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
   .splash, .sp-mark, .sp-mark::before, .sp-mark g, .sp-bar b, .sp-name, .stag > *, .hero .num.cu, .pop:not([hidden]), .toast { animation: none !important; transition: none !important; }
   .nav .ind, .sw path { transition: none; animation: none !important; }
 }
-@media (prefers-reduced-motion: reduce) { .cap .fill, .crow .bar6 b, .segs i b, .hero .meter b, .hero .split2 b { transition: none !important; } .fadein, .liquid, .liquid i, .pair { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .cap .fill, .crow .bar6 b, .segs i b, .hero .meter b, .hero .split2 b { transition: none !important; } .fadein, .liquid span { animation: none; } }
 </style>
 </head>
 <body class="p-marko">
@@ -613,7 +595,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
 
   <div id="v-report">
     <div id="h-alert"></div>
-    <div class="hero-wrap"><svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="melt" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="14"/><feColorMatrix values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 5 -0.9"/><feGaussianBlur stdDeviation="30"/></filter></svg><div class="liquid" id="liquid" aria-hidden="true"><span class="pair"><i></i><i></i></span><span class="pair"><i></i><i></i></span><span class="pair"><i></i><i></i></span></div><section class="hero" id="hero" aria-live="polite"></section></div>
+    <div class="hero-wrap"><div class="liquid" id="liquid" aria-hidden="true"><span class="f1"></span><span class="f2"></span><span class="core"></span></div><section class="hero" id="hero" aria-live="polite"></section></div>
     <a class="cashbtn" id="cash" href="#add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg>Додати готівку</a>
     <section class="card goal" id="goal" hidden></section>
     <section class="card list fadein" id="insights" hidden></section>
@@ -1354,13 +1336,8 @@ function countUp(el) {
   }
   requestAnimationFrame(step);
 }
-// випадковий старт: у кожної пари свій шлях, а дві плями пари рухаються синхронно (дзеркально)
-$("liquid").querySelectorAll(".pair").forEach(function (pr) {
-  var cs = getComputedStyle(pr), pd = parseFloat(cs.getPropertyValue("--pd")) || 20, sd = parseFloat(cs.getPropertyValue("--sd")) || 10;
-  pr.style.animationDelay = -(Math.random() * pd).toFixed(1) + "s";
-  var d = -(Math.random() * sd).toFixed(1) + "s";
-  pr.querySelectorAll("i").forEach(function (b) { b.style.animationDelay = d; });
-});
+// випадковий старт: композиція щоразу починається з іншого положення
+$("liquid").querySelectorAll("span").forEach(function (s) { s.style.animationDelay = -(Math.random() * 30).toFixed(1) + "s"; });
 var lastView = view(), prevView = null, reportKey = null;
 window.addEventListener("hashchange", function () {
   var v = view();
