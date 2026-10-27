@@ -179,7 +179,7 @@ a { color: inherit; text-decoration: none; }
 .pop .opt b { display: block; font-size: 15px; font-weight: 500; }
 .pop .opt small { display: block; font-size: 12px; color: var(--ink2); }
 .pop .opt .radio { flex: none; width: 20px; height: 20px; margin-left: auto; border: 1.5px solid var(--mute); border-radius: 50%; }
-.pop .opt[aria-checked="true"] { background: var(--blue-soft); }
+.pop .opt[aria-checked="true"] { background: var(--soft); }
 .pop .opt[aria-checked="true"] .radio { border: 6px solid var(--blue); }
 .pop .foot { margin: 6px 6px 4px; padding: 10px 6px 6px; border-top: 1px solid var(--soft); font-size: 12px; color: var(--ink2); line-height: 1.45; }
 .mmenu { right: 0; width: min(332px, calc(100vw - 28px)); padding: 16px; }
