@@ -1471,7 +1471,7 @@ function renderAnalytics(P) {
   $("fvsplit").innerHTML = '<i style="width:' + fp + '%;background:#A9C6F8"></i><i style="flex:1;background:linear-gradient(90deg,#3B82F6,#1D5FE0)"></i>';
   $("fv").innerHTML = '<div><span><i style="background:#A9C6F8"></i>Фіксовані, ' + nf1.format(fp) + " %</span><b>" + zl(M.fixed) + "</b>" + (cmp ? badge(M.fixed, pm.fixed, true, "", false) : "") + "</div>" +
     '<div><span><i style="background:#1F63E6"></i>Змінні, ' + nf1.format(100 - fp) + " %</span><b>" + zl(M.variable) + "</b>" + (cmp ? badge(M.variable, pm.variable, true, "", false) : "") + "</div>";
-  $("fvnote").textContent = "Фіксовані: " + FIXED[P.key] + ". Змінними можна керувати.";
+  $("fvnote").textContent = "Фіксовані: " + FIXED[P.key] + ". Змінні — решта витрат, саме їх можна зменшити.";
   $("fava").href = FAVA[P.key] + "query/";
 }
 function renderTrends(P) {
