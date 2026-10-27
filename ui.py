@@ -1189,8 +1189,8 @@ function renderCal(P) {
     grid.appendChild(b);
   }
   var lastM = P.months[P.months.length - 1];
-  $("cal-note").textContent = M.incomplete ? "Сірі дні — даних ще немає. Облік до " + M.last_op + "." :
-    "Дані є за " + P.months[0].name.toLowerCase() + " – " + lastM.name.toLowerCase() + " " + lastM.key.slice(0, 4) + ".";
+  $("cal-note").textContent = M.incomplete ? "Сірі дні — даних ще немає. Облік до " + M.last_op + "." : "";
+  $("cal-note").hidden = !M.incomplete;
 }
 function scrollToDay(key) {
   if (view() !== "journal") return;
