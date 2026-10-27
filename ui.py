@@ -166,8 +166,8 @@ a { color: inherit; text-decoration: none; }
 .av::before, .av::after { content: ""; position: absolute; border-radius: 50%; background: #3B82F6; }
 .av::before { left: 30%; top: 17%; width: 40%; height: 40%; }
 .av::after { left: 10%; top: 66%; width: 80%; height: 60%; }
-.av.olya { background: #E9E1FB; }
-.av.olya::before, .av.olya::after { background: #8B6CE0; }
+.av.olya { background: #F8E1EF; }
+.av.olya::before, .av.olya::after { background: #C2569E; }
 .mpick > button, .mstatic { display: flex; align-items: center; gap: 8px; height: 48px; padding: 0 14px 0 12px; border: 1px solid var(--border); border-radius: 24px; background: var(--card); font-size: 14px; white-space: nowrap; cursor: pointer; }
 .mstatic { cursor: default; }
 .who > button[aria-expanded="true"] .chev, .mpick > button[aria-expanded="true"] .chev { transform: rotate(180deg); }
