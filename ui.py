@@ -869,7 +869,8 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
   transition: opacity 1.2s cubic-bezier(.4, 0, .2, 1), visibility 0s linear 1.2s; }
 .splash.out { opacity: 0; visibility: hidden; }
 .app.pre > * { opacity: 0; animation-play-state: paused !important; }
-.splash.out .sp-mark { transform: scale(.96) translateY(-4px); }
+.app.pre *, .app.pre *::before { transition: none !important; }
+.splash.out .sp-mark, .splash.out .sp-mark g, .splash.out .sp-mark::before { animation-play-state: paused; }
 .sp-mark { position: relative; width: 84px; height: 84px; border-radius: 20px; display: grid; place-items: center; overflow: hidden; isolation: isolate;
   background: var(--blue-g); box-shadow: 0 10px 24px rgba(29,95,224,.34), inset 0 1px 0 rgba(255,255,255,.3);
   animation: breathe 2.4s ease-in-out infinite; transition: transform 1.2s cubic-bezier(.4, 0, .2, 1); }
@@ -881,9 +882,9 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .sp-back { transform-origin: 13px 9px; animation: spBack 2.4s var(--ease) infinite; }
 .sp-note { transform-origin: 10px 13px; animation: spNote 2.4s var(--ease) infinite; }
 .sp-coin { transform-origin: 18.6px 17.6px; animation: spCoin 2.4s var(--ease) infinite; }
-@keyframes spBack { 0% { opacity: 0; transform: translate(-3px, 3px) rotate(-6deg); } 18%, 70% { opacity: 1; transform: none; } 45% { transform: translate(.4px, -.6px) rotate(2deg); } 100% { opacity: 1; transform: none; } }
-@keyframes spNote { 0% { opacity: 0; transform: translateY(4px) scale(.9); } 22% { opacity: 1; transform: translateY(-.6px) scale(1.02); } 34%, 100% { opacity: 1; transform: none; } 60% { transform: translateY(-.5px) rotate(-1.5deg); } }
-@keyframes spCoin { 0%, 18% { opacity: 0; transform: translate(6px, 0) rotate(160deg); } 40% { opacity: 1; transform: translate(0, 0) rotate(0); } 50% { transform: translateY(-2.2px); } 60% { transform: none; } 68% { transform: translateY(-.8px); } 76%, 100% { opacity: 1; transform: none; } }
+@keyframes spBack { 0% { opacity: 0; transform: translate(-3px, 3px) rotate(-6deg); } 24%, 100% { opacity: 1; transform: none; } }
+@keyframes spNote { 0% { opacity: 0; transform: translateY(4px) scale(.9); } 30%, 100% { opacity: 1; transform: none; } }
+@keyframes spCoin { 0%, 18% { opacity: 0; transform: translate(6px, 0) rotate(160deg); } 46%, 100% { opacity: 1; transform: none; } }
 .sp-name { font-size: 16px; font-weight: 500; color: var(--ink); opacity: 0; animation: rise .5s .15s var(--ease) both; }
 /* повзунок: швидко доходить до ~85 %, а коли все готово — до кінця */
 .sp-bar { width: 148px; height: 6px; margin-top: 4px; border-radius: 3px; background: var(--track); overflow: hidden; }
