@@ -1197,8 +1197,8 @@ function scrollToDay(key) {
   var el = document.querySelector('[data-day="' + key + '"]');
   if (el) requestAnimationFrame(function () { window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 12); });
 }
-$("cal-prev").onclick = function () { var P = D.people[person], k = P.months.map(function (m) { return m.key; }).indexOf(calKey); if (k > 0) { calKey = P.months[k - 1].key; renderCal(P); } };
-$("cal-next").onclick = function () { var P = D.people[person], k = P.months.map(function (m) { return m.key; }).indexOf(calKey); if (k < P.months.length - 1) { calKey = P.months[k + 1].key; renderCal(P); } };
+$("cal-prev").onclick = function () { var P = D.people[person], k = P.months.map(function (m) { return m.key; }).indexOf(calKey); if (k > 0) { month = k - 1; calKey = P.months[month].key; selDay = null; trendMonth = null; render(); } };
+$("cal-next").onclick = function () { var P = D.people[person], k = P.months.map(function (m) { return m.key; }).indexOf(calKey); if (k < P.months.length - 1) { month = k + 1; calKey = P.months[month].key; selDay = null; trendMonth = null; render(); } };
 var MENUS = { w: ["who-menu", "who-btn"], m: ["mmenu", "mcal"] };
 function popMenu(k, open) {
   Object.keys(MENUS).forEach(function (x) { var on = x === k && open; $(MENUS[x][0]).hidden = !on; $(MENUS[x][1]).setAttribute("aria-expanded", on); });
@@ -1303,7 +1303,7 @@ function renderReport(P) {
     // увесь дохід — це смуга; витрати й залишок — її частини
     var ep = M.income > 0 ? Math.min(100, M.expenses / M.income * 100) : 100, sp = 100 - ep;
     hero.innerHTML = tag + '<div class="lbl">Лишилось у ' + LOC[k] + '</div><div class="num">' + approx + zl(M.saved) + "</div>" +
-      '<div class="sub">' + nf1.format(M.rate) + " % від доходу " + '<a href="#journal" data-filter="inc" class="inc">' + zl(M.income) + "</a>" + inc + (P.ok ? "" : ", потребує перевірки") + "</div>" +
+      '<div class="sub">Норма заощаджень ' + nf1.format(M.rate) + " % · дохід " + '<a href="#journal" data-filter="inc" class="inc">' + nf0.format(M.income) + " зл" + "</a>" + inc + (P.ok ? "" : ", потребує перевірки") + "</div>" +
       '<div class="split2" role="img" aria-label="Витрати ' + nf0.format(ep) + " %, лишилось " + nf0.format(sp) + ' % доходу">' +
         '<b class="e" data-to="calc(' + ep.toFixed(2) + '% - 2px)"></b><b class="s"></b></div>' +
       '<div class="lg2"><a href="#journal" data-filter="exp" class="le"><span class="lt"><i></i>Витрати' + (M.incomplete ? " за " + dn + " " + plural(dn, "день", "дні", "днів") : "") + ", " + nf0.format(ep) + " %</span>" +
@@ -1340,12 +1340,12 @@ function renderInsights(P, M) {
   if (M.incomplete) {
     add("Фіксовані платежі вже сплачено", '<span class="bd">' + zl(M.fixed) + "</span>");
     add("Змінні витрати за " + (+M.last_op.slice(0, 2)) + " " + plural(+M.last_op.slice(0, 2), "день", "дні", "днів"), '<span class="bd">' + zl(M.variable) + "</span>");
-    add("Лишилось від доходу (попередньо)", '<span class="bd new">' + nf1.format(M.rate) + " %</span>");
+    add("Норма заощаджень (попередньо)", '<span class="bd new">' + nf1.format(M.rate) + " %</span>");
   } else {
     var pi = prevWithIncome(P, month);
     if (pi) {
       var pp = M.rate - pi.rate;
-      add("Заощаджено " + nf1.format(M.rate) + " % доходу",
+      add("Норма заощаджень " + nf1.format(M.rate) + " %",
         Math.abs(pp) < 0.05 ? '<span class="bd">як у ' + LOC[mi(pi)] + "</span>" :
         '<span class="bd ' + (pp > 0 ? "good" : "bad") + '" aria-label="' + (pp > 0 ? "більше" : "менше") + ", ніж у " + LOC[mi(pi)] + ": " + nf1.format(pi.rate) + ' %">' + arr(pp) + " з " + nf1.format(pi.rate) + " %</span>");
     }
@@ -1510,7 +1510,7 @@ function renderTrends(P) {
   else if (S.incomplete && metric === "exp") right = cmpBadge(val(S), sameDays) + '<small>проти 1–' + upTo(S) + " " + GEN[mi(prev)] + "</small>";
   else if (S.incomplete) right = '<small class="vs-why">місяць ще триває</small>';
   else right = cmpBadge(val(S), val(prev)) + "<small>проти " + GEN[mi(prev)] + "</small>";
-  var sub = metric === "saved" && paid ? nf1.format(S.rate) + " % доходу" : "";
+  var sub = metric === "saved" && paid ? "норма заощаджень " + nf1.format(S.rate) + " %" : "";
   var tag = S.incomplete ? '<em class="vs-tag">1–' + upTo(S) + " " + GEN[mi(S)] + "</em>" : "";
   $("t-duo").innerHTML = '<div class="card vs vs2"><div class="vs-l"><div class="vs-head"><span>' + NAME + " у " + LOC[mi(S)] + "</span>" + tag + "</div>" +
     '<div class="vs-big"><b>' + (known ? z0(val(S)) : "—") + "</b></div>" + (sub ? '<small class="vs-sub">' + sub + "</small>" : "") + "</div>" +
