@@ -1489,7 +1489,7 @@ function renderAnalytics(P) {
   $("t-leg").innerHTML = sl.map(function (x) { return '<div class="leg"><i style="background:' + x.color + '"></i><span>' + esc(x.name) + '</span><span class="v" style="color:var(--ink2)">' + zl(x.amount) + '</span><span class="bd blue">' + nf1.format(x.amount / tot * 100) + " %</span></div>"; }).join("");
 }
 function renderTrends(P) {
-  var METRICS = [["exp", "Витрати"], ["inc", "Дохід"], ["saved", "Лишилось"]];
+  var METRICS = [["exp", "Витрати"], ["saved", "Лишилось"], ["inc", "Дохід"]];  // головні два поруч, стабільний дохід — в кінці
   var mb = $("t-metric"); mb.innerHTML = "";
   METRICS.forEach(function (x) {
     var b = h("button", "", x[1]); b.type = "button"; b.setAttribute("aria-pressed", x[0] === metric);
