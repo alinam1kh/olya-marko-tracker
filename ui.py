@@ -994,7 +994,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
     <div class="seg" id="a-mode" role="group" aria-label="Розділ аналітики"></div>
     <div id="an-month">
       <section class="card">
-        <div class="ch" style="min-height:0"><h2>Витрати по тижнях</h2><div class="seg sm" id="rent-mode" role="group" aria-label="Оренда в графіку" style="grid-auto-columns:auto" hidden></div></div>
+        <div class="ch" style="min-height:0"><h2 id="w-title">Витрати по тижнях</h2><div class="seg sm" id="rent-mode" role="group" aria-label="Оренда в графіку" style="grid-auto-columns:auto" hidden></div></div>
         <div class="note" id="wnote" style="margin-top:6px"></div>
         <div class="chart"><div class="ticks" id="wticks" aria-hidden="true"></div><div class="caps" id="bars"></div></div>
       </section>
@@ -1439,7 +1439,7 @@ function capsules(boxId, tickId, items, max, sel, onPick, n, avg) {
 }
 function renderAnalytics(P) {
   var mb = $("a-mode"); mb.innerHTML = "";
-  [["month", "Місяць"], ["trends", "Динаміка"]].forEach(function (x) {
+  [["month", "Обраний місяць"], ["trends", "Усі місяці"]].forEach(function (x) {
     var b = h("button", "", x[1]); b.type = "button"; b.setAttribute("aria-pressed", x[0] === amode);
     b.onclick = function () { amode = x[0]; render(); };
     mb.appendChild(b);
@@ -1463,6 +1463,7 @@ function renderAnalytics(P) {
   });
   $("wnote").textContent = rent.length ? (useOut ? "Оренду " + nf0.format(rentSum) + " зл, сплачену " + rent[0].date.slice(0, 2).replace(/^0/, "") + "." + rent[0].date.slice(3) + ", винесено з графіка. Разом з орендою — " + zl(M.expenses) + "."
     : "Оренда — світла частина першого тижня. Без оренди — " + zl(M.expenses - rentSum) + ".") : "Усього за місяць — " + zl(M.expenses) + (M.incomplete ? ", дані до " + M.last_op : "") + ".";
+  $("w-title").textContent = "Витрати по тижнях у " + LOC[mi(M)];
   var labels = ["1–7", "8–14", "15–21", "22–28", "29+"];
   capsules("bars", "wticks", weeks.map(function (w, i) { return { v: w, rent: rentW[i], label: labels[i], sub: nf0.format(w) + " зл" }; }), niceMax(Math.max.apply(null, weeks.concat([1]))), -1, null);
 
