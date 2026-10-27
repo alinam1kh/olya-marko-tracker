@@ -248,17 +248,17 @@ a { color: inherit; text-decoration: none; }
 /* «рідке» світло: три пари плям. Кожна пара пливе своїм шляхом (19–27 с), а дві плями в ній сходяться,
    зливаються, розтягуються одна за одною й знову розходяться (8–12 с). Фільтр #melt мʼяко «склеює» плями,
    коли вони близько, а сильне розмиття робить з цього переливи градієнта. Старт кожної пари — випадковий */
-.liquid { position: absolute; inset: -6%; z-index: 0; pointer-events: none; opacity: .92; filter: url(#melt) blur(10px); }
-.pair { position: absolute; width: 78%; height: 66%; will-change: transform; animation: var(--path) var(--pd) linear infinite; }
-.pair i { position: absolute; top: 10%; width: 58%; aspect-ratio: 1; border-radius: 50%; mix-blend-mode: screen; will-change: transform;
+.liquid { position: absolute; inset: -6%; z-index: 0; pointer-events: none; opacity: .92; filter: url(#melt) blur(18px); }
+.pair { position: absolute; width: 96%; height: 82%; will-change: transform; animation: var(--path) var(--pd) linear infinite; }
+.pair i { position: absolute; top: 8%; width: 64%; aspect-ratio: 1; border-radius: 50%; mix-blend-mode: screen; will-change: transform;
   background: radial-gradient(circle, var(--c), transparent 70%); animation: apartL var(--sd) cubic-bezier(.45, 0, .55, 1) infinite; }
 .pair i:first-child { left: 0; transform-origin: 70% 50%; }
 .pair i:last-child { right: 0; transform-origin: 30% 50%; animation-name: apartR; }
-.pair:nth-child(1) { left: 26%; top: -22%; --path: pathA; --pd: 21s; --sd: 9s; }
+.pair:nth-child(1) { left: 18%; top: -30%; --path: pathA; --pd: 21s; --sd: 9s; }
 .pair:nth-child(1) i:first-child { --c: var(--h1); } .pair:nth-child(1) i:last-child { --c: var(--h3); }
-.pair:nth-child(2) { left: -18%; top: 34%; --path: pathB; --pd: 25s; --sd: 11s; }
+.pair:nth-child(2) { left: -30%; top: 26%; --path: pathB; --pd: 25s; --sd: 11s; }
 .pair:nth-child(2) i:first-child { --c: var(--h2); } .pair:nth-child(2) i:last-child { --c: var(--h5); }
-.pair:nth-child(3) { left: 34%; top: 44%; --path: pathC; --pd: 27s; --sd: 12.5s; }
+.pair:nth-child(3) { left: 26%; top: 38%; --path: pathC; --pd: 27s; --sd: 12.5s; }
 .pair:nth-child(3) i:first-child { --c: var(--h4); } .pair:nth-child(3) i:last-child { --c: var(--h6); }
 /* сходяться (злиття) → розтягуються одна за одною → розходяться → пауза окремо */
 @keyframes apartL {
@@ -578,7 +578,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
 
   <div id="v-report">
     <div id="h-alert"></div>
-    <div class="hero-wrap"><svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="melt" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="14"/><feColorMatrix values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 5 -0.9"/><feGaussianBlur stdDeviation="18"/></filter></svg><div class="liquid" id="liquid" aria-hidden="true"><span class="pair"><i></i><i></i></span><span class="pair"><i></i><i></i></span><span class="pair"><i></i><i></i></span></div><section class="hero" id="hero" aria-live="polite"></section></div>
+    <div class="hero-wrap"><svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="melt" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="14"/><feColorMatrix values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 5 -0.9"/><feGaussianBlur stdDeviation="24"/></filter></svg><div class="liquid" id="liquid" aria-hidden="true"><span class="pair"><i></i><i></i></span><span class="pair"><i></i><i></i></span><span class="pair"><i></i><i></i></span></div><section class="hero" id="hero" aria-live="polite"></section></div>
     <a class="cashbtn" id="cash" href="#add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg>Додати готівку</a>
     <section class="card goal" id="goal" hidden></section>
     <section class="card list fadein" id="insights" hidden></section>
@@ -649,7 +649,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
   <i class="ind" id="nav-ind" aria-hidden="true"></i>
   <a id="navr" href="#report"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.3 2.8a1.1 1.1 0 0 1 1.4 0l8 6.6a1 1 0 0 1-.65 1.8H19V20a1 1 0 0 1-1 1h-4v-5h-4v5H6a1 1 0 0 1-1-1v-8.8H3.95a1 1 0 0 1-.65-1.8z"/></svg>Головна</a>
   <a id="navt" href="#analytics"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="3.5" y="12" width="4.2" height="8.5" rx="1.4"/><rect x="9.9" y="4" width="4.2" height="16.5" rx="1.4"/><rect x="16.3" y="8.5" width="4.2" height="12" rx="1.4"/></svg>Аналітика</a>
-  <a id="navj" href="#journal"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M6 2.5h12a1 1 0 0 1 1 1v17.2a.6.6 0 0 1-.95.5L15.5 19.4l-2.9 1.9a1 1 0 0 1-1.1 0l-2.9-1.9-2.55 1.8A.6.6 0 0 1 5 20.7V3.5a1 1 0 0 1 1-1zM9 7.2a.85.85 0 0 0 0 1.7h6a.85.85 0 0 0 0-1.7zm0 4a.85.85 0 0 0 0 1.7h6a.85.85 0 0 0 0-1.7zm0 4a.85.85 0 0 0 0 1.7h3a.85.85 0 0 0 0-1.7z"/></svg>Журнал</a>
+  <a id="navj" href="#journal"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M6.6 2.5H18a1.5 1.5 0 0 1 1.5 1.5v13.8a.9.9 0 0 1-.9.9H6.9a1.25 1.25 0 0 0 0 2.5h11.8a.8.8 0 0 1 0 1.6H6.9A2.85 2.85 0 0 1 4.05 19.95V5.05A2.55 2.55 0 0 1 6.6 2.5zM10 2.5v6.6l2.1-1.5 2.1 1.5V2.5z"/></svg>Журнал</a>
 </nav>
 
 <script type="application/json" id="data">__DATA__</script>
