@@ -641,9 +641,13 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .more[aria-expanded="true"] svg { transform: rotate(180deg); }
 .more[aria-expanded="true"] .more-sum { opacity: 0; }
 .more-sum { transition: opacity .3s var(--ease); }
-.more-rows { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .5s var(--ease); }
+/* розгортання як у решті застосунку: висота мʼяко відкривається, рядки по черзі піднімаються (як .stag, крок 45 мс);
+   при згортанні рядки спершу тануть, потім висота закривається */
+.more-rows { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .55s cubic-bezier(.4, 0, .2, 1) .12s; }
 .more-rows > div { overflow: hidden; min-height: 0; }
-.more-rows.open { grid-template-rows: 1fr; }
+.more-rows .crow { opacity: 0; transform: translateY(6px); transition: opacity .25s var(--ease), transform .25s var(--ease); }
+.more-rows.open { grid-template-rows: 1fr; transition-delay: 0s; transition-duration: .7s; }
+.more-rows.open .crow { opacity: 1; transform: none; transition-duration: .8s; transition-delay: calc(var(--i, 0) * 45ms + 120ms); }
 /* операції */
 .op { display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 12px 0; border-top: 1px solid var(--soft); }
 .op .cic { width: 40px; height: 40px; border-radius: 20px; }
@@ -862,7 +866,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
 .toast { animation: toastin .7s var(--spring) both; }
 @keyframes toastin { from { opacity: 0; transform: translate(-50%, 16px) scale(.96); } to { opacity: 1; transform: translateX(-50%); } }
 @media (prefers-reduced-motion: reduce) {
-  .splash, .sp-mark, .sp-mark::before, .sp-mark g, .sp-bar b, .sp-name, .stag > *, .hero .num.cu, .pop:not([hidden]), .toast { animation: none !important; transition: none !important; }
+  .splash, .sp-mark, .sp-mark::before, .sp-mark g, .sp-bar b, .sp-name, .stag > *, .more-rows, .more-rows .crow, .hero .num.cu, .pop:not([hidden]), .toast { animation: none !important; transition: none !important; }
   .nav .ind, .sw path { transition: none; animation: none !important; }
 }
 @media (prefers-reduced-motion: reduce) { .cap .fill, .crow .bar6 b, .segs i b, .hero .meter b, .hero .split2 b { transition: none !important; } .fadein, .liquid, .liquid span { animation: none !important; }
@@ -1191,7 +1195,7 @@ function catRows(M, limit) {
   if (rest.length) {
     // «Ще N категорій» розгортає решту просто тут, у картці (а не веде на іншу сторінку)
     var sum = rest.reduce(function (s, c) { return s + c.amount; }, 0);
-    out += '<div class="more-rows" id="more-rows"><div>' + rest.map(function (c) { return row(c, true); }).join("") + "</div></div>" +
+    out += '<div class="more-rows" id="more-rows"><div>' + rest.map(function (c, i) { return row(c, true).replace('<div class="crow">', '<div class="crow" style="--i:' + i + '">'); }).join("") + "</div></div>" +
       '<button type="button" class="more" id="more-btn" aria-expanded="false" aria-controls="more-rows"><span class="more-l">Ще ' + rest.length + " " +
       plural(rest.length, "категорія", "категорії", "категорій") + '</span><span class="more-r"><span class="more-sum">' + zl(sum) + "</span>" +
       '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></span></button>';
