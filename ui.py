@@ -211,14 +211,15 @@ a { color: inherit; text-decoration: none; }
 .sw { overflow: hidden; }
 /* «світч»: стрілки виїжджають кожна у свій бік і заходять з протилежного — ніби міняються місцями.
    Грає, коли меню відкривається і коли закривається (після вибору людини) */
-.who > button[aria-expanded="true"] .sw-a { animation: swOutR .6s cubic-bezier(.65, 0, .35, 1); }
-.who > button[aria-expanded="true"] .sw-b { animation: swOutL .6s cubic-bezier(.65, 0, .35, 1); }
-.who > button[aria-expanded="false"] .sw-a { animation: swOutR2 .6s cubic-bezier(.65, 0, .35, 1); }
-.who > button[aria-expanded="false"] .sw-b { animation: swOutL2 .6s cubic-bezier(.65, 0, .35, 1); }
-@keyframes swOutR { 0% { transform: none; } 48% { transform: translateX(22px); } 49% { transform: translateX(-22px); } 100% { transform: none; } }
-@keyframes swOutL { 0% { transform: none; } 48% { transform: translateX(-22px); } 49% { transform: translateX(22px); } 100% { transform: none; } }
-@keyframes swOutR2 { 0% { transform: none; } 48% { transform: translateX(22px); } 49% { transform: translateX(-22px); } 100% { transform: none; } }
-@keyframes swOutL2 { 0% { transform: none; } 48% { transform: translateX(-22px); } 49% { transform: translateX(22px); } 100% { transform: none; } }
+.who > button[aria-expanded="true"] .sw-a { animation: swOutR .8s linear; }
+.who > button[aria-expanded="true"] .sw-b { animation: swOutL .8s linear; }
+.who > button[aria-expanded="false"] .sw-a { animation: swOutR2 .8s linear; }
+.who > button[aria-expanded="false"] .sw-b { animation: swOutL2 .8s linear; }
+/* виїзд з розгоном і згасанням, заїзд з протилежного боку з проявом і мʼяким гальмуванням */
+@keyframes swOutR { 0% { transform: none; opacity: 1; animation-timing-function: cubic-bezier(.55, 0, .75, .4); } 44% { transform: translateX(15px); opacity: 0; } 45% { transform: translateX(-15px); opacity: 0; animation-timing-function: cubic-bezier(.2, .7, .3, 1); } 100% { transform: none; opacity: 1; } }
+@keyframes swOutL { 0% { transform: none; opacity: 1; animation-timing-function: cubic-bezier(.55, 0, .75, .4); } 44% { transform: translateX(-15px); opacity: 0; } 45% { transform: translateX(15px); opacity: 0; animation-timing-function: cubic-bezier(.2, .7, .3, 1); } 100% { transform: none; opacity: 1; } }
+@keyframes swOutR2 { 0% { transform: none; opacity: 1; animation-timing-function: cubic-bezier(.55, 0, .75, .4); } 44% { transform: translateX(15px); opacity: 0; } 45% { transform: translateX(-15px); opacity: 0; animation-timing-function: cubic-bezier(.2, .7, .3, 1); } 100% { transform: none; opacity: 1; } }
+@keyframes swOutL2 { 0% { transform: none; opacity: 1; animation-timing-function: cubic-bezier(.55, 0, .75, .4); } 44% { transform: translateX(-15px); opacity: 0; } 45% { transform: translateX(15px); opacity: 0; animation-timing-function: cubic-bezier(.2, .7, .3, 1); } 100% { transform: none; opacity: 1; } }
 .pop { position: absolute; top: 56px; padding: 6px; border: 1px solid var(--border); border-radius: 24px; background: var(--card); box-shadow: 0 20px 40px rgba(17,19,24,.16); }
 .who .pop { left: 0; width: 272px; }
 .pop > p { margin: 10px 12px 6px; font-size: 12px; color: var(--ink2); }
