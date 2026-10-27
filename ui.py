@@ -669,6 +669,13 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .op .del:hover { background: var(--bad-bg); color: var(--bad); }
 .op .del svg { width: 18px; height: 18px; }
 .op .ask { flex: none; display: flex; gap: 6px; }
+.swipe { position: relative; overflow: hidden; }
+.swipe .op { position: relative; z-index: 1; background: var(--card); touch-action: pan-y; transition: transform .45s cubic-bezier(.32, .72, 0, 1); }
+.swdel { position: absolute; left: 0; top: 1px; bottom: 0; width: 88px; z-index: 0; border: 0; border-radius: 16px; background: var(--bad); color: #fff;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font: 500 12px var(--font); cursor: pointer; opacity: 0; transition: opacity .3s var(--ease); }
+.swdel svg { width: 18px; height: 18px; }
+.swipe.on .swdel { opacity: 1; }
+.swipe.gone { opacity: .4; pointer-events: none; transition: opacity .3s var(--ease); }
 .op .ask button { min-height: 44px; padding: 0 12px; border: 0; border-radius: 22px; background: var(--soft); font-size: 13px; font-weight: 500; cursor: pointer; }
 .op .ask button.yes { background: var(--bad); color: #fff; }
 .toast button { min-height: 36px; margin-left: 4px; padding: 0 12px; border: 0; border-radius: 18px; background: rgba(255,255,255,.16); color: #fff; font-size: 13px; font-weight: 500; cursor: pointer; }
@@ -812,7 +819,8 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .save:disabled { background: #D9DDE3; box-shadow: none; cursor: default; }
 .toast { position: fixed; left: 50%; bottom: calc(104px + env(safe-area-inset-bottom, 0px)); z-index: 30; transform: translateX(-50%); display: flex; align-items: center; gap: 10px;
   padding: 12px 18px; border-radius: 16px; background: var(--ink); color: #fff; font-size: 14px; white-space: nowrap; }
-.toast i { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; background: var(--good); font-style: normal; font-size: 12px; }
+.toast i { flex: none; width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; background: var(--good); font-style: normal; }
+.toast i svg { display: block; }
 
 /* нижня навігація v2: біла плаваюча панель, активний пункт — синя капсула; fade під нею */
 .fade { z-index: 19; position: fixed; left: 0; right: 0; bottom: 0; height: 130px; pointer-events: none; background: linear-gradient(rgba(245,246,248,0), var(--bg) 70%); }
@@ -1074,12 +1082,12 @@ var saved = null;  // після збереження готівки: сума �
   if (q.get("saved")) {
     saved = { amount: +q.get("a") || 0, day: q.get("d") || "", line: +q.get("l") || 0, title: q.get("t") || "" };
     setTimeout(function () {
-      toast('<i aria-hidden="true">✓</i>Збережено: −' + zl(saved.amount), saved.line ? ["Скасувати", function () {
+      toast(OKI + 'Збережено: −' + zl(saved.amount), saved.line ? ["Скасувати", function () {
         delCash(D.people[person], saved.line, saved.day, saved.title, "#report");
       }] : null);
     }, 100);
   }
-  if (q.get("deleted")) setTimeout(function () { toast('<i aria-hidden="true">✓</i>Запис видалено'); }, 100);
+  if (q.get("deleted")) setTimeout(function () { toast(OKI + 'Запис видалено'); }, 100);
   history.replaceState(null, "", location.pathname + location.hash);
 })();
 function view() {
@@ -1265,8 +1273,11 @@ function renderReport(P) {
   $("recent").innerHTML = ops.length ? ops.map(function (o) {
     var fresh = saved && !freshDone && o.cash && Math.abs(o.amount - saved.amount) < 0.005 && (!saved.day || o.day === saved.day);
     if (fresh) freshDone = true;
-    return opRow(o, true, fresh);
+    var row = opRow(o, true, fresh);
+    return o.cash && o.line ? '<div class="swipe" data-line="' + o.line + '" data-day="' + o.day + '" data-title="' + esc(o.title) + '">' +
+      '<button type="button" class="swdel" tabindex="-1" aria-label="Видалити запис «' + esc(o.title) + '»">' + TRASH + "<span>Видалити</span></button>" + row + "</div>" : row;
   }).join("") : '<div class="empty">Операцій немає</div>';
+  $("recent").querySelectorAll(".swipe").forEach(function (sw) { swipeRow(sw, P); });
   grow("#hero .meter b, #hero .split2 .e, #v-report .bar6 b", "width");
 }
 // «Головне за вересень»: факт і бейдж праворуч; у неповному місяці — що вже відомо
@@ -1480,6 +1491,32 @@ function renderJournal(P) {
   });
 }
 
+// свайп рядка вправо відкриває червону кнопку «Видалити» зліва; відпустили не дотягнувши — рядок повертається
+var SW_OPEN = 96;
+function swipeRow(sw, P) {
+  var op = sw.querySelector(".op"), x0 = null, y0 = 0, dx = 0, base = 0, horiz = null;
+  var set = function (x, anim) { op.style.transition = anim ? "" : "none"; op.style.transform = x ? "translateX(" + x + "px)" : ""; sw.classList.toggle("on", x > 0); };
+  op.addEventListener("pointerdown", function (e) { x0 = e.clientX; y0 = e.clientY; base = sw.classList.contains("open") ? SW_OPEN : 0; dx = 0; horiz = null; });
+  op.addEventListener("pointermove", function (e) {
+    if (x0 === null) return;
+    var mx = e.clientX - x0, my = e.clientY - y0;
+    if (horiz === null && (Math.abs(mx) > 8 || Math.abs(my) > 8)) horiz = Math.abs(mx) > Math.abs(my);
+    if (!horiz) return;
+    dx = mx; var x = Math.max(0, base + dx); set(x > SW_OPEN ? SW_OPEN + (x - SW_OPEN) * .25 : x, false);
+  });
+  var end = function () {
+    if (x0 === null) return; x0 = null;
+    if (!horiz) { if (sw.classList.contains("open") ) { sw.classList.remove("open"); set(0, true); } return; }
+    var open = base + dx > SW_OPEN * .55;
+    document.querySelectorAll("#recent .swipe.open").forEach(function (o) { if (o !== sw) { o.classList.remove("open"); o.querySelector(".op").style.transform = ""; o.classList.remove("on"); } });
+    sw.classList.toggle("open", open); set(open ? SW_OPEN : 0, true);
+  };
+  op.addEventListener("pointerup", end); op.addEventListener("pointercancel", end);
+  sw.querySelector(".swdel").onclick = function () {
+    sw.classList.add("gone");
+    delCash(P, +sw.dataset.line, sw.dataset.day, sw.dataset.title, "#report");
+  };
+}
 // видалення одного готівкового запису; після — перезавантаження зі свіжими даними і тостом
 function delCash(P, line, day, title, back) {
   fetch("api/cash/delete", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "same-origin",
@@ -1494,10 +1531,11 @@ function delCash(P, line, day, title, back) {
       month = ms.indexOf(mk) >= 0 ? ms.indexOf(mk) : lastFull(D.people[person]);
       saved = null; reportKey = null;
       if (back && location.hash !== back) location.hash = back; else render();
-      toast('<i aria-hidden="true">✓</i>Запис видалено');
+      toast(OKI + 'Запис видалено');
     })
     .catch(function (err) { toast(err.message || "Немає звʼязку, спробуйте ще раз"); });
 }
+var OKI = '<i aria-hidden="true"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5.5 12.5 4 4 9-9"/></svg></i>';
 function toast(html, action) {
   var t = h("div", "toast", html); t.setAttribute("role", "status");
   if (action) { var b = h("button", "", action[0]); b.type = "button"; b.onclick = action[1]; t.appendChild(b); }
@@ -1588,7 +1626,7 @@ $("v-add").addEventListener("submit", function (e) {
       saved = { amount: amountValue(), day: res.date, line: res.line, title: res.title };
       reportKey = null; btn.disabled = false;
       location.replace("#report");
-      toast('<i aria-hidden="true">✓</i>Збережено: −' + zl(saved.amount), ["Скасувати", function () {
+      toast(OKI + 'Збережено: −' + zl(saved.amount), ["Скасувати", function () {
         delCash(D.people[person], saved.line, saved.day, saved.title, "#report");
       }]);
     })
