@@ -294,14 +294,14 @@ a { color: inherit; text-decoration: none; }
 .hero .lbl, .hero .num, .hero .sub, .hero .lt, .hero .lg2 b { text-shadow: 0 1px 10px rgba(5, 10, 30, .28); }
 .hero .sub .inc { color: inherit; }
 .hero .sub .bd { display: inline-flex; margin-left: 6px; vertical-align: 1px; }
-/* смуга доходу: біла — залишок, напівпрозора — витрати; витрати ростуть зліва й стискають білу */
+/* смуга доходу: біла — залишок, штрихова — витрати; витрати ростуть зліва й стискають білу */
 .hero .split2 { display: flex; gap: 4px; height: 8px; margin-top: 26px; }
 .hero .split2 b { display: block; height: 100%; width: 0; border-radius: 4px; transition: width 2.1s var(--ease); }
-.hero .split2 .e { background: rgba(255, 255, 255, .34); }
+.hero .split2 .e { background: repeating-linear-gradient(135deg, rgba(255, 255, 255, .78) 0 2px, rgba(255, 255, 255, .22) 2px 5px); }
 .hero .split2 .s { flex: 1; min-width: 0; background: #fff; }
 .hero .lg2 { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-top: 12px; }
 .hero .lt { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
-.hero .lt i { flex: none; width: 7px; height: 7px; border-radius: 50%; background: rgba(255, 255, 255, .45); }
+.hero .lt i { flex: none; width: 7px; height: 7px; border-radius: 50%; background: repeating-linear-gradient(135deg, rgba(255, 255, 255, .85) 0 1.5px, rgba(255, 255, 255, .3) 1.5px 3px); }
 .hero .ls .lt i { background: #fff; }
 .hero .lv { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
 .hero .lg2 b { font-size: 18px; font-weight: 500; }
