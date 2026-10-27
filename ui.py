@@ -597,8 +597,8 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
     <div class="mpick" id="mpick">
       <button type="button" id="mcal" aria-haspopup="dialog" aria-expanded="false" aria-controls="mmenu"><svg class="ico16" viewBox="0 0 24 24" fill="none" stroke="#6B7180" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span id="mcal-name"></span><svg class="ico16 chev" viewBox="0 0 24 24" fill="none" stroke="#6B7180" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
       <div class="pop mmenu" id="mmenu" role="dialog" aria-label="Вибір дня" hidden>
-        <div class="cal-head"><button type="button" id="cal-prev" aria-label="Попередній місяць"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg></button>
-          <b id="cal-year"></b><button type="button" id="cal-next" aria-label="Наступний місяць"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></button></div>
+        <div class="cal-head"><button type="button" id="cal-prev" aria-label="Попередній місяць"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg></button>
+          <b id="cal-year"></b><button type="button" id="cal-next" aria-label="Наступний місяць"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m10 6 6 6-6 6"/></svg></button></div>
         <div class="cal-wd" aria-hidden="true"><span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Нд</span></div>
         <div class="cal-grid" id="cal-grid"></div>
         <p class="cal-note" id="cal-note"></p>
@@ -663,8 +663,8 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
       <div class="lab" id="date-lab">Дата</div>
       <div class="dates" id="a-dates" role="group" aria-labelledby="date-lab"></div>
       <div class="acal" id="a-cal" role="group" aria-label="Інша дата" hidden>
-        <div class="cal-head"><button type="button" id="a-cal-prev" aria-label="Попередній місяць"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg></button>
-          <b id="a-cal-title"></b><button type="button" id="a-cal-next" aria-label="Наступний місяць"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></button></div>
+        <div class="cal-head"><button type="button" id="a-cal-prev" aria-label="Попередній місяць"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg></button>
+          <b id="a-cal-title"></b><button type="button" id="a-cal-next" aria-label="Наступний місяць"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m10 6 6 6-6 6"/></svg></button></div>
         <div class="cal-wd" aria-hidden="true"><span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Нд</span></div>
         <div class="cal-grid" id="a-cal-grid"></div>
       </div>
