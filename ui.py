@@ -768,9 +768,9 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .empty { padding: 26px 10px; text-align: center; color: var(--ink2); }
 
 /* шторка «Витрата готівкою» */
-.sheet-bg { position: fixed; inset: 0; z-index: 40; background: rgba(17,19,24,.38); opacity: 0; transition: opacity .55s var(--ease); }
+.sheet-bg { position: fixed; inset: 0; z-index: 40; background: rgba(17,19,24,.38); opacity: 0; transition: opacity .6s cubic-bezier(.32, .72, 0, 1); }
 .sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 41; max-width: 440px; max-height: 92vh; margin: 0 auto; display: flex; flex-direction: column;
-  background: var(--card); border-radius: 28px 28px 0 0; transform: translateY(100%); transition: transform .6s var(--ease); }
+  background: var(--card); border-radius: 28px 28px 0 0; transform: translateY(100%); transition: transform .7s cubic-bezier(.32, .72, 0, 1); will-change: transform; }
 .sheet.open { transform: none; }
 .sheet-bg.open { opacity: 1; }
 .sheet-head { display: grid; grid-template-columns: 1fr 44px; align-items: center; padding: 8px 16px 0; touch-action: none; }
@@ -1505,14 +1505,14 @@ function toast(html, action) {
 }
 
 // ---------- шторка «Витрата готівкою» ----------
-var pick = null, dpick = 0;
+var pick = null, dpick = 1;  // 1 — «Сьогодні» (порядок: Вчора, Сьогодні, Інша дата)
 function amountValue() { var v = parseFloat($("a-amount").value.replace(/\s/g, "").replace(",", ".")); return isFinite(v) ? v : 0; }
 function check() { var a = amountValue(); $("a-save").disabled = !(a > 0 && pick); $("a-save").textContent = "Зберегти" + (a > 0 ? " " + zl(a) : ""); }
 var wd = new Intl.DateTimeFormat("uk-UA", { weekday: "short" }), dm = new Intl.DateTimeFormat("uk-UA", { day: "2-digit", month: "2-digit" });
 function renderDates() {
   var t = new Date(), y = new Date(t.getTime() - 864e5), box = $("a-dates"); box.innerHTML = "";
   var v = $("a-date").value, other = v && v !== iso(t) && v !== iso(y);
-  [["Сьогодні", t], ["Вчора", y], ["Інша дата", null]].forEach(function (x, i) {
+  [["Вчора", y], ["Сьогодні", t], ["Інша дата", null]].forEach(function (x, i) {
     var b;
     if (x[1]) b = h("button", "", x[0] + "<small>" + wd.format(x[1]) + ", " + dm.format(x[1]) + "</small>");
     else b = h("button", other ? "" : "other", other ? "Інша дата<small>" + v.slice(8) + "." + v.slice(5, 7) + "</small>" : CAL.replace('stroke="#6B7180"', 'stroke="currentColor"') + "Інша дата");
@@ -1549,7 +1549,7 @@ function shiftACal(n) { var y = +aCal.slice(0, 4), mo = +aCal.slice(5) - 1 + n; 
 $("a-cal-prev").onclick = function () { shiftACal(-1); };
 $("a-cal-next").onclick = function () { shiftACal(1); };
 function renderAdd(P) {
-  if (!$("a-date").value) { $("a-date").value = iso(new Date()); dpick = 0; }
+  if (!$("a-date").value) { $("a-date").value = iso(new Date()); dpick = 1; }
   $("a-date").max = iso(new Date());
   var box = $("a-cats"); box.innerHTML = "";
   P.accounts.forEach(function (a) {
@@ -1601,7 +1601,7 @@ function sheet(open, P) {
     if (!was) {
       s.hidden = bg.hidden = false; document.body.style.overflow = "hidden";
       $("a-amount").value = ""; $("a-cal").hidden = true; fitAmount(); check();
-      requestAnimationFrame(function () { s.classList.add("open"); bg.classList.add("open"); });
+      requestAnimationFrame(function () { requestAnimationFrame(function () { s.classList.add("open"); bg.classList.add("open"); }); });
       $("a-amount").focus({ preventScroll: true });
     }
   } else if (was) {
