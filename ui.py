@@ -320,12 +320,12 @@ a { color: inherit; text-decoration: none; }
 .bd { flex: none; display: inline-flex; align-items: center; gap: 3px; height: 24px; padding: 0 8px; border-radius: 12px; background: var(--soft); color: var(--ink3); font-size: 12px; font-weight: 500; white-space: nowrap; }
 .bd.good { background: var(--good-bg); color: var(--good); }
 .bd.bad { background: var(--bad-bg); color: var(--bad); }
-.bd.blue { height: auto; padding: 0; background: none; color: var(--ink2); font-size: 13px; font-weight: 400; }
+.bd.blue { background: var(--blue-soft); color: var(--blue-txt); }
 .bd.new { background: var(--cash-bg); color: var(--cash); }
 .hero .bd:not(.good):not(.bad) { background: rgba(255,255,255,.92); color: #3A4050; }
-/* на темній картці плашки зміни напівпрозорі, як скляна панель під ними: кольоровий відтінок + світлий текст */
-.hero .bd.bad { background: rgba(248, 113, 113, .24); color: #FECACA; box-shadow: inset 0 0 0 1px rgba(252, 165, 165, .28); }
-.hero .bd.good { background: rgba(74, 222, 128, .22); color: #BBF7D0; box-shadow: inset 0 0 0 1px rgba(134, 239, 172, .28); }
+/* на темній картці плашки зміни залиті: насичений колір і білий текст */
+.hero .bd.bad { background: #DC2626; color: #fff; }
+.hero .bd.good { background: #16A34A; color: #fff; }
 
 .cashbtn { display: flex; align-items: center; justify-content: center; gap: 10px; height: 56px; margin-top: 12px; border-radius: 28px; background: var(--blue-g);
   box-shadow: 0 8px 18px rgba(29,95,224,.32), inset 0 1px 0 rgba(255,255,255,.3); color: #fff; font-size: 16px; font-weight: 500; }
@@ -955,7 +955,7 @@ function renderInsights(P, M) {
   var title = "Головне за " + MONTHS_FULL[k].toLowerCase();
   if (M.incomplete) {
     add("Фіксовані платежі вже сплачено", '<span class="bd">' + zl(M.fixed) + "</span>");
-    add("Змінні витрати за " + (+M.last_op.slice(0, 2)) + " " + plural(+M.last_op.slice(0, 2), "день", "дні", "днів"), '<span class="bd blue">' + zl(M.variable) + "</span>");
+    add("Змінні витрати за " + (+M.last_op.slice(0, 2)) + " " + plural(+M.last_op.slice(0, 2), "день", "дні", "днів"), '<span class="bd">' + zl(M.variable) + "</span>");
     add("Норма заощаджень (попередньо)", '<span class="bd new">' + nf1.format(M.rate) + " %</span>");
   } else {
     var pi = prevWithIncome(P, month);
