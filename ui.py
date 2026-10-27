@@ -284,7 +284,6 @@ a { color: inherit; text-decoration: none; }
 .cashbtn { display: flex; align-items: center; justify-content: center; gap: 10px; height: 56px; margin-top: 12px; border-radius: 28px; background: var(--blue-g);
   box-shadow: 0 8px 18px rgba(29,95,224,.32), inset 0 1px 0 rgba(255,255,255,.3); color: #fff; font-size: 16px; font-weight: 500; }
 .cashbtn svg { width: 22px; height: 22px; }
-.cashnote { margin: 12px 0 0; text-align: center; font-size: 13px; color: var(--ink2); }
 
 /* картки */
 .card { margin-top: 12px; padding: 16px; border: 1px solid var(--border); border-radius: 20px; background: var(--card); }
@@ -297,7 +296,7 @@ a { color: inherit; text-decoration: none; }
 .fx { display: inline-block; padding: 0 8px; border-radius: 10px; line-height: 20px; background: var(--soft); color: var(--ink3); font-size: 12px; }
 .fx.cash { background: var(--cash-bg); color: var(--cash); }
 .fx.now { background: var(--blue); color: #fff; }
-/* «Вересень коротко» */
+/* «Головне за вересень» */
 .ins { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 56px; padding: 14px 0; border-top: 1px solid var(--soft); font-size: 14px; line-height: 1.45; color: var(--ink4); }
 .fadein { animation: rise .8s var(--ease) both; }
 @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
@@ -556,7 +555,6 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
     <div id="h-alert"></div>
     <div class="hero-wrap"><div class="liquid" id="liquid" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div><section class="hero" id="hero" aria-live="polite"></section></div>
     <a class="cashbtn" id="cash" href="#add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg>Додати готівку</a>
-    <p class="cashnote" id="cashnote" hidden>Готівку вносить Марко — у його журналі</p>
     <section class="card goal" id="goal" hidden></section>
     <section class="card list fadein" id="insights" hidden></section>
     <section class="card list"><div class="ch"><h2>Категорії</h2><a href="#analytics" id="cats-all"></a></div><div id="cats"></div></section>
@@ -573,7 +571,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
       </section>
       <section class="card"><div class="ch" style="min-height:0;margin-bottom:12px"><h2>Фіксовані й змінні</h2></div><div class="split" id="fvsplit" aria-hidden="true"></div><div class="fv2" id="fv"></div><p class="note" id="fvnote" style="margin:14px 0 0"></p></section>
       <section class="card list"><div class="ch"><h2>Усі категорії</h2><span class="sub" id="fcatn"></span></div><div id="fcats"></div></section>
-      <a class="fava" id="fava">Детальні запити у Fava<span id="arr-f"></span></a>
+      <a class="fava" id="fava">Повний журнал у Fava<span id="arr-f"></span></a>
     </div>
     <div id="an-trends" hidden>
       <section class="card">
@@ -856,12 +854,12 @@ function renderReport(P) {
     var exp = M.incomplete ? "" : (prevM ? badge(M.expenses, prevM.expenses, true, GEN[mi(prevM)]) : "");
     var dn = +M.last_op.slice(0, 2);
     hero.innerHTML = tag + '<div class="lbl">Лишилось у ' + LOC[k] + '</div><div class="num">' + approx + zl(M.saved) + "</div>" +
-      '<div class="sub">' + nf1.format(M.rate) + " % від доходу" + (M.incomplete ? ", поки що" : "") + (P.ok ? "" : ", потребує перевірки") + "</div>" +
+      '<div class="sub">' + nf1.format(M.rate) + " % від доходу" + (P.ok ? "" : ", потребує перевірки") + "</div>" +
       '<div class="cols"><a href="#journal" data-filter="inc"><span class="t">Дохід</span><b>' + zl(M.income) + "</b>" + inc + "</a>" +
       '<a href="#journal" data-filter="exp"><span class="t">Витрати' + (M.incomplete ? " за " + dn + " " + plural(dn, "день", "дні", "днів") : "") + "</span><b>" + zl(M.expenses) + "</b>" + exp + "</a></div>";
   }
   hero.querySelectorAll("[data-filter]").forEach(function (a) { a.onclick = function () { filter = a.dataset.filter; }; });
-  $("cash").hidden = !P.cash; $("cashnote").hidden = !!P.cash;
+  $("cash").hidden = !P.cash;
   renderGoal(P);
   renderInsights(P, M);
   $("cats-all").innerHTML = "<span>Усі " + M.categories.length + "</span>" + CHR;
@@ -874,14 +872,13 @@ function renderReport(P) {
   }).join("") : '<div class="empty">Операцій поки немає</div>';
   grow("#hero .meter b, #v-report .bar6 b, #goal .segs b", "width");
 }
-// «Вересень коротко»: факт і бейдж праворуч; у неповному місяці — що вже відомо
+// «Головне за вересень»: факт і бейдж праворуч; у неповному місяці — що вже відомо
 function renderInsights(P, M) {
   var box = $("insights"), rows = [], k = mi(M);
   var add = function (text, bd) { rows.push('<div class="ins"><span>' + text + "</span>" + (bd || "") + "</div>"); };
   if (!(M.income > 0)) { box.hidden = true; return; }
-  var title = MONTHS_FULL[k] + " коротко";
+  var title = "Головне за " + MONTHS_FULL[k].toLowerCase();
   if (M.incomplete) {
-    title = "Поки що в " + LOC[k];
     add("Фіксовані вже сплачено, далі переважно змінні", '<span class="bd">' + zl(M.fixed) + "</span>");
     add("Змінні за " + (+M.last_op.slice(0, 2)) + " " + plural(+M.last_op.slice(0, 2), "день", "дні", "днів"), '<span class="bd blue">' + zl(M.variable) + "</span>");
     add("Частка ще зменшиться, місяць не закінчився", '<span class="bd new">' + nf1.format(M.rate) + " %</span>");
