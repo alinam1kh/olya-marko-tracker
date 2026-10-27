@@ -57,6 +57,14 @@ def _authorized(environ):
     return hmac.compare_digest(user, USER) & hmac.compare_digest(password, PASSWORD)
 
 
+# Файли, без яких телефон не встановить застосунок: маніфест, service worker та іконки.
+# Телефон забирає їх без пароля, тож віддаємо без входу; даних у них немає.
+PUBLIC_PATHS = {
+    "/manifest.webmanifest", "/sw.js", "/static/apple-touch-icon.png",
+    "/static/icon-192.png", "/static/icon-512.png", "/static/icon-maskable-512.png",
+}
+
+
 def application(environ, start_response):
     scheme = environ.get("HTTP_X_FORWARDED_PROTO", environ.get("wsgi.url_scheme", "http"))
     if scheme != "https" and not ALLOW_HTTP:
@@ -64,6 +72,8 @@ def application(environ, start_response):
         location = f"https://{host}{environ.get('PATH_INFO', '/')}"
         start_response("301 Moved Permanently", [("Location", location), ("Content-Length", "0")])
         return [b""]
+    if environ.get("PATH_INFO", "") in PUBLIC_PATHS:
+        return site(environ, start_response)
     if not _authorized(environ):
         body = "Потрібен вхід".encode("utf-8")
         start_response("401 Unauthorized", [

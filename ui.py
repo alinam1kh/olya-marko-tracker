@@ -487,7 +487,14 @@ a { color: inherit; text-decoration: none; }
 /* відблиск, що проходить по кнопці */
 .sp-mark::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(110deg, transparent 35%, rgba(255,255,255,.28) 50%, transparent 65%);
   transform: translateX(-100%); animation: shine 1.8s ease-in-out infinite; }
-.sp-mark svg { width: 40px; height: 40px; }
+.sp-mark svg { width: 40px; height: 40px; overflow: visible; }
+.sp-mark g { transform-box: view-box; }
+.sp-back { transform-origin: 13px 9px; animation: spBack 2.4s var(--ease) infinite; }
+.sp-note { transform-origin: 10px 13px; animation: spNote 2.4s var(--ease) infinite; }
+.sp-coin { transform-origin: 18.6px 17.6px; animation: spCoin 2.4s var(--ease) infinite; }
+@keyframes spBack { 0% { opacity: 0; transform: translate(-3px, 3px) rotate(-6deg); } 18%, 70% { opacity: 1; transform: none; } 45% { transform: translate(.4px, -.6px) rotate(2deg); } 100% { opacity: 1; transform: none; } }
+@keyframes spNote { 0% { opacity: 0; transform: translateY(4px) scale(.9); } 22% { opacity: 1; transform: translateY(-.6px) scale(1.02); } 34%, 100% { opacity: 1; transform: none; } 60% { transform: translateY(-.5px) rotate(-1.5deg); } }
+@keyframes spCoin { 0%, 18% { opacity: 0; transform: translate(6px, 0) rotate(160deg); } 40% { opacity: 1; transform: translate(0, 0) rotate(0); } 50% { transform: translateY(-2.2px); } 60% { transform: none; } 68% { transform: translateY(-.8px); } 76%, 100% { opacity: 1; transform: none; } }
 .sp-name { font-size: 16px; font-weight: 500; color: var(--ink); opacity: 0; animation: rise .5s .15s var(--ease) both; }
 /* повзунок: швидко доходить до ~85 %, а коли все готово — до кінця */
 .sp-bar { width: 148px; height: 6px; margin-top: 4px; border-radius: 3px; background: var(--track); overflow: hidden; }
@@ -511,7 +518,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
 .toast { animation: toastin .7s var(--spring) both; }
 @keyframes toastin { from { opacity: 0; transform: translate(-50%, 16px) scale(.96); } to { opacity: 1; transform: translateX(-50%); } }
 @media (prefers-reduced-motion: reduce) {
-  .splash, .sp-mark, .sp-mark::before, .sp-bar b, .sp-name, .stag > *, .hero .num.cu, .pop:not([hidden]), .toast { animation: none !important; transition: none !important; }
+  .splash, .sp-mark, .sp-mark::before, .sp-mark g, .sp-bar b, .sp-name, .stag > *, .hero .num.cu, .pop:not([hidden]), .toast { animation: none !important; transition: none !important; }
   .nav .ind { transition: none; }
 }
 @media (prefers-reduced-motion: reduce) { .cap .fill, .crow .bar6 b, .segs i b, .hero .meter b { transition: none; } .fadein, .liquid i { animation: none; } }
@@ -519,7 +526,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
 </head>
 <body class="p-marko">
 <div class="splash" id="splash" role="progressbar" aria-label="Завантаження">
-  <div class="sp-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4.2" y="3.4" width="17.5" height="11" rx="1.8" fill="#fff" opacity=".45" transform="rotate(-7 13 9)"/><rect x="1.5" y="7.5" width="17.5" height="11" rx="1.8" fill="#fff"/><g fill="none" stroke="#2A6BE8" stroke-linecap="round"><rect x="3.2" y="9.2" width="14.1" height="7.6" rx=".9" stroke-width=".55" opacity=".55"/><circle cx="10.25" cy="13" r="2.3" stroke-width="1.1"/><path d="M10.25 11.9v2.2" stroke-width=".9"/></g><circle cx="5.5" cy="13" r=".8" fill="#2A6BE8"/><circle cx="15" cy="13" r=".8" fill="#2A6BE8"/><circle cx="18.6" cy="17.6" r="4.4" fill="#2A6BE8"/><circle cx="18.6" cy="17.6" r="3.6" fill="#fff"/><circle cx="18.6" cy="17.6" r="2.5" fill="none" stroke="#2A6BE8" stroke-width=".6" opacity=".6"/></svg></div>
+  <div class="sp-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><g class="sp-back"><rect x="4.2" y="3.4" width="17.5" height="11" rx="1.8" fill="#fff" opacity=".45" transform="rotate(-7 13 9)"/></g><g class="sp-note"><rect x="1.5" y="7.5" width="17.5" height="11" rx="1.8" fill="#fff"/><g fill="none" stroke="#2A6BE8" stroke-linecap="round"><rect x="3.2" y="9.2" width="14.1" height="7.6" rx=".9" stroke-width=".55" opacity=".55"/><circle cx="10.25" cy="13" r="2.3" stroke-width="1.1"/><path d="M10.25 11.9v2.2" stroke-width=".9"/></g><circle cx="5.5" cy="13" r=".8" fill="#2A6BE8"/><circle cx="15" cy="13" r=".8" fill="#2A6BE8"/></g><g class="sp-coin"><circle cx="18.6" cy="17.6" r="4.4" fill="#2A6BE8"/><circle cx="18.6" cy="17.6" r="3.6" fill="#fff"/><circle cx="18.6" cy="17.6" r="2.5" fill="none" stroke="#2A6BE8" stroke-width=".6" opacity=".6"/></g></svg></div>
   <div class="sp-name">Фінанси Олі й Марка</div>
   <div class="sp-bar" aria-hidden="true"><b id="sp-fill"></b></div>
 </div>
@@ -1257,13 +1264,13 @@ window.addEventListener("hashchange", function () {
 });
 render();
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(function () {});
-// сплеш зникає, коли готовий шрифт (але не довше 1,2 с і не швидше 0,5 с, щоб не блимав)
+// сплеш зникає, коли готовий шрифт (але не довше 1,6 с і не швидше 0,9 с — щоб встигли зіграти гроші)
 (function () {
   var s = $("splash"), t = Date.now(), done = false, fill = $("sp-fill");
   requestAnimationFrame(function () { fill.style.width = "85%"; });
-  function hide() { if (done) return; done = true; setTimeout(function () { s.classList.add("done"); fill.style.width = "100%"; setTimeout(function () { s.classList.add("out"); lastBase = null; render(); setTimeout(function () { s.remove(); }, 700); }, 320); }, Math.max(0, 500 - (Date.now() - t))); }
+  function hide() { if (done) return; done = true; setTimeout(function () { s.classList.add("done"); fill.style.width = "100%"; setTimeout(function () { s.classList.add("out"); lastBase = null; render(); setTimeout(function () { s.remove(); }, 700); }, 320); }, Math.max(0, 900 - (Date.now() - t))); }
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(hide);
-  setTimeout(hide, 1200);
+  setTimeout(hide, 1600);
 })();
 })();
 </script>
