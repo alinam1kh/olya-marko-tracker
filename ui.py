@@ -671,7 +671,7 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .op .ask { flex: none; display: flex; gap: 6px; }
 .swipe { position: relative; overflow: hidden; }
 .swipe .op { position: relative; z-index: 1; background: var(--card); touch-action: pan-y; transition: transform .45s cubic-bezier(.32, .72, 0, 1); }
-.swdel { position: absolute; left: 0; top: 1px; bottom: 0; width: 88px; z-index: 0; border: 0; border-radius: 16px; background: var(--bad); color: #fff;
+.swdel { position: absolute; right: 0; top: 1px; bottom: 0; width: 88px; z-index: 0; border: 0; border-radius: 16px; background: var(--bad-bg); color: var(--bad);
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font: 500 12px var(--font); cursor: pointer; opacity: 0; transition: opacity .3s var(--ease); }
 .swdel svg { width: 18px; height: 18px; }
 .swipe.on .swdel { opacity: 1; }
@@ -1491,18 +1491,19 @@ function renderJournal(P) {
   });
 }
 
-// свайп рядка вправо відкриває червону кнопку «Видалити» зліва; відпустили не дотягнувши — рядок повертається
+// свайп рядка вліво відкриває кнопку «Видалити» справа; відпустили не дотягнувши — рядок повертається
 var SW_OPEN = 96;
 function swipeRow(sw, P) {
   var op = sw.querySelector(".op"), x0 = null, y0 = 0, dx = 0, base = 0, horiz = null;
-  var set = function (x, anim) { op.style.transition = anim ? "" : "none"; op.style.transform = x ? "translateX(" + x + "px)" : ""; sw.classList.toggle("on", x > 0); };
+  // x — наскільки рядок зсунутий уліво (додатне число)
+  var set = function (x, anim) { op.style.transition = anim ? "" : "none"; op.style.transform = x ? "translateX(" + -x + "px)" : ""; sw.classList.toggle("on", x > 0); };
   op.addEventListener("pointerdown", function (e) { x0 = e.clientX; y0 = e.clientY; base = sw.classList.contains("open") ? SW_OPEN : 0; dx = 0; horiz = null; });
   op.addEventListener("pointermove", function (e) {
     if (x0 === null) return;
     var mx = e.clientX - x0, my = e.clientY - y0;
     if (horiz === null && (Math.abs(mx) > 8 || Math.abs(my) > 8)) horiz = Math.abs(mx) > Math.abs(my);
     if (!horiz) return;
-    dx = mx; var x = Math.max(0, base + dx); set(x > SW_OPEN ? SW_OPEN + (x - SW_OPEN) * .25 : x, false);
+    dx = -mx; var x = Math.max(0, base + dx); set(x > SW_OPEN ? SW_OPEN + (x - SW_OPEN) * .25 : x, false);
   });
   var end = function () {
     if (x0 === null) return; x0 = null;
