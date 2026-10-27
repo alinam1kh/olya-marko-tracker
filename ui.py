@@ -715,8 +715,13 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .ticks { flex: none; display: flex; flex-direction: column; justify-content: space-between; height: 150px; width: 66px; font-size: 12px; color: var(--ink2); text-align: right; }
 .ticks span { line-height: 1; }
 .caps { position: relative; flex: 1; display: flex; justify-content: space-around; }
-.avgl { position: absolute; left: 0; right: 0; height: 0; border-top: 1.5px dashed #AEB5C2; pointer-events: none; z-index: 2; }
-.avgl span { position: absolute; right: 0; bottom: 3px; padding: 0 2px; font-size: 11px; color: var(--ink2); background: var(--card); border-radius: 4px; }
+/* середнє: більші заокруглені штрихи (SVG-візерунок), окремим шаром поверх стовпчиків */
+.avgl { position: absolute; left: 0; right: 0; height: 3px; margin-top: -1.5px; pointer-events: none; z-index: 3; transform: translateZ(0);
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='3'%3E%3Cline x1='1.5' y1='1.5' x2='7.5' y2='1.5' stroke='%2358606E' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E") repeat-x left center / 12px 3px; }
+.avg-leg { display: flex; align-items: center; gap: 10px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--soft); font-size: 14px; color: var(--ink2); }
+.avg-leg i { flex: none; width: 20px; height: 3px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='3'%3E%3Cline x1='1.5' y1='1.5' x2='7.5' y2='1.5' stroke='%2358606E' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E") repeat-x left center / 12px 3px; }
+.avg-leg b { margin-left: auto; font-size: 15px; font-weight: 500; color: var(--ink); }
+.avg-leg:empty { display: none; }
 .cap { display: flex; flex-direction: column; align-items: center; gap: 6px; }
 .cap.pick { cursor: pointer; }
 .cap .trk { width: 40px; height: 150px; border-radius: 10px; background: var(--track); display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; }
@@ -758,6 +763,14 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .vs-avg span { display: inline; font-size: 14px; color: var(--ink2); }
 .vs-avg b { display: inline; margin: 0; font-size: 15px; font-weight: 500; }
 .vs .vs-sub { display: block; margin-top: 2px; font-size: 13px; color: var(--ink2); }
+.vs2 { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; }
+.vs2 .vs-l { min-width: 0; }
+.vs2 .vs-big { margin-bottom: 0; }
+.vs2 .vs-r { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; padding-bottom: 4px; text-align: right; }
+.vs2 .vs-r .bd { display: inline-flex; font-size: 13px; white-space: nowrap; color: var(--ink2); }
+.vs2 .vs-r .bd.bad { color: var(--bad); } .vs2 .vs-r .bd.good { color: var(--good); }
+.vs2 .vs-r small { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink2); line-height: 1.3; }
+.vs2 .vs-r .dash { display: inline-block; width: 12px; height: 0; border-top: 2px dashed var(--blue); }
 .vs-head { display: flex; justify-content: flex-start; align-items: center; gap: 8px; min-height: 24px; }
 .vs-head span { font-size: 13px; color: var(--ink2); }
 .vs-tag { flex: none; padding: 3px 10px; border-radius: 12px; background: var(--soft); font-style: normal; font-size: 12px; font-weight: 500; color: var(--ink2); white-space: nowrap; }
@@ -973,7 +986,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
     <div id="an-trends" hidden>
       <section class="card">
         <div class="seg sm" id="t-metric" role="group" aria-label="Показник"></div>
-        <div class="chart"><div class="ticks" id="mticks" aria-hidden="true"></div><div class="caps" id="mbars"></div></div>
+        <div class="chart"><div class="ticks" id="mticks" aria-hidden="true"></div><div class="caps" id="mbars"></div></div><div class="avg-leg" id="t-avg"></div>
       </section>
       <div class="duo" id="t-duo"></div>
       <p class="note" id="t-note" style="margin:8px 4px 0"></p>
@@ -1404,7 +1417,7 @@ function capsules(boxId, tickId, items, max, sel, onPick, n, avg) {
     box.appendChild(c);
   });
   // середнє за повні місяці — одна сіра пунктирна лінія через увесь графік (число одне на весь період)
-  if (avg) box.appendChild(h("div", "avgl", '<span>середнє ' + nf0.format(Math.round(avg)) + "</span>")).style.top = Math.round(H - avg / max * H) + "px";
+  if (avg) box.appendChild(h("div", "avgl", "")).style.top = Math.round(H - avg / max * H) + "px";
   grow("#" + boxId + " .fill", "height");
 }
 function renderAnalytics(P) {
@@ -1470,6 +1483,8 @@ function renderTrends(P) {
     return { v: skip ? 0 : val(m), label: m.name, part: m.incomplete, sub: skip ? "—" : nf0.format(val(m)) + " зл",
       mark: sameDays !== null && i === trendMonth - 1 ? sameDays : 0 };
   }), ax.max, trendMonth, function (i) { trendMonth = i; render(); }, ax.n, avg);
+  $("t-avg").innerHTML = avg ? '<i aria-hidden="true"></i><span>' + { exp: "Середні витрати за місяць", inc: "Середній дохід за місяць", saved: "У середньому лишається за місяць" }[metric] +
+    "</span><b>" + nf0.format(Math.round(avg)) + " зл</b>" : "";
 
   var full = P.months.filter(function (m) { return m.income > 0 && !m.incomplete; });
   var sum = full.reduce(function (s, m) { return s + m.saved; }, 0);
@@ -1482,18 +1497,18 @@ function renderTrends(P) {
     if (Math.abs(d) < 0.5) return '<span class="bd">0 %</span>';
     return '<span class="bd ' + (good ? "good" : "bad") + '">' + arr(d) + " " + nf0.format(Math.abs(Math.round(d))) + " зл, " + nf1.format(Math.abs(ch)) + " %</span>";
   };
-  var row = "";
-  if (!known) row = '<div class="vs-row"><span>' + (metric === "inc" ? "Зарплата ще не прийшла, зазвичай " + (payDays(P) ? payDays(P) + " числа" : "наприкінці місяця") : "Порахуємо, коли прийде зарплата") + "</span></div>";
-  else if (!prev) row = '<div class="vs-row"><span>' + S.name + ' — перший місяць з даними</span><span class="bd">немає з чим порівняти</span></div>';
-  else if (S.incomplete && metric === "exp") row = '<div class="vs-row"><span><i class="dash" aria-hidden="true"></i>Проти тих самих днів ' + GEN[mi(prev)] + ', <b class="nw">' + z0(sameDays) + "</b></span>" + cmpBadge(val(S), sameDays) + "</div>";
-  else if (S.incomplete) row = '<div class="vs-row"><span>Місяць ще триває — порівняємо, коли закінчиться</span></div>';
-  else row = '<div class="vs-row"><span>Проти ' + GEN[mi(prev)] + ', <b class="nw">' + z0(val(prev)) + "</b></span>" + cmpBadge(val(S), val(prev)) + "</div>";
-  // період неповного місяця — плашкою праворуч від заголовка (як «дані до 15.10» на головній)
+  // справа: плашка зміни й з чим порівнюємо; зліва: заголовок (з періодом для неповного місяця) і сума
+  var right = "";
+  if (!known) right = '<small class="vs-why">' + (metric === "inc" ? "зарплата ще не прийшла,<br>зазвичай " + (payDays(P) ? payDays(P) + " числа" : "наприкінці місяця") : "порахуємо,<br>коли прийде зарплата") + "</small>";
+  else if (!prev) right = '<span class="bd">перший місяць</span><small>немає з чим порівняти</small>';
+  else if (S.incomplete && metric === "exp") right = cmpBadge(val(S), sameDays) + '<small><i class="dash" aria-hidden="true"></i>проти 1–' + upTo(S) + " " + GEN[mi(prev)] + "</small>";
+  else if (S.incomplete) right = '<small class="vs-why">місяць ще триває</small>';
+  else right = cmpBadge(val(S), val(prev)) + "<small>проти " + GEN[mi(prev)] + "</small>";
   var sub = metric === "saved" && paid ? nf1.format(S.rate) + " % доходу" : "";
   var tag = S.incomplete ? '<em class="vs-tag">1–' + upTo(S) + " " + GEN[mi(S)] + "</em>" : "";
-  $("t-duo").innerHTML = '<div class="card vs"><div class="vs-head"><span>' + NAME + " у " + LOC[mi(S)] + "</span>" + tag + '</div><div class="vs-big"><b>' + (known ? z0(val(S)) : "—") + "</b></div>" +
-    (sub ? '<small class="vs-sub">' + sub + "</small>" : "") + row +
-    "</div>";
+  $("t-duo").innerHTML = '<div class="card vs vs2"><div class="vs-l"><div class="vs-head"><span>' + NAME + " у " + LOC[mi(S)] + "</span>" + tag + "</div>" +
+    '<div class="vs-big"><b>' + (known ? z0(val(S)) : "—") + "</b></div>" + (sub ? '<small class="vs-sub">' + sub + "</small>" : "") + "</div>" +
+    '<div class="vs-r">' + right + "</div></div>";
   $("t-note").hidden = true;
 
   $("t-dmon").textContent = "Категорії у " + LOC[mi(S)];
