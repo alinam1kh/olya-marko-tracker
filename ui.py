@@ -986,7 +986,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
     <a class="cashbtn" id="cash" href="#add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg>Додати готівку</a>
     <section class="card goal" id="goal" hidden></section>
     <section class="card list fadein" id="insights" hidden></section>
-    <section class="card list"><div class="ch"><h2>Категорії</h2><a href="#analytics" id="cats-all"></a></div><div id="cats"></div></section>
+    <section class="card list"><div class="ch"><h2>Категорії</h2></div><div id="cats"></div></section>
     <section class="card list"><div class="ch"><h2>Останні операції</h2><a href="#journal" id="ops-all">Журнал<span id="arr-j"></span></a></div><div id="recent"></div></section>
   </div>
 
@@ -999,7 +999,6 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
         <div class="chart"><div class="ticks" id="wticks" aria-hidden="true"></div><div class="caps" id="bars"></div></div>
       </section>
       <section class="card"><div class="ch" style="min-height:0;margin-bottom:12px"><h2>Фіксовані й змінні</h2></div><div class="split" id="fvsplit" aria-hidden="true"></div><div class="fv2" id="fv"></div><p class="note" id="fvnote" style="margin:14px 0 0"></p></section>
-      <section class="card list"><div class="ch"><h2>Усі категорії</h2><span class="sub" id="fcatn"></span></div><div id="fcats"></div></section>
       <a class="fava" id="fava">Повний журнал у Fava<span id="arr-f"></span></a>
     </div>
     <div id="an-trends" hidden>
@@ -1327,22 +1326,7 @@ function renderReport(P) {
   $("cash").hidden = !P.cash;
   renderGoal(P);
   renderInsights(P, M);
-  $("cats-all").innerHTML = "<span>Усі " + M.categories.length + "</span>" + CHR;
   $("cats").innerHTML = catRows(M, 3);
-  $("cats-all").onclick = function (e) {
-    e.preventDefault(); amode = "month"; location.hash = "#analytics";
-    setTimeout(function () {
-      var s = $("fcats").closest("section"); if (!s) return;
-      var y0 = scrollY, y1 = s.getBoundingClientRect().top + scrollY - 76, t0 = null, dur = 1000;
-      if (matchMedia("(prefers-reduced-motion: reduce)").matches) { window.scrollTo(0, y1); return; }
-      (function step(ts) {
-        if (t0 === null) t0 = ts;
-        var k = Math.min(1, (ts - t0) / dur), e = k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
-        window.scrollTo(0, y0 + (y1 - y0) * e);
-        if (k < 1) requestAnimationFrame(step);
-      })(performance.now());
-    }, 250);
-  };
   var mb = $("more-btn");
   if (mb) mb.onclick = function () {
     var open = mb.getAttribute("aria-expanded") !== "true", n = $("more-rows").querySelectorAll(".crow").length;
@@ -1488,10 +1472,7 @@ function renderAnalytics(P) {
   $("fv").innerHTML = '<div><span><i style="background:#A9C6F8"></i>Фіксовані, ' + nf1.format(fp) + " %</span><b>" + zl(M.fixed) + "</b>" + (cmp ? badge(M.fixed, pm.fixed, true, "", false) : "") + "</div>" +
     '<div><span><i style="background:#1F63E6"></i>Змінні, ' + nf1.format(100 - fp) + " %</span><b>" + zl(M.variable) + "</b>" + (cmp ? badge(M.variable, pm.variable, true, "", false) : "") + "</div>";
   $("fvnote").textContent = "Фіксовані: " + FIXED[P.key] + ". Змінними можна керувати.";
-  $("fcatn").textContent = zl(M.expenses);
-  $("fcats").innerHTML = catRows(M, 0);
   $("fava").href = FAVA[P.key] + "query/";
-  grow("#an-month .bar6 b", "width");
 }
 function renderTrends(P) {
   var METRICS = [["exp", "Витрати"], ["inc", "Дохід"], ["saved", "Лишилось"]];
@@ -1791,7 +1772,6 @@ document.addEventListener("keydown", function (e) { if (e.key === "Escape" && vi
   });
 })();
 $("cash").addEventListener("click", function () { sheetFromApp = true; });
-$("cats-all").addEventListener("click", function () { amode = "month"; });
 $("ops-all").addEventListener("click", function () { filter = "all"; });
 $("arr-j").outerHTML = CHR; $("arr-f").outerHTML = CHR;
 
