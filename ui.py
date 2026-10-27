@@ -804,7 +804,11 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .cap .r3 { display: block; margin-top: 2px; font-size: 11px; color: var(--ink2); }
 .vs-parts { margin-top: 12px; }
 .vs-parts:empty { display: none; }
-.vs-part i[style] { width: 16px; }
+.wleg { display: flex; justify-content: space-between; gap: 12px; margin-top: 14px; }
+.wleg .vs-part { padding: 0; background: none; margin: 0; gap: 8px; }
+.wleg .vs-part + .vs-part { margin: 0; text-align: right; }
+.wleg .vs-part i { width: 14px; height: 14px; border-radius: 4px; }
+.wleg .vs-part span { color: var(--ink2); }
 .vs-part { display: flex; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 14px; background: var(--soft); }
 .vs-part + .vs-part { margin-top: 8px; }
 .vs-part i { flex: none; width: 22px; height: 16px; border-radius: 4px; background: repeating-linear-gradient(135deg, #CBD1DA 0 4px, #E6E9EE 4px 8px); }
@@ -997,12 +1001,12 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
   <div id="v-analytics" hidden>
     <div class="seg" id="a-mode" role="group" aria-label="Розділ аналітики"></div>
     <div id="an-month">
-      <section class="card"><div class="ch" style="min-height:0;margin-bottom:12px"><h2>Фіксовані й змінні</h2></div><div class="split" id="fvsplit" aria-hidden="true"></div><div class="fv2" id="fv"></div><div class="vs-parts" id="fvnote"></div></section>
+      <section class="card"><div class="ch" style="min-height:0;margin-bottom:12px"><h2>Фіксовані й змінні</h2></div><div class="split" id="fvsplit" aria-hidden="true"></div><div class="fv2" id="fv"></div><p class="note" id="fvnote" style="margin:14px 0 0"></p></section>
       <section class="card list"><div class="ch"><h2 id="t-dmon"></h2></div><div class="share" id="t-share" aria-hidden="true"></div><div id="t-leg" style="padding-bottom:8px"></div></section>
       <section class="card">
         <div class="ch" style="min-height:0"><h2 id="w-title">Витрати по тижнях</h2><div class="seg sm" id="rent-mode" role="group" aria-label="Оренда в графіку" style="grid-auto-columns:auto" hidden></div></div>
         <div class="chart"><div class="ticks" id="wticks" aria-hidden="true"></div><div class="caps" id="bars"></div></div>
-        <div class="vs-parts" id="wnote"></div>
+        <div class="wleg" id="wnote"></div>
       </section>
     </div>
     <div id="an-trends" hidden>
@@ -1478,8 +1482,7 @@ function renderAnalytics(P) {
   $("fvsplit").innerHTML = '<i style="width:' + fp + '%;background:#A9C6F8"></i><i style="flex:1;background:linear-gradient(90deg,#3B82F6,#1D5FE0)"></i>';
   $("fv").innerHTML = '<div><span><i style="background:#A9C6F8"></i>Фіксовані, ' + nf1.format(fp) + " %</span><b>" + zl(M.fixed) + "</b>" + (cmp ? badge(M.fixed, pm.fixed, true, "", false) : "") + "</div>" +
     '<div><span><i style="background:#1F63E6"></i>Змінні, ' + nf1.format(100 - fp) + " %</span><b>" + zl(M.variable) + "</b>" + (cmp ? badge(M.variable, pm.variable, true, "", false) : "") + "</div>";
-  $("fvnote").innerHTML = '<div class="vs-part"><i aria-hidden="true" style="background:#A9C6F8"></i><span>Фіксовані — ' + FIXED[P.key] + "</span></div>" +
-    '<div class="vs-part"><i aria-hidden="true" style="background:linear-gradient(90deg,#3B82F6,#1D5FE0)"></i><span>Змінні — усе інше: на них можна заощадити</span></div>';
+  $("fvnote").textContent = "Фіксовані: " + FIXED[P.key] + ". Змінні — решта витрат, саме їх можна зменшити.";
   $("t-dmon").textContent = "Категорії у " + LOC[mi(M)];
   var sl = slices(M), tot = sl.reduce(function (s, x) { return s + x.amount; }, 0) || 1;
   $("t-share").innerHTML = sl.map(function (x) { return '<i style="flex:' + x.amount + ";background:" + x.color + '"></i>'; }).join("");
