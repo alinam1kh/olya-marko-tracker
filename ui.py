@@ -766,7 +766,7 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .vs2 { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; }
 .vs2 .vs-l { min-width: 0; }
 .vs2 .vs-big { margin-bottom: 0; }
-.vs2 .vs-r { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; padding-bottom: 4px; text-align: right; }
+.vs2 .vs-r { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; padding-bottom: 4px; text-align: right; }
 .vs2 .vs-r .bd { display: inline-flex; font-size: 13px; white-space: nowrap; color: var(--ink2); }
 .vs2 .vs-r .bd.bad { color: var(--bad); } .vs2 .vs-r .bd.good { color: var(--good); }
 .vs2 .vs-r small { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink2); line-height: 1.3; }
