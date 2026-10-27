@@ -386,11 +386,11 @@ a { color: inherit; text-decoration: none; }
 .segs { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
 .segs i { position: relative; height: 8px; border-radius: 4px; background: var(--track); overflow: hidden; }
 .segs i b { position: absolute; inset: 0; width: 0; border-radius: 4px; background: var(--blue-g); transition: width 2.1s var(--ease); }
-.seglab { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; margin-top: 6px; font-size: 12px; color: var(--ink2); }
-.gcols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0 12px; padding-top: 14px; border-top: 1px solid var(--soft); }
+.seglab { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; margin-top: 8px; font-size: 12px; color: var(--ink2); }
+.gcols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0 18px; padding-top: 18px; border-top: 1px solid var(--soft); }
 .gcols span { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ink2); }
 .gcols span svg { flex: none; width: 16px; height: 16px; }
-.gcols b { display: block; margin: 3px 0 2px; font-size: 18px; font-weight: 500; }
+.gcols b { display: block; margin: 7px 0 4px; font-size: 18px; font-weight: 500; }
 .gcols small { display: block; font-size: 12px; color: var(--ink2); }
 .gpace { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 14px; background: #F8F9FB; font-size: 13px; line-height: 1.4; color: var(--ink4); }
 /* помилка обліку */
@@ -520,7 +520,7 @@ a { color: inherit; text-decoration: none; }
 
 /* нижня навігація v2: біла плаваюча панель, активний пункт — синя капсула; fade під нею */
 .fade { z-index: 19; position: fixed; left: 0; right: 0; bottom: 0; height: 130px; pointer-events: none; background: linear-gradient(rgba(245,246,248,0), var(--bg) 70%); }
-.nav { z-index: 20; position: fixed; left: 50%; bottom: calc(22px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); width: min(342px, calc(100vw - 48px)); height: 68px;
+.nav { z-index: 20; position: fixed; left: 50%; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); width: min(342px, calc(100vw - 48px)); height: 68px;
   display: flex; align-items: center; padding: 0 8px; border: 1px solid var(--border); border-radius: 32px; background: rgba(255,255,255,.96); box-shadow: 0 10px 30px rgba(17,19,24,.10); }
 .nav a { position: relative; flex: 1; height: 54px; border-radius: 27px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 13px; color: var(--ink3); transition: color .35s var(--ease); }
 .nav a.on { color: var(--blue); font-weight: 500; }
