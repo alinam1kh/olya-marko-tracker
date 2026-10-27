@@ -336,7 +336,7 @@ body.p-olya .liquid { --sheen: .4; }
 .liquid .after { -webkit-mask: linear-gradient(var(--a), #000 calc(var(--p) - 14%), transparent calc(var(--p) + 6%)), linear-gradient(rgba(0, 0, 0, .5) 0 0);
   mask: linear-gradient(var(--a), #000 calc(var(--p) - 14%), transparent calc(var(--p) + 6%)), linear-gradient(rgba(0, 0, 0, .5) 0 0); }
 .liquid .after > span { position: absolute; inset: 0; border-radius: inherit; }
-.liquid .ehalo { opacity: .5; } .liquid .erim { opacity: .45; }
+.liquid .ehalo { opacity: .38; } .liquid .erim { opacity: .34; }
 .liquid .ehalo { filter: blur(8px); }
 .liquid .ehalo i, .liquid .erim { position: absolute; inset: 0; border-radius: inherit;
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
