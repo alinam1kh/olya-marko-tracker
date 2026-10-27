@@ -267,6 +267,7 @@ a { color: inherit; text-decoration: none; }
 .hero .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.35); }
 .hero .cols a { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; min-height: 44px; }
 .hero .cols .t { font-size: 13px; }
+.hero .cols .hd { display: flex; justify-content: space-between; align-items: center; gap: 8px; width: 100%; min-height: 24px; }
 .hero .cols b { font-size: 18px; font-weight: 500; }
 .hero .cols i { font-style: normal; font-size: 12px; color: var(--hero-on); }
 .hero .meter { height: 8px; margin: 14px 0 8px; border-radius: 4px; background: rgba(255,255,255,.25); overflow: hidden; }
@@ -789,6 +790,15 @@ function badge(now, was, isExp, prevGen, whole) {
   return '<span class="bd ' + (good ? "good" : "bad") + '" aria-label="' + (ch > 0 ? "більше" : "менше") + " на " + fmt.format(Math.abs(ch)) + " %, " + (good ? "краще" : "гірше") + '">' +
     arr(ch) + " " + fmt.format(Math.abs(ch)) + " %" + (prevGen ? " до " + prevGen : "") + "</span>";
 }
+// плашка на головній картці: коротка, праворуч від підпису; «без змін» не показуємо
+function heroBadge(now, was, isExp, gen) {
+  if (!was) return "";
+  var ch = (now - was) / was * 100;
+  if (Math.abs(ch) < 0.5) return "";
+  var good = (ch > 0) !== isExp;
+  return '<span class="bd ' + (good ? "good" : "bad") + '" title="' + (ch > 0 ? "більше" : "менше") + ", ніж у " + gen + '" aria-label="' +
+    (ch > 0 ? "більше" : "менше") + " на " + nf1.format(Math.abs(ch)) + " %, ніж у " + gen + ", " + (good ? "краще" : "гірше") + '">' + arr(ch) + " " + nf1.format(Math.abs(ch)) + " %</span>";
+}
 function prevWithIncome(P, k) { for (var j = k - 1; j >= 0; j--) if (P.months[j].income > 0) return P.months[j]; return null; }
 function fixedCats(M) {
   var fx = {};
@@ -850,13 +860,13 @@ function renderReport(P) {
       '<div class="hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>' +
       "<span>Зарплата зазвичай приходить " + (days ? days + " числа" : "наприкінці місяця") + ". «Лишилось» порахуємо після неї.</span></div>";
   } else {
-    var inc = M.incomplete ? "" : (prevI ? badge(M.income, prevI.income, false, GEN[mi(prevI)]) : "");
-    var exp = M.incomplete ? "" : (prevM ? badge(M.expenses, prevM.expenses, true, GEN[mi(prevM)]) : "");
+    var inc = M.incomplete ? "" : (prevI ? heroBadge(M.income, prevI.income, false, LOC[mi(prevI)]) : "");
+    var exp = M.incomplete ? "" : (prevM ? heroBadge(M.expenses, prevM.expenses, true, LOC[mi(prevM)]) : "");
     var dn = +M.last_op.slice(0, 2);
     hero.innerHTML = tag + '<div class="lbl">Лишилось у ' + LOC[k] + '</div><div class="num">' + approx + zl(M.saved) + "</div>" +
       '<div class="sub">' + nf1.format(M.rate) + " % від доходу" + (P.ok ? "" : ", потребує перевірки") + "</div>" +
-      '<div class="cols"><a href="#journal" data-filter="inc"><span class="t">Дохід</span><b>' + zl(M.income) + "</b>" + inc + "</a>" +
-      '<a href="#journal" data-filter="exp"><span class="t">Витрати' + (M.incomplete ? " за " + dn + " " + plural(dn, "день", "дні", "днів") : "") + "</span><b>" + zl(M.expenses) + "</b>" + exp + "</a></div>";
+      '<div class="cols"><a href="#journal" data-filter="inc"><span class="hd"><span class="t">Дохід</span>' + inc + "</span><b>" + zl(M.income) + "</b></a>" +
+      '<a href="#journal" data-filter="exp"><span class="hd"><span class="t">Витрати' + (M.incomplete ? " за " + dn + " " + plural(dn, "день", "дні", "днів") : "") + "</span>" + exp + "</span><b>" + zl(M.expenses) + "</b></a></div>";
   }
   hero.querySelectorAll("[data-filter]").forEach(function (a) { a.onclick = function () { filter = a.dataset.filter; }; });
   $("cash").hidden = !P.cash;
