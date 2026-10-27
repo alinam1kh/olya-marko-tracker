@@ -178,11 +178,11 @@ PAGE = r"""<!doctype html>
   --ink: #111318; --ink2: #6B7180; --ink3: #4A5060; --ink4: #2A2E38; --mute: #C4C8D0;
   --blue: #1F63E6; --blue-g: linear-gradient(180deg, #3B82F6, #1D5FE0); --blue-soft: #EAF1FF; --blue-txt: #1F55C9; --blue-l: #A9C6F8;
   --good: #15803D; --good-bg: #E3F7EA; --bad: #C0261B; --bad-bg: #FDE8E6; --cash: #7A4E00; --cash-bg: #FFF2DB;
-  --hero-on: #DCE3F4; --glow: rgba(120, 160, 245, .24); --glow2: rgba(130, 175, 255, .62); --glow3: rgba(190, 215, 255, .45); --glow4: rgba(90, 120, 255, .55); --glow5: rgba(150, 130, 255, .5); --h1: rgba(120, 165, 255, .6); --h2: rgba(80, 200, 255, .45); --h3: rgba(150, 120, 255, .5); --h4: rgba(200, 225, 255, .42); --h5: rgba(70, 105, 255, .55); --h6: rgba(120, 235, 230, .3); --g1: #3A62C2; --g2: #1A2F6A; --g3: #04070F;
+  --hero-on: #DCE3F4; --glow: rgba(120, 160, 245, .24); --glow2: rgba(130, 175, 255, .62); --glow3: rgba(190, 215, 255, .45); --glow4: rgba(90, 120, 255, .55); --glow5: rgba(150, 130, 255, .5); --h1: rgba(120, 165, 255, .6); --h2: rgba(80, 200, 255, .45); --h3: rgba(150, 120, 255, .5); --h4: rgba(200, 225, 255, .42); --h5: rgba(70, 105, 255, .55); --h6: rgba(120, 235, 230, .3); --g1: #3A62C2; --g2: #142456; --g3: #010205;
   --ease: cubic-bezier(.33, 1, .68, 1); --spring: cubic-bezier(.34, 1.2, .64, 1);
   --font: "Onest", "Outfit", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
-body.p-olya { --hero-on: #F1DDEA; --glow: rgba(214, 120, 182, .34); --glow2: rgba(232, 130, 200, .6); --glow3: rgba(255, 190, 230, .42); --glow4: rgba(255, 110, 170, .5); --glow5: rgba(190, 100, 230, .48); --h1: rgba(232, 130, 200, .58); --h2: rgba(255, 150, 140, .4); --h3: rgba(180, 100, 235, .5); --h4: rgba(255, 200, 230, .4); --h5: rgba(255, 100, 165, .5); --h6: rgba(255, 190, 120, .28); --g1: #9A4783; --g2: #4E1B3F; --g3: #0B0309; }
+body.p-olya { --hero-on: #F1DDEA; --glow: rgba(214, 120, 182, .34); --glow2: rgba(232, 130, 200, .6); --glow3: rgba(255, 190, 230, .42); --glow4: rgba(255, 110, 170, .5); --glow5: rgba(190, 100, 230, .48); --h1: rgba(232, 130, 200, .58); --h2: rgba(255, 150, 140, .4); --h3: rgba(180, 100, 235, .5); --h4: rgba(255, 200, 230, .4); --h5: rgba(255, 100, 165, .5); --h6: rgba(255, 190, 120, .28); --g1: #9A4783; --g2: #3F1433; --g3: #040103; }
 * { box-sizing: border-box; }
 html, body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.4 var(--font); -webkit-font-smoothing: antialiased; font-variant-numeric: tabular-nums; }
 .app { max-width: 440px; margin: 0 auto; padding: 8px 14px 130px; }
@@ -204,7 +204,7 @@ a { color: inherit; text-decoration: none; }
 .av::after { left: 10%; top: 66%; width: 80%; height: 60%; }
 .av.olya { background: #F8E1EF; }
 .av.olya::before, .av.olya::after { background: #C2569E; }
-.mpick > button, .mstatic { display: flex; align-items: center; gap: 8px; height: 48px; padding: 0 14px 0 12px; border: 1px solid var(--border); border-radius: 24px; background: var(--card); font-size: 14px; white-space: nowrap; cursor: pointer; }
+.mpick > button, .mstatic { display: flex; align-items: center; gap: 8px; height: 48px; padding: 0 14px 0 12px; border: 1px solid var(--border); border-radius: 24px; background: var(--card); font-size: 15px; font-weight: 500; white-space: nowrap; cursor: pointer; }
 .mstatic { cursor: default; }
 .who > button[aria-expanded="true"] .chev, .mpick > button[aria-expanded="true"] .chev { transform: rotate(180deg); }
 .chev { transition: transform .45s var(--ease); }
@@ -367,7 +367,7 @@ a { color: inherit; text-decoration: none; }
 
 /* капсульні графіки: сіра доріжка, синя заливка, неповний місяць — штрих */
 .chart { display: flex; gap: 8px; margin-top: 24px; }
-.ticks { display: flex; flex-direction: column; justify-content: space-between; height: 150px; min-width: 54px; font-size: 12px; color: var(--ink2); text-align: right; }
+.ticks { flex: none; display: flex; flex-direction: column; justify-content: space-between; height: 150px; width: 66px; font-size: 12px; color: var(--ink2); text-align: right; }
 .ticks span { line-height: 1; }
 .caps { flex: 1; display: flex; justify-content: space-around; }
 .cap { display: flex; flex-direction: column; align-items: center; gap: 6px; }
@@ -527,7 +527,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
   .splash, .sp-mark, .sp-mark::before, .sp-mark g, .sp-bar b, .sp-name, .stag > *, .hero .num.cu, .pop:not([hidden]), .toast { animation: none !important; transition: none !important; }
   .nav .ind { transition: none; }
 }
-@media (prefers-reduced-motion: reduce) { .cap .fill, .crow .bar6 b, .segs i b, .hero .meter b { transition: none; } .fadein, .liquid i { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .cap .fill, .crow .bar6 b, .segs i b, .hero .meter b { transition: none !important; } .fadein, .liquid i { animation: none; } }
 </style>
 </head>
 <body class="p-marko">
@@ -572,8 +572,9 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
     <div class="seg" id="a-mode" role="group" aria-label="Розділ аналітики"></div>
     <div id="an-month">
       <section class="card">
-        <div class="ch" style="min-height:0"><h2>Витрати по тижнях</h2><div class="seg sm" id="rent-mode" role="group" aria-label="Оренда в графіку" hidden></div></div>
+        <div class="ch" style="min-height:0"><h2>Витрати по тижнях</h2></div>
         <div class="note" id="wnote" style="margin-top:6px"></div>
+        <div class="seg sm" id="rent-mode" role="group" aria-label="Оренда в графіку" style="margin-top:14px;width:fit-content" hidden></div>
         <div class="chart"><div class="ticks" id="wticks" aria-hidden="true"></div><div class="caps" id="bars"></div></div>
       </section>
       <section class="card"><div class="ch" style="min-height:0;margin-bottom:12px"><h2>Фіксовані й змінні</h2></div><div class="split" id="fvsplit" aria-hidden="true"></div><div class="fv2" id="fv"></div><p class="note" id="fvnote" style="margin:14px 0 0"></p></section>
@@ -587,8 +588,8 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
       </section>
       <div class="duo" id="t-duo"></div>
       <p class="note" id="t-note" style="margin:8px 4px 0"></p>
-      <section class="card list"><div class="ch"><h2 id="t-dmon"></h2><button type="button" class="sub" id="t-chg" style="border:0;background:none;color:var(--blue);font-weight:500;min-height:44px;display:inline-flex;align-items:center;gap:6px;cursor:pointer">Змінити місяць</button></div><div class="share" id="t-share" aria-hidden="true"></div><div id="t-leg" style="padding-bottom:8px"></div></section>
-      <section class="card list"><div class="ch"><h2 id="t-cmp"></h2></div><div id="t-cats"></div><p class="note" id="t-cmpnote" style="margin:6px 0 8px"></p></section>
+      <section class="card list"><div class="ch"><h2 id="t-dmon"></h2><button type="button" class="sub" id="t-chg" style="border:0;background:none;color:var(--blue);font-weight:500;min-height:44px;display:inline-flex;align-items:center;gap:4px;cursor:pointer">Змінити місяць</button></div><div class="share" id="t-share" aria-hidden="true"></div><div id="t-leg" style="padding-bottom:8px"></div></section>
+      <section class="card list"><div class="ch" style="flex-direction:column;align-items:flex-start;gap:2px;padding:10px 0 8px"><h2 id="t-cmp"></h2><span class="sub" id="t-cmpsub" style="font-size:13px"></span></div><div id="t-cats"></div><p class="note" id="t-cmpnote" style="margin:6px 0 8px"></p></section>
     </div>
   </div>
 
@@ -620,7 +621,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
         <div class="cal-grid" id="a-cal-grid"></div>
       </div>
       <input class="vh" id="a-date" type="date" tabindex="-1" aria-hidden="true">
-      <div class="info">Лише готівка. Оплати карткою вносити не треба: вони прийдуть з банківською випискою, інакше задвояться.</div>
+      <div class="info">Лише готівка. Оплати карткою вносити не треба: вони прийдуть з банківською випискою.</div>
     </div>
     <div class="sheet-foot"><p class="msg" id="a-msg" role="status"></p><button class="save" id="a-save" type="submit" disabled>Зберегти</button></div>
   </form>
@@ -640,6 +641,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
 var D = JSON.parse(document.getElementById("data").textContent);
 var FAVA = { marko: "fava/%D1%84%D1%96%D0%BD%D0%B0%D0%BD%D1%81%D0%B8-%D0%BC%D0%B0%D1%80%D0%BA%D0%B0/",
              olya: "fava/%D1%84%D1%96%D0%BD%D0%B0%D0%BD%D1%81%D0%B8-%D0%BE%D0%BB%D1%96/" };
+var INS = ["січнем", "лютим", "березнем", "квітнем", "травнем", "червнем", "липнем", "серпнем", "вереснем", "жовтнем", "листопадом", "груднем"];  // орудний: «порівняно з вереснем»
 var GEN = ["січня","лютого","березня","квітня","травня","червня","липня","серпня","вересня","жовтня","листопада","грудня"];
 var LOC = ["січні","лютому","березні","квітні","травні","червні","липні","серпні","вересні","жовтні","листопаді","грудні"];
 var MONTHS_FULL = ["Січень", "Лютий", "Березень", "Квітень", "Травень", "Червень", "Липень", "Серпень", "Вересень", "Жовтень", "Листопад", "Грудень"];
@@ -661,7 +663,7 @@ var growIO = "IntersectionObserver" in window ? new IntersectionObserver(functio
     if (!en.isIntersecting && !above) return;  // ще нижче екрана — чекаємо
     growIO.unobserve(e);
     // якщо шкалу різко прогорнули повз екран — просто заповнюємо, без анімації
-    e.style.transitionDelay = above ? "0ms" : Math.min(k++, 8) * 80 + 150 + "ms"; e.style[e.dataset.attr] = e.dataset.to;
+    e.style.transitionDelay = above ? "0ms" : (e.dataset.delay ? +e.dataset.delay + 150 : Math.min(k++, 8) * 80 + 150) + "ms"; e.style[e.dataset.attr] = e.dataset.to;
   });
 }, { rootMargin: "0px 0px -60px 0px" }) : null;
 function grow(sel, attr) {
@@ -680,26 +682,26 @@ var CHR = svgI("currentColor", '<path d="m9 6 6 6-6 6"/>', 16);
 var CAL = svgI("#6B7180", '<rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/>', 16);
 // кольорові іконки категорій (з макета v2): фон, колір лінії, малюнок
 var CATS = {
-  "Продукти": ["#E3F7EA", "#16A34A", '<path d="M2 3.25A.75.75 0 0 1 2.75 2.5h1.6c.6 0 1.1.42 1.22 1L5.8 5H20a1 1 0 0 1 .97 1.24l-1.6 6.6A2 2 0 0 1 17.4 14.4H8.1l.3 1.6H18a.9.9 0 0 1 0 1.8H7.7a1 1 0 0 1-.98-.8L4 4H2.75A.75.75 0 0 1 2 3.25z"/><circle cx="9" cy="20.2" r="1.6"/><circle cx="17.5" cy="20.2" r="1.6"/>'],
-  "Кафе": ["#FDE8EC", "#E11D48", '<path fill-rule="evenodd" d="M4 7.5a.5.5 0 0 1 .5-.5h12a.5.5 0 0 1 .5.5V9h1.3a3.2 3.2 0 0 1 0 6.4h-1.7A6 6 0 0 1 11.2 19H9.8A5.8 5.8 0 0 1 4 13.2zM17 10.8v2.8h1.3a1.4 1.4 0 0 0 0-2.8z"/><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M8 2.5V4.5M12 2.5V4.5"/>'],
-  "Доставка Їжі": ["#E6EFFE", "#0284C7", '<path fill-rule="evenodd" d="M8 7V6a4 4 0 0 1 8 0v1h2.1a1 1 0 0 1 1 .92l.9 11A2 2 0 0 1 18 21H6a2 2 0 0 1-2-2.08l.9-11A1 1 0 0 1 5.9 7zm1.8 0h4.4V6a2.2 2.2 0 0 0-4.4 0z"/>'],
-  "Звязок": ["#F1E8FD", "#9333EA", '<path fill-rule="evenodd" d="M8.5 2h7A2.5 2.5 0 0 1 18 4.5v15a2.5 2.5 0 0 1-2.5 2.5h-7A2.5 2.5 0 0 1 6 19.5v-15A2.5 2.5 0 0 1 8.5 2zm2.5 16a1 1 0 0 0 0 2h2a1 1 0 0 0 0-2z"/>'],
-  "Дохід": ["#E3F7EA", "#16A34A", '<path fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" d="M17 7 7.5 16.5M7.5 9.5v7h7"/>'],
-  "Комунальні": ["#DFF5F2", "#0D9488", '<path d="M13.6 2.2a.6.6 0 0 1 1 .5L13.5 10H18a.6.6 0 0 1 .5 1l-8.1 10.8a.6.6 0 0 1-1-.5L10.5 14H6a.6.6 0 0 1-.5-1z"/>'],
-  "Спорт": ["#FFEDDF", "#EA580C", '<rect x="5" y="5.5" width="3.2" height="13" rx="1.2"/><rect x="15.8" y="5.5" width="3.2" height="13" rx="1.2"/><rect x="2" y="8.5" width="2.6" height="7" rx="1"/><rect x="19.4" y="8.5" width="2.6" height="7" rx="1"/><rect x="8" y="11" width="8" height="2" rx=".5"/>'],
-  "Житло": ["#E9EAFD", "#4F46E5", '<path d="M11.3 2.8a1.1 1.1 0 0 1 1.4 0l8 6.6a1 1 0 0 1-.65 1.8H19V20a1 1 0 0 1-1 1h-4v-5h-4v5H6a1 1 0 0 1-1-1v-8.8H3.95a1 1 0 0 1-.65-1.8z"/>'],
-  "Транспорт": ["#E0F2FE", "#2563EB", '<path fill-rule="evenodd" d="M8 3h8a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3zm-1 3.5v4h10v-4z"/><circle cx="8.5" cy="14.5" r="1.1" fill="#fff"/><circle cx="15.5" cy="14.5" r="1.1" fill="#fff"/><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M8 18.5V21M16 18.5V21"/>'],
-  "Підписки": ["#FEF6D8", "#D97706", '<circle cx="12" cy="12" r="9.5"/><path fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M8 12a4 4 0 0 1 6.9-2.8M16 12a4 4 0 0 1-6.9 2.8M15.4 6.8v2.6h-2.6M8.6 17.2v-2.6h2.6"/>'],
-  "Краса і Побут": ["#FDE8F4", "#DB2777", '<path stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" d="M11 3.5l1.8 5.2L18 10.5l-5.2 1.8L11 17.5l-1.8-5.2L4 10.5l5.2-1.8z"/><path d="M18.5 14.5l.75 1.75L21 17l-1.75.75-.75 1.75-.75-1.75L16 17l1.75-.75z"/>'],
-  "Розваги": ["#EDE9FE", "#C026D3", '<path fill-rule="evenodd" d="M7 7h10a5 5 0 0 1 4.9 6l-.5 2.6a3 3 0 0 1-5.1 1.5L14.6 15H9.4l-1.7 2.1a3 3 0 0 1-5.1-1.5L2.1 13A5 5 0 0 1 7 7zm.2 3a.9.9 0 0 0-.9.9v.9h-.9a.9.9 0 0 0 0 1.8h.9v.9a.9.9 0 0 0 1.8 0v-.9h.9a.9.9 0 0 0 0-1.8h-.9v-.9a.9.9 0 0 0-.9-.9zm8.8 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>'],
-  "Покупки": ["#FCE7F3", "#7C3AED", '<path fill-rule="evenodd" d="M8.2 7a3.8 3.8 0 0 1 7.6 0h2.3a1 1 0 0 1 1 .9l1 12A1 1 0 0 1 19 21H5a1 1 0 0 1-1-1.1l1-12A1 1 0 0 1 6 7zm1.8 0h4a2 2 0 0 0-4 0z"/>'],
-  "Інші": ["#F1F2F5", "#64748B", '<circle cx="5.5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="18.5" cy="12" r="2"/>']
+  "Продукти": ["#E3F7EA", "#22C55E", '<path d="M2 3.25A.75.75 0 0 1 2.75 2.5h1.6c.6 0 1.1.42 1.22 1L5.8 5H20a1 1 0 0 1 .97 1.24l-1.6 6.6A2 2 0 0 1 17.4 14.4H8.1l.3 1.6H18a.9.9 0 0 1 0 1.8H7.7a1 1 0 0 1-.98-.8L4 4H2.75A.75.75 0 0 1 2 3.25z"/><circle cx="9" cy="20.2" r="1.6"/><circle cx="17.5" cy="20.2" r="1.6"/>'],
+  "Кафе": ["#FDE8EC", "#F43F5E", '<path fill-rule="evenodd" d="M4 7.5a.5.5 0 0 1 .5-.5h12a.5.5 0 0 1 .5.5V9h1.3a3.2 3.2 0 0 1 0 6.4h-1.7A6 6 0 0 1 11.2 19H9.8A5.8 5.8 0 0 1 4 13.2zM17 10.8v2.8h1.3a1.4 1.4 0 0 0 0-2.8z"/><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M8 2.5V4.5M12 2.5V4.5"/>'],
+  "Доставка Їжі": ["#E6EFFE", "#0EA5E9", '<path fill-rule="evenodd" d="M8 7V6a4 4 0 0 1 8 0v1h2.1a1 1 0 0 1 1 .92l.9 11A2 2 0 0 1 18 21H6a2 2 0 0 1-2-2.08l.9-11A1 1 0 0 1 5.9 7zm1.8 0h4.4V6a2.2 2.2 0 0 0-4.4 0z"/>'],
+  "Звязок": ["#F1E8FD", "#A855F7", '<path fill-rule="evenodd" d="M8.5 2h7A2.5 2.5 0 0 1 18 4.5v15a2.5 2.5 0 0 1-2.5 2.5h-7A2.5 2.5 0 0 1 6 19.5v-15A2.5 2.5 0 0 1 8.5 2zm2.5 16a1 1 0 0 0 0 2h2a1 1 0 0 0 0-2z"/>'],
+  "Дохід": ["#E3F7EA", "#22C55E", '<path fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" d="M17 7 7.5 16.5M7.5 9.5v7h7"/>'],
+  "Комунальні": ["#DFF5F2", "#14B8A6", '<path d="M13.6 2.2a.6.6 0 0 1 1 .5L13.5 10H18a.6.6 0 0 1 .5 1l-8.1 10.8a.6.6 0 0 1-1-.5L10.5 14H6a.6.6 0 0 1-.5-1z"/>'],
+  "Спорт": ["#FFEDDF", "#FB923C", '<rect x="5" y="5.5" width="3.2" height="13" rx="1.2"/><rect x="15.8" y="5.5" width="3.2" height="13" rx="1.2"/><rect x="2" y="8.5" width="2.6" height="7" rx="1"/><rect x="19.4" y="8.5" width="2.6" height="7" rx="1"/><rect x="8" y="11" width="8" height="2" rx=".5"/>'],
+  "Житло": ["#E9EAFD", "#6366F1", '<path d="M11.3 2.8a1.1 1.1 0 0 1 1.4 0l8 6.6a1 1 0 0 1-.65 1.8H19V20a1 1 0 0 1-1 1h-4v-5h-4v5H6a1 1 0 0 1-1-1v-8.8H3.95a1 1 0 0 1-.65-1.8z"/>'],
+  "Транспорт": ["#E0F2FE", "#3B82F6", '<path fill-rule="evenodd" d="M8 3h8a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3zm-1 3.5v4h10v-4z"/><circle cx="8.5" cy="14.5" r="1.1" fill="#fff"/><circle cx="15.5" cy="14.5" r="1.1" fill="#fff"/><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M8 18.5V21M16 18.5V21"/>'],
+  "Підписки": ["#FEF6D8", "#F59E0B", '<circle cx="12" cy="12" r="9.5"/><path fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M8 12a4 4 0 0 1 6.9-2.8M16 12a4 4 0 0 1-6.9 2.8M15.4 6.8v2.6h-2.6M8.6 17.2v-2.6h2.6"/>'],
+  "Краса і Побут": ["#FDE8F4", "#EC4899", '<path stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" d="M11 3.5l1.8 5.2L18 10.5l-5.2 1.8L11 17.5l-1.8-5.2L4 10.5l5.2-1.8z"/><path d="M18.5 14.5l.75 1.75L21 17l-1.75.75-.75 1.75-.75-1.75L16 17l1.75-.75z"/>'],
+  "Розваги": ["#EDE9FE", "#D946EF", '<path fill-rule="evenodd" d="M7 7h10a5 5 0 0 1 4.9 6l-.5 2.6a3 3 0 0 1-5.1 1.5L14.6 15H9.4l-1.7 2.1a3 3 0 0 1-5.1-1.5L2.1 13A5 5 0 0 1 7 7zm.2 3a.9.9 0 0 0-.9.9v.9h-.9a.9.9 0 0 0 0 1.8h.9v.9a.9.9 0 0 0 1.8 0v-.9h.9a.9.9 0 0 0 0-1.8h-.9v-.9a.9.9 0 0 0-.9-.9zm8.8 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>'],
+  "Покупки": ["#FCE7F3", "#8B5CF6", '<path fill-rule="evenodd" d="M8.2 7a3.8 3.8 0 0 1 7.6 0h2.3a1 1 0 0 1 1 .9l1 12A1 1 0 0 1 19 21H5a1 1 0 0 1-1-1.1l1-12A1 1 0 0 1 6 7zm1.8 0h4a2 2 0 0 0-4 0z"/>'],
+  "Інші": ["#F1F2F5", "#94A3B8", '<circle cx="5.5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="18.5" cy="12" r="2"/>']
 };
 // зсув малюнка до центру кола: виміряно за видимими пікселями (разом із товщиною ліній)
 // плюс невелика оптична поправка на «вагу» — щоб сумки, чашка й кошик не здавались зміщеними
 var SHIFT = {"Продукти": [0.18, 0.25], "Кафе": [-0.2, 1.08], "Доставка Їжі": [0, -0.19], "Звязок": [0, 0.09], "Дохід": [0.14, -0.15], "Комунальні": [0, 0], "Спорт": [0, 0], "Житло": [0, 0.01], "Транспорт": [0, -0.2], "Підписки": [0, 0], "Краса і Побут": [0.06, 0.89], "Розваги": [-0.15, -0.3], "Покупки": [-0.05, -0.67], "Інші": [0, 0]};
 // іконка категорії: світло-сірий круг, залитий малюнок у кольорі категорії, по центру
-// яскраві кольори категорій — для шкал, часток і крапок; малюнки іконок беруть темніший відтінок
+// яскраві кольори категорій — для шкал, часток, крапок і малюнків іконок
 var BRIGHT = {"Продукти": "#22C55E", "Кафе": "#F43F5E", "Доставка Їжі": "#0EA5E9", "Звязок": "#A855F7", "Дохід": "#22C55E", "Комунальні": "#14B8A6", "Спорт": "#FB923C", "Житло": "#6366F1", "Транспорт": "#3B82F6", "Підписки": "#F59E0B", "Краса і Побут": "#EC4899", "Розваги": "#D946EF", "Покупки": "#8B5CF6", "Інші": "#94A3B8"};
 function bright(n) { return BRIGHT[n] || BRIGHT["Інші"]; }
 function cic(name, big) {
@@ -945,16 +947,25 @@ function renderGoal(P) {
   var left = Math.max(0, target - have), monthsLeft = (G.deadline[0] * 12 + G.deadline[1] - 1) - (y * 12 + m);
   var need = monthsLeft > 0 ? left / monthsLeft : left;
   var eta = pace > 0 ? Math.ceil(left / pace) : 0, etaIdx = y * 12 + m - 1 + eta, etaY = Math.floor(etaIdx / 12), etaM = etaIdx % 12;
-  var early = etaY * 12 + etaM < G.deadline[0] * 12 + G.deadline[1] - 1;
+  var early = etaY * 12 + etaM < G.deadline[0] * 12 + G.deadline[1] - 1, ahead = (G.deadline[0] * 12 + G.deadline[1] - 1) - (etaY * 12 + etaM);
   var segs = "", labs = "";
-  for (var i = 0; i < G.months; i++) { segs += '<i><b data-to="' + Math.max(0, Math.min(1, life - i)) * 100 + '%"></b></i>'; labs += "<span>" + (i === 0 ? "1 міс." : i + 1) + "</span>"; }
+  var SEG = 0.55, at = 0;  // секунд на одну повну смужку
+  for (var i = 0; i < G.months; i++) {
+    var f = Math.max(0, Math.min(1, life - i)), dur = Math.max(f, .01) * SEG, last = f < 1 || i === G.months - 1;
+    segs += '<i><b data-to="' + f * 100 + '%" data-delay="' + Math.round(at * 1000) + '" style="transition: width ' + dur.toFixed(2) + "s " + (last ? "cubic-bezier(.33, 1, .68, 1)" : "linear") + '"></b></i>';
+    at += f >= 1 ? dur : 0;
+    labs += "<span>" + (i === 0 ? "1 міс." : i + 1) + "</span>";
+  }
   box.innerHTML = '<div class="ch" style="min-height:0"><h2>' + G.title + '</h2><span class="sub" style="font-size:12px">до 1 червня ' + G.deadline[0] + "</span></div>" +
     '<div class="gbig"><b>' + nf1.format(life) + "</b><span>" + (Math.round(life * 10) % 10 ? "місяця" : plural(Math.round(life), "місяць", "місяці", "місяців")) + " спокійного життя<br>з шести запланованих</span></div>" +
     '<div class="segs" role="img" aria-label="' + nf1.format(life) + " з " + G.months + ' місяців">' + segs + '</div><div class="seglab" aria-hidden="true">' + labs + "</div>" +
     '<div class="gcols"><div><span>Накопичено</span><b>' + nf0.format(have) + " зл</b><small>з " + nf0.format(target) + " зл, " + nf0.format(have / target * 100) + " %</small></div>" +
     "<div><span>Відкладаєте на місяць</span><b>" + nf0.format(pace) + " зл</b><small>треба " + nf0.format(need) + " зл</small></div></div>" +
-    '<div class="gpace"><span>' + (pace >= need ? "У такому темпі — " + MONTHS_FULL[etaM].toLowerCase() + " " + etaY + (early ? ", раніше терміну" : "") : "Щоб встигнути, треба відкладати більше") + "</span>" +
-    '<span class="bd ' + (pace >= need ? "good" : "bad") + '">' + arr(pace - need) + " " + nf0.format(Math.abs(pace - need)) + " зл</span></div>";
+    '<div class="gpace"><span>' + (pace >= need
+      ? "Якщо відкладати стільки ж, подушка буде готова " + (early ? "вже в " + LOC[etaM] + " " + etaY + ", на " + ahead + " " + plural(ahead, "місяць", "місяці", "місяців") + " раніше плану" : "якраз вчасно")
+      : "Щоб встигнути до червня " + G.deadline[0] + ", відкладайте щомісяця більше") + "</span>" +
+    '<span class="bd ' + (pace >= need ? "good" : "bad") + '" title="' + (pace >= need ? "на стільки більше, ніж треба щомісяця" : "на стільки треба більше щомісяця") + '">' +
+    (pace >= need ? "+" : "−") + nf0.format(Math.abs(pace - need)) + " зл/міс.</span></div>";
 }
 
 // ---------- аналітика ----------
@@ -1046,15 +1057,16 @@ function renderTrends(P) {
   var sl = slices(S), tot = sl.reduce(function (s, x) { return s + x.amount; }, 0) || 1;
   $("t-share").innerHTML = sl.map(function (x) { return '<i style="flex:' + x.amount + ";background:" + x.color + '"></i>'; }).join("");
   $("t-leg").innerHTML = sl.map(function (x) { return '<div class="leg"><i style="background:' + x.color + '"></i><span>' + esc(x.name) + '</span><span class="v" style="color:var(--ink2)">' + zl(x.amount) + '</span><span class="bd blue">' + nf1.format(x.amount / tot * 100) + " %</span></div>"; }).join("");
-  $("t-chg").innerHTML = "Змінити місяць" + CHR;
+  $("t-chg").innerHTML = "Змінити місяць" + svgI("currentColor", '<path d="M4 8h14M14 4l4 4-4 4M20 16H6M10 12l-4 4 4 4"/>', 16);
   $("t-chg").onclick = function () { trendMonth = (trendMonth + list.length - 1) % list.length; render(); };
 
   var idx = P.months.indexOf(S), prev = P.months[idx - 1], pm = {};
   if (prev) prev.categories.forEach(function (c) { pm[c.name] = c.amount; });
-  $("t-cmp").textContent = prev ? S.name + " проти " + GEN[mi(prev)] : S.name;
+  $("t-cmp").textContent = prev ? "Як змінились витрати" : "Витрати за категоріями";
+  $("t-cmpsub").textContent = prev ? S.name + " порівняно з " + INS[mi(prev)] : "";
   $("t-cats").innerHTML = S.categories.map(function (c) {
     var d = "";
-    if (prev) { var was = pm[c.name] || 0; d = !was ? '<span class="bd new">нова</span>' : badge(c.amount, was, true, "", true); }
+    if (prev) { var was = pm[c.name] || 0; d = !was ? '<span class="bd new" title="у попередньому місяці цих витрат не було">вперше</span>' : badge(c.amount, was, true, "", true); }
     return '<div class="cmp"><span class="n">' + esc(c.name) + '</span><span class="v">' + zl(c.amount) + "</span>" + d + "</div>";
   }).join("");
   $("t-cmpnote").textContent = S.incomplete ? "Місяць ще триває, тож порівняння неповне." : "";
@@ -1131,10 +1143,11 @@ function renderDates() {
     var b;
     if (x[1]) b = h("button", "", x[0] + "<small>" + wd.format(x[1]) + ", " + dm.format(x[1]) + "</small>");
     else b = h("button", other ? "" : "other", other ? "Інша дата<small>" + v.slice(8) + "." + v.slice(5, 7) + "</small>" : CAL + "Інша дата");
-    b.type = "button"; b.setAttribute("aria-pressed", other ? i === 2 : i === dpick);
+    var calOpen = !$("a-cal").hidden;
+    b.type = "button"; b.setAttribute("aria-pressed", calOpen || other ? i === 2 : i === dpick);
     b.onclick = function () {
-      if (x[1]) { dpick = i; $("a-date").value = iso(x[1]); renderDates(); }
-      else { var c = $("a-cal"); c.hidden = !c.hidden; if (!c.hidden) { aCal = ($("a-date").value || iso(new Date())).slice(0, 7); renderACal(); } }
+      if (x[1]) { dpick = i; $("a-date").value = iso(x[1]); $("a-cal").hidden = true; renderDates(); }
+      else { var c = $("a-cal"); c.hidden = !c.hidden; if (!c.hidden) { aCal = ($("a-date").value || iso(new Date())).slice(0, 7); renderACal(); } renderDates(); }
     };
     box.appendChild(b);
   });
