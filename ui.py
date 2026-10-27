@@ -445,7 +445,7 @@ a { color: inherit; text-decoration: none; }
 .cmp { display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 12px 0; border-top: 1px solid var(--soft); font-size: 15px; }
 .cmp .n { flex: 1; min-width: 0; }
 .cmp .v { color: var(--ink2); }
-.cmp .bd { min-width: 64px; justify-content: center; }
+.cmp .bd { min-width: 46px; justify-content: center; padding: 0 6px; letter-spacing: -.02em; word-spacing: -.12em; }
 .fava { display: inline-flex; align-items: center; gap: 2px; min-height: 44px; margin: 10px 4px 0; font-size: 14px; font-weight: 500; color: var(--blue); }
 
 /* журнал */
@@ -1117,7 +1117,7 @@ function renderTrends(P) {
   $("t-cmpsub").textContent = prev ? S.name + " порівняно з " + INS[mi(prev)] : "";
   $("t-cats").innerHTML = S.categories.map(function (c) {
     var d = "";
-    if (prev) { var was = pm[c.name] || 0; d = !was ? '<span class="bd bad" title="у попередньому місяці цих витрат не було" aria-label="більше на ' + nf0.format(c.amount) + ' зл, минулого місяця не було">↗ +' + nf0.format(c.amount) + " зл</span>" : badge(c.amount, was, true, "", true); }
+    if (prev) { var was = pm[c.name] || 0; d = !was ? '<span class="bd bad" title="у попередньому місяці цих витрат не було" aria-label="більше на ' + nf0.format(c.amount) + ' зл, минулого місяця не було">↗ +' + nf0.format(c.amount) + " зл</span>" : badge(c.amount, was, true, "", true).replace(">без змін<", ">0 %<"); }
     return '<div class="cmp"><span class="n">' + esc(c.name) + '</span><span class="v">' + zl(c.amount) + "</span>" + d + "</div>";
   }).join("");
   $("t-cmpnote").textContent = S.incomplete ? "Місяць триває, дані попередні." : "";
