@@ -388,7 +388,8 @@ a { color: inherit; text-decoration: none; }
 .segs i b { position: absolute; inset: 0; width: 0; border-radius: 4px; background: var(--blue-g); transition: width 2.1s var(--ease); }
 .seglab { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; margin-top: 6px; font-size: 12px; color: var(--ink2); }
 .gcols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0 12px; padding-top: 14px; border-top: 1px solid var(--soft); }
-.gcols span { display: block; font-size: 12px; color: var(--ink2); }
+.gcols span { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ink2); }
+.gcols span svg { flex: none; width: 16px; height: 16px; }
 .gcols b { display: block; margin: 3px 0 2px; font-size: 18px; font-weight: 500; }
 .gcols small { display: block; font-size: 12px; color: var(--ink2); }
 .gpace { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 14px; background: #F8F9FB; font-size: 13px; line-height: 1.4; color: var(--ink4); }
@@ -1011,8 +1012,8 @@ function renderGoal(P) {
   box.innerHTML = '<div class="ch" style="min-height:0"><h2>' + G.title + '</h2><span class="sub" style="font-size:12px">до 1 червня ' + G.deadline[0] + "</span></div>" +
     '<div class="gbig"><b>' + nf1.format(life) + "</b><span>" + (Math.round(life * 10) % 10 ? "місяця" : plural(Math.round(life), "місяць", "місяці", "місяців")) + " витрат покрито<br>із 6 запланованих</span></div>" +
     '<div class="segs" role="img" aria-label="' + nf1.format(life) + " з " + G.months + ' місяців">' + segs + '</div><div class="seglab" aria-hidden="true">' + labs + "</div>" +
-    '<div class="gcols"><div><span>Накопичено</span><b>' + nf0.format(have) + " зл</b><small>з " + nf0.format(target) + " зл, " + nf0.format(have / target * 100) + " %</small></div>" +
-    "<div><span>Відкладено за місяць</span><b>" + nf0.format(pace) + " зл</b><small>треба " + nf0.format(need) + " зл</small></div></div>" +
+    '<div class="gcols"><div><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 11.5a6.5 5.5 0 0 1 6.5-5.5h3a6.5 5.5 0 0 1 6 3.4l1.5.4v3.4l-1.6.5a6.5 5.5 0 0 1-2.4 2.7V20h-2.6v-1.8h-3.8V20H8.5v-2.6a5.5 5.5 0 0 1-4-5.9z"/><path d="M11 6V4.2M10 9.5h3.5"/><circle cx="16.5" cy="10.5" r=".6" fill="currentColor"/></svg>Накопичено</span><b>' + nf0.format(have) + " зл</b><small>з " + nf0.format(target) + " зл, " + nf0.format(have / target * 100) + " %</small></div>" +
+    "<div><span><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"3.5\" y=\"5\" width=\"17\" height=\"15.5\" rx=\"3\"/><path d=\"M3.5 10h17M8 3v4M16 3v4\"/></svg>Відкладено за місяць</span><b>" + nf0.format(pace) + " зл</b><small>треба " + nf0.format(need) + " зл</small></div></div>" +
     '<div class="gpace"><span>' + (pace >= need
       ? "За поточного темпу ціль буде досягнуто " + (early ? "в " + LOC[etaM] + " " + etaY + " — на " + ahead + " " + plural(ahead, "місяць", "місяці", "місяців") + " раніше плану" : "вчасно")
       : "Щоб досягти цілі до червня " + G.deadline[0] + ", потрібно відкладати більше") + "</span>" +
