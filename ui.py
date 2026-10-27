@@ -178,11 +178,11 @@ PAGE = r"""<!doctype html>
   --ink: #111318; --ink2: #6B7180; --ink3: #4A5060; --ink4: #2A2E38; --mute: #C4C8D0;
   --blue: #1F63E6; --blue-g: linear-gradient(180deg, #3B82F6, #1D5FE0); --blue-soft: #EAF1FF; --blue-txt: #1F55C9; --blue-l: #A9C6F8;
   --good: #15803D; --good-bg: #E3F7EA; --bad: #C0261B; --bad-bg: #FDE8E6; --cash: #7A4E00; --cash-bg: #FFF2DB;
-  --hero-on: #DCE3F4; --glow: rgba(120, 160, 245, .24); --glow2: rgba(130, 175, 255, .62); --glow3: rgba(190, 215, 255, .45); --glow4: rgba(90, 120, 255, .55); --glow5: rgba(150, 130, 255, .5); --h1: rgba(86, 146, 255, .85); --h2: rgba(56, 189, 248, .7); --h3: rgba(139, 92, 246, .75); --h4: rgba(6, 12, 44, .85); --h5: rgba(59, 91, 255, .8); --h6: rgba(110, 231, 255, .5); --g1: #3A62C2; --g2: #142456; --g3: #010205;
+  --hero-on: #DCE3F4; --glow: rgba(120, 160, 245, .24); --glow2: rgba(130, 175, 255, .62); --glow3: rgba(190, 215, 255, .45); --glow4: rgba(90, 120, 255, .55); --glow5: rgba(150, 130, 255, .5); --h1: rgba(86, 146, 255, .72); --h2: rgba(56, 189, 248, .5); --h3: rgba(139, 92, 246, .58); --h4: rgba(4, 8, 32, .9); --h5: rgba(59, 91, 255, .62); --h6: rgba(110, 231, 255, .66); --g1: #3A62C2; --g2: #142456; --g3: #010205;
   --ease: cubic-bezier(.33, 1, .68, 1); --spring: cubic-bezier(.34, 1.2, .64, 1);
   --font: "Onest", "Outfit", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
-body.p-olya { --hero-on: #F1DDEA; --glow: rgba(214, 120, 182, .34); --glow2: rgba(232, 130, 200, .6); --glow3: rgba(255, 190, 230, .42); --glow4: rgba(255, 110, 170, .5); --glow5: rgba(190, 100, 230, .48); --h1: rgba(244, 114, 182, .85); --h2: rgba(251, 146, 120, .65); --h3: rgba(192, 86, 240, .75); --h4: rgba(36, 4, 26, .85); --h5: rgba(255, 72, 150, .8); --h6: rgba(255, 186, 130, .45); --g1: #9A4783; --g2: #3F1433; --g3: #040103; }
+body.p-olya { --hero-on: #F1DDEA; --glow: rgba(214, 120, 182, .34); --glow2: rgba(232, 130, 200, .6); --glow3: rgba(255, 190, 230, .42); --glow4: rgba(255, 110, 170, .5); --glow5: rgba(190, 100, 230, .48); --h1: rgba(244, 114, 182, .62); --h2: rgba(251, 146, 120, .42); --h3: rgba(192, 86, 240, .55); --h4: rgba(28, 2, 20, .9); --h5: rgba(255, 72, 150, .55); --h6: rgba(255, 176, 120, .58); --g1: #9A4783; --g2: #3F1433; --g3: #040103; }
 * { box-sizing: border-box; }
 html, body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.4 var(--font); -webkit-font-smoothing: antialiased; font-variant-numeric: tabular-nums; }
 .app { max-width: 440px; margin: 0 auto; padding: 8px 14px 130px; }
@@ -259,22 +259,22 @@ a { color: inherit; text-decoration: none; }
 .hero { position: relative; z-index: 1; padding: 22px 20px 20px; border-radius: 24px; color: #fff; }
 /* мʼякий темний край: світло з плям плавно тоне в найтемніший тон ближче до країв картки */
 .hero-wrap::after { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; border-radius: inherit;
-  background: radial-gradient(140% 120% at 45% 40%, transparent 60%, color-mix(in srgb, var(--g3) 35%, transparent) 84%, color-mix(in srgb, var(--g3) 85%, transparent) 100%); }
+  background: radial-gradient(130% 115% at 45% 40%, transparent 50%, color-mix(in srgb, var(--g3) 50%, transparent) 80%, var(--g3) 100%); }
 /* «рідке» світло: три пари плям. Кожна пара пливе своїм шляхом (25–33 с), а дві плями в ній сходяться,
    зливаються, розтягуються одна за одною й знову розходяться (11–15 с). Фільтр #melt мʼяко «склеює» плями,
    коли вони близько, а сильне розмиття робить з цього переливи градієнта. Старт кожної пари — випадковий */
-.liquid { position: absolute; inset: -10%; z-index: 0; pointer-events: none; filter: blur(28px) saturate(1.45) brightness(1.18); }
+.liquid { position: absolute; inset: -10%; z-index: 0; pointer-events: none; filter: blur(44px) saturate(1.4) brightness(1.1); }
 .pair { position: absolute; width: 96%; height: 82%; will-change: transform; animation: var(--path) var(--pd) cubic-bezier(.37, 0, .63, 1) infinite; }
-.pair i { position: absolute; top: 18%; width: 92%; aspect-ratio: 2.6 / 1; border-radius: 50%; mix-blend-mode: screen; will-change: transform;
+.pair i { position: absolute; top: 18%; width: 74%; aspect-ratio: 2.6 / 1; border-radius: 50%; mix-blend-mode: screen; will-change: transform;
   background: radial-gradient(closest-side, var(--c) 0%, var(--c) 35%, transparent 100%); animation: apartL var(--sd) cubic-bezier(.37, 0, .63, 1) infinite; }
 .pair i:first-child { left: 0; transform-origin: 70% 50%; }
 .pair i:last-child { right: 0; transform-origin: 30% 50%; animation-name: apartR; }
-.pair:nth-child(1) { left: 48%; top: -34%; --path: pathA; --pd: 25s; --sd: 11s; }
+.pair:nth-child(1) { left: 34%; top: -34%; --path: pathA; --pd: 34s; --sd: 15s; }
 .pair:nth-child(1) i:first-child { --c: var(--h1); } .pair:nth-child(1) i:last-child { --c: var(--h3); }
-.pair:nth-child(2) { left: -58%; top: 6%; --path: pathB; --pd: 30s; --sd: 13s; }
-.pair:nth-child(2) i:first-child { --c: var(--h2); } .pair:nth-child(2) i:last-child { --c: var(--h5); }
-.pair:nth-child(3) { left: 52%; top: 40%; --path: pathC; --pd: 33s; --sd: 15s; }
-.pair:nth-child(3) i:first-child { --c: var(--h4); mix-blend-mode: normal; } .pair:nth-child(3) i:last-child { --c: var(--h6); }
+.pair:nth-child(2) { left: -52%; top: 14%; --path: pathB; --pd: 38s; --sd: 17s; }
+.pair:nth-child(2) i:first-child { --c: var(--h2); } .pair:nth-child(2) i:last-child { --c: var(--h4); mix-blend-mode: normal; }
+.pair:nth-child(3) { left: 30%; top: 40%; --path: pathC; --pd: 43s; --sd: 19s; }
+.pair:nth-child(3) i:first-child { --c: var(--h5); } .pair:nth-child(3) i:last-child { --c: var(--h6); }
 /* сходяться (злиття) → розтягуються одна за одною → розходяться → пауза окремо */
 @keyframes apartL {
   0%, 100% { transform: translateX(-20%) rotate(-14deg) scale(1, 1); }
@@ -289,9 +289,9 @@ a { color: inherit; text-decoration: none; }
   70% { transform: translateX(4%) rotate(-4deg) scale(1.1, .9); }
 }
 
-@keyframes pathA { 0%, 100% { transform: translate(0, 0) rotate(0); } 25% { transform: translate(-10%, 14%) rotate(35deg); } 50% { transform: translate(2%, 30%) rotate(80deg); } 75% { transform: translate(10%, 12%) rotate(130deg); } }
-@keyframes pathB { 0%, 100% { transform: translate(0, 0) rotate(0); } 30% { transform: translate(14%, 22%) rotate(-50deg); } 60% { transform: translate(6%, 40%) rotate(-110deg); } 80% { transform: translate(-4%, 18%) rotate(-150deg); } }
-@keyframes pathC { 0%, 100% { transform: translate(0, 0) rotate(0); } 33% { transform: translate(-12%, -26%) rotate(60deg); } 66% { transform: translate(8%, -14%) rotate(140deg); } }
+@keyframes pathA { 0%, 100% { transform: translate(0, 0) rotate(0); } 25% { transform: translate(-22%, 18%) rotate(40deg); } 50% { transform: translate(-6%, 38%) rotate(90deg); } 75% { transform: translate(16%, 16%) rotate(140deg); } }
+@keyframes pathB { 0%, 100% { transform: translate(0, 0) rotate(0); } 30% { transform: translate(26%, 20%) rotate(-50deg); } 60% { transform: translate(14%, -18%) rotate(-110deg); } 80% { transform: translate(-6%, 10%) rotate(-150deg); } }
+@keyframes pathC { 0%, 100% { transform: translate(0, 0) rotate(0); } 33% { transform: translate(-24%, -30%) rotate(60deg); } 66% { transform: translate(18%, -16%) rotate(140deg); } }
 /* легка тінь під білим текстом — підпис лишається читабельним, коли блік пропливає під ним */
 .hero .lbl, .hero .num, .hero .sub, .hero .lt, .hero .lg2 b { text-shadow: 0 1px 10px rgba(5, 10, 30, .28); }
 .hero .sub .inc { color: inherit; }
