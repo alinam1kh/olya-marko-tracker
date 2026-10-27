@@ -723,10 +723,12 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
   clip-path: inset(0 100% 0 0); transition: clip-path 1.6s cubic-bezier(.33, 1, .68, 1) .35s; }
 /* поява разом зі стовпчиками: лінія «прокреслюється» зліва направо */
 .avgl.in { clip-path: inset(0 0 0 0); }
-/* натиснули легенду — лінія на мить синіє */
+/* перемикач у легенді: лінія й значок у легенді сині, поки увімкнено */
 .avgl::after { content: ""; position: absolute; inset: 0; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='3'%3E%3Cline x1='1.5' y1='1.5' x2='7.5' y2='1.5' stroke='%231F63E6' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") repeat-x left center / 12px 3px; opacity: 0; transition: opacity .45s var(--ease); }
 .avgl.hi::after { opacity: 1; }
 .avg-leg { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.avg-leg[aria-pressed="true"] i { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='3'%3E%3Cline x1='1.5' y1='1.5' x2='7.5' y2='1.5' stroke='%231F63E6' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"); }
+.avg-leg[aria-pressed="true"] span { color: var(--ink); }
 .avg-leg { display: flex; align-items: center; gap: 10px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--soft); font-size: 14px; color: var(--ink2); }
 .avg-leg i { flex: none; width: 20px; height: 3px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='3'%3E%3Cline x1='1.5' y1='1.5' x2='7.5' y2='1.5' stroke='%23C3C9D3' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") repeat-x left center / 12px 3px; }
 .avg-leg b { margin-left: auto; font-size: 15px; font-weight: 500; color: var(--ink); }
@@ -1127,6 +1129,7 @@ function cic(name, big) {
 function arr(d) { return d > 0 ? "↗" : "↘"; }
 
 function lastFull(P) { for (var i = P.months.length - 1; i >= 0; i--) if (P.months[i].income > 0) return i; return P.months.length - 1; }
+var avgHi = false;  // лінія середнього підсвічена синім (перемикач у легенді)
 var person = 0, month = lastFull(D.people[0]), trendMonth = null, filter = "all", metric = "exp", rentOut = false, amode = "month";
 var GOAL = { olya: { months: 6, deadline: [2027, 6], title: "Подушка безпеки" } };  // фіча 5 з роадмапу ДЗ
 var VIEWS = { report: 1, analytics: 1, journal: 1, add: 1 };
@@ -1498,11 +1501,13 @@ function renderTrends(P) {
   }), ax.max, trendMonth, function (i) { trendMonth = i; render(); }, ax.n, avg);
   $("t-avg").innerHTML = avg ? '<i aria-hidden="true"></i><span>' + { exp: "Середні витрати за місяць", inc: "Середній дохід за місяць", saved: "У середньому лишається за місяць" }[metric] +
     "</span><b>" + nf0.format(Math.round(avg)) + " зл</b>" : "";
-  $("t-avg").setAttribute("role", "button"); $("t-avg").tabIndex = 0;
+  $("t-avg").setAttribute("role", "button"); $("t-avg").tabIndex = 0; $("t-avg").setAttribute("aria-pressed", avgHi);
+  var al2 = document.querySelector("#mbars .avgl"); if (al2) al2.classList.toggle("hi", avgHi);
   $("t-avg").onclick = $("t-avg").onkeydown = function (e) {
     if (e.type === "keydown" && e.key !== "Enter" && e.key !== " ") return;
-    var l = document.querySelector("#mbars .avgl"); if (!l) return;
-    l.classList.add("hi"); clearTimeout(l._t); l._t = setTimeout(function () { l.classList.remove("hi"); }, 1400);
+    if (e.type === "keydown") e.preventDefault();
+    avgHi = !avgHi; this.setAttribute("aria-pressed", avgHi);
+    var l = document.querySelector("#mbars .avgl"); if (l) l.classList.toggle("hi", avgHi);
   };
 
   var full = P.months.filter(function (m) { return m.income > 0 && !m.incomplete; });
