@@ -828,6 +828,7 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .splash { position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; background: var(--bg);
   transition: opacity 1.2s cubic-bezier(.4, 0, .2, 1), visibility 0s linear 1.2s; }
 .splash.out { opacity: 0; visibility: hidden; }
+.app.pre > * { opacity: 0; animation-play-state: paused !important; }
 .splash.out .sp-mark { transform: scale(.96) translateY(-4px); }
 .sp-mark { position: relative; width: 84px; height: 84px; border-radius: 25px; display: grid; place-items: center; overflow: hidden; isolation: isolate;
   background: var(--blue-g); box-shadow: 0 10px 24px rgba(29,95,224,.34), inset 0 1px 0 rgba(255,255,255,.3);
@@ -880,7 +881,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
   <div class="sp-bar" aria-hidden="true"><b id="sp-fill"></b></div>
 </div>
 </div>
-<div class="app">
+<div class="app pre" id="app">
   <div class="top">
     <div class="who">
       <button type="button" id="who-btn" aria-haspopup="menu" aria-expanded="false" aria-controls="who-menu"><span class="av" id="who-av"></span><span id="who-name"></span><svg class="ico16 sw" style="width:14px;height:14px" viewBox="0 0 24 24" fill="none" stroke="#6B7180" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="sw-a" d="M3 6.5h18M16.5 2 21 6.5 16.5 11"/><path class="sw-b" d="M21 17.5H3M7.5 13 3 17.5 7.5 22"/></svg></button>
@@ -1672,7 +1673,7 @@ if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catc
 (function () {
   var s = $("splash"), t = Date.now(), done = false, fill = $("sp-fill");
   requestAnimationFrame(function () { fill.style.width = "85%"; });
-  function hide() { if (done) return; done = true; setTimeout(function () { s.classList.add("done"); fill.style.width = "100%"; setTimeout(function () { s.classList.add("out"); setTimeout(function () { lastBase = null; render(); $("liquid").classList.add("sheen"); }, 180); setTimeout(function () { s.remove(); }, 1300); }, 550); }, Math.max(0, 1500 - (Date.now() - t))); }
+  function hide() { if (done) return; done = true; setTimeout(function () { s.classList.add("done"); fill.style.width = "100%"; setTimeout(function () { lastBase = null; render(); requestAnimationFrame(function () { requestAnimationFrame(function () { $("app").classList.remove("pre"); s.classList.add("out"); $("liquid").classList.add("sheen"); }); }); setTimeout(function () { s.remove(); }, 1500); }, 550); }, Math.max(0, 1500 - (Date.now() - t))); }
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(hide);
   setTimeout(hide, 2200);
 })();
