@@ -759,6 +759,7 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .vs-part { display: flex; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 14px; background: var(--soft); }
 .vs-part + .vs-part { margin-top: 8px; }
 .vs-part i { flex: none; width: 22px; height: 16px; border-radius: 4px; background: repeating-linear-gradient(135deg, #CBD1DA 0 4px, #E6E9EE 4px 8px); }
+.vs-part.on i { background: repeating-linear-gradient(135deg, #7FA9F1 0 4px, #C9DAFA 4px 8px); }
 .vs-part span { display: inline; font-size: 13px; line-height: 1.4; color: var(--ink); }
 .share { display: flex; gap: 3px; height: 10px; margin: 6px 0 12px; }
 .share i { display: block; height: 100%; border-radius: 5px; min-width: 6px; }
@@ -1466,7 +1467,7 @@ function renderTrends(P) {
     if (metric === "exp") txt = m.name + " поки неповний: " + z0(m.expenses) + (days ? " за " + days + " " + plural(days, "день", "дні", "днів") : "") + ". У середнє не входить.";
     else if (metric === "inc") txt = paid ? m.name + " ще триває: зарплата " + z0(m.income) + " вже прийшла." : m.name + ": зарплата ще не прийшла, зазвичай " + (pd ? pd + " числа" : "наприкінці місяця") + ".";
     else txt = paid ? m.name + " ще триває: поки лишилось " + z0(m.saved) + ". У середнє не входить." : m.name + " порахуємо, коли прийде зарплата. Поки що він не входить у середнє.";
-    return '<div class="vs-part"><i aria-hidden="true"></i><span>' + esc(txt) + "</span></div>";
+    return '<div class="vs-part' + (list.indexOf(m) === trendMonth ? " on" : "") + '"><i aria-hidden="true"></i><span>' + esc(txt) + "</span></div>";
   }).join("");
   $("t-duo").innerHTML = '<div class="card vs">' + card + (part ? '<div class="vs-parts">' + part + "</div>" : "") + "</div>";
   $("t-note").hidden = true;
