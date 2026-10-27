@@ -558,7 +558,7 @@ body.p-olya .liquid .after { opacity: .8; }  /* в Олі світлі тони 
 /* мʼякі абстрактні форми після бліку: три великі розмиті плями біля країв (рух і яскравість — у кадрах flow1–3) */
 .liquid .amb { inset: auto; width: 96%; aspect-ratio: 1.7; border-radius: 50%; filter: blur(34px); mix-blend-mode: screen;
   will-change: transform; opacity: .7; }
-.liquid .a3 { right: -50%; top: 10%; width: 86%; background: radial-gradient(60% 70% at 35% 40%, var(--l4) 0%, color-mix(in srgb, var(--l4) 55%, transparent) 55%, transparent 100%), radial-gradient(65% 60% at 68% 62%, var(--l3) 0%, color-mix(in srgb, var(--l3) 50%, transparent) 50%, transparent 100%);
+.liquid .a3 { right: -44%; top: 6%; width: 68%; aspect-ratio: 1.2; background: radial-gradient(42% 38% at 30% 26%, var(--l4) 0%, color-mix(in srgb, var(--l4) 50%, transparent) 50%, transparent 100%), radial-gradient(40% 36% at 66% 76%, var(--l3) 0%, color-mix(in srgb, var(--l3) 45%, transparent) 50%, transparent 100%);
   animation: flow3 9.5s linear infinite; }
 .liquid .a1 { animation: flow1 11s linear infinite; }
 .liquid .a2 { animation: flow2 13s linear infinite; }
