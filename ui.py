@@ -299,12 +299,6 @@ a { color: inherit; text-decoration: none; }
 .hero .cols a { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; min-height: 44px; }
 .hero .cols .t { font-size: 13px; }
 .hero .cols .hd { display: flex; justify-content: flex-start; align-items: center; gap: 8px; width: 100%; min-height: 24px; }
-/* маленькі кола зі стрілками: надходження — мʼяко-зелене, витрати — мʼяко-червоне (приглушені, щоб не сперечатися з плашкою зміни) */
-.hero .hi { flex: none; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; }
-.hero .hi svg { width: 13px; height: 13px; }
-.hero .hi.in { background: rgba(74, 222, 128, .2); color: #86EFAC; }
-.hero .hi.out { background: rgba(248, 113, 113, .2); color: #FCA5A5; }
-.hero .cols .hd .hi + .t { margin-left: -2px; }
 .hero .cols b { font-size: 18px; font-weight: 500; }
 .hero .cols i { font-style: normal; font-size: 12px; color: var(--hero-on); }
 .hero .meter { height: 8px; margin: 14px 0 8px; border-radius: 4px; background: rgba(255,255,255,.25); overflow: hidden; }
@@ -922,8 +916,8 @@ function renderReport(P) {
     var dn = +M.last_op.slice(0, 2);
     hero.innerHTML = tag + '<div class="lbl">Лишилось у ' + LOC[k] + '</div><div class="num">' + approx + zl(M.saved) + "</div>" +
       '<div class="sub">' + nf1.format(M.rate) + " % від доходу" + (P.ok ? "" : ", потребує перевірки") + "</div>" +
-      '<div class="cols"><a href="#journal" data-filter="inc"><span class="hd"><span class="hi in" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 7 7.5 16.5M7.5 9.5v7h7"/></svg></span><span class="t">Дохід</span>' + inc + "</span><b>" + zl(M.income) + "</b></a>" +
-      '<a href="#journal" data-filter="exp"><span class="hd"><span class="hi out" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 16.5 7.5M9.5 7.5h7v7"/></svg></span><span class="t">Витрати' + (M.incomplete ? " за " + dn + " " + plural(dn, "день", "дні", "днів") : "") + "</span>" + exp + "</span><b>" + zl(M.expenses) + "</b></a></div>";
+      '<div class="cols"><a href="#journal" data-filter="inc"><span class="hd"><span class="t">Дохід</span>' + inc + "</span><b>" + zl(M.income) + "</b></a>" +
+      '<a href="#journal" data-filter="exp"><span class="hd"><span class="t">Витрати' + (M.incomplete ? " за " + dn + " " + plural(dn, "день", "дні", "днів") : "") + "</span>" + exp + "</span><b>" + zl(M.expenses) + "</b></a></div>";
   }
   hero.querySelectorAll("[data-filter]").forEach(function (a) { a.onclick = function () { filter = a.dataset.filter; }; });
   $("cash").hidden = !P.cash;
