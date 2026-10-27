@@ -804,7 +804,7 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .cap .r3 { display: block; margin-top: 2px; font-size: 11px; color: var(--ink2); }
 .vs-parts { margin-top: 12px; }
 .vs-parts:empty { display: none; }
-.wleg { display: flex; justify-content: space-between; gap: 12px; margin-top: 14px; }
+.wleg { display: flex; justify-content: space-between; gap: 12px; margin-top: 24px; }
 .wleg .vs-part { padding: 0; background: none; margin: 0; gap: 8px; }
 .wleg .vs-part + .vs-part { margin: 0; text-align: right; }
 .wleg .vs-part i { width: 14px; height: 14px; border-radius: 4px; }
