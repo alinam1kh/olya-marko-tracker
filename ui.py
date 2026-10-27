@@ -345,8 +345,7 @@ a { color: inherit; text-decoration: none; }
 .segs { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
 .segs i { position: relative; height: 8px; border-radius: 4px; background: var(--track); overflow: hidden; }
 .segs i b { position: absolute; inset: 0; width: 0; border-radius: 4px; background: var(--blue-g); transition: width 1.6s var(--ease); }
-.seglab { display: grid; grid-template-columns: repeat(6, 1fr); margin-top: 6px; font-size: 12px; color: var(--ink2); }
-.seglab span:last-child { text-align: right; }
+.seglab { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; margin-top: 6px; font-size: 12px; color: var(--ink2); }
 .gcols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0 12px; padding-top: 14px; border-top: 1px solid var(--soft); }
 .gcols span { display: block; font-size: 12px; color: var(--ink2); }
 .gcols b { display: block; margin: 3px 0 2px; font-size: 18px; font-weight: 500; }
