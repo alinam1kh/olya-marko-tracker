@@ -190,7 +190,7 @@ button { font: inherit; color: inherit; }
 a { color: inherit; text-decoration: none; }
 [hidden] { display: none !important; }
 /* у звичайному тексті цифри природної ширини («15 днів» без «дірки» біля 1); рівні цифри лишаються для сум у стовпчиках */
-.ins > span:first-child, .note, .sub, .lbl, .hero .cols .t, h2, .op .t1, .op .t2, .cal-note, .tag, .day-h, .info, .duo span, .duo small, .fv2 span { font-variant-numeric: proportional-nums; }
+.ins > span:first-child, .note, .sub, .lbl, .hero .lt, h2, .op .t1, .op .t2, .cal-note, .tag, .day-h, .info, .duo span, .duo small, .fv2 span { font-variant-numeric: proportional-nums; }
 :focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
 .ico16 { flex: none; width: 16px; height: 16px; }
 
@@ -291,27 +291,28 @@ a { color: inherit; text-decoration: none; }
 @keyframes pathB { 0%, 100% { transform: translate(0, 0) rotate(0); } 30% { transform: translate(14%, 22%) rotate(-50deg); } 60% { transform: translate(6%, 40%) rotate(-110deg); } 80% { transform: translate(-4%, 18%) rotate(-150deg); } }
 @keyframes pathC { 0%, 100% { transform: translate(0, 0) rotate(0); } 33% { transform: translate(-12%, -26%) rotate(60deg); } 66% { transform: translate(8%, -14%) rotate(140deg); } }
 /* легка тінь під білим текстом — підпис лишається читабельним, коли блік пропливає під ним */
-.hero .lbl, .hero .num, .hero .sub, .hero .cols .t, .hero .cols b { text-shadow: 0 1px 10px rgba(5, 10, 30, .28); }
+.hero .lbl, .hero .num, .hero .sub, .hero .lt, .hero .lg2 b { text-shadow: 0 1px 10px rgba(5, 10, 30, .28); }
+.hero .sub .inc { color: inherit; }
+.hero .sub .bd { display: inline-flex; margin-left: 6px; vertical-align: 1px; }
+/* смуга доходу: світло-червона частина — витрати, біла — залишок; ростуть зліва направо */
+.hero .split2 { display: flex; gap: 4px; height: 8px; margin-top: 18px; }
+.hero .split2 b { display: block; height: 100%; width: 0; border-radius: 4px; transition: width 2.1s var(--ease); }
+.hero .split2 .e { background: #FCA5A5; }
+.hero .split2 .s { background: #fff; }
+.hero .lg2 { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-top: 12px; }
+.hero .lt { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
+.hero .lt i { flex: none; width: 7px; height: 7px; border-radius: 50%; background: #FCA5A5; }
+.hero .ls .lt i { background: #fff; }
+.hero .lv { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+.hero .lg2 b { font-size: 18px; font-weight: 500; }
+.hero .ls { display: flex; flex-direction: column; align-items: flex-end; text-align: right; }
+.hero .ls b { margin-top: 6px; }
 .hero .lbl { font-size: 14px; }
 .hero .num.cu { animation: numin .7s var(--ease) both .1s; }
 @keyframes numin { from { opacity: 0; transform: translateY(8px); filter: blur(4px); } to { opacity: 1; transform: none; filter: none; } }
 .hero .num { margin-top: 6px; font-size: 40px; font-weight: 500; letter-spacing: -.02em; line-height: 1.05; }
 .hero .sub { margin-top: 6px; font-size: 14px; }
 .hero .tag { position: absolute; top: 18px; right: 18px; height: 24px; padding: 0 8px; border-radius: 12px; background: rgba(255,255,255,.92); color: var(--ink3); font-size: 12px; font-weight: 500; display: flex; align-items: center; }
-/* «Дохід / Витрати» — окрема скляна панель унизу картки: відділена від головної суми, але не сперечається з нею */
-.hero .cols { display: grid; grid-template-columns: 1fr 1fr; margin: 18px -6px -4px; padding: 12px 0; border: 1px solid rgba(255,255,255,.14); border-radius: 18px;
-  background: rgba(255,255,255,.08); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
-.hero .cols a { padding: 0 14px; }
-.hero .cols a + a { border-left: 1px solid rgba(255,255,255,.16); }
-/* маленька крапка-маркер: зелена — надходження, червона — витрати */
-.hero .cols .t { display: inline-flex; align-items: center; gap: 6px; }
-.hero .cols .t::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #4ADE80; }
-.hero .cols a[data-filter="exp"] .t::before { background: #F87171; }
-.hero .cols a { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; min-height: 44px; }
-.hero .cols .t { font-size: 13px; }
-.hero .cols .hd { display: flex; justify-content: flex-start; align-items: center; gap: 8px; width: 100%; min-height: 24px; }
-.hero .cols b { font-size: 18px; font-weight: 500; }
-.hero .cols i { font-style: normal; font-size: 12px; color: var(--hero-on); }
 .hero .meter { height: 8px; margin: 14px 0 8px; border-radius: 4px; background: rgba(255,255,255,.25); overflow: hidden; }
 .hero .meter b { display: block; height: 100%; width: 0; border-radius: 4px; background: #fff; transition: width 2.1s var(--ease); }
 .hero .hint { display: flex; gap: 10px; align-items: flex-start; margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.35); font-size: 14px; line-height: 1.4; }
@@ -555,7 +556,7 @@ a { color: inherit; text-decoration: none; }
 .stag > *:not([hidden]), .stag .stagk:not([hidden]) { animation: lift 1s var(--ease) both; animation-delay: calc(var(--i, 0) * 45ms); }
 @keyframes lift { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 /* натискання: кнопка трохи «вдавлюється» */
-button, .cashbtn, .ch a, .hero .cols a, .more, .op { transition: transform .45s var(--spring), background-color .4s var(--ease), box-shadow .4s var(--ease), color .4s var(--ease); }
+button, .cashbtn, .ch a, .hero .le, .more, .op { transition: transform .45s var(--spring), background-color .4s var(--ease), box-shadow .4s var(--ease), color .4s var(--ease); }
 button:active:not(:disabled), .cashbtn:active, .ch a:active, .more:active { transition-duration: .12s; }
 button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .more:active { transform: scale(.96); }
 .cashbtn:hover { box-shadow: 0 10px 22px rgba(29,95,224,.4), inset 0 1px 0 rgba(255,255,255,.3); }
@@ -570,7 +571,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
   .splash, .sp-mark, .sp-mark::before, .sp-mark g, .sp-bar b, .sp-name, .stag > *, .hero .num.cu, .pop:not([hidden]), .toast { animation: none !important; transition: none !important; }
   .nav .ind, .sw path { transition: none; animation: none !important; }
 }
-@media (prefers-reduced-motion: reduce) { .cap .fill, .crow .bar6 b, .segs i b, .hero .meter b { transition: none !important; } .fadein, .liquid i, .pair { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .cap .fill, .crow .bar6 b, .segs i b, .hero .meter b, .hero .split2 b { transition: none !important; } .fadein, .liquid i, .pair { animation: none; } }
 </style>
 </head>
 <body class="p-marko">
@@ -928,10 +929,15 @@ function renderReport(P) {
     var inc = M.incomplete ? "" : (prevI ? heroBadge(M.income, prevI.income, false, LOC[mi(prevI)]) : "");
     var exp = M.incomplete ? "" : (prevM ? heroBadge(M.expenses, prevM.expenses, true, LOC[mi(prevM)]) : "");
     var dn = +M.last_op.slice(0, 2);
+    // увесь дохід — це смуга; витрати й залишок — її частини
+    var ep = M.income > 0 ? Math.min(100, M.expenses / M.income * 100) : 100, sp = 100 - ep;
     hero.innerHTML = tag + '<div class="lbl">Лишилось у ' + LOC[k] + '</div><div class="num">' + approx + zl(M.saved) + "</div>" +
-      '<div class="sub">' + nf1.format(M.rate) + " % від доходу" + (P.ok ? "" : ", потребує перевірки") + "</div>" +
-      '<div class="cols"><a href="#journal" data-filter="inc"><span class="hd"><span class="t">Дохід</span>' + inc + "</span><b>" + zl(M.income) + "</b></a>" +
-      '<a href="#journal" data-filter="exp"><span class="hd"><span class="t">Витрати' + (M.incomplete ? " за " + dn + " " + plural(dn, "день", "дні", "днів") : "") + "</span>" + exp + "</span><b>" + zl(M.expenses) + "</b></a></div>";
+      '<div class="sub">' + nf1.format(M.rate) + " % від доходу " + '<a href="#journal" data-filter="inc" class="inc">' + zl(M.income) + "</a>" + inc + (P.ok ? "" : ", потребує перевірки") + "</div>" +
+      '<div class="split2" role="img" aria-label="Витрати ' + nf0.format(ep) + " %, лишилось " + nf0.format(sp) + ' % доходу">' +
+        '<b class="e" data-to="calc(' + ep.toFixed(2) + '% - 2px)"></b><b class="s" data-to="calc(' + sp.toFixed(2) + '% - 2px)"></b></div>' +
+      '<div class="lg2"><a href="#journal" data-filter="exp" class="le"><span class="lt"><i></i>Витрати' + (M.incomplete ? " за " + dn + " " + plural(dn, "день", "дні", "днів") : "") + ", " + nf0.format(ep) + " %</span>" +
+        '<span class="lv"><b>' + zl(M.expenses) + "</b>" + exp + "</span></a>" +
+      '<div class="ls"><span class="lt"><i></i>Лишилось, ' + nf0.format(sp) + " %</span><b>" + zl(M.saved) + "</b></div></div>";
   }
   hero.querySelectorAll("[data-filter]").forEach(function (a) { a.onclick = function () { filter = a.dataset.filter; }; });
   $("cash").hidden = !P.cash;
@@ -945,7 +951,7 @@ function renderReport(P) {
     if (fresh) freshDone = true;
     return opRow(o, true, fresh);
   }).join("") : '<div class="empty">Операцій немає</div>';
-  grow("#hero .meter b, #v-report .bar6 b, #goal .segs b", "width");
+  grow("#hero .meter b, #hero .split2 b, #v-report .bar6 b, #goal .segs b", "width");
 }
 // «Головне за вересень»: факт і бейдж праворуч; у неповному місяці — що вже відомо
 function renderInsights(P, M) {
