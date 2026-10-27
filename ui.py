@@ -1857,7 +1857,7 @@ function replaySheen() {
   if (!l || !l.classList.contains("sheen") || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   l.getAnimations().forEach(function (a) { if (a.animationName === "sheen" && a.playState !== "running") { a.currentTime = 0; a.play(); } });
 }
-setInterval(function () { if (!document.hidden && view() === "report") replaySheen(); }, 60000);
+setInterval(function () { if (!document.hidden && view() === "report") replaySheen(); }, 30000);
 window.addEventListener("hashchange", function () {
   var v = view();
   if (v === "report" && lastView !== "report" && lastView !== "add") setTimeout(replaySheen, 250);
