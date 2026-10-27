@@ -247,21 +247,21 @@ a { color: inherit; text-decoration: none; }
 .hero { position: relative; z-index: 1; padding: 22px 20px 20px; border-radius: 24px; color: #fff; }
 /* мʼякий темний край: світло з плям плавно тоне в найтемніший тон ближче до країв картки */
 .hero-wrap::after { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; border-radius: inherit;
-  background: radial-gradient(120% 95% at 42% 38%, transparent 38%, color-mix(in srgb, var(--g3) 55%, transparent) 72%, var(--g3) 100%); }
+  background: radial-gradient(130% 110% at 45% 40%, transparent 52%, color-mix(in srgb, var(--g3) 45%, transparent) 80%, var(--g3) 100%); }
 /* «рідке» світло: три пари плям. Кожна пара пливе своїм шляхом (19–27 с), а дві плями в ній сходяться,
    зливаються, розтягуються одна за одною й знову розходяться (8–12 с). Фільтр #melt мʼяко «склеює» плями,
    коли вони близько, а сильне розмиття робить з цього переливи градієнта. Старт кожної пари — випадковий */
-.liquid { position: absolute; inset: -6%; z-index: 0; pointer-events: none; opacity: .92; filter: url(#melt) blur(18px); }
+.liquid { position: absolute; inset: -6%; z-index: 0; pointer-events: none; opacity: .95; filter: url(#melt) blur(28px); }
 .pair { position: absolute; width: 96%; height: 82%; will-change: transform; animation: var(--path) var(--pd) linear infinite; }
 .pair i { position: absolute; top: 8%; width: 64%; aspect-ratio: 1; border-radius: 50%; mix-blend-mode: screen; will-change: transform;
   background: radial-gradient(circle, var(--c), transparent 70%); animation: apartL var(--sd) cubic-bezier(.45, 0, .55, 1) infinite; }
 .pair i:first-child { left: 0; transform-origin: 70% 50%; }
 .pair i:last-child { right: 0; transform-origin: 30% 50%; animation-name: apartR; }
-.pair:nth-child(1) { left: 18%; top: -30%; --path: pathA; --pd: 21s; --sd: 9s; }
+.pair:nth-child(1) { left: 48%; top: -34%; --path: pathA; --pd: 21s; --sd: 9s; }
 .pair:nth-child(1) i:first-child { --c: var(--h1); } .pair:nth-child(1) i:last-child { --c: var(--h3); }
-.pair:nth-child(2) { left: -30%; top: 26%; --path: pathB; --pd: 25s; --sd: 11s; }
+.pair:nth-child(2) { left: -58%; top: 6%; --path: pathB; --pd: 25s; --sd: 11s; }
 .pair:nth-child(2) i:first-child { --c: var(--h2); } .pair:nth-child(2) i:last-child { --c: var(--h5); }
-.pair:nth-child(3) { left: 26%; top: 38%; --path: pathC; --pd: 27s; --sd: 12.5s; }
+.pair:nth-child(3) { left: 52%; top: 40%; --path: pathC; --pd: 27s; --sd: 12.5s; }
 .pair:nth-child(3) i:first-child { --c: var(--h4); } .pair:nth-child(3) i:last-child { --c: var(--h6); }
 /* сходяться (злиття) → розтягуються одна за одною → розходяться → пауза окремо */
 @keyframes apartL {
@@ -276,9 +276,9 @@ a { color: inherit; text-decoration: none; }
   52% { transform: translateX(-30%) scale(1.5, .78); }
   70% { transform: translateX(4%) scale(1.18, .9); }
 }
-@keyframes pathA { 0%, 100% { transform: translate(0, 0) rotate(0); } 25% { transform: translate(-22%, 18%) rotate(35deg); } 50% { transform: translate(-8%, 46%) rotate(80deg); } 75% { transform: translate(14%, 20%) rotate(130deg); } }
-@keyframes pathB { 0%, 100% { transform: translate(0, 0) rotate(0); } 30% { transform: translate(34%, -18%) rotate(-50deg); } 60% { transform: translate(52%, 14%) rotate(-110deg); } 80% { transform: translate(20%, 10%) rotate(-150deg); } }
-@keyframes pathC { 0%, 100% { transform: translate(0, 0) rotate(0); } 33% { transform: translate(-30%, -34%) rotate(60deg); } 66% { transform: translate(14%, -22%) rotate(140deg); } }
+@keyframes pathA { 0%, 100% { transform: translate(0, 0) rotate(0); } 25% { transform: translate(-10%, 14%) rotate(35deg); } 50% { transform: translate(2%, 30%) rotate(80deg); } 75% { transform: translate(10%, 12%) rotate(130deg); } }
+@keyframes pathB { 0%, 100% { transform: translate(0, 0) rotate(0); } 30% { transform: translate(14%, 22%) rotate(-50deg); } 60% { transform: translate(6%, 40%) rotate(-110deg); } 80% { transform: translate(-4%, 18%) rotate(-150deg); } }
+@keyframes pathC { 0%, 100% { transform: translate(0, 0) rotate(0); } 33% { transform: translate(-12%, -26%) rotate(60deg); } 66% { transform: translate(8%, -14%) rotate(140deg); } }
 /* легка тінь під білим текстом — підпис лишається читабельним, коли блік пропливає під ним */
 .hero .lbl, .hero .num, .hero .sub, .hero .cols .t, .hero .cols b { text-shadow: 0 1px 10px rgba(5, 10, 30, .28); }
 .hero .lbl { font-size: 14px; }
@@ -581,7 +581,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
 
   <div id="v-report">
     <div id="h-alert"></div>
-    <div class="hero-wrap"><svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="melt" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="14"/><feColorMatrix values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 5 -0.9"/><feGaussianBlur stdDeviation="24"/></filter></svg><div class="liquid" id="liquid" aria-hidden="true"><span class="pair"><i></i><i></i></span><span class="pair"><i></i><i></i></span><span class="pair"><i></i><i></i></span></div><section class="hero" id="hero" aria-live="polite"></section></div>
+    <div class="hero-wrap"><svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="melt" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="14"/><feColorMatrix values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 5 -0.9"/><feGaussianBlur stdDeviation="30"/></filter></svg><div class="liquid" id="liquid" aria-hidden="true"><span class="pair"><i></i><i></i></span><span class="pair"><i></i><i></i></span><span class="pair"><i></i><i></i></span></div><section class="hero" id="hero" aria-live="polite"></section></div>
     <a class="cashbtn" id="cash" href="#add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg>Додати готівку</a>
     <section class="card goal" id="goal" hidden></section>
     <section class="card list fadein" id="insights" hidden></section>
