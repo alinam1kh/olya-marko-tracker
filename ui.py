@@ -353,15 +353,15 @@ body.p-olya .liquid { --sheen: .4; }
   75% { --ex: 20%; --ey: 0%; }
 }
 /* мʼякі абстрактні форми після бліку: дві великі розмиті плями повільно пливуть, тягнуться й перетікають */
-.liquid .amb { inset: auto; width: 90%; aspect-ratio: 1.6; border-radius: 50%; filter: blur(30px); mix-blend-mode: screen;
+.liquid .amb { inset: auto; width: 80%; aspect-ratio: 1.7; border-radius: 50%; filter: blur(34px); mix-blend-mode: screen;
   will-change: transform; opacity: .7; }
 body.p-olya .liquid .amb { opacity: .75; }
-.liquid .a1 { left: -30%; top: -40%; background: radial-gradient(closest-side, var(--l2), color-mix(in srgb, var(--l2) 40%, transparent) 55%, transparent);
+.liquid .a1 { left: -38%; top: -48%; background: radial-gradient(closest-side, var(--l2), color-mix(in srgb, var(--l2) 35%, transparent) 40%, color-mix(in srgb, var(--l2) 10%, transparent) 70%, transparent);
   animation: drift1 15s cubic-bezier(.45, 0, .55, 1) infinite; }
-.liquid .a2 { right: -35%; bottom: -45%; background: radial-gradient(closest-side, var(--l3), color-mix(in srgb, var(--l3) 50%, transparent) 45%, transparent);
+.liquid .a2 { right: -40%; bottom: -52%; background: radial-gradient(closest-side, var(--l3), color-mix(in srgb, var(--l3) 35%, transparent) 40%, color-mix(in srgb, var(--l3) 10%, transparent) 70%, transparent);
   opacity: .5; animation: drift2 19s cubic-bezier(.45, 0, .55, 1) infinite; }
-@keyframes drift1 { 0%, 100% { transform: translate(0, 0) rotate(0) scale(1, 1); } 33% { transform: translate(28%, 22%) rotate(40deg) scale(1.25, .8); } 66% { transform: translate(8%, 45%) rotate(-20deg) scale(.9, 1.15); } }
-@keyframes drift2 { 0%, 100% { transform: translate(0, 0) rotate(0) scale(1, 1); } 40% { transform: translate(-32%, -28%) rotate(-35deg) scale(1.2, .85); } 75% { transform: translate(-10%, -50%) rotate(25deg) scale(.85, 1.2); } }
+@keyframes drift1 { 0%, 100% { transform: translate(0, 0) rotate(0) scale(1, 1); } 33% { transform: translate(38%, -4%) rotate(12deg) scale(1.2, .85); } 66% { transform: translate(-6%, 34%) rotate(-10deg) scale(.9, 1.15); } }
+@keyframes drift2 { 0%, 100% { transform: translate(0, 0) rotate(0) scale(1, 1); } 40% { transform: translate(-38%, 4%) rotate(-12deg) scale(1.2, .85); } 75% { transform: translate(6%, -34%) rotate(10deg) scale(.88, 1.15); } }
 /* легка тінь під білим текстом — підпис лишається читабельним, коли блік пропливає під ним */
 .hero .lbl, .hero .num, .hero .sub, .hero .lt, .hero .lg2 b { text-shadow: 0 1px 10px rgba(5, 10, 30, .28); }
 .hero .sub .inc { color: inherit; }
