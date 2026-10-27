@@ -714,8 +714,8 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .chart { display: flex; gap: 8px; margin-top: 24px; }
 .ticks { flex: none; display: flex; flex-direction: column; justify-content: space-between; height: 150px; width: 66px; font-size: 12px; color: var(--ink2); text-align: right; }
 .ticks span { line-height: 1; }
-/* «Динаміка»: числа осі біля лівого краю, щоб пунктир середнього не впирався в них */
-#mticks { width: 46px; text-align: left; }
+/* «Динаміка»: числа осі притиснуті праворуч, з відступом до пунктиру середнього */
+#mticks { width: 46px; margin-right: 8px; text-align: right; }
 .caps { position: relative; flex: 1; display: flex; justify-content: space-around; }
 /* середнє: більші заокруглені штрихи (SVG-візерунок), окремим шаром поверх стовпчиків */
 .avgl { position: absolute; left: 0; right: 0; height: 3px; margin-top: -1.5px; pointer-events: none; z-index: 3; transform: translateZ(0);
