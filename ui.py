@@ -696,7 +696,7 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .swipe.gone .swdel { opacity: 0; transition: opacity .25s ease; }
 .op .ask button { min-height: 44px; padding: 0 12px; border: 0; border-radius: 22px; background: var(--soft); font-size: 13px; font-weight: 500; cursor: pointer; }
 .op .ask button.yes { background: var(--bad); color: #fff; }
-.toast button { min-height: 36px; margin-left: 9px; padding: 0 12px; border: 0; border-radius: 12px; background: var(--blue-soft, #EAF1FF); color: var(--blue); font: 500 13px var(--font); cursor: pointer; }
+.toast button { min-height: 36px; margin-left: 7px; padding: 0 12px; border: 0; border-radius: 12px; background: var(--blue-soft, #EAF1FF); color: var(--blue); font: 500 13px var(--font); cursor: pointer; }
 .toast button.bad { background: var(--bad-bg); color: var(--bad); }  /* «Скасувати» після додавання — прибирає запис */
 
 /* подушка безпеки (Оля) */
@@ -892,7 +892,7 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .msg:empty { display: none; }
 .save { width: 100%; height: 52px; border: 0; border-radius: 26px; background: var(--blue-g); box-shadow: 0 8px 18px rgba(29,95,224,.3); color: #fff; font: 500 16px var(--font); cursor: pointer; }
 .save:disabled { background: #D9DDE3; box-shadow: none; cursor: default; }
-.toast { position: fixed; left: 50%; bottom: calc(104px + env(safe-area-inset-bottom, 0px)); z-index: 30; transform: translateX(-50%); display: flex; align-items: center; gap: 7px;
+.toast { position: fixed; left: 50%; bottom: calc(104px + env(safe-area-inset-bottom, 0px)); z-index: 30; transform: translateX(-50%); display: flex; align-items: center; gap: 9px;
   padding: 8px 8px 8px 14px; min-height: 52px; border-radius: 18px; background: rgba(255, 255, 255, .72); -webkit-backdrop-filter: blur(18px) saturate(1.6); backdrop-filter: blur(18px) saturate(1.6);
   border: 1px solid #fff; box-shadow: 0 10px 30px rgba(17,19,24,.10); color: var(--ink); font-size: 14px; font-weight: 500; white-space: nowrap; }
 .toast:not(:has(button)) { padding-right: 18px; }
