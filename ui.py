@@ -257,23 +257,67 @@ a { color: inherit; text-decoration: none; }
 .hero-wrap { position: relative; isolation: isolate; margin-top: 12px; border-radius: 24px; overflow: hidden;
   background: radial-gradient(120% 100% at 40% 30%, color-mix(in srgb, var(--g2) 70%, var(--g3)) 0%, var(--g3) 85%); }
 .hero { position: relative; z-index: 1; padding: 22px 20px 20px; border-radius: 24px; color: #fff; }
-/* блік-смуга: світло збирається в лівому верхньому куті, потім широкою діагональною смугою проходить
-   через усю картку до правого нижнього кута й повертається назад. Тонкий кант і розмита рамка по краях
-   загоряються там, де зараз смуга, — усе з однієї позиції (--p), тож це один цілісний блік */
-@property --p { syntax: "<percentage>"; inherits: true; initial-value: 0%; }
-.liquid { position: absolute; inset: 0; z-index: 0; pointer-events: none; border-radius: inherit;
-  animation: sheen 9s cubic-bezier(.65, 0, .35, 1) infinite alternate; }
+.hero-wrap::after { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; border-radius: inherit; opacity: .16; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+/* Під час відкриття — один живий прохід бліку: світло збирається в лівому верхньому куті, смугою на всю картку
+   хвилясто (кут смуги «гуляє») проходить до правого нижнього кута й зникає. Кант і розмита рамка по краях
+   горять разом зі смугою. Далі лишаються тільки мʼякі абстрактні форми, що повільно перетікають усередині */
+@property --p { syntax: "<percentage>"; inherits: true; initial-value: -40%; }
+@property --ex { syntax: "<percentage>"; inherits: true; initial-value: 0%; }
+@property --ey { syntax: "<percentage>"; inherits: true; initial-value: 20%; }
+@property --a { syntax: "<angle>"; inherits: true; initial-value: 115deg; }
+.liquid { position: absolute; inset: 0; z-index: 0; pointer-events: none; border-radius: inherit; --sheen: .6; }
+.liquid.sheen { animation: sheen 7.5s cubic-bezier(.42, 0, .3, 1) both, edge 24s cubic-bezier(.45, 0, .55, 1) infinite; }
+body.p-olya .liquid { --sheen: .42; }
 .liquid > span { position: absolute; inset: 0; border-radius: inherit; }
-.liquid .glow { filter: blur(18px);
-  background: linear-gradient(125deg, transparent calc(var(--p) - 34%), color-mix(in srgb, var(--l2) 45%, transparent) calc(var(--p) - 16%),
-    var(--l2) calc(var(--p) - 5%), var(--l1) var(--p), var(--l2) calc(var(--p) + 5%),
-    color-mix(in srgb, var(--l2) 45%, transparent) calc(var(--p) + 16%), transparent calc(var(--p) + 34%)); opacity: .9; }
+.liquid .glow, .liquid .halo, .liquid .rim { opacity: var(--sheen); }
+.liquid .glow { filter: blur(22px);
+  background: linear-gradient(var(--a), transparent calc(var(--p) - 36%), color-mix(in srgb, var(--l2) 40%, transparent) calc(var(--p) - 18%),
+    var(--l2) calc(var(--p) - 6%), var(--l1) var(--p), var(--l2) calc(var(--p) + 7%),
+    color-mix(in srgb, var(--l2) 40%, transparent) calc(var(--p) + 20%), transparent calc(var(--p) + 38%)); }
 .liquid .halo { filter: blur(8px); }
 .liquid .halo i, .liquid .rim { position: absolute; inset: 0; border-radius: inherit;
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
-.liquid .halo i { padding: 12px; background: linear-gradient(125deg, transparent calc(var(--p) - 26%), var(--l2) calc(var(--p) - 8%), var(--l1) var(--p), var(--l2) calc(var(--p) + 8%), transparent calc(var(--p) + 26%)); }
-.liquid .rim { padding: 1.5px; background: linear-gradient(125deg, transparent calc(var(--p) - 20%), var(--l2) calc(var(--p) - 7%), #fff var(--p), var(--l2) calc(var(--p) + 7%), transparent calc(var(--p) + 20%)); }
-@keyframes sheen { from { --p: 0%; } to { --p: 100%; } }
+.liquid .halo i { padding: 12px; background: linear-gradient(var(--a), transparent calc(var(--p) - 26%), var(--l2) calc(var(--p) - 8%), var(--l1) var(--p), var(--l2) calc(var(--p) + 8%), transparent calc(var(--p) + 26%)); }
+.liquid .rim { padding: 1.5px; background: linear-gradient(var(--a), transparent calc(var(--p) - 20%), var(--l2) calc(var(--p) - 7%), #fff var(--p), var(--l2) calc(var(--p) + 7%), transparent calc(var(--p) + 20%)); }
+@keyframes sheen {
+  0% { --p: -40%; --a: 105deg; }
+  22% { --p: 4%; --a: 128deg; }
+  55% { --p: 52%; --a: 112deg; }
+  80% { --p: 98%; --a: 138deg; }
+  100% { --p: 150%; --a: 122deg; }
+}
+/* після бліку світло лишається на краях: розмита рамка й тонкий кант біля лівого верхнього й правого нижнього кутів,
+   повільно ковзають уздовж країв і перетікають (дві точки дзеркальні одна одній) */
+.liquid .after { -webkit-mask: linear-gradient(var(--a), #000 calc(var(--p) - 14%), transparent calc(var(--p) + 6%));
+  mask: linear-gradient(var(--a), #000 calc(var(--p) - 14%), transparent calc(var(--p) + 6%)); }
+.liquid .after > span { position: absolute; inset: 0; border-radius: inherit; }
+.liquid .ehalo { opacity: .9; } .liquid .erim { opacity: .85; }
+.liquid .ehalo { filter: blur(8px); }
+.liquid .ehalo i, .liquid .erim { position: absolute; inset: 0; border-radius: inherit;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
+.liquid .ehalo i { padding: 12px; background:
+  radial-gradient(70% 90% at var(--ex) var(--ey), var(--l1) 0%, var(--l2) 30%, transparent 70%),
+  radial-gradient(60% 80% at calc(100% - var(--ex)) calc(100% - var(--ey)), var(--l2) 0%, color-mix(in srgb, var(--l2) 50%, transparent) 35%, transparent 70%); }
+.liquid .erim { padding: 1.5px; background:
+  radial-gradient(55% 75% at var(--ex) var(--ey), #fff 0%, var(--l1) 25%, var(--l2) 50%, transparent 78%),
+  radial-gradient(45% 65% at calc(100% - var(--ex)) calc(100% - var(--ey)), var(--l1) 0%, var(--l2) 40%, transparent 75%); }
+@keyframes edge {
+  0%, 100% { --ex: 0%; --ey: 20%; }
+  30% { --ex: 30%; --ey: 0%; }
+  60% { --ex: 0%; --ey: 65%; }
+  80% { --ex: 12%; --ey: 0%; }
+}
+/* мʼякі абстрактні форми після бліку: дві великі розмиті плями повільно пливуть, тягнуться й перетікають */
+.liquid .amb { inset: auto; width: 90%; aspect-ratio: 1.6; border-radius: 50%; filter: blur(30px); mix-blend-mode: screen;
+  will-change: transform; opacity: .7; }
+body.p-olya .liquid .amb { opacity: .6; }
+.liquid .a1 { left: -30%; top: -40%; background: radial-gradient(closest-side, var(--l2), color-mix(in srgb, var(--l2) 40%, transparent) 55%, transparent);
+  animation: drift1 21s cubic-bezier(.45, 0, .55, 1) infinite; }
+.liquid .a2 { right: -35%; bottom: -45%; background: radial-gradient(closest-side, var(--l1), color-mix(in srgb, var(--l2) 50%, transparent) 45%, transparent);
+  opacity: .5; animation: drift2 26s cubic-bezier(.45, 0, .55, 1) infinite; }
+@keyframes drift1 { 0%, 100% { transform: translate(0, 0) rotate(0) scale(1, 1); } 33% { transform: translate(28%, 22%) rotate(40deg) scale(1.25, .8); } 66% { transform: translate(8%, 45%) rotate(-20deg) scale(.9, 1.15); } }
+@keyframes drift2 { 0%, 100% { transform: translate(0, 0) rotate(0) scale(1, 1); } 40% { transform: translate(-32%, -28%) rotate(-35deg) scale(1.2, .85); } 75% { transform: translate(-10%, -50%) rotate(25deg) scale(.85, 1.2); } }
 /* легка тінь під білим текстом — підпис лишається читабельним, коли блік пропливає під ним */
 .hero .lbl, .hero .num, .hero .sub, .hero .lt, .hero .lg2 b { text-shadow: 0 1px 10px rgba(5, 10, 30, .28); }
 .hero .sub .inc { color: inherit; }
@@ -562,7 +606,8 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
   .splash, .sp-mark, .sp-mark::before, .sp-mark g, .sp-bar b, .sp-name, .stag > *, .hero .num.cu, .pop:not([hidden]), .toast { animation: none !important; transition: none !important; }
   .nav .ind, .sw path { transition: none; animation: none !important; }
 }
-@media (prefers-reduced-motion: reduce) { .cap .fill, .crow .bar6 b, .segs i b, .hero .meter b, .hero .split2 b { transition: none !important; } .fadein, .liquid { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .cap .fill, .crow .bar6 b, .segs i b, .hero .meter b, .hero .split2 b { transition: none !important; } .fadein, .liquid, .liquid span { animation: none !important; }
+  .liquid .after { -webkit-mask: none; mask: none; } }
 </style>
 </head>
 <body class="p-marko">
@@ -595,7 +640,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
 
   <div id="v-report">
     <div id="h-alert"></div>
-    <div class="hero-wrap"><div class="liquid" id="liquid" aria-hidden="true"><span class="glow"></span><span class="halo"><i></i></span><span class="rim"></span></div><section class="hero" id="hero" aria-live="polite"></section></div>
+    <div class="hero-wrap"><div class="liquid" id="liquid" aria-hidden="true"><span class="after"><span class="amb a1"></span><span class="amb a2"></span><span class="ehalo"><i></i></span><span class="erim"></span></span><span class="glow"></span><span class="halo"><i></i></span><span class="rim"></span></div><section class="hero" id="hero" aria-live="polite"></section></div>
     <a class="cashbtn" id="cash" href="#add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg>Додати готівку</a>
     <section class="card goal" id="goal" hidden></section>
     <section class="card list fadein" id="insights" hidden></section>
@@ -1336,8 +1381,8 @@ function countUp(el) {
   }
   requestAnimationFrame(step);
 }
-// випадковий старт: композиція щоразу починається з іншого положення
-$("liquid").style.animationDelay = -(Math.random() * 18).toFixed(1) + "s";
+// абстрактні форми щоразу стартують з іншого положення
+$("liquid").querySelectorAll(".amb").forEach(function (s) { s.style.animationDelay = -(Math.random() * 26).toFixed(1) + "s"; });
 var lastView = view(), prevView = null, reportKey = null;
 window.addEventListener("hashchange", function () {
   var v = view();
@@ -1351,7 +1396,7 @@ if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catc
 (function () {
   var s = $("splash"), t = Date.now(), done = false, fill = $("sp-fill");
   requestAnimationFrame(function () { fill.style.width = "85%"; });
-  function hide() { if (done) return; done = true; setTimeout(function () { s.classList.add("done"); fill.style.width = "100%"; setTimeout(function () { s.classList.add("out"); setTimeout(function () { lastBase = null; render(); }, 180); setTimeout(function () { s.remove(); }, 1300); }, 550); }, Math.max(0, 1500 - (Date.now() - t))); }
+  function hide() { if (done) return; done = true; setTimeout(function () { s.classList.add("done"); fill.style.width = "100%"; setTimeout(function () { s.classList.add("out"); setTimeout(function () { lastBase = null; render(); $("liquid").classList.add("sheen"); }, 180); setTimeout(function () { s.remove(); }, 1300); }, 550); }, Math.max(0, 1500 - (Date.now() - t))); }
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(hide);
   setTimeout(hide, 2200);
 })();
