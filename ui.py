@@ -267,7 +267,7 @@ a { color: inherit; text-decoration: none; }
 @property --ey { syntax: "<percentage>"; inherits: true; initial-value: 20%; }
 @property --a { syntax: "<angle>"; inherits: true; initial-value: 115deg; }
 .liquid { position: absolute; inset: 0; z-index: 0; pointer-events: none; border-radius: inherit; --sheen: .45; }
-.liquid.sheen { animation: sheen 6.2s linear both, edge 15s cubic-bezier(.45, 0, .55, 1) infinite; }
+.liquid.sheen { animation: sheen 7s linear both, edge 15s cubic-bezier(.45, 0, .55, 1) infinite; }
 body.p-olya .liquid { --sheen: .4; }
 .liquid > span { position: absolute; inset: 0; border-radius: inherit; }
 .liquid .glow, .liquid .halo, .liquid .rim { opacity: var(--sheen); }
@@ -282,60 +282,69 @@ body.p-olya .liquid { --sheen: .4; }
 .liquid .rim { padding: 1.5px; background: linear-gradient(var(--a), transparent calc(var(--p) - 15%), var(--l2) calc(var(--p) - 5%), #fff var(--p), var(--l2) calc(var(--p) + 5%), transparent calc(var(--p) + 15%)); }
 @keyframes sheen {
   0.0% { --p: -40.0%; --a: 120.0deg; }
-  2.1% { --p: -38.5%; --a: 120.8deg; }
-  4.2% { --p: -36.6%; --a: 121.7deg; }
-  6.2% { --p: -34.5%; --a: 122.5deg; }
-  8.3% { --p: -32.0%; --a: 123.3deg; }
-  10.4% { --p: -29.3%; --a: 124.0deg; }
-  12.5% { --p: -26.4%; --a: 124.7deg; }
-  14.6% { --p: -23.2%; --a: 125.4deg; }
-  16.7% { --p: -19.8%; --a: 125.9deg; }
-  18.8% { --p: -16.1%; --a: 126.5deg; }
-  20.8% { --p: -12.3%; --a: 126.9deg; }
-  22.9% { --p: -8.3%; --a: 127.3deg; }
-  25.0% { --p: -4.1%; --a: 127.6deg; }
-  27.1% { --p: 0.3%; --a: 127.8deg; }
-  29.2% { --p: 4.8%; --a: 128.0deg; }
-  31.2% { --p: 9.4%; --a: 128.0deg; }
-  33.3% { --p: 14.2%; --a: 128.0deg; }
-  35.4% { --p: 19.1%; --a: 127.8deg; }
-  37.5% { --p: 24.0%; --a: 127.6deg; }
-  39.6% { --p: 29.1%; --a: 127.3deg; }
-  41.7% { --p: 34.2%; --a: 126.9deg; }
-  43.8% { --p: 39.3%; --a: 126.5deg; }
-  45.8% { --p: 44.5%; --a: 125.9deg; }
-  47.9% { --p: 49.8%; --a: 125.4deg; }
-  50.0% { --p: 55.0%; --a: 124.7deg; }
-  52.1% { --p: 60.2%; --a: 124.0deg; }
-  54.2% { --p: 65.5%; --a: 123.3deg; }
-  56.2% { --p: 70.7%; --a: 122.5deg; }
-  58.3% { --p: 75.8%; --a: 121.7deg; }
-  60.4% { --p: 80.9%; --a: 120.8deg; }
-  62.5% { --p: 86.0%; --a: 120.0deg; }
-  64.6% { --p: 90.9%; --a: 119.2deg; }
-  66.7% { --p: 95.8%; --a: 118.3deg; }
-  68.8% { --p: 100.6%; --a: 117.5deg; }
-  70.8% { --p: 105.2%; --a: 116.7deg; }
-  72.9% { --p: 109.7%; --a: 116.0deg; }
-  75.0% { --p: 114.1%; --a: 115.3deg; }
-  77.1% { --p: 118.3%; --a: 114.6deg; }
-  79.2% { --p: 122.3%; --a: 114.1deg; }
-  81.2% { --p: 126.1%; --a: 113.5deg; }
-  83.3% { --p: 129.8%; --a: 113.1deg; }
-  85.4% { --p: 133.2%; --a: 112.7deg; }
-  87.5% { --p: 136.4%; --a: 112.4deg; }
-  89.6% { --p: 139.3%; --a: 112.2deg; }
-  91.7% { --p: 142.0%; --a: 112.0deg; }
-  93.8% { --p: 144.5%; --a: 112.0deg; }
-  95.8% { --p: 146.6%; --a: 112.0deg; }
-  97.9% { --p: 148.5%; --a: 112.2deg; }
+  1.8% { --p: -34.4%; --a: 120.7deg; }
+  3.6% { --p: -28.9%; --a: 121.4deg; }
+  5.4% { --p: -23.4%; --a: 122.1deg; }
+  7.1% { --p: -17.9%; --a: 122.8deg; }
+  8.9% { --p: -12.5%; --a: 123.5deg; }
+  10.7% { --p: -7.1%; --a: 124.1deg; }
+  12.5% { --p: -1.8%; --a: 124.7deg; }
+  14.3% { --p: 3.4%; --a: 125.3deg; }
+  16.1% { --p: 8.6%; --a: 125.8deg; }
+  17.9% { --p: 13.8%; --a: 126.3deg; }
+  19.6% { --p: 18.9%; --a: 126.7deg; }
+  21.4% { --p: 23.9%; --a: 127.0deg; }
+  23.2% { --p: 28.9%; --a: 127.4deg; }
+  25.0% { --p: 33.8%; --a: 127.6deg; }
+  26.8% { --p: 38.6%; --a: 127.8deg; }
+  28.6% { --p: 43.4%; --a: 127.9deg; }
+  30.4% { --p: 48.1%; --a: 128.0deg; }
+  32.1% { --p: 52.7%; --a: 128.0deg; }
+  33.9% { --p: 57.2%; --a: 127.9deg; }
+  35.7% { --p: 61.7%; --a: 127.8deg; }
+  37.5% { --p: 66.0%; --a: 127.6deg; }
+  39.3% { --p: 70.3%; --a: 127.4deg; }
+  41.1% { --p: 74.5%; --a: 127.0deg; }
+  42.9% { --p: 78.7%; --a: 126.7deg; }
+  44.6% { --p: 82.7%; --a: 126.3deg; }
+  46.4% { --p: 86.6%; --a: 125.8deg; }
+  48.2% { --p: 90.4%; --a: 125.3deg; }
+  50.0% { --p: 94.2%; --a: 124.7deg; }
+  51.8% { --p: 97.8%; --a: 124.1deg; }
+  53.6% { --p: 101.4%; --a: 123.5deg; }
+  55.4% { --p: 104.8%; --a: 122.8deg; }
+  57.1% { --p: 108.1%; --a: 122.1deg; }
+  58.9% { --p: 111.3%; --a: 121.4deg; }
+  60.7% { --p: 114.4%; --a: 120.7deg; }
+  62.5% { --p: 117.4%; --a: 120.0deg; }
+  64.3% { --p: 120.3%; --a: 119.3deg; }
+  66.1% { --p: 123.1%; --a: 118.6deg; }
+  67.9% { --p: 125.7%; --a: 117.9deg; }
+  69.6% { --p: 128.2%; --a: 117.2deg; }
+  71.4% { --p: 130.6%; --a: 116.5deg; }
+  73.2% { --p: 132.9%; --a: 115.9deg; }
+  75.0% { --p: 135.0%; --a: 115.3deg; }
+  76.8% { --p: 137.0%; --a: 114.7deg; }
+  78.6% { --p: 138.9%; --a: 114.2deg; }
+  80.4% { --p: 140.6%; --a: 113.7deg; }
+  82.1% { --p: 142.2%; --a: 113.3deg; }
+  83.9% { --p: 143.7%; --a: 113.0deg; }
+  85.7% { --p: 145.0%; --a: 112.6deg; }
+  87.5% { --p: 146.1%; --a: 112.4deg; }
+  89.3% { --p: 147.1%; --a: 112.2deg; }
+  91.1% { --p: 148.0%; --a: 112.1deg; }
+  92.9% { --p: 148.7%; --a: 112.0deg; }
+  94.6% { --p: 149.3%; --a: 112.0deg; }
+  96.4% { --p: 149.7%; --a: 112.1deg; }
+  98.2% { --p: 149.9%; --a: 112.2deg; }
   100.0% { --p: 150.0%; --a: 112.4deg; }
 }
 /* після бліку світло лишається на краях: розмита рамка й тонкий кант біля лівого верхнього й правого нижнього кутів,
    повільно ковзають уздовж країв і перетікають (дві точки дзеркальні одна одній) */
 .liquid .after { -webkit-mask: linear-gradient(var(--a), #000 calc(var(--p) - 14%), transparent calc(var(--p) + 6%)), linear-gradient(rgba(0, 0, 0, .7) 0 0);
   mask: linear-gradient(var(--a), #000 calc(var(--p) - 14%), transparent calc(var(--p) + 6%)), linear-gradient(rgba(0, 0, 0, .7) 0 0); }
-.liquid .after > span { position: absolute; inset: 0; border-radius: inherit; }
+.liquid .after > .ehalo, .liquid .after > .erim { position: absolute; inset: 0; border-radius: inherit; }
+.liquid .after > .amb { position: absolute; }
 .liquid .ehalo { opacity: .38; } .liquid .erim { opacity: .34; }
 .liquid .ehalo { filter: blur(8px); }
 .liquid .ehalo i, .liquid .erim { position: absolute; inset: 0; border-radius: inherit;
@@ -356,23 +365,23 @@ body.p-olya .liquid { --sheen: .4; }
 .liquid .amb { inset: auto; width: 80%; aspect-ratio: 1.7; border-radius: 50%; filter: blur(34px); mix-blend-mode: screen;
   will-change: transform; opacity: .7; }
 body.p-olya .liquid .amb { opacity: .75; }
-.liquid .a3 { left: -52%; top: 8%; width: 70%; background: radial-gradient(closest-side, var(--l4), color-mix(in srgb, var(--l4) 35%, transparent) 40%, color-mix(in srgb, var(--l4) 10%, transparent) 70%, transparent);
+.liquid .a3 { right: -46%; top: 14%; width: 70%; background: radial-gradient(closest-side, var(--l4), color-mix(in srgb, var(--l4) 35%, transparent) 40%, color-mix(in srgb, var(--l4) 10%, transparent) 70%, transparent);
   animation: drift3 17s cubic-bezier(.45, 0, .55, 1) infinite, breathe3 9s ease-in-out infinite; }
 .liquid .a1 { animation: drift1 15s cubic-bezier(.45, 0, .55, 1) infinite, breathe1 7s ease-in-out infinite; }
 .liquid .a2 { animation: drift2 19s cubic-bezier(.45, 0, .55, 1) infinite, breathe2 11s ease-in-out infinite; }
-@keyframes drift3 { 0%, 100% { transform: translate(0, 0) scale(1, 1); } 50% { transform: translate(8%, 26%) scale(1.15, .9); } }
+@keyframes drift3 { 0%, 100% { transform: translate(0, 0) scale(1, 1); } 50% { transform: translate(-6%, 14%) scale(1.1, .92); } }
 /* «дихання»: форми то світлішають, то темнішають, кожна у своєму ритмі */
-@keyframes breathe1 { 0%, 100% { opacity: .35; } 50% { opacity: .8; } }
-@keyframes breathe2 { 0%, 100% { opacity: .75; } 50% { opacity: .3; } }
-@keyframes breathe3 { 0%, 100% { opacity: .2; } 50% { opacity: .6; } }
+@keyframes breathe1 { 0%, 100% { opacity: .15; } 50% { opacity: .8; } }
+@keyframes breathe2 { 0%, 100% { opacity: .75; } 50% { opacity: .12; } }
+@keyframes breathe3 { 0%, 100% { opacity: .1; } 35% { opacity: .55; } 70% { opacity: .2; } }
 .liquid .ehalo i { animation: glint 6s ease-in-out infinite; }
 @keyframes glint { 0%, 100% { opacity: .6; } 50% { opacity: 1; } }
 .liquid .a1 { right: -38%; top: -48%; background: radial-gradient(closest-side, var(--l2), color-mix(in srgb, var(--l2) 35%, transparent) 40%, color-mix(in srgb, var(--l2) 10%, transparent) 70%, transparent);
   animation: drift1 15s cubic-bezier(.45, 0, .55, 1) infinite; }
 .liquid .a2 { left: -40%; bottom: -52%; background: radial-gradient(closest-side, var(--l3), color-mix(in srgb, var(--l3) 35%, transparent) 40%, color-mix(in srgb, var(--l3) 10%, transparent) 70%, transparent);
   opacity: .5; animation: drift2 19s cubic-bezier(.45, 0, .55, 1) infinite; }
-@keyframes drift1 { 0%, 100% { transform: translate(0, 0) rotate(0) scale(1, 1); } 33% { transform: translate(-36%, -4%) rotate(-12deg) scale(1.2, .85); } 66% { transform: translate(6%, 30%) rotate(10deg) scale(.9, 1.15); } }
-@keyframes drift2 { 0%, 100% { transform: translate(0, 0) rotate(0) scale(1, 1); } 40% { transform: translate(36%, 4%) rotate(12deg) scale(1.2, .85); } 75% { transform: translate(-6%, -30%) rotate(-10deg) scale(.88, 1.15); } }
+@keyframes drift1 { 0%, 100% { transform: translate(0, 0) rotate(0) scale(1, 1); } 33% { transform: translate(-12%, 4%) rotate(-8deg) scale(1.12, .9); } 66% { transform: translate(3%, 12%) rotate(6deg) scale(.92, 1.1); } }
+@keyframes drift2 { 0%, 100% { transform: translate(0, 0) rotate(0) scale(1, 1); } 40% { transform: translate(12%, -4%) rotate(8deg) scale(1.12, .9); } 75% { transform: translate(-3%, -12%) rotate(-6deg) scale(.9, 1.1); } }
 /* легка тінь під білим текстом — підпис лишається читабельним, коли блік пропливає під ним */
 .hero .lbl, .hero .num, .hero .sub, .hero .lt, .hero .lg2 b { text-shadow: 0 1px 10px rgba(5, 10, 30, .28); }
 .hero .sub .inc { color: inherit; }
@@ -1437,7 +1446,8 @@ function countUp(el) {
   requestAnimationFrame(step);
 }
 // абстрактні форми щоразу стартують з іншого положення
-$("liquid").querySelectorAll(".amb").forEach(function (s) { s.style.animationDelay = -(Math.random() * 19).toFixed(1) + "s"; });
+// старт форм зміщений випадково, але спільно — щоб протифаза яскравості зберігалась
+var ambD = -(Math.random() * 60).toFixed(1) + "s"; $("liquid").querySelectorAll(".amb").forEach(function (s) { s.style.animationDelay = ambD; });
 var lastView = view(), prevView = null, reportKey = null;
 window.addEventListener("hashchange", function () {
   var v = view();
