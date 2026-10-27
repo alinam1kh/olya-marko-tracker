@@ -144,11 +144,11 @@ PAGE = r"""<!doctype html>
   --ink: #111318; --ink2: #6B7180; --ink3: #4A5060; --ink4: #2A2E38; --mute: #C4C8D0;
   --blue: #1F63E6; --blue-g: linear-gradient(180deg, #3B82F6, #1D5FE0); --blue-soft: #EAF1FF; --blue-txt: #1F55C9; --blue-l: #A9C6F8;
   --good: #15803D; --good-bg: #E3F7EA; --bad: #C0261B; --bad-bg: #FDE8E6; --cash: #7A4E00; --cash-bg: #FFF2DB;
-  --hero-on: #DCE3F4; --glow: rgba(120, 160, 245, .24); --glow2: rgba(130, 175, 255, .62); --glow3: rgba(190, 215, 255, .45); --glow4: rgba(90, 120, 255, .55); --glow5: rgba(150, 130, 255, .5); --l1: #9DBEFF; --l2: #E2ECFF; --l3: #8A9BFF; --g1: #3A62C2; --g2: #1A2F6A; --g3: #04070F;
+  --hero-on: #DCE3F4; --glow: rgba(120, 160, 245, .24); --glow2: rgba(130, 175, 255, .62); --glow3: rgba(190, 215, 255, .45); --glow4: rgba(90, 120, 255, .55); --glow5: rgba(150, 130, 255, .5); --h1: rgba(120, 165, 255, .6); --h2: rgba(80, 200, 255, .45); --h3: rgba(150, 120, 255, .5); --h4: rgba(200, 225, 255, .42); --h5: rgba(70, 105, 255, .55); --h6: rgba(120, 235, 230, .3); --g1: #3A62C2; --g2: #1A2F6A; --g3: #04070F;
   --ease: cubic-bezier(.22, 1, .36, 1); --spring: cubic-bezier(.34, 1.36, .64, 1);
   --font: "Onest", "Outfit", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
-body.p-olya { --hero-on: #F1DDEA; --glow: rgba(214, 120, 182, .34); --glow2: rgba(232, 130, 200, .6); --glow3: rgba(255, 190, 230, .42); --glow4: rgba(255, 110, 170, .5); --glow5: rgba(190, 100, 230, .48); --l1: #E57DC8; --l2: #FFB7E0; --l3: #C25BD6; --g1: #9A4783; --g2: #4E1B3F; --g3: #0B0309; }
+body.p-olya { --hero-on: #F1DDEA; --glow: rgba(214, 120, 182, .34); --glow2: rgba(232, 130, 200, .6); --glow3: rgba(255, 190, 230, .42); --glow4: rgba(255, 110, 170, .5); --glow5: rgba(190, 100, 230, .48); --h1: rgba(232, 130, 200, .58); --h2: rgba(255, 150, 140, .4); --h3: rgba(180, 100, 235, .5); --h4: rgba(255, 200, 230, .4); --h5: rgba(255, 100, 165, .5); --h6: rgba(255, 190, 120, .28); --g1: #9A4783; --g2: #4E1B3F; --g3: #0B0309; }
 * { box-sizing: border-box; }
 html, body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.4 var(--font); -webkit-font-smoothing: antialiased; font-variant-numeric: tabular-nums; }
 .app { max-width: 440px; margin: 0 auto; padding: 8px 14px 130px; }
@@ -204,21 +204,23 @@ a { color: inherit; text-decoration: none; }
 .hero-wrap { position: relative; isolation: isolate; margin-top: 12px; border-radius: 24px; overflow: hidden;
   background: linear-gradient(162deg, var(--g1) 0%, var(--g2) 48%, var(--g3) 100%); }
 .hero { position: relative; z-index: 1; padding: 22px 20px 20px; border-radius: 24px; color: #fff; }
-/* «рідке» світло: плями пливуть, розтягуються й зливаються, як краплі. Фільтр #goo спершу розмиває їх,
-   потім робить краї чіткими (там, де плями близько, вони злипаються в одну), а тоді знову м'яко розмиває.
-   Кожна пляма — свій шлях і своя швидкість (11–23 с), старт випадковий */
-.liquid { position: absolute; inset: -10%; z-index: 0; pointer-events: none; filter: url(#goo); opacity: .5; mix-blend-mode: soft-light; }
-.liquid i { position: absolute; width: 44%; aspect-ratio: 1; border-radius: 50%; will-change: transform;
-  animation: var(--path) var(--dur) ease-in-out infinite; }
-.liquid i:nth-child(1) { --path: flow1; --dur: 17s; left: 52%; top: -6%; background: var(--l1); }
-.liquid i:nth-child(2) { --path: flow2; --dur: 21s; left: 4%; top: 52%; width: 36%; background: var(--l2); }
-.liquid i:nth-child(3) { --path: flow3; --dur: 23s; left: 34%; top: 48%; width: 40%; background: var(--l3); }
-.liquid i:nth-child(4) { --path: flow4; --dur: 11s; left: 72%; top: 42%; width: 26%; background: var(--l2); }
-.liquid i:nth-child(5) { --path: flow2; --dur: 19s; left: 16%; top: -14%; width: 30%; background: var(--l3); animation-direction: reverse; }
-@keyframes flow1 { 0%, 100% { transform: translate(0, 0) scale(1, 1); } 25% { transform: translate(-45%, 40%) scale(1.35, .8) rotate(25deg); } 50% { transform: translate(-20%, 85%) scale(.8, 1.2); } 75% { transform: translate(30%, 35%) scale(1.15, .9) rotate(-20deg); } }
-@keyframes flow2 { 0%, 100% { transform: translate(0, 0) scale(1, 1); } 30% { transform: translate(110%, -40%) scale(1.4, .75) rotate(-30deg); } 60% { transform: translate(170%, 20%) scale(.85, 1.15); } 80% { transform: translate(60%, 25%) scale(1.2, .9); } }
-@keyframes flow3 { 0%, 100% { transform: translate(0, 0) scale(1, 1); } 33% { transform: translate(-60%, -70%) scale(1.3, .85) rotate(30deg); } 66% { transform: translate(45%, -45%) scale(.8, 1.25); } }
-@keyframes flow4 { 0%, 100% { transform: translate(0, 0) scale(1); } 20% { transform: translate(-120%, 80%) scale(1.5, .8); } 45% { transform: translate(-200%, -10%) scale(.9, 1.2); } 70% { transform: translate(-60%, -90%) scale(1.25); } }
+/* шість м'яких плям різних відтінків повільно пливуть кожна своїм шляхом (37–61 с) і змінюють форму;
+   спільне розмиття зливає їх, тож кольори переливаються. Старт кожної — випадковий */
+.liquid { position: absolute; inset: 0; z-index: 0; pointer-events: none; filter: blur(26px); }
+.liquid i { position: absolute; width: 56%; aspect-ratio: 1; border-radius: 42% 58% 63% 37% / 45% 40% 60% 55%; mix-blend-mode: screen; will-change: transform, border-radius;
+  background: radial-gradient(circle, var(--c), transparent 68%);
+  animation: var(--path) var(--dur) cubic-bezier(.45, 0, .55, 1) infinite, morph calc(var(--dur) * .5) ease-in-out infinite alternate; }
+.liquid i:nth-child(1) { --c: var(--h1); --path: flow1; --dur: 43s; left: 48%; top: -30%; }
+.liquid i:nth-child(2) { --c: var(--h2); --path: flow2; --dur: 53s; left: -15%; top: 40%; width: 50%; }
+.liquid i:nth-child(3) { --c: var(--h3); --path: flow3; --dur: 61s; left: 30%; top: 45%; width: 64%; }
+.liquid i:nth-child(4) { --c: var(--h4); --path: flow4; --dur: 37s; left: 68%; top: 30%; width: 40%; }
+.liquid i:nth-child(5) { --c: var(--h5); --path: flow2; --dur: 59s; left: 5%; top: -35%; width: 48%; animation-direction: reverse, alternate; }
+.liquid i:nth-child(6) { --c: var(--h6); --path: flow1; --dur: 47s; left: 20%; top: 60%; width: 44%; animation-direction: reverse, alternate; }
+@keyframes flow1 { 0%, 100% { transform: translate(0, 0) rotate(0); } 25% { transform: translate(-38%, 30%) rotate(40deg) scale(1.15); } 50% { transform: translate(-12%, 72%) rotate(95deg) scale(.9); } 75% { transform: translate(24%, 26%) rotate(150deg) scale(1.1); } }
+@keyframes flow2 { 0%, 100% { transform: translate(0, 0) rotate(0); } 30% { transform: translate(85%, -30%) rotate(-60deg) scale(1.25); } 60% { transform: translate(140%, 25%) rotate(-120deg) scale(.85); } 80% { transform: translate(50%, 20%) rotate(-160deg) scale(1.05); } }
+@keyframes flow3 { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(-45%, -55%) scale(1.2); } 66% { transform: translate(30%, -35%) scale(.8); } }
+@keyframes flow4 { 0%, 100% { transform: translate(0, 0) scale(1); } 20% { transform: translate(-90%, 60%) scale(1.3); } 45% { transform: translate(-150%, -10%) scale(.9); } 70% { transform: translate(-40%, -70%) scale(1.15); } }
+@keyframes morph { 0% { border-radius: 42% 58% 63% 37% / 45% 40% 60% 55%; } 50% { border-radius: 63% 37% 41% 59% / 58% 62% 38% 42%; } 100% { border-radius: 35% 65% 55% 45% / 38% 52% 48% 62%; } }
 /* легка тінь під білим текстом — підпис лишається читабельним, коли блік пропливає під ним */
 .hero .lbl, .hero .num, .hero .sub, .hero .cols .t, .hero .cols b { text-shadow: 0 1px 10px rgba(5, 10, 30, .28); }
 .hero .lbl { font-size: 14px; }
@@ -509,7 +511,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
 
   <div id="v-report">
     <div id="h-alert"></div>
-    <div class="hero-wrap"><svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="goo" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur in="SourceGraphic" stdDeviation="16"/><feColorMatrix values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -8"/><feGaussianBlur stdDeviation="7"/></filter></svg><div class="liquid" id="liquid" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div><section class="hero" id="hero" aria-live="polite"></section></div>
+    <div class="hero-wrap"><div class="liquid" id="liquid" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div><section class="hero" id="hero" aria-live="polite"></section></div>
     <a class="cashbtn" id="cash" href="#add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg>Додати готівку</a>
     <section class="card goal" id="goal" hidden></section>
     <section class="card list fadein" id="insights" hidden></section>
@@ -1175,7 +1177,7 @@ function countUp(el) {
 }
 $("liquid").querySelectorAll("i").forEach(function (b) {
   var d = parseFloat(getComputedStyle(b).getPropertyValue("--dur")) || 20;
-  b.style.animationDelay = -(Math.random() * d).toFixed(1) + "s";
+  b.style.animationDelay = -(Math.random() * d).toFixed(1) + "s, " + -(Math.random() * d * .5).toFixed(1) + "s";
 });
 var lastView = view();
 window.addEventListener("hashchange", function () {
