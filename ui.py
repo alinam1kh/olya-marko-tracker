@@ -204,7 +204,7 @@ a { color: inherit; text-decoration: none; }
 .av::after { left: 10%; top: 66%; width: 80%; height: 60%; }
 .av.olya { background: #F8E1EF; }
 .av.olya::before, .av.olya::after { background: #C2569E; }
-.mpick > button, .mstatic { display: flex; align-items: center; gap: 8px; height: 48px; padding: 0 14px 0 12px; border: 1px solid var(--border); border-radius: 24px; background: var(--card); font-size: 15px; font-weight: 500; white-space: nowrap; cursor: pointer; }
+.mpick > button, .mstatic { display: flex; align-items: center; gap: 8px; height: 48px; padding: 0 14px 0 12px; border: 1px solid var(--border); border-radius: 24px; background: var(--card); font-size: 15px; white-space: nowrap; cursor: pointer; }
 .mstatic { cursor: default; }
 .who > button[aria-expanded="true"] .chev, .mpick > button[aria-expanded="true"] .chev { transform: rotate(180deg); }
 .chev { transition: transform .45s var(--ease); }
@@ -245,23 +245,37 @@ a { color: inherit; text-decoration: none; }
 .hero-wrap { position: relative; isolation: isolate; margin-top: 12px; border-radius: 24px; overflow: hidden;
   background: linear-gradient(162deg, var(--g1) 0%, var(--g2) 48%, var(--g3) 100%); }
 .hero { position: relative; z-index: 1; padding: 22px 20px 20px; border-radius: 24px; color: #fff; }
-/* шість м'яких плям різних відтінків повільно пливуть кожна своїм шляхом (25–40 с), темп чергується: швидше — повільніше, і змінюють форму;
-   спільне розмиття зливає їх, тож кольори переливаються. Старт кожної — випадковий */
-.liquid { position: absolute; inset: 0; z-index: 0; pointer-events: none; filter: blur(26px); }
-.liquid i { position: absolute; width: 56%; aspect-ratio: 1; border-radius: 42% 58% 63% 37% / 45% 40% 60% 55%; mix-blend-mode: screen; will-change: transform, border-radius;
-  background: radial-gradient(circle, var(--c), transparent 68%);
-  animation: var(--path) var(--dur) linear infinite, morph calc(var(--dur) * .5) ease-in-out infinite alternate; }
-.liquid i:nth-child(1) { --c: var(--h1); --path: flow1; --dur: 29s; left: 48%; top: -30%; }
-.liquid i:nth-child(2) { --c: var(--h2); --path: flow2; --dur: 35s; left: -15%; top: 40%; width: 50%; }
-.liquid i:nth-child(3) { --c: var(--h3); --path: flow3; --dur: 40s; left: 30%; top: 45%; width: 64%; }
-.liquid i:nth-child(4) { --c: var(--h4); --path: flow4; --dur: 25s; left: 68%; top: 30%; width: 40%; }
-.liquid i:nth-child(5) { --c: var(--h5); --path: flow2; --dur: 38s; left: 5%; top: -35%; width: 48%; animation-direction: reverse, alternate; }
-.liquid i:nth-child(6) { --c: var(--h6); --path: flow1; --dur: 31s; left: 20%; top: 60%; width: 44%; animation-direction: reverse, alternate; }
-@keyframes flow1 { 0%, 100% { animation-timing-function: cubic-bezier(.65, 0, .35, 1); transform: translate(0, 0) rotate(0); } 25% { animation-timing-function: cubic-bezier(.37, 0, .63, 1); transform: translate(-38%, 30%) rotate(40deg) scale(1.15); } 50% { animation-timing-function: cubic-bezier(.65, 0, .35, 1); transform: translate(-12%, 72%) rotate(95deg) scale(.9); } 75% { animation-timing-function: cubic-bezier(.37, 0, .63, 1); transform: translate(24%, 26%) rotate(150deg) scale(1.1); } }
-@keyframes flow2 { 0%, 100% { animation-timing-function: cubic-bezier(.65, 0, .35, 1); transform: translate(0, 0) rotate(0); } 30% { animation-timing-function: cubic-bezier(.37, 0, .63, 1); transform: translate(85%, -30%) rotate(-60deg) scale(1.25); } 60% { animation-timing-function: cubic-bezier(.65, 0, .35, 1); transform: translate(140%, 25%) rotate(-120deg) scale(.85); } 80% { animation-timing-function: cubic-bezier(.37, 0, .63, 1); transform: translate(50%, 20%) rotate(-160deg) scale(1.05); } }
-@keyframes flow3 { 0%, 100% { animation-timing-function: cubic-bezier(.65, 0, .35, 1); transform: translate(0, 0) scale(1); } 33% { animation-timing-function: cubic-bezier(.37, 0, .63, 1); transform: translate(-45%, -55%) scale(1.2); } 66% { animation-timing-function: cubic-bezier(.65, 0, .35, 1); transform: translate(30%, -35%) scale(.8); } }
-@keyframes flow4 { 0%, 100% { animation-timing-function: cubic-bezier(.65, 0, .35, 1); transform: translate(0, 0) scale(1); } 20% { animation-timing-function: cubic-bezier(.37, 0, .63, 1); transform: translate(-90%, 60%) scale(1.3); } 45% { animation-timing-function: cubic-bezier(.65, 0, .35, 1); transform: translate(-150%, -10%) scale(.9); } 70% { animation-timing-function: cubic-bezier(.37, 0, .63, 1); transform: translate(-40%, -70%) scale(1.15); } }
-@keyframes morph { 0% { border-radius: 42% 58% 63% 37% / 45% 40% 60% 55%; } 50% { border-radius: 63% 37% 41% 59% / 58% 62% 38% 42%; } 100% { border-radius: 35% 65% 55% 45% / 38% 52% 48% 62%; } }
+/* «рідке» світло: три пари плям. Кожна пара пливе своїм шляхом (19–27 с), а дві плями в ній сходяться,
+   зливаються, розтягуються одна за одною й знову розходяться (8–12 с). Фільтр #melt мʼяко «склеює» плями,
+   коли вони близько, а сильне розмиття робить з цього переливи градієнта. Старт кожної пари — випадковий */
+.liquid { position: absolute; inset: -6%; z-index: 0; pointer-events: none; opacity: .92; filter: url(#melt) blur(10px); }
+.pair { position: absolute; width: 78%; height: 66%; will-change: transform; animation: var(--path) var(--pd) linear infinite; }
+.pair i { position: absolute; top: 10%; width: 58%; aspect-ratio: 1; border-radius: 50%; mix-blend-mode: screen; will-change: transform;
+  background: radial-gradient(circle, var(--c), transparent 70%); animation: apartL var(--sd) cubic-bezier(.45, 0, .55, 1) infinite; }
+.pair i:first-child { left: 0; transform-origin: 70% 50%; }
+.pair i:last-child { right: 0; transform-origin: 30% 50%; animation-name: apartR; }
+.pair:nth-child(1) { left: 26%; top: -22%; --path: pathA; --pd: 21s; --sd: 9s; }
+.pair:nth-child(1) i:first-child { --c: var(--h1); } .pair:nth-child(1) i:last-child { --c: var(--h3); }
+.pair:nth-child(2) { left: -18%; top: 34%; --path: pathB; --pd: 25s; --sd: 11s; }
+.pair:nth-child(2) i:first-child { --c: var(--h2); } .pair:nth-child(2) i:last-child { --c: var(--h5); }
+.pair:nth-child(3) { left: 34%; top: 44%; --path: pathC; --pd: 27s; --sd: 12.5s; }
+.pair:nth-child(3) i:first-child { --c: var(--h4); } .pair:nth-child(3) i:last-child { --c: var(--h6); }
+/* сходяться (злиття) → розтягуються одна за одною → розходяться → пауза окремо */
+@keyframes apartL {
+  0%, 100% { transform: translateX(-22%) scale(1); }
+  38% { transform: translateX(42%) scale(1.12, .96); }
+  52% { transform: translateX(30%) scale(1.5, .78); }
+  70% { transform: translateX(-4%) scale(1.18, .9); }
+}
+@keyframes apartR {
+  0%, 100% { transform: translateX(22%) scale(1); }
+  38% { transform: translateX(-42%) scale(1.12, .96); }
+  52% { transform: translateX(-30%) scale(1.5, .78); }
+  70% { transform: translateX(4%) scale(1.18, .9); }
+}
+@keyframes pathA { 0%, 100% { transform: translate(0, 0) rotate(0); } 25% { transform: translate(-22%, 18%) rotate(35deg); } 50% { transform: translate(-8%, 46%) rotate(80deg); } 75% { transform: translate(14%, 20%) rotate(130deg); } }
+@keyframes pathB { 0%, 100% { transform: translate(0, 0) rotate(0); } 30% { transform: translate(34%, -18%) rotate(-50deg); } 60% { transform: translate(52%, 14%) rotate(-110deg); } 80% { transform: translate(20%, 10%) rotate(-150deg); } }
+@keyframes pathC { 0%, 100% { transform: translate(0, 0) rotate(0); } 33% { transform: translate(-30%, -34%) rotate(60deg); } 66% { transform: translate(14%, -22%) rotate(140deg); } }
 /* легка тінь під білим текстом — підпис лишається читабельним, коли блік пропливає під ним */
 .hero .lbl, .hero .num, .hero .sub, .hero .cols .t, .hero .cols b { text-shadow: 0 1px 10px rgba(5, 10, 30, .28); }
 .hero .lbl { font-size: 14px; }
@@ -531,7 +545,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
   .splash, .sp-mark, .sp-mark::before, .sp-mark g, .sp-bar b, .sp-name, .stag > *, .hero .num.cu, .pop:not([hidden]), .toast { animation: none !important; transition: none !important; }
   .nav .ind { transition: none; }
 }
-@media (prefers-reduced-motion: reduce) { .cap .fill, .crow .bar6 b, .segs i b, .hero .meter b { transition: none !important; } .fadein, .liquid i { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .cap .fill, .crow .bar6 b, .segs i b, .hero .meter b { transition: none !important; } .fadein, .liquid i, .pair { animation: none; } }
 </style>
 </head>
 <body class="p-marko">
@@ -564,7 +578,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
 
   <div id="v-report">
     <div id="h-alert"></div>
-    <div class="hero-wrap"><div class="liquid" id="liquid" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div><section class="hero" id="hero" aria-live="polite"></section></div>
+    <div class="hero-wrap"><svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="melt" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="14"/><feColorMatrix values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 5 -0.9"/><feGaussianBlur stdDeviation="18"/></filter></svg><div class="liquid" id="liquid" aria-hidden="true"><span class="pair"><i></i><i></i></span><span class="pair"><i></i><i></i></span><span class="pair"><i></i><i></i></span></div><section class="hero" id="hero" aria-live="polite"></section></div>
     <a class="cashbtn" id="cash" href="#add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg>Додати готівку</a>
     <section class="card goal" id="goal" hidden></section>
     <section class="card list fadein" id="insights" hidden></section>
@@ -1298,9 +1312,12 @@ function countUp(el) {
   }
   requestAnimationFrame(step);
 }
-$("liquid").querySelectorAll("i").forEach(function (b) {
-  var d = parseFloat(getComputedStyle(b).getPropertyValue("--dur")) || 20;
-  b.style.animationDelay = -(Math.random() * d).toFixed(1) + "s, " + -(Math.random() * d * .5).toFixed(1) + "s";
+// випадковий старт: у кожної пари свій шлях, а дві плями пари рухаються синхронно (дзеркально)
+$("liquid").querySelectorAll(".pair").forEach(function (pr) {
+  var cs = getComputedStyle(pr), pd = parseFloat(cs.getPropertyValue("--pd")) || 20, sd = parseFloat(cs.getPropertyValue("--sd")) || 10;
+  pr.style.animationDelay = -(Math.random() * pd).toFixed(1) + "s";
+  var d = -(Math.random() * sd).toFixed(1) + "s";
+  pr.querySelectorAll("i").forEach(function (b) { b.style.animationDelay = d; });
 });
 var lastView = view();
 window.addEventListener("hashchange", function () {
