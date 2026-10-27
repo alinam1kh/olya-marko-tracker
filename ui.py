@@ -248,20 +248,20 @@ a { color: inherit; text-decoration: none; }
 /* мʼякий темний край: світло з плям плавно тоне в найтемніший тон ближче до країв картки */
 .hero-wrap::after { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; border-radius: inherit;
   background: radial-gradient(130% 110% at 45% 40%, transparent 52%, color-mix(in srgb, var(--g3) 45%, transparent) 80%, var(--g3) 100%); }
-/* «рідке» світло: три пари плям. Кожна пара пливе своїм шляхом (19–27 с), а дві плями в ній сходяться,
-   зливаються, розтягуються одна за одною й знову розходяться (8–12 с). Фільтр #melt мʼяко «склеює» плями,
+/* «рідке» світло: три пари плям. Кожна пара пливе своїм шляхом (25–33 с), а дві плями в ній сходяться,
+   зливаються, розтягуються одна за одною й знову розходяться (11–15 с). Фільтр #melt мʼяко «склеює» плями,
    коли вони близько, а сильне розмиття робить з цього переливи градієнта. Старт кожної пари — випадковий */
 .liquid { position: absolute; inset: -6%; z-index: 0; pointer-events: none; opacity: .95; filter: url(#melt) blur(28px); }
-.pair { position: absolute; width: 96%; height: 82%; will-change: transform; animation: var(--path) var(--pd) linear infinite; }
+.pair { position: absolute; width: 96%; height: 82%; will-change: transform; animation: var(--path) var(--pd) cubic-bezier(.37, 0, .63, 1) infinite; }
 .pair i { position: absolute; top: 8%; width: 64%; aspect-ratio: 1; border-radius: 50%; mix-blend-mode: screen; will-change: transform;
-  background: radial-gradient(circle, var(--c), transparent 70%); animation: apartL var(--sd) cubic-bezier(.45, 0, .55, 1) infinite; }
+  background: radial-gradient(circle, var(--c), transparent 70%); animation: apartL var(--sd) cubic-bezier(.37, 0, .63, 1) infinite; }
 .pair i:first-child { left: 0; transform-origin: 70% 50%; }
 .pair i:last-child { right: 0; transform-origin: 30% 50%; animation-name: apartR; }
-.pair:nth-child(1) { left: 48%; top: -34%; --path: pathA; --pd: 21s; --sd: 9s; }
+.pair:nth-child(1) { left: 48%; top: -34%; --path: pathA; --pd: 25s; --sd: 11s; }
 .pair:nth-child(1) i:first-child { --c: var(--h1); } .pair:nth-child(1) i:last-child { --c: var(--h3); }
-.pair:nth-child(2) { left: -58%; top: 6%; --path: pathB; --pd: 25s; --sd: 11s; }
+.pair:nth-child(2) { left: -58%; top: 6%; --path: pathB; --pd: 30s; --sd: 13s; }
 .pair:nth-child(2) i:first-child { --c: var(--h2); } .pair:nth-child(2) i:last-child { --c: var(--h5); }
-.pair:nth-child(3) { left: 52%; top: 40%; --path: pathC; --pd: 27s; --sd: 12.5s; }
+.pair:nth-child(3) { left: 52%; top: 40%; --path: pathC; --pd: 33s; --sd: 15s; }
 .pair:nth-child(3) i:first-child { --c: var(--h4); } .pair:nth-child(3) i:last-child { --c: var(--h6); }
 /* сходяться (злиття) → розтягуються одна за одною → розходяться → пауза окремо */
 @keyframes apartL {
