@@ -361,7 +361,7 @@ a { color: inherit; text-decoration: none; }
 .seg.sm button { min-height: 36px; padding: 0 10px; border-radius: 11px; font-size: 12px; white-space: nowrap; }
 
 /* капсульні графіки: сіра доріжка, синя заливка, неповний місяць — штрих */
-.chart { display: flex; gap: 8px; margin-top: 28px; }
+.chart { display: flex; gap: 8px; margin-top: 24px; }
 .ticks { display: flex; flex-direction: column; justify-content: space-between; height: 150px; min-width: 54px; font-size: 12px; color: var(--ink2); text-align: right; }
 .ticks span { line-height: 1; }
 .caps { flex: 1; display: flex; justify-content: space-around; }
@@ -567,8 +567,8 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
     <div class="seg" id="a-mode" role="group" aria-label="Розділ аналітики"></div>
     <div id="an-month">
       <section class="card">
-        <div class="ch"><h2>Витрати по тижнях</h2><div class="seg sm" id="rent-mode" role="group" aria-label="Оренда в графіку" hidden></div></div>
-        <div class="note" id="wnote" style="margin-top:10px"></div>
+        <div class="ch" style="min-height:0"><h2>Витрати по тижнях</h2><div class="seg sm" id="rent-mode" role="group" aria-label="Оренда в графіку" hidden></div></div>
+        <div class="note" id="wnote" style="margin-top:6px"></div>
         <div class="chart"><div class="ticks" id="wticks" aria-hidden="true"></div><div class="caps" id="bars"></div></div>
       </section>
       <section class="card"><div class="ch" style="min-height:0;margin-bottom:12px"><h2>Фіксовані й змінні</h2></div><div class="split" id="fvsplit" aria-hidden="true"></div><div class="fv2" id="fv"></div><p class="note" id="fvnote" style="margin:14px 0 0"></p></section>
