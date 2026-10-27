@@ -717,9 +717,9 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .caps { position: relative; flex: 1; display: flex; justify-content: space-around; }
 /* середнє: більші заокруглені штрихи (SVG-візерунок), окремим шаром поверх стовпчиків */
 .avgl { position: absolute; left: 0; right: 0; height: 3px; margin-top: -1.5px; pointer-events: none; z-index: 3; transform: translateZ(0);
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='3'%3E%3Cline x1='1.5' y1='1.5' x2='7.5' y2='1.5' stroke='%2358606E' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E") repeat-x left center / 12px 3px; }
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='3'%3E%3Cline x1='1.5' y1='1.5' x2='7.5' y2='1.5' stroke='%238E97A6' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") repeat-x left center / 12px 3px; }
 .avg-leg { display: flex; align-items: center; gap: 10px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--soft); font-size: 14px; color: var(--ink2); }
-.avg-leg i { flex: none; width: 20px; height: 3px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='3'%3E%3Cline x1='1.5' y1='1.5' x2='7.5' y2='1.5' stroke='%2358606E' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E") repeat-x left center / 12px 3px; }
+.avg-leg i { flex: none; width: 20px; height: 3px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='3'%3E%3Cline x1='1.5' y1='1.5' x2='7.5' y2='1.5' stroke='%238E97A6' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") repeat-x left center / 12px 3px; }
 .avg-leg b { margin-left: auto; font-size: 15px; font-weight: 500; color: var(--ink); }
 .avg-leg:empty { display: none; }
 .cap { display: flex; flex-direction: column; align-items: center; gap: 6px; }
