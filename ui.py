@@ -677,8 +677,11 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font: 500 12px var(--font); cursor: pointer; opacity: 0; transition: opacity .3s var(--ease); }
 .swdel svg { width: 18px; height: 18px; }
 /* під кнопкою ховаємо лінію наступного рядка на всю ширину кнопки (і під її заокругленими кутами) */
-.swipe::after { content: ""; position: absolute; right: -16px; bottom: -1px; width: 112px; height: 1px; background: var(--card); opacity: 0; transition: opacity .2s ease; }
+.swipe::after { content: ""; position: absolute; right: -16px; bottom: -1px; width: 96px; height: 1px; background: var(--card); opacity: 0; transition: opacity .2s ease; }
 .swipe.on::after { opacity: 1; }
+.swipe::before { content: ""; position: absolute; left: 0; right: 80px; top: 0; z-index: 2; border-top: 1px solid var(--soft); opacity: 0; transition: opacity .2s ease; pointer-events: none; }
+.swipe.on::before { opacity: 1; }
+.day .card .swipe:first-child::before { display: none; }
 .day .card .swipe:first-child .swdel { top: 2px; }   /* 8 px від верху картки (відступ картки 6 px) */
 .card .swipe:last-child .swdel { bottom: 0; }            /* 8 px від низу картки (відступ картки 8 px) */
 .card .swipe:last-child::after { display: none; }
