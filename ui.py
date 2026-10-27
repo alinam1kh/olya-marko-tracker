@@ -267,7 +267,7 @@ a { color: inherit; text-decoration: none; }
 .hero .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.35); }
 .hero .cols a { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; min-height: 44px; }
 .hero .cols .t { font-size: 13px; }
-.hero .cols .hd { display: flex; justify-content: space-between; align-items: center; gap: 8px; width: 100%; min-height: 24px; }
+.hero .cols .hd { display: flex; justify-content: flex-start; align-items: center; gap: 8px; width: 100%; min-height: 24px; }
 .hero .cols b { font-size: 18px; font-weight: 500; }
 .hero .cols i { font-style: normal; font-size: 12px; color: var(--hero-on); }
 .hero .meter { height: 8px; margin: 14px 0 8px; border-radius: 4px; background: rgba(255,255,255,.25); overflow: hidden; }
