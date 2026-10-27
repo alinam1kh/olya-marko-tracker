@@ -652,9 +652,24 @@ function h(tag, cls, html) { var e = document.createElement(tag); if (cls) e.cla
 function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
 function mi(m) { return parseInt(m.key.slice(5), 10) - 1; }
 function iso(d) { return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
-function grow(sel, attr) {  // плавне заповнення після першого кадру
+// шкали й стовпчики заповнюються, коли зʼявляються на екрані: одразу видимі — після першого кадру,
+// нижчі — тоді, коли до них догортають; ті, що виринули разом, ростуть по черзі
+var growIO = "IntersectionObserver" in window ? new IntersectionObserver(function (list) {
+  var k = 0;
+  list.forEach(function (en) {
+    var e = en.target, above = !en.isIntersecting && en.boundingClientRect.bottom < 0;
+    if (!en.isIntersecting && !above) return;  // ще нижче екрана — чекаємо
+    growIO.unobserve(e);
+    // якщо шкалу різко прогорнули повз екран — просто заповнюємо, без анімації
+    e.style.transitionDelay = above ? "0ms" : Math.min(k++, 8) * 80 + 150 + "ms"; e.style[e.dataset.attr] = e.dataset.to;
+  });
+}, { rootMargin: "0px 0px -60px 0px" }) : null;
+function grow(sel, attr) {
   requestAnimationFrame(function () { requestAnimationFrame(function () {
-    document.querySelectorAll(sel).forEach(function (e, i) { e.style.transitionDelay = Math.min(i, 8) * 80 + 150 + "ms"; e.style[attr] = e.dataset.to; });
+    document.querySelectorAll(sel).forEach(function (e, i) {
+      if (growIO) { e.dataset.attr = attr; growIO.observe(e); }
+      else { e.style.transitionDelay = Math.min(i, 8) * 80 + 150 + "ms"; e.style[attr] = e.dataset.to; }
+    });
   }); });
 }
 function plural(n, one, few, many) { var a = n % 10, b = n % 100; return a === 1 && b !== 11 ? one : a >= 2 && a <= 4 && (b < 12 || b > 14) ? few : many; }
