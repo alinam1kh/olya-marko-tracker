@@ -756,6 +756,9 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .vs-avg span { display: inline; font-size: 14px; color: var(--ink2); }
 .vs-avg b { display: inline; margin: 0; font-size: 15px; font-weight: 500; }
 .vs .vs-sub { display: block; margin-top: 2px; font-size: 13px; color: var(--ink2); }
+.vs-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; min-height: 24px; }
+.vs-head span { font-size: 13px; color: var(--ink2); }
+.vs-tag { flex: none; padding: 3px 10px; border-radius: 12px; background: var(--soft); font-style: normal; font-size: 12px; font-weight: 500; color: var(--ink2); white-space: nowrap; }
 .vs-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--soft); }
 .vs-row > span:first-child { display: inline; font-size: 14px; color: var(--ink2); line-height: 1.35; }
 .vs-row .nw { display: inline; margin: 0; font-size: inherit; font-weight: 400; white-space: nowrap; }
@@ -1480,8 +1483,10 @@ function renderTrends(P) {
   else if (S.incomplete && metric === "exp") row = '<div class="vs-row"><span><i class="dash" aria-hidden="true"></i>Проти тих самих днів ' + GEN[mi(prev)] + ', <b class="nw">' + z0(sameDays) + "</b></span>" + cmpBadge(val(S), sameDays) + "</div>";
   else if (S.incomplete) row = '<div class="vs-row"><span>Місяць ще триває — порівняємо, коли закінчиться</span></div>';
   else row = '<div class="vs-row"><span>Проти ' + GEN[mi(prev)] + ', <b class="nw">' + z0(val(prev)) + "</b></span>" + cmpBadge(val(S), val(prev)) + "</div>";
-  var sub = [S.incomplete ? "1–" + upTo(S) + " " + GEN[mi(S)] + ", місяць ще триває" : "", metric === "saved" && paid ? nf1.format(S.rate) + " % доходу" : ""].filter(Boolean).join(" · ");
-  $("t-duo").innerHTML = '<div class="card vs"><span>' + NAME + " у " + LOC[mi(S)] + '</span><div class="vs-big"><b>' + (known ? z0(val(S)) : "—") + "</b></div>" +
+  // період неповного місяця — плашкою праворуч від заголовка (як «дані до 15.10» на головній)
+  var sub = metric === "saved" && paid ? nf1.format(S.rate) + " % доходу" : "";
+  var tag = S.incomplete ? '<em class="vs-tag">1–' + upTo(S) + " " + GEN[mi(S)] + "</em>" : "";
+  $("t-duo").innerHTML = '<div class="card vs"><div class="vs-head"><span>' + NAME + " у " + LOC[mi(S)] + "</span>" + tag + '</div><div class="vs-big"><b>' + (known ? z0(val(S)) : "—") + "</b></div>" +
     (sub ? '<small class="vs-sub">' + sub + "</small>" : "") + row +
     '<div class="vs-avg"><span>Середнє за повний місяць</span><b>' + z0(avg) + "</b></div></div>";
   $("t-note").hidden = true;
