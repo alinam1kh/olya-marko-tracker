@@ -593,7 +593,8 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 @keyframes numin { from { opacity: 0; transform: translateY(8px); filter: blur(4px); } to { opacity: 1; transform: none; filter: none; } }
 .hero .num { margin-top: 6px; font-size: 40px; font-weight: 500; letter-spacing: -.02em; line-height: 1.05; }
 .hero .sub { margin-top: 6px; font-size: 14px; }
-.hero .tag { position: absolute; top: 18px; right: 18px; height: 24px; padding: 0 8px; border-radius: 12px; background: rgba(255,255,255,.16); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,.22); color: #fff; font-size: 12px; font-weight: 500; display: flex; align-items: center; }
+.hero .lbl { display: flex; align-items: center; gap: 8px; }
+.hero .tag { flex: none; height: 22px; padding: 0 8px; border-radius: 11px; background: rgba(255,255,255,.16); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); color: #fff; font-size: 12px; font-weight: 500; display: flex; align-items: center; }
 .hero .meter { height: 8px; margin: 14px 0 8px; border-radius: 4px; background: rgba(255,255,255,.25); overflow: hidden; }
 .hero .meter b { display: block; height: 100%; width: 0; border-radius: 4px; background: #fff; transition: width 2.1s var(--ease); }
 .hero .hint { display: flex; gap: 6px; align-items: flex-start; margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.35); font-size: 14px; line-height: 1.4; }
@@ -985,22 +986,22 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
     <div id="h-alert"></div>
     <div class="hero-wrap"><div class="liquid" id="liquid" aria-hidden="true"><span class="after"><span class="amb a1"></span><span class="amb a2"></span><span class="amb a3"></span><span class="ehalo"><i></i></span><span class="erim"></span></span><span class="glow"></span><span class="halo"><i></i></span><span class="rim"></span></div><section class="hero" id="hero" aria-live="polite"></section></div>
     <a class="cashbtn" id="cash" href="#add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg>Додати готівку</a>
-    <section class="card goal" id="goal" hidden></section>
     <section class="card list fadein" id="insights" hidden></section>
     <section class="card list"><div class="ch"><h2>Категорії</h2></div><div id="cats"></div></section>
+    <section class="card goal" id="goal" hidden></section>
     <section class="card list"><div class="ch"><h2>Останні операції</h2><a href="#journal" id="ops-all">Журнал<span id="arr-j"></span></a></div><div id="recent"></div></section>
   </div>
 
   <div id="v-analytics" hidden>
     <div class="seg" id="a-mode" role="group" aria-label="Розділ аналітики"></div>
     <div id="an-month">
+      <section class="card list"><div class="ch"><h2 id="t-dmon"></h2></div><div class="share" id="t-share" aria-hidden="true"></div><div id="t-leg" style="padding-bottom:8px"></div></section>
+      <section class="card"><div class="ch" style="min-height:0;margin-bottom:12px"><h2>Фіксовані й змінні</h2></div><div class="split" id="fvsplit" aria-hidden="true"></div><div class="fv2" id="fv"></div><p class="note" id="fvnote" style="margin:14px 0 0"></p></section>
       <section class="card">
         <div class="ch" style="min-height:0"><h2 id="w-title">Витрати по тижнях</h2><div class="seg sm" id="rent-mode" role="group" aria-label="Оренда в графіку" style="grid-auto-columns:auto" hidden></div></div>
         <div class="note" id="wnote" style="margin-top:6px"></div>
         <div class="chart"><div class="ticks" id="wticks" aria-hidden="true"></div><div class="caps" id="bars"></div></div>
       </section>
-      <section class="card"><div class="ch" style="min-height:0;margin-bottom:12px"><h2>Фіксовані й змінні</h2></div><div class="split" id="fvsplit" aria-hidden="true"></div><div class="fv2" id="fv"></div><p class="note" id="fvnote" style="margin:14px 0 0"></p></section>
-      <section class="card list"><div class="ch"><h2 id="t-dmon"></h2></div><div class="share" id="t-share" aria-hidden="true"></div><div id="t-leg" style="padding-bottom:8px"></div></section>
     </div>
     <div id="an-trends" hidden>
       <section class="card">
@@ -1305,7 +1306,7 @@ function renderReport(P) {
   var tag = M.incomplete ? '<span class="tag">дані до ' + M.last_op + "</span>" : "";
   if (noIncome) {
     var usual = prevI ? prevI.income : 0, share = usual ? M.expenses / usual * 100 : 0, days = payDays(P);
-    hero.innerHTML = tag + '<div class="lbl">Витрачено до зарплати</div><div class="num">' + approx + zl(M.expenses) + "</div>" +
+    hero.innerHTML = '<div class="lbl">Витрачено до зарплати' + tag + '</div><div class="num">' + approx + zl(M.expenses) + "</div>" +
       (usual ? '<div class="meter"><b data-to="' + Math.min(100, share) + '%"></b></div><div class="sub">Це ' + nf1.format(share) + " % від зарплати " + nf0.format(usual) + " зл</div>" : "") +
       '<div class="hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="7.8" r=".6" fill="currentColor"/></svg>' +
       "<span>Залишок зʼявиться після зарплати " + (days ? days + " числа" : "наприкінці місяця") + ".</span></div>";
@@ -1315,7 +1316,7 @@ function renderReport(P) {
     var dn = +M.last_op.slice(0, 2);
     // увесь дохід — це смуга; витрати й залишок — її частини
     var ep = M.income > 0 ? Math.min(100, M.expenses / M.income * 100) : 100, sp = 100 - ep;
-    hero.innerHTML = tag + '<div class="lbl">Лишилось у ' + LOC[k] + '</div><div class="num">' + approx + zl(M.saved) + "</div>" +
+    hero.innerHTML = '<div class="lbl">Лишилось у ' + LOC[k] + tag + '</div><div class="num">' + approx + zl(M.saved) + "</div>" +
       '<div class="sub">Норма заощаджень ' + nf1.format(M.rate) + " % з доходу " + '<a href="#journal" data-filter="inc" class="inc">' + nf0.format(M.income) + " зл" + "</a>" + inc + (P.ok ? "" : ", потребує перевірки") + "</div>" +
       '<div class="split2" role="img" aria-label="Витрати ' + nf0.format(ep) + " %, лишилось " + nf0.format(sp) + ' % доходу">' +
         '<b class="e" data-to="calc(' + ep.toFixed(2) + '% - 2px)"></b><b class="s"></b></div>' +
@@ -1352,12 +1353,11 @@ function renderInsights(P, M) {
   if (M.incomplete) {
     add("Фіксовані платежі вже сплачено", '<span class="bd">' + zl(M.fixed) + "</span>");
     add("Змінні витрати за " + (+M.last_op.slice(0, 2)) + " " + plural(+M.last_op.slice(0, 2), "день", "дні", "днів"), '<span class="bd">' + zl(M.variable) + "</span>");
-    add("Норма заощаджень (попередньо)", '<span class="bd new">' + nf1.format(M.rate) + " %</span>");
   } else {
     var pi = prevWithIncome(P, month);
     if (pi) {
       var pp = M.rate - pi.rate;
-      add("Норма заощаджень " + nf1.format(M.rate) + " %",
+      add("Норма заощаджень проти " + GEN[mi(pi)],
         Math.abs(pp) < 0.05 ? '<span class="bd">як у ' + LOC[mi(pi)] + "</span>" :
         '<span class="bd ' + (pp > 0 ? "good" : "bad") + '" aria-label="' + (pp > 0 ? "більше" : "менше") + ", ніж у " + LOC[mi(pi)] + ": " + nf1.format(pi.rate) + ' %">' + arr(pp) + " з " + nf1.format(pi.rate) + " %</span>");
     }
