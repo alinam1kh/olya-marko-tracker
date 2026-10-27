@@ -354,8 +354,8 @@ a { color: inherit; text-decoration: none; }
 .cic { flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--soft); }
 .cic svg { width: 18px; height: 18px; }
 .cic.inc { background: var(--good-bg); }
-.cic .glyph, .ji .glyph { font-weight: 500; line-height: 1; }
-.ji .glyph { font-size: 20px; }
+.cic .glyph, .ji .glyph { font-weight: 400; line-height: 1; }
+.jsum .ji .glyph { display: inline; font-size: 20px; color: inherit; }
 .more { display: flex; justify-content: space-between; align-items: center; min-height: 52px; margin-top: 4px; border-top: 1px solid var(--soft); font-size: 15px; color: var(--ink2); }
 /* операції */
 .op { display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 12px 0; border-top: 1px solid var(--soft); }
