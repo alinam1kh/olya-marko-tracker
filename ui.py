@@ -1331,7 +1331,17 @@ function renderReport(P) {
   $("cats").innerHTML = catRows(M, 3);
   $("cats-all").onclick = function (e) {
     e.preventDefault(); amode = "month"; location.hash = "#analytics";
-    setTimeout(function () { var s = $("fcats").closest("section"); if (s) window.scrollTo({ top: s.getBoundingClientRect().top + scrollY - 76, behavior: "smooth" }); }, 120);
+    setTimeout(function () {
+      var s = $("fcats").closest("section"); if (!s) return;
+      var y0 = scrollY, y1 = s.getBoundingClientRect().top + scrollY - 76, t0 = null, dur = 1000;
+      if (matchMedia("(prefers-reduced-motion: reduce)").matches) { window.scrollTo(0, y1); return; }
+      (function step(ts) {
+        if (t0 === null) t0 = ts;
+        var k = Math.min(1, (ts - t0) / dur), e = k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+        window.scrollTo(0, y0 + (y1 - y0) * e);
+        if (k < 1) requestAnimationFrame(step);
+      })(performance.now());
+    }, 250);
   };
   var mb = $("more-btn");
   if (mb) mb.onclick = function () {
