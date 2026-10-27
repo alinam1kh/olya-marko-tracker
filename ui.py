@@ -660,6 +660,7 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .op .t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
 .op .t1 { font-size: 15px; }
 .op .t1.one { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.op .t1:not(.one) { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; overflow-wrap: anywhere; }
 .op .t2 { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 13px; color: var(--ink2); }
 .op .r { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
 .op .am { font-size: 15px; font-weight: 500; white-space: nowrap; }
