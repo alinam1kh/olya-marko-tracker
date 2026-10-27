@@ -233,6 +233,7 @@ a { color: inherit; text-decoration: none; }
 .cal-grid button[aria-pressed="true"] { background: var(--blue-g); color: #fff; }
 .cal-grid button[aria-pressed="true"].has::after { background: #fff; opacity: .8; }
 .cal-note { margin: 10px 4px 0; font-size: 12px; color: var(--ink2); }
+.acal { margin-top: 10px; padding: 12px; border: 1px solid var(--border); border-radius: 20px; background: var(--card); animation: popin .45s var(--ease) both; transform-origin: top right; }
 
 /* головна картка: градієнт у кольорі людини, а над ним «рідкі» плями світла */
 .hero-wrap { position: relative; isolation: isolate; margin-top: 12px; border-radius: 24px; overflow: hidden;
@@ -598,6 +599,12 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
       <input class="field" id="a-title" maxlength="80" autocomplete="off" placeholder="Опис, за бажанням: ринок, овочі" aria-label="Опис, за бажанням">
       <div class="lab" id="date-lab">Дата</div>
       <div class="dates" id="a-dates" role="group" aria-labelledby="date-lab"></div>
+      <div class="acal" id="a-cal" role="group" aria-label="Інша дата" hidden>
+        <div class="cal-head"><button type="button" id="a-cal-prev" aria-label="Попередній місяць"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg></button>
+          <b id="a-cal-title"></b><button type="button" id="a-cal-next" aria-label="Наступний місяць"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></button></div>
+        <div class="cal-wd" aria-hidden="true"><span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Нд</span></div>
+        <div class="cal-grid" id="a-cal-grid"></div>
+      </div>
       <input class="vh" id="a-date" type="date" tabindex="-1" aria-hidden="true">
       <div class="info">Лише готівка. Оплати карткою вносити не треба: вони прийдуть з банківською випискою, інакше задвояться.</div>
     </div>
@@ -1090,12 +1097,34 @@ function renderDates() {
     b.type = "button"; b.setAttribute("aria-pressed", other ? i === 2 : i === dpick);
     b.onclick = function () {
       if (x[1]) { dpick = i; $("a-date").value = iso(x[1]); renderDates(); }
-      else { try { $("a-date").showPicker(); } catch (e) { $("a-date").focus(); } }
+      else { var c = $("a-cal"); c.hidden = !c.hidden; if (!c.hidden) { aCal = ($("a-date").value || iso(new Date())).slice(0, 7); renderACal(); } }
     };
     box.appendChild(b);
   });
 }
 $("a-date").addEventListener("change", function () { dpick = -1; renderDates(); });
+// календар «Інша дата»: як у хедері, але для вибору дня витрати (до сьогодні включно, рік назад)
+var aCal = null;
+function renderACal() {
+  var y = +aCal.slice(0, 4), mo = +aCal.slice(5) - 1, now = new Date(), today = iso(now), sel = $("a-date").value;
+  var minKey = iso(new Date(now.getFullYear() - 1, now.getMonth(), 1)).slice(0, 7), maxKey = today.slice(0, 7);
+  $("a-cal-title").textContent = MONTHS_FULL[mo] + " " + y;
+  $("a-cal-prev").disabled = aCal <= minKey; $("a-cal-next").disabled = aCal >= maxKey;
+  var first = new Date(y, mo, 1), dim = new Date(y, mo + 1, 0).getDate(), start = new Date(y, mo, 1 - WD0(first));
+  var grid = $("a-cal-grid"); grid.innerHTML = "";
+  for (var c = 0; c < Math.ceil((WD0(first) + dim) / 7) * 7; c++) {
+    var d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + c), key = iso(d), inMonth = d.getMonth() === mo;
+    var b = h("button", key === today ? "today" : "", inMonth ? String(d.getDate()) : "");
+    b.type = "button"; b.disabled = !inMonth || key > today;
+    b.setAttribute("aria-pressed", key === sel);
+    if (inMonth) b.setAttribute("aria-label", d.getDate() + " " + GEN[mo] + " " + y + (key > today ? ", ще не настав" : ""));
+    if (!b.disabled) (function (key) { b.onclick = function () { $("a-date").value = key; dpick = -1; $("a-cal").hidden = true; renderDates(); }; })(key);
+    grid.appendChild(b);
+  }
+}
+function shiftACal(n) { var y = +aCal.slice(0, 4), mo = +aCal.slice(5) - 1 + n; aCal = iso(new Date(y, mo, 1)).slice(0, 7); renderACal(); }
+$("a-cal-prev").onclick = function () { shiftACal(-1); };
+$("a-cal-next").onclick = function () { shiftACal(1); };
 function renderAdd(P) {
   if (!$("a-date").value) { $("a-date").value = iso(new Date()); dpick = 0; }
   $("a-date").max = iso(new Date());
@@ -1140,7 +1169,7 @@ function sheet(open, P) {
     renderAdd(P);
     if (!was) {
       s.hidden = bg.hidden = false; document.body.style.overflow = "hidden";
-      $("a-amount").value = ""; fitAmount(); check();
+      $("a-amount").value = ""; $("a-cal").hidden = true; fitAmount(); check();
       requestAnimationFrame(function () { s.classList.add("open"); bg.classList.add("open"); });
       $("a-amount").focus({ preventScroll: true });
     }
