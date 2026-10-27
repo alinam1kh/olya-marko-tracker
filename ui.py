@@ -294,11 +294,11 @@ a { color: inherit; text-decoration: none; }
 .hero .lbl, .hero .num, .hero .sub, .hero .lt, .hero .lg2 b { text-shadow: 0 1px 10px rgba(5, 10, 30, .28); }
 .hero .sub .inc { color: inherit; }
 .hero .sub .bd { display: inline-flex; margin-left: 6px; vertical-align: 1px; }
-/* смуга доходу: світло-червона частина — витрати, біла — залишок; ростуть зліва направо */
+/* смуга доходу: біла — залишок, світло-червона — витрати; червона росте зліва й стискає білу */
 .hero .split2 { display: flex; gap: 4px; height: 8px; margin-top: 18px; }
 .hero .split2 b { display: block; height: 100%; width: 0; border-radius: 4px; transition: width 2.1s var(--ease); }
 .hero .split2 .e { background: #FCA5A5; }
-.hero .split2 .s { background: #fff; }
+.hero .split2 .s { flex: 1; min-width: 0; background: #fff; }
 .hero .lg2 { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-top: 12px; }
 .hero .lt { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
 .hero .lt i { flex: none; width: 7px; height: 7px; border-radius: 50%; background: #FCA5A5; }
@@ -931,7 +931,7 @@ function renderReport(P) {
     hero.innerHTML = tag + '<div class="lbl">Лишилось у ' + LOC[k] + '</div><div class="num">' + approx + zl(M.saved) + "</div>" +
       '<div class="sub">' + nf1.format(M.rate) + " % від доходу " + '<a href="#journal" data-filter="inc" class="inc">' + zl(M.income) + "</a>" + inc + (P.ok ? "" : ", потребує перевірки") + "</div>" +
       '<div class="split2" role="img" aria-label="Витрати ' + nf0.format(ep) + " %, лишилось " + nf0.format(sp) + ' % доходу">' +
-        '<b class="e" data-to="calc(' + ep.toFixed(2) + '% - 2px)"></b><b class="s" data-to="calc(' + sp.toFixed(2) + '% - 2px)"></b></div>' +
+        '<b class="e" data-to="calc(' + ep.toFixed(2) + '% - 2px)"></b><b class="s"></b></div>' +
       '<div class="lg2"><a href="#journal" data-filter="exp" class="le"><span class="lt"><i></i>Витрати' + (M.incomplete ? " за " + dn + " " + plural(dn, "день", "дні", "днів") : "") + ", " + nf0.format(ep) + " %</span>" +
         '<span class="lv"><b>' + zl(M.expenses) + "</b>" + exp + "</span></a>" +
       '<div class="ls"><span class="lt"><i></i>Лишилось, ' + nf0.format(sp) + " %</span><b>" + zl(M.saved) + "</b></div></div>";
@@ -948,7 +948,7 @@ function renderReport(P) {
     if (fresh) freshDone = true;
     return opRow(o, true, fresh);
   }).join("") : '<div class="empty">Операцій немає</div>';
-  grow("#hero .meter b, #hero .split2 b, #v-report .bar6 b, #goal .segs b", "width");
+  grow("#hero .meter b, #hero .split2 .e, #v-report .bar6 b, #goal .segs b", "width");
 }
 // «Головне за вересень»: факт і бейдж праворуч; у неповному місяці — що вже відомо
 function renderInsights(P, M) {
