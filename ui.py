@@ -436,6 +436,8 @@ a { color: inherit; text-decoration: none; }
 .duo span { display: block; font-size: 13px; color: var(--ink2); }
 .duo b { display: block; margin: 4px 0 6px; font-size: 20px; font-weight: 500; }
 .duo small { display: block; margin-top: 6px; font-size: 13px; color: var(--ink2); }
+.duo .duo-cmp { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 6px; }
+.duo .duo-cmp small { margin-top: 0; }
 .share { display: flex; gap: 3px; height: 10px; margin: 6px 0 12px; }
 .share i { display: block; height: 100%; border-radius: 5px; min-width: 6px; }
 .leg { display: grid; grid-template-columns: 12px 1fr auto auto; gap: 10px; align-items: center; min-height: 36px; font-size: 14px; }
@@ -1097,7 +1099,7 @@ function renderTrends(P) {
   var last = full[full.length - 1], before = full[full.length - 2], pp = last && before ? last.rate - before.rate : 0;
   $("t-duo").innerHTML = '<div class="card"><span>Лишилось разом</span><b>' + zl(sum) + "</b><small>у середньому " + zl(full.length ? sum / full.length : 0) + " на місяць</small></div>" +
     '<div class="card"><span>Норма заощаджень</span><b>' + nf1.format(last ? last.rate : 0) + " %</b>" +
-    (before ? '<span class="bd ' + (pp >= 0 ? "good" : "bad") + '" style="display:inline-flex">' + arr(pp) + " з " + nf1.format(before.rate) + " %</span><small>у " + LOC[mi(before)] + "</small>" : "") + "</div>";
+    (before ? '<div class="duo-cmp"><span class="bd ' + (pp >= 0 ? "good" : "bad") + '">' + arr(pp) + " з " + nf1.format(before.rate) + " %</span><small>у " + LOC[mi(before)] + "</small></div>" : "") + "</div>";
   var out = P.months.filter(function (m) { return !(m.income > 0 && !m.incomplete); });
   $("t-note").textContent = "Враховано лише повні місяці, " + full.map(function (m) { return m.name.toLowerCase(); }).join(" і ") + "." +
     (out.length ? " " + out.map(function (m) { return m.name; }).join(", ") + (out[0].income > 0 ? " ще триває." : " ще без зарплати.") : "");
