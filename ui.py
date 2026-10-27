@@ -561,7 +561,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
 <div class="app">
   <div class="top">
     <div class="who">
-      <button type="button" id="who-btn" aria-haspopup="menu" aria-expanded="false" aria-controls="who-menu"><span class="av" id="who-av"></span><span id="who-name"></span><svg class="ico16" viewBox="0 0 24 24" fill="none" stroke="#6B7180" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h15M15 4l4 4-4 4M20 16H5M9 12l-4 4 4 4"/></svg></button>
+      <button type="button" id="who-btn" aria-haspopup="menu" aria-expanded="false" aria-controls="who-menu"><span class="av" id="who-av"></span><span id="who-name"></span><svg class="ico16" viewBox="0 0 24 24" fill="none" stroke="#6B7180" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6.5h18M16.5 2 21 6.5 16.5 11M21 17.5H3M7.5 13 3 17.5 7.5 22"/></svg></button>
       <div class="pop" id="who-menu" role="menu" aria-label="Чиї дані показати" hidden><p>Чиї дані показати</p><div id="who-opts"></div>
         <form class="logout" method="post" action="logout"><button type="submit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 16l-4-4 4-4M6 12h10"/></svg>Вийти</button></form>
 </div>
@@ -1077,7 +1077,7 @@ function renderTrends(P) {
   var sl = slices(S), tot = sl.reduce(function (s, x) { return s + x.amount; }, 0) || 1;
   $("t-share").innerHTML = sl.map(function (x) { return '<i style="flex:' + x.amount + ";background:" + x.color + '"></i>'; }).join("");
   $("t-leg").innerHTML = sl.map(function (x) { return '<div class="leg"><i style="background:' + x.color + '"></i><span>' + esc(x.name) + '</span><span class="v" style="color:var(--ink2)">' + zl(x.amount) + '</span><span class="bd blue">' + nf1.format(x.amount / tot * 100) + " %</span></div>"; }).join("");
-  $("t-chg").innerHTML = "Змінити місяць" + svgI("currentColor", '<path d="M4 8h14M14 4l4 4-4 4M20 16H6M10 12l-4 4 4 4"/>', 16);
+  $("t-chg").innerHTML = "Змінити місяць" + svgI("currentColor", '<path d="M3 6.5h18M16.5 2 21 6.5 16.5 11M21 17.5H3M7.5 13 3 17.5 7.5 22"/>', 16);
   $("t-chg").onclick = function () { trendMonth = (trendMonth + list.length - 1) % list.length; render(); };
 
   var idx = P.months.indexOf(S), prev = P.months[idx - 1], pm = {};
