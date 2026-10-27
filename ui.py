@@ -225,7 +225,7 @@ a { color: inherit; text-decoration: none; }
 @keyframes swOutL2 { 0% { transform: none; opacity: 1; animation-timing-function: cubic-bezier(.55, 0, .75, .4); } 44% { transform: translateX(-15px); opacity: 0; } 45% { transform: translateX(15px); opacity: 0; animation-timing-function: cubic-bezier(.2, .7, .3, 1); } 100% { transform: none; opacity: 1; } }
 .pop { position: absolute; top: 56px; padding: 6px; border: 1px solid var(--border); border-radius: 24px; background: var(--card); box-shadow: 0 20px 40px rgba(17,19,24,.16); }
 .who .pop { left: 0; width: 272px; }
-.pop > p { margin: 10px 12px 6px; font-size: 12px; color: var(--ink2); }
+.pop > p { margin: 10px 12px 6px; font-size: 13px; color: var(--ink2); }
 .pop .opt { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 60px; padding: 6px 12px 6px 8px; border: 0; border-radius: 18px; background: transparent; text-align: left; cursor: pointer; }
 .pop .opt b { display: block; font-size: 15px; font-weight: 500; }
 .pop .opt small { display: block; font-size: 12px; color: var(--ink2); }
