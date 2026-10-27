@@ -580,7 +580,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
 <div class="app">
   <div class="top">
     <div class="who">
-      <button type="button" id="who-btn" aria-haspopup="menu" aria-expanded="false" aria-controls="who-menu"><span class="av" id="who-av"></span><span id="who-name"></span><svg class="ico16 sw" viewBox="0 0 24 24" fill="none" stroke="#6B7180" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="sw-a" d="M3 6.5h18M16.5 2 21 6.5 16.5 11"/><path class="sw-b" d="M21 17.5H3M7.5 13 3 17.5 7.5 22"/></svg></button>
+      <button type="button" id="who-btn" aria-haspopup="menu" aria-expanded="false" aria-controls="who-menu"><span class="av" id="who-av"></span><span id="who-name"></span><svg class="ico16 sw" style="width:14px;height:14px" viewBox="0 0 24 24" fill="none" stroke="#6B7180" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="sw-a" d="M3 6.5h18M16.5 2 21 6.5 16.5 11"/><path class="sw-b" d="M21 17.5H3M7.5 13 3 17.5 7.5 22"/></svg></button>
       <div class="pop" id="who-menu" role="menu" aria-label="Чиї дані показати" hidden><p>Чиї дані показати</p><div id="who-opts"></div>
         <form class="logout" method="post" action="logout"><button type="submit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 16l-4-4 4-4M6 12h10"/></svg>Вийти</button></form>
 </div>
