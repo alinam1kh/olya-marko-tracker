@@ -189,6 +189,8 @@ html, body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.4
 button { font: inherit; color: inherit; }
 a { color: inherit; text-decoration: none; }
 [hidden] { display: none !important; }
+/* у звичайному тексті цифри природної ширини («15 днів» без «дірки» біля 1); рівні цифри лишаються для сум у стовпчиках */
+.ins > span:first-child, .note, .sub, .lbl, .hero .cols .t, h2, .op .t1, .op .t2, .cal-note, .tag, .day-h, .info, .duo span, .duo small, .fv2 span { font-variant-numeric: proportional-nums; }
 :focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
 .ico16 { flex: none; width: 16px; height: 16px; }
 
