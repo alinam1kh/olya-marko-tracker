@@ -618,6 +618,8 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .ch a { display: inline-flex; align-items: center; gap: 2px; min-height: 44px; font-size: 14px; font-weight: 500; color: var(--blue); }
 .ch .sub { font-size: 14px; color: var(--ink2); }
 .note { font-size: 13px; line-height: 1.45; color: var(--ink2); }
+#t-note { display: flex; gap: 8px; align-items: flex-start; }
+#t-note svg { flex: none; width: 16px; height: 16px; margin-top: 1px; }
 .fx { display: inline-block; padding: 0 8px; border-radius: 10px; line-height: 20px; background: var(--soft); color: var(--ink3); font-size: 12px; }
 .fx.cash { background: var(--cash-bg); color: var(--cash); }
 .fx.now { background: var(--blue); color: #fff; }
@@ -841,7 +843,7 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .splash.out { opacity: 0; visibility: hidden; }
 .app.pre > * { opacity: 0; animation-play-state: paused !important; }
 .splash.out .sp-mark { transform: scale(.96) translateY(-4px); }
-.sp-mark { position: relative; width: 84px; height: 84px; border-radius: 25px; display: grid; place-items: center; overflow: hidden; isolation: isolate;
+.sp-mark { position: relative; width: 84px; height: 84px; border-radius: 20px; display: grid; place-items: center; overflow: hidden; isolation: isolate;
   background: var(--blue-g); box-shadow: 0 10px 24px rgba(29,95,224,.34), inset 0 1px 0 rgba(255,255,255,.3);
   animation: breathe 2.4s ease-in-out infinite; transition: transform 1.2s cubic-bezier(.4, 0, .2, 1); }
 /* відблиск, що проходить по кнопці */
@@ -1423,12 +1425,14 @@ function renderTrends(P) {
   var sum = full.reduce(function (s, m) { return s + m.saved; }, 0);
   var last = full[full.length - 1], before = full[full.length - 2], pp = last && before ? last.rate - before.rate : 0;
   var period = full.map(function (m) { return m.name.toLowerCase(); }).join(full.length > 2 ? ", " : " і ");
-  $("t-duo").innerHTML = '<div class="card"><span>Лишилось за ' + period + "</span><b>" + zl(sum) + "</b><small>≈ " + zl(full.length ? sum / full.length : 0) + " щомісяця</small></div>" +
+  $("t-duo").innerHTML = '<div class="card"><span>Лишилось за ' + period + "</span><b>" + zl(sum) + "</b><small>в середньому " + zl(full.length ? sum / full.length : 0) + " за місяць</small></div>" +
     '<div class="card"><span>' + (last ? "У " + LOC[mi(last)] + " лишилось" : "Лишилось") + "</span><b>" + nf1.format(last ? last.rate : 0) + ' %<i style="font-style:normal;font-size:15px;font-weight:400;color:var(--ink2)"> доходу</i></b>' +
     (before ? '<div class="duo-cmp"><span class="bd ' + (pp >= 0 ? "good" : "bad") + '">' + arr(pp) + " з " + nf1.format(before.rate) + " %</span><small>у " + LOC[mi(before)] + "</small></div>" : "") + "</div>";
   var out = P.months.filter(function (m) { return !(m.income > 0 && !m.incomplete); });
-  $("t-note").textContent = "Враховано лише повні місяці, " + full.map(function (m) { return m.name.toLowerCase(); }).join(" і ") + "." +
-    (out.length ? " " + out.map(function (m) { return m.name; }).join(", ") + (out[0].income > 0 ? " ще триває." : " ще без зарплати.") : "");
+  // примітка з іконкою «i», як підказка в головній картці
+  $("t-note").innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="7.8" r=".6" fill="currentColor"/></svg><span>' +
+    esc("Враховано лише повні місяці, " + full.map(function (m) { return m.name.toLowerCase(); }).join(" і ") + "." +
+    (out.length ? " " + out.map(function (m) { return m.name; }).join(", ") + (out[0].income > 0 ? " ще триває." : " ще без зарплати.") : "")) + "</span>";
 
   $("t-dmon").textContent = "Категорії у " + LOC[mi(S)];
   var sl = slices(S), tot = sl.reduce(function (s, x) { return s + x.amount; }, 0) || 1;
