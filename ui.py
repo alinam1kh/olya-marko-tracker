@@ -26,6 +26,33 @@ def static_file(name):
     return send_from_directory(ROOT / "static", name, max_age=86400)
 
 
+# застосунок на телефоні: «Додати на початковий екран» відкриває трекер окремим вікном з іконкою
+@ui_app.route("/manifest.webmanifest")
+def manifest():
+    data = {
+        "name": "Фінанси Олі й Марка", "short_name": "Фінанси", "lang": "uk",
+        "start_url": "./", "scope": "./", "display": "standalone",
+        "background_color": "#F5F6F8", "theme_color": "#F5F6F8",
+        "icons": [
+            {"src": "static/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+            {"src": "static/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+            {"src": "static/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"},
+        ],
+    }
+    resp = jsonify(data)
+    resp.mimetype = "application/manifest+json"
+    return resp
+
+
+# service worker без кешу: дані завжди свіжі з сервера, він лише робить сайт «встановлюваним»
+@ui_app.route("/sw.js")
+def service_worker():
+    js = ('self.addEventListener("install", function () { self.skipWaiting(); });\n'
+          'self.addEventListener("activate", function (e) { e.waitUntil(self.clients.claim()); });\n'
+          'self.addEventListener("fetch", function (e) { e.respondWith(fetch(e.request)); });\n')
+    return ui_app.response_class(js, mimetype="text/javascript", headers={"Cache-Control": "no-cache"})
+
+
 _write_lock = threading.Lock()
 
 
@@ -131,6 +158,13 @@ PAGE = r"""<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#F5F6F8">
+<link rel="manifest" href="manifest.webmanifest" crossorigin="use-credentials">
+<link rel="icon" type="image/png" sizes="192x192" href="static/icon-192.png">
+<link rel="apple-touch-icon" href="static/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Фінанси">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Фінанси Олі й Марка</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -398,18 +432,21 @@ a { color: inherit; text-decoration: none; }
 .sheet-head button svg { width: 16px; height: 16px; }
 .sheet-scroll { overflow-y: auto; padding: 0 16px 12px; }
 .amount { display: flex; justify-content: center; align-items: baseline; gap: 6px; padding: 22px 0 0; cursor: text; }
-.amount input { width: 1.6ch; min-width: 1.6ch; max-width: 100%; border: 0; outline: 0; background: transparent; text-align: right;
+.amount input { width: 30px; min-width: 0; max-width: 100%; padding: 0; margin: 0; border: 0; border-radius: 0; outline: 0; background: transparent; text-align: right; -webkit-appearance: none; appearance: none;
   font: 500 48px/1.1 var(--font); letter-spacing: -0.02em; color: var(--ink); caret-color: var(--blue); }
 .amount input::placeholder { color: var(--mute); opacity: 1; }
 .amount input::-webkit-input-placeholder { color: var(--mute); opacity: 1; }
 .amount span { font-size: 22px; color: var(--ink2); }
+.amount-mirror { position: absolute; left: -9999px; top: 0; visibility: hidden; white-space: pre; font: 500 48px/1.1 var(--font); letter-spacing: -0.02em; }
 .amount-sub { margin: 4px 0 14px; text-align: center; font-size: 12px; color: var(--ink2); }
 .lab { margin: 14px 2px 8px; font-size: 13px; font-weight: 500; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .chips button { min-height: 44px; padding: 0 14px; border: 1px solid var(--border); border-radius: 22px; background: var(--card); font-size: 14px; cursor: pointer; }
 .chips button[aria-pressed="true"] { border-color: transparent; background: var(--blue-g); color: #fff; font-weight: 500; }
-.field { width: 100%; height: 48px; margin-top: 14px; padding: 0 14px; border: 0; border-radius: 14px; background: var(--soft); font: 15px var(--font); color: var(--ink); }
-.field:focus { outline: 2px solid var(--blue); outline-offset: 0; }
+.field { width: 100%; height: 52px; margin-top: 16px; padding: 0 16px; border: 1.5px solid #DDE1E8; border-radius: 16px; background: var(--card); font: 15px var(--font); color: var(--ink);
+  -webkit-appearance: none; appearance: none; transition: border-color .3s var(--ease), box-shadow .3s var(--ease); }
+.field::placeholder { color: #8A90A0; opacity: 1; }
+.field:focus { outline: 0; border-color: var(--blue); box-shadow: 0 0 0 4px var(--blue-soft); }
 .dates { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
 .dates button { min-height: 52px; border: 0; border-radius: 14px; background: var(--soft); font-size: 14px; font-weight: 500; line-height: 1.2; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .dates button small { font-size: 12px; font-weight: 400; color: var(--ink2); }
@@ -481,10 +518,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
 </head>
 <body class="p-marko">
 <div class="splash" id="splash" role="progressbar" aria-label="Завантаження">
-  <div class="sp-mark"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true">
-    <rect x="5" y="4.5" width="16" height="10" rx="2.6" opacity=".45"/>
-    <path fill-rule="evenodd" d="M5.6 8.5h12.8a2.6 2.6 0 0 1 2.6 2.6v5.8a2.6 2.6 0 0 1-2.6 2.6H5.6A2.6 2.6 0 0 1 3 16.9v-5.8a2.6 2.6 0 0 1 2.6-2.6zM12 11.2a2.8 2.8 0 1 0 0 5.6 2.8 2.8 0 0 0 0-5.6z"/>
-  </svg></div>
+  <div class="sp-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4.2" y="3.4" width="17.5" height="11" rx="1.8" fill="#fff" opacity=".45" transform="rotate(-7 13 9)"/><rect x="1.5" y="7.5" width="17.5" height="11" rx="1.8" fill="#fff"/><g fill="none" stroke="#2A6BE8" stroke-linecap="round"><rect x="3.2" y="9.2" width="14.1" height="7.6" rx=".9" stroke-width=".55" opacity=".55"/><circle cx="10.25" cy="13" r="2.3" stroke-width="1.1"/><path d="M10.25 11.9v2.2" stroke-width=".9"/></g><circle cx="5.5" cy="13" r=".8" fill="#2A6BE8"/><circle cx="15" cy="13" r=".8" fill="#2A6BE8"/><circle cx="18.6" cy="17.6" r="4.4" fill="#2A6BE8"/><circle cx="18.6" cy="17.6" r="3.6" fill="#fff"/><circle cx="18.6" cy="17.6" r="2.5" fill="none" stroke="#2A6BE8" stroke-width=".6" opacity=".6"/></svg></div>
   <div class="sp-name">Фінанси Олі й Марка</div>
   <div class="sp-bar" aria-hidden="true"><b id="sp-fill"></b></div>
 </div>
@@ -967,7 +1001,7 @@ function renderTrends(P) {
   $("t-dmon").textContent = "Категорії у " + LOC[mi(S)];
   var sl = slices(S), tot = sl.reduce(function (s, x) { return s + x.amount; }, 0) || 1;
   $("t-share").innerHTML = sl.map(function (x) { return '<i style="flex:' + x.amount + ";background:" + x.color + '"></i>'; }).join("");
-  $("t-leg").innerHTML = sl.map(function (x) { return '<div class="leg"><i style="background:' + x.color + '"></i><span>' + esc(x.name) + '</span><span class="v" style="color:var(--ink2)">' + nf2.format(x.amount) + '</span><span class="bd blue">' + nf1.format(x.amount / tot * 100) + " %</span></div>"; }).join("");
+  $("t-leg").innerHTML = sl.map(function (x) { return '<div class="leg"><i style="background:' + x.color + '"></i><span>' + esc(x.name) + '</span><span class="v" style="color:var(--ink2)">' + zl(x.amount) + '</span><span class="bd blue">' + nf1.format(x.amount / tot * 100) + " %</span></div>"; }).join("");
   $("t-chg").innerHTML = "Змінити місяць" + CHR;
   $("t-chg").onclick = function () { trendMonth = (trendMonth + list.length - 1) % list.length; render(); };
 
@@ -977,7 +1011,7 @@ function renderTrends(P) {
   $("t-cats").innerHTML = S.categories.map(function (c) {
     var d = "";
     if (prev) { var was = pm[c.name] || 0; d = !was ? '<span class="bd new">нова</span>' : badge(c.amount, was, true, "", true); }
-    return '<div class="cmp"><span class="n">' + esc(c.name) + '</span><span class="v">' + nf2.format(c.amount) + "</span>" + d + "</div>";
+    return '<div class="cmp"><span class="n">' + esc(c.name) + '</span><span class="v">' + zl(c.amount) + "</span>" + d + "</div>";
   }).join("");
   $("t-cmpnote").textContent = S.incomplete ? "Місяць ще триває, тож порівняння неповне." : "";
 }
@@ -1075,9 +1109,15 @@ function renderAdd(P) {
 }
 $("a-amount").addEventListener("input", function () {
   this.value = this.value.replace(/[^0-9.,]/g, "");
-  this.style.width = Math.max(1, this.value.length || 1) + 0.6 + "ch";
-  check();
+  fitAmount(); check();
 });
+// поле росте рівно на ширину набраного (або плейсхолдера «0») плюс місце для курсора
+function fitAmount() {
+  var a = $("a-amount"), m = fitAmount.m || (fitAmount.m = document.body.appendChild(h("span", "amount-mirror")));
+  m.textContent = a.value || a.placeholder;
+  a.style.width = Math.ceil(m.getBoundingClientRect().width) + 4 + "px";
+}
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitAmount);
 document.querySelector(".amount").addEventListener("click", function () { $("a-amount").focus(); });
 $("v-add").addEventListener("submit", function (e) {
   e.preventDefault();
@@ -1100,7 +1140,7 @@ function sheet(open, P) {
     renderAdd(P);
     if (!was) {
       s.hidden = bg.hidden = false; document.body.style.overflow = "hidden";
-      $("a-amount").value = ""; $("a-amount").style.width = ""; check();
+      $("a-amount").value = ""; fitAmount(); check();
       requestAnimationFrame(function () { s.classList.add("open"); bg.classList.add("open"); });
       $("a-amount").focus({ preventScroll: true });
     }
@@ -1187,6 +1227,7 @@ window.addEventListener("hashchange", function () {
   lastView = v; render();
 });
 render();
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(function () {});
 // сплеш зникає, коли готовий шрифт (але не довше 1,2 с і не швидше 0,5 с, щоб не блимав)
 (function () {
   var s = $("splash"), t = Date.now(), done = false, fill = $("sp-fill");
