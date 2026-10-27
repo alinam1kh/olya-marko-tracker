@@ -294,7 +294,7 @@ a { color: inherit; text-decoration: none; }
 .hero .cols b { font-size: 18px; font-weight: 500; }
 .hero .cols i { font-style: normal; font-size: 12px; color: var(--hero-on); }
 .hero .meter { height: 8px; margin: 14px 0 8px; border-radius: 4px; background: rgba(255,255,255,.25); overflow: hidden; }
-.hero .meter b { display: block; height: 100%; width: 0; border-radius: 4px; background: #fff; transition: width 1.6s var(--ease); }
+.hero .meter b { display: block; height: 100%; width: 0; border-radius: 4px; background: #fff; transition: width 2.1s var(--ease); }
 .hero .hint { display: flex; gap: 10px; align-items: flex-start; margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.35); font-size: 14px; line-height: 1.4; }
 .hero .hint svg { flex: none; width: 18px; height: 18px; margin-top: 1px; }
 /* бейджі: маленькі заокруглені плашки, стрілка діагональна */
@@ -330,7 +330,7 @@ a { color: inherit; text-decoration: none; }
 .crow .nm { font-size: 15px; display: flex; align-items: center; gap: 6px; min-width: 0; }
 .crow .am { font-size: 14px; font-weight: 500; }
 .crow .bar6 { grid-column: 2 / -1; height: 6px; border-radius: 999px; background: var(--track); overflow: hidden; }
-.crow .bar6 b { display: block; height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, #3B82F6, #1D5FE0); transition: width 1.6s var(--ease); }
+.crow .bar6 b { display: block; height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, #3B82F6, #1D5FE0); transition: width 2.1s var(--ease); }
 .cic { flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--soft); }
 .cic svg { width: 18px; height: 18px; }
 .cic.inc { background: var(--good-bg); }
@@ -363,7 +363,7 @@ a { color: inherit; text-decoration: none; }
 .goal .gbig span { font-size: 14px; line-height: 1.35; color: var(--ink4); padding-top: 3px; }
 .segs { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
 .segs i { position: relative; height: 8px; border-radius: 4px; background: var(--track); overflow: hidden; }
-.segs i b { position: absolute; inset: 0; width: 0; border-radius: 4px; background: var(--blue-g); transition: width 1.6s var(--ease); }
+.segs i b { position: absolute; inset: 0; width: 0; border-radius: 4px; background: var(--blue-g); transition: width 2.1s var(--ease); }
 .seglab { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; margin-top: 6px; font-size: 12px; color: var(--ink2); }
 .gcols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0 12px; padding-top: 14px; border-top: 1px solid var(--soft); }
 .gcols span { display: block; font-size: 12px; color: var(--ink2); }
@@ -390,7 +390,7 @@ a { color: inherit; text-decoration: none; }
 .cap { display: flex; flex-direction: column; align-items: center; gap: 6px; }
 .cap.pick { cursor: pointer; }
 .cap .trk { width: 40px; height: 150px; border-radius: 10px; background: var(--track); display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; }
-.cap .fill { display: flex; flex-direction: column; height: 0; border-radius: 10px; overflow: hidden; transition: height 1.6s var(--ease); }
+.cap .fill { display: flex; flex-direction: column; height: 0; border-radius: 10px; overflow: hidden; transition: height 2.1s var(--ease); }
 .cap .fill .rent { background: repeating-linear-gradient(135deg, #A9C6F8 0 5px, #D7E4FC 5px 10px); }
 .cap .fill .main { flex: 1; background: var(--blue-g); }
 .cap.dim .fill .main { background: linear-gradient(180deg, #A9C6F8, #7FA9F1); }
