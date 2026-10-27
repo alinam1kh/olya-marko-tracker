@@ -320,7 +320,7 @@ a { color: inherit; text-decoration: none; }
 .bd { flex: none; display: inline-flex; align-items: center; gap: 3px; height: 24px; padding: 0 8px; border-radius: 12px; background: var(--soft); color: var(--ink3); font-size: 12px; font-weight: 500; white-space: nowrap; }
 .bd.good { background: var(--good-bg); color: var(--good); }
 .bd.bad { background: var(--bad-bg); color: var(--bad); }
-.bd.blue { background: var(--blue-soft); color: var(--blue-txt); }
+.bd.blue { padding: 0 6px; background: var(--blue-soft); color: var(--blue-txt); letter-spacing: -.02em; word-spacing: -.12em; }
 .bd.new { background: var(--cash-bg); color: var(--cash); }
 .hero .bd:not(.good):not(.bad) { background: rgba(255,255,255,.92); color: #3A4050; }
 /* на темній картці плашки зміни залиті: насичений колір і білий текст */
