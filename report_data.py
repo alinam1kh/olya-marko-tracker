@@ -89,7 +89,8 @@ def report():
                 "weeks": [float(m["weeks"][i]) for i in range(5)],
                 "categories": sorted(({"name": k.replace("-", " "), "amount": float(v)}
                                       for k, v in m["categories"].items() if v), key=lambda c: -c["amount"]),
-                "ops": sorted(m["ops"], key=lambda o: o["day"], reverse=True),
+                # у межах дня — новіші записи вище (у файлі вони нижче)
+                "ops": sorted(reversed(m["ops"]), key=lambda o: o["day"], reverse=True),
             })
         people.append({"key": key, "name": name, "ok": not errors, "months": out,
                        # Готівку з телефона поки веде лише Марко (у нього є Assets:Готівка і marko-cash.beancount).

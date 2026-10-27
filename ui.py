@@ -872,7 +872,7 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .chips button { min-height: 44px; padding: 0 14px; border: 1px solid var(--border); border-radius: 22px; background: var(--card); font-size: 14px; cursor: pointer; }
 .chips button[aria-pressed="true"] { border-color: transparent; background: var(--blue-g); color: #fff; font-weight: 500; }
-.field { width: 100%; height: 52px; margin-top: 16px; padding: 0 16px; border: 1.5px solid #DDE1E8; border-radius: 16px; background: var(--card); font: 15px var(--font); color: var(--ink);
+.field { width: 100%; height: 52px; margin-top: 16px; padding: 0 16px; border: 1.5px solid #DDE1E8; border-radius: 16px; background: var(--card); font: 16px var(--font); color: var(--ink);
   -webkit-appearance: none; appearance: none; transition: border-color .3s var(--ease), box-shadow .3s var(--ease); }
 .field::placeholder { color: #8A90A0; opacity: 1; }
 .field:focus { outline: 0; border-color: var(--blue); box-shadow: 0 0 0 4px var(--blue-soft); }
@@ -1155,6 +1155,8 @@ var person = 0, month = lastFull(D.people[0]), trendMonth = null, filter = "all"
 var GOAL = { olya: { months: 6, deadline: [2027, 6], title: "Подушка безпеки" } };  // фіча 5 з роадмапу ДЗ
 var VIEWS = { report: 1, analytics: 1, journal: 1, add: 1 };
 var saved = null;  // після збереження готівки: сума й дата, щоб підсвітити новий запис
+var justAdded = [];  // усі записи, додані за цей сеанс, — кожен має «щойно»
+function markFresh(s) { if (s) justAdded.push({ amount: +s.amount, day: s.day, title: s.title }); }
 (function () {
   var q = new URLSearchParams(location.search), pi = -1;
   D.people.forEach(function (p, i) { if (p.key === q.get("p")) pi = i; });
@@ -1162,7 +1164,7 @@ var saved = null;  // після збереження готівки: сума �
   person = pi;
   D.people[pi].months.forEach(function (m, i) { if (m.key === q.get("m")) month = i; });
   if (q.get("saved")) {
-    saved = { amount: +q.get("a") || 0, day: q.get("d") || "", line: +q.get("l") || 0, title: q.get("t") || "" };
+    saved = { amount: +q.get("a") || 0, day: q.get("d") || "", line: +q.get("l") || 0, title: q.get("t") || "" }; markFresh(saved);
     setTimeout(function () {
       toast(okMsg("Готівку додано"), saved.line ? ["Скасувати", function () {
         delCash(D.people[person], saved.line, saved.day, saved.title, "#report", null, true);
@@ -1350,10 +1352,10 @@ function renderReport(P) {
     mb.setAttribute("aria-expanded", open); $("more-rows").classList.toggle("open", open);
     mb.querySelector(".more-l").textContent = open ? "Згорнути" : "Ще " + n + " " + plural(n, "категорія", "категорії", "категорій");
   };
-  var last = P.months[P.months.length - 1], ops = last ? last.ops.slice(0, 5) : [], freshDone = false;
+  var last = P.months[P.months.length - 1], ops = last ? last.ops.slice(0, 5) : [], left = justAdded.slice();
   $("recent").innerHTML = ops.length ? ops.map(function (o) {
-    var fresh = saved && !freshDone && o.cash && Math.abs(o.amount - saved.amount) < 0.005 && (!saved.day || o.day === saved.day);
-    if (fresh) freshDone = true;
+    var k = !o.cash ? -1 : left.findIndex(function (s) { return Math.abs(o.amount - s.amount) < 0.005 && (!s.day || o.day === s.day) && (!s.title || o.title === s.title); });
+    var fresh = k >= 0; if (fresh) left.splice(k, 1);
     return swipeWrap(o, opRow(o, true, fresh));
   }).join("") : '<div class="empty">Операцій немає</div>';
   $("recent").querySelectorAll(".swipe").forEach(function (sw) { swipeRow(sw, P, "#report"); });
@@ -1643,6 +1645,7 @@ function delCash(P, line, day, title, back, undo, cancel) {
       var ms = D.people[person].months.map(function (m) { return m.key; });
       month = ms.indexOf(mk) >= 0 ? ms.indexOf(mk) : lastFull(D.people[person]);
       saved = null; reportKey = null;
+      justAdded = justAdded.filter(function (s) { return !(s.day === day && s.title === title); });
       if (back && location.hash !== back) location.hash = back; else render();
       // «Скасувати» записує той самий запис назад (та сама сума, категорія, опис і дата)
       toast(okMsg(cancel ? "Скасовано" : "Запис видалено"), undo ? ["Скасувати", function () { restoreCash(P, undo); }] : null);
@@ -1661,7 +1664,7 @@ function restoreCash(P, u) {
     .then(function (r) { return r.json().catch(function () { return { ok: false, error: "Сервер не відповів" }; }); })
     .then(function (res) {
       if (!res.ok) throw new Error(res.error || "Не вдалося відновити");
-      D = res.data; saved = { amount: +u.amount, day: res.date, line: res.line, title: res.title }; reportKey = null; render();
+      D = res.data; saved = { amount: +u.amount, day: res.date, line: res.line, title: res.title }; markFresh(saved); reportKey = null; render();
       toast(okMsg("Скасовано"));
     })
     .catch(function (err) { toast(err.message || "Немає звʼязку, спробуйте ще раз"); });
@@ -1755,7 +1758,7 @@ $("v-add").addEventListener("submit", function (e) {
       D = res.data;
       var ms = D.people[person].months.map(function (m) { return m.key; });
       if (ms.indexOf(res.month) >= 0) month = ms.indexOf(res.month);
-      saved = { amount: amountValue(), day: res.date, line: res.line, title: res.title };
+      saved = { amount: amountValue(), day: res.date, line: res.line, title: res.title }; markFresh(saved);
       reportKey = null; btn.disabled = false;
       location.replace("#report");
       toast(okMsg("Готівку додано", D.people[person], saved.amount, pick), ["Скасувати", function () {
