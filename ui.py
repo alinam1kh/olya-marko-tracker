@@ -178,11 +178,11 @@ PAGE = r"""<!doctype html>
   --ink: #111318; --ink2: #6B7180; --ink3: #4A5060; --ink4: #2A2E38; --mute: #C4C8D0;
   --blue: #1F63E6; --blue-g: linear-gradient(180deg, #3B82F6, #1D5FE0); --blue-soft: #EAF1FF; --blue-txt: #1F55C9; --blue-l: #A9C6F8;
   --good: #15803D; --good-bg: #E3F7EA; --bad: #C0261B; --bad-bg: #FDE8E6; --cash: #7A4E00; --cash-bg: #FFF2DB;
-  --hero-on: #DCE3F4; --glow: rgba(120, 160, 245, .24); --glow2: rgba(130, 175, 255, .62); --glow3: rgba(190, 215, 255, .45); --glow4: rgba(90, 120, 255, .55); --glow5: rgba(150, 130, 255, .5); --h1: rgba(86, 146, 255, .72); --h2: rgba(56, 189, 248, .5); --h3: rgba(139, 92, 246, .58); --h4: rgba(4, 8, 32, .9); --h5: rgba(59, 91, 255, .62); --h6: rgba(110, 231, 255, .78); --g1: #3A62C2; --g2: #142456; --g3: #010205; --l1: #8AF2FF; --l2: #2F6BFF; --l3: #2CCFD8;
+  --hero-on: #DCE3F4; --glow: rgba(120, 160, 245, .24); --glow2: rgba(130, 175, 255, .62); --glow3: rgba(190, 215, 255, .45); --glow4: rgba(90, 120, 255, .55); --glow5: rgba(150, 130, 255, .5); --h1: rgba(86, 146, 255, .72); --h2: rgba(56, 189, 248, .5); --h3: rgba(139, 92, 246, .58); --h4: rgba(4, 8, 32, .9); --h5: rgba(59, 91, 255, .62); --h6: rgba(110, 231, 255, .78); --g1: #3A62C2; --g2: #142456; --g3: #010205; --l1: #8AF2FF; --l2: #2F6BFF; --l3: #2CCFD8; --l4: #7C5CFF;
   --ease: cubic-bezier(.33, 1, .68, 1); --spring: cubic-bezier(.34, 1.2, .64, 1);
   --font: "Onest", "Outfit", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
-body.p-olya { --hero-on: #F1DDEA; --glow: rgba(214, 120, 182, .34); --glow2: rgba(232, 130, 200, .6); --glow3: rgba(255, 190, 230, .42); --glow4: rgba(255, 110, 170, .5); --glow5: rgba(190, 100, 230, .48); --h1: rgba(244, 114, 182, .62); --h2: rgba(251, 146, 120, .42); --h3: rgba(192, 86, 240, .55); --h4: rgba(28, 2, 20, .9); --h5: rgba(255, 72, 150, .55); --h6: rgba(255, 176, 120, .68); --g1: #9A4783; --g2: #3E1338; --g3: #040105; --l1: #FFBDE6; --l2: #E8449A; --l3: #A855F7; }
+body.p-olya { --hero-on: #F1DDEA; --glow: rgba(214, 120, 182, .34); --glow2: rgba(232, 130, 200, .6); --glow3: rgba(255, 190, 230, .42); --glow4: rgba(255, 110, 170, .5); --glow5: rgba(190, 100, 230, .48); --h1: rgba(244, 114, 182, .62); --h2: rgba(251, 146, 120, .42); --h3: rgba(192, 86, 240, .55); --h4: rgba(28, 2, 20, .9); --h5: rgba(255, 72, 150, .55); --h6: rgba(255, 176, 120, .68); --g1: #9A4783; --g2: #3E1338; --g3: #040105; --l1: #FFBDE6; --l2: #E8449A; --l3: #A855F7; --l4: #D58CFF; }
 * { box-sizing: border-box; }
 html, body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.4 var(--font); -webkit-font-smoothing: antialiased; font-variant-numeric: tabular-nums; }
 .app { max-width: 440px; margin: 0 auto; padding: 8px 14px 130px; }
@@ -255,7 +255,7 @@ a { color: inherit; text-decoration: none; }
 
 /* головна картка: градієнт у кольорі людини, а над ним «рідкі» плями світла */
 .hero-wrap { position: relative; isolation: isolate; margin-top: 12px; border-radius: 24px; overflow: hidden; clip-path: inset(0 round 24px); -webkit-mask-image: -webkit-radial-gradient(white, black);
-  background: radial-gradient(120% 100% at 40% 30%, color-mix(in srgb, var(--g2) 88%, var(--g1)) 0%, color-mix(in srgb, var(--g2) 35%, var(--g3)) 55%, var(--g3) 92%); }
+  background: linear-gradient(160deg, color-mix(in srgb, var(--g2) 84%, var(--g3)) 0%, color-mix(in srgb, var(--g2) 70%, var(--g3)) 50%, color-mix(in srgb, var(--g2) 54%, var(--g3)) 100%); }
 .hero { position: relative; z-index: 1; padding: 22px 20px 20px; border-radius: 24px; color: #fff; }
 .hero-wrap::after { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; border-radius: inherit; opacity: .16; mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
@@ -356,6 +356,17 @@ body.p-olya .liquid { --sheen: .4; }
 .liquid .amb { inset: auto; width: 80%; aspect-ratio: 1.7; border-radius: 50%; filter: blur(34px); mix-blend-mode: screen;
   will-change: transform; opacity: .7; }
 body.p-olya .liquid .amb { opacity: .75; }
+.liquid .a3 { left: -52%; top: 8%; width: 70%; background: radial-gradient(closest-side, var(--l4), color-mix(in srgb, var(--l4) 35%, transparent) 40%, color-mix(in srgb, var(--l4) 10%, transparent) 70%, transparent);
+  animation: drift3 17s cubic-bezier(.45, 0, .55, 1) infinite, breathe3 9s ease-in-out infinite; }
+.liquid .a1 { animation: drift1 15s cubic-bezier(.45, 0, .55, 1) infinite, breathe1 7s ease-in-out infinite; }
+.liquid .a2 { animation: drift2 19s cubic-bezier(.45, 0, .55, 1) infinite, breathe2 11s ease-in-out infinite; }
+@keyframes drift3 { 0%, 100% { transform: translate(0, 0) scale(1, 1); } 50% { transform: translate(8%, 26%) scale(1.15, .9); } }
+/* «дихання»: форми то світлішають, то темнішають, кожна у своєму ритмі */
+@keyframes breathe1 { 0%, 100% { opacity: .35; } 50% { opacity: .8; } }
+@keyframes breathe2 { 0%, 100% { opacity: .75; } 50% { opacity: .3; } }
+@keyframes breathe3 { 0%, 100% { opacity: .2; } 50% { opacity: .6; } }
+.liquid .ehalo i { animation: glint 6s ease-in-out infinite; }
+@keyframes glint { 0%, 100% { opacity: .6; } 50% { opacity: 1; } }
 .liquid .a1 { right: -38%; top: -48%; background: radial-gradient(closest-side, var(--l2), color-mix(in srgb, var(--l2) 35%, transparent) 40%, color-mix(in srgb, var(--l2) 10%, transparent) 70%, transparent);
   animation: drift1 15s cubic-bezier(.45, 0, .55, 1) infinite; }
 .liquid .a2 { left: -40%; bottom: -52%; background: radial-gradient(closest-side, var(--l3), color-mix(in srgb, var(--l3) 35%, transparent) 40%, color-mix(in srgb, var(--l3) 10%, transparent) 70%, transparent);
@@ -684,7 +695,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
 
   <div id="v-report">
     <div id="h-alert"></div>
-    <div class="hero-wrap"><div class="liquid" id="liquid" aria-hidden="true"><span class="after"><span class="amb a1"></span><span class="amb a2"></span><span class="ehalo"><i></i></span><span class="erim"></span></span><span class="glow"></span><span class="halo"><i></i></span><span class="rim"></span></div><section class="hero" id="hero" aria-live="polite"></section></div>
+    <div class="hero-wrap"><div class="liquid" id="liquid" aria-hidden="true"><span class="after"><span class="amb a1"></span><span class="amb a2"></span><span class="amb a3"></span><span class="ehalo"><i></i></span><span class="erim"></span></span><span class="glow"></span><span class="halo"><i></i></span><span class="rim"></span></div><section class="hero" id="hero" aria-live="polite"></section></div>
     <a class="cashbtn" id="cash" href="#add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg>Додати готівку</a>
     <section class="card goal" id="goal" hidden></section>
     <section class="card list fadein" id="insights" hidden></section>
