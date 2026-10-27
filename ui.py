@@ -948,7 +948,7 @@ function renderReport(P) {
     if (fresh) freshDone = true;
     return opRow(o, true, fresh);
   }).join("") : '<div class="empty">Операцій немає</div>';
-  grow("#hero .meter b, #hero .split2 .e, #v-report .bar6 b, #goal .segs b", "width");
+  grow("#hero .meter b, #hero .split2 .e, #v-report .bar6 b", "width");
 }
 // «Головне за вересень»: факт і бейдж праворуч; у неповному місяці — що вже відомо
 function renderInsights(P, M) {
@@ -994,11 +994,10 @@ function renderGoal(P) {
   var eta = pace > 0 ? Math.ceil(left / pace) : 0, etaIdx = y * 12 + m - 1 + eta, etaY = Math.floor(etaIdx / 12), etaM = etaIdx % 12;
   var early = etaY * 12 + etaM < G.deadline[0] * 12 + G.deadline[1] - 1, ahead = (G.deadline[0] * 12 + G.deadline[1] - 1) - (etaY * 12 + etaM);
   var segs = "", labs = "";
-  var SEG = 0.55, at = 0;  // секунд на одну повну смужку
+  // смужки подушки статичні: одразу показують, скільки місяців покрито
   for (var i = 0; i < G.months; i++) {
-    var f = Math.max(0, Math.min(1, life - i)), dur = Math.max(f, .01) * SEG, last = f < 1 || i === G.months - 1;
-    segs += '<i><b data-to="' + f * 100 + '%" data-delay="' + Math.round(at * 1000) + '" style="transition: width ' + dur.toFixed(2) + "s " + (last ? "cubic-bezier(.33, 1, .68, 1)" : "linear") + '"></b></i>';
-    at += f >= 1 ? dur : 0;
+    var f = Math.max(0, Math.min(1, life - i));
+    segs += '<i><b style="width:' + (f * 100).toFixed(2) + '%;transition:none"></b></i>';
     labs += "<span>" + (i === 0 ? "1 міс." : i + 1) + "</span>";
   }
   box.innerHTML = '<div class="ch" style="min-height:0"><h2>' + G.title + '</h2><span class="sub" style="font-size:12px">до 1 червня ' + G.deadline[0] + "</span></div>" +
