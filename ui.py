@@ -1488,7 +1488,7 @@ function renderTrends(P) {
   var tag = S.incomplete ? '<em class="vs-tag">1–' + upTo(S) + " " + GEN[mi(S)] + "</em>" : "";
   $("t-duo").innerHTML = '<div class="card vs"><div class="vs-head"><span>' + NAME + " у " + LOC[mi(S)] + "</span>" + tag + '</div><div class="vs-big"><b>' + (known ? z0(val(S)) : "—") + "</b></div>" +
     (sub ? '<small class="vs-sub">' + sub + "</small>" : "") + row +
-    '<div class="vs-avg"><span>Середнє за повний місяць</span><b>' + z0(avg) + "</b></div></div>";
+    '<div class="vs-avg"><span>Середнє за місяць</span><b>' + z0(avg) + "</b></div></div>";
   $("t-note").hidden = true;
 
   $("t-dmon").textContent = "Категорії у " + LOC[mi(S)];
