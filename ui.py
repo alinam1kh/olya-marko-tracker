@@ -693,7 +693,7 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .swipe.gone .swdel { opacity: 0; transition: opacity .25s ease; }
 .op .ask button { min-height: 44px; padding: 0 12px; border: 0; border-radius: 22px; background: var(--soft); font-size: 13px; font-weight: 500; cursor: pointer; }
 .op .ask button.yes { background: var(--bad); color: #fff; }
-.toast button { min-height: 36px; margin-left: 6px; padding: 0 12px; border: 0; border-radius: 9px; background: var(--blue-soft, #EAF1FF); color: var(--blue); font: 500 13px var(--font); cursor: pointer; }
+.toast button { min-height: 36px; margin-left: 6px; padding: 0 12px; border: 0; border-radius: 12px; background: var(--blue-soft, #EAF1FF); color: var(--blue); font: 500 13px var(--font); cursor: pointer; }
 
 /* подушка безпеки (Оля) */
 .goal .gbig { display: flex; align-items: flex-start; gap: 10px; margin: 16px 0 16px; }
@@ -889,10 +889,10 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .save { width: 100%; height: 52px; border: 0; border-radius: 26px; background: var(--blue-g); box-shadow: 0 8px 18px rgba(29,95,224,.3); color: #fff; font: 500 16px var(--font); cursor: pointer; }
 .save:disabled { background: #D9DDE3; box-shadow: none; cursor: default; }
 .toast { position: fixed; left: 50%; bottom: calc(104px + env(safe-area-inset-bottom, 0px)); z-index: 30; transform: translateX(-50%); display: flex; align-items: center; gap: 10px;
-  padding: 8px 8px 8px 14px; min-height: 52px; border-radius: 14px; background: var(--card);
+  padding: 8px 8px 8px 14px; min-height: 52px; border-radius: 18px; background: rgba(255, 255, 255, .72); -webkit-backdrop-filter: blur(18px) saturate(1.6); backdrop-filter: blur(18px) saturate(1.6);
   border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(17,19,24,.10); color: var(--ink); font-size: 14px; font-weight: 500; white-space: nowrap; }
 .toast:not(:has(button)) { padding-right: 18px; }
-.toast i { flex: none; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: #E7F6EC; font-style: normal; }
+.toast i { flex: none; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: var(--good); font-style: normal; }
 .toast i svg { display: block; }
 
 /* нижня навігація v2: біла плаваюча панель, активний пункт — синя капсула; fade під нею */
@@ -1642,7 +1642,7 @@ function delCash(P, line, day, title, back, undo) {
     })
     .catch(function (err) { toast(err.message || "Немає звʼязку, спробуйте ще раз"); });
 }
-var OKI = '<i aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#16A34A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5.5 12.5 4 4 9-9"/></svg></i>';
+var OKI = '<i aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="m5.5 12.5 4 4 9-9"/></svg></i>';
 function restoreCash(P, u) {
   fetch("api/cash", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "same-origin",
     body: JSON.stringify({ person: P.key, amount: u.amount, category: u.category, title: u.title, date: u.date }) })
