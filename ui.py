@@ -323,6 +323,9 @@ a { color: inherit; text-decoration: none; }
 .bd.blue { height: auto; padding: 0; background: none; color: var(--ink2); font-size: 13px; font-weight: 400; }
 .bd.new { background: var(--cash-bg); color: var(--cash); }
 .hero .bd:not(.good):not(.bad) { background: rgba(255,255,255,.92); color: #3A4050; }
+/* на темній картці плашки зміни напівпрозорі, як скляна панель під ними: кольоровий відтінок + світлий текст */
+.hero .bd.bad { background: rgba(248, 113, 113, .24); color: #FECACA; box-shadow: inset 0 0 0 1px rgba(252, 165, 165, .28); }
+.hero .bd.good { background: rgba(74, 222, 128, .22); color: #BBF7D0; box-shadow: inset 0 0 0 1px rgba(134, 239, 172, .28); }
 
 .cashbtn { display: flex; align-items: center; justify-content: center; gap: 10px; height: 56px; margin-top: 12px; border-radius: 28px; background: var(--blue-g);
   box-shadow: 0 8px 18px rgba(29,95,224,.32), inset 0 1px 0 rgba(255,255,255,.3); color: #fff; font-size: 16px; font-weight: 500; }
