@@ -673,7 +673,7 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .op .ask { flex: none; display: flex; gap: 6px; }
 .swipe { position: relative; z-index: 1; clip-path: inset(-6px -16px -8px 0); }
 .swipe .op { position: relative; z-index: 1; background: var(--card); touch-action: pan-y; transition: transform .45s cubic-bezier(.32, .72, 0, 1); }
-.swdel { position: absolute; right: -8px; top: 8px; bottom: 8px; width: 88px; z-index: 0; border: 0; border-radius: 0 14px 14px 0; background: var(--bad-bg); color: var(--bad);
+.swdel { position: absolute; right: -8px; top: 0; bottom: 0; width: 88px; z-index: 0; border: 0; border-radius: 0 14px 14px 0; background: var(--bad-bg); color: var(--bad);
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font: 500 12px var(--font); cursor: pointer; opacity: 0; transition: opacity .3s var(--ease); }
 .swdel svg { width: 18px; height: 18px; }
 /* під кнопкою ховаємо лінію наступного рядка на всю ширину кнопки (і під її заокругленими кутами) */
