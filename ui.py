@@ -671,10 +671,9 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .op .del:hover { background: var(--bad-bg); color: var(--bad); }
 .op .del svg { width: 18px; height: 18px; }
 .op .ask { flex: none; display: flex; gap: 6px; }
-.swipe { position: relative; overflow: hidden; border-top: 1px solid var(--soft); }
-.swipe > .op { border-top: 0; }
+.swipe { position: relative; z-index: 1; clip-path: inset(0 0 -1px 0); }
 .swipe .op { position: relative; z-index: 1; background: var(--card); touch-action: pan-y; transition: transform .45s cubic-bezier(.32, .72, 0, 1); }
-.swdel { position: absolute; right: 0; top: 0; bottom: 0; width: 88px; z-index: 0; border: 0; border-radius: 0 16px 16px 0; background: var(--bad-bg); color: var(--bad);
+.swdel { position: absolute; right: 0; top: 0; bottom: -1px; width: 88px; z-index: 0; border: 0; border-radius: 0 16px 16px 0; background: var(--bad-bg); color: var(--bad);
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font: 500 12px var(--font); cursor: pointer; opacity: 0; transition: opacity .3s var(--ease); }
 .swdel svg { width: 18px; height: 18px; }
 .swipe.on .swdel { opacity: 1; }
@@ -824,7 +823,7 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .dh > span { color: var(--ink2); white-space: nowrap; }
 .day { scroll-margin-top: 12px; }
 .day .card { margin-top: 0; }
-.day .card .op:first-child, .day .card .swipe:first-child { border-top: 0; }
+.day .card .op:first-child, .day .card .swipe:first-child > .op { border-top: 0; }
 .empty { padding: 26px 10px; text-align: center; color: var(--ink2); }
 
 /* шторка «Витрата готівкою» */
