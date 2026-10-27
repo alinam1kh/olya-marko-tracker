@@ -890,9 +890,9 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .save:disabled { background: #D9DDE3; box-shadow: none; cursor: default; }
 .toast { position: fixed; left: 50%; bottom: calc(104px + env(safe-area-inset-bottom, 0px)); z-index: 30; transform: translateX(-50%); display: flex; align-items: center; gap: 10px;
   padding: 8px 8px 8px 14px; min-height: 52px; border-radius: 18px; background: rgba(255, 255, 255, .72); -webkit-backdrop-filter: blur(18px) saturate(1.6); backdrop-filter: blur(18px) saturate(1.6);
-  border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(17,19,24,.10); color: var(--ink); font-size: 14px; font-weight: 500; white-space: nowrap; }
+  border: 1px solid #fff; box-shadow: 0 10px 30px rgba(17,19,24,.10); color: var(--ink); font-size: 14px; font-weight: 500; white-space: nowrap; }
 .toast:not(:has(button)) { padding-right: 18px; }
-.toast i { flex: none; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: var(--good); font-style: normal; }
+.toast i { flex: none; width: 19px; height: 19px; border-radius: 50%; display: grid; place-items: center; background: var(--good); font-style: normal; }
 .toast i svg { display: block; }
 
 /* нижня навігація v2: біла плаваюча панель, активний пункт — синя капсула; fade під нею */
