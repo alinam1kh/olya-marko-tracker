@@ -245,6 +245,9 @@ a { color: inherit; text-decoration: none; }
 .hero-wrap { position: relative; isolation: isolate; margin-top: 12px; border-radius: 24px; overflow: hidden;
   background: linear-gradient(162deg, var(--g1) 0%, var(--g2) 48%, var(--g3) 100%); }
 .hero { position: relative; z-index: 1; padding: 22px 20px 20px; border-radius: 24px; color: #fff; }
+/* мʼякий темний край: світло з плям плавно тоне в найтемніший тон ближче до країв картки */
+.hero-wrap::after { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; border-radius: inherit;
+  background: radial-gradient(120% 95% at 42% 38%, transparent 38%, color-mix(in srgb, var(--g3) 55%, transparent) 72%, var(--g3) 100%); }
 /* «рідке» світло: три пари плям. Кожна пара пливе своїм шляхом (19–27 с), а дві плями в ній сходяться,
    зливаються, розтягуються одна за одною й знову розходяться (8–12 с). Фільтр #melt мʼяко «склеює» плями,
    коли вони близько, а сильне розмиття робить з цього переливи градієнта. Старт кожної пари — випадковий */
