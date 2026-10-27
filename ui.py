@@ -378,7 +378,7 @@ a { color: inherit; text-decoration: none; }
 .toast button { min-height: 36px; margin-left: 4px; padding: 0 12px; border: 0; border-radius: 18px; background: rgba(255,255,255,.16); color: #fff; font-size: 13px; font-weight: 500; cursor: pointer; }
 
 /* подушка безпеки (Оля) */
-.goal .gbig { display: flex; align-items: flex-start; gap: 10px; margin: 6px 0 14px; }
+.goal .gbig { display: flex; align-items: flex-start; gap: 10px; margin: 16px 0 16px; }
 .goal .gbig b { font-size: 32px; font-weight: 500; line-height: 1; color: var(--blue); }
 .goal .gbig span { font-size: 14px; line-height: 1.35; color: var(--ink4); padding-top: 3px; }
 .segs { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
