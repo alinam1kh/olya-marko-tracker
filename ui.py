@@ -255,7 +255,7 @@ a { color: inherit; text-decoration: none; }
 
 /* головна картка: градієнт у кольорі людини, а над ним «рідкі» плями світла */
 .hero-wrap { position: relative; isolation: isolate; margin-top: 12px; border-radius: 24px; overflow: hidden; clip-path: inset(0 round 24px); -webkit-mask-image: -webkit-radial-gradient(white, black);
-  background: radial-gradient(120% 100% at 40% 30%, color-mix(in srgb, var(--g2) 70%, var(--g3)) 0%, var(--g3) 85%); }
+  background: radial-gradient(120% 100% at 40% 30%, color-mix(in srgb, var(--g2) 88%, var(--g1)) 0%, color-mix(in srgb, var(--g2) 35%, var(--g3)) 55%, var(--g3) 92%); }
 .hero { position: relative; z-index: 1; padding: 22px 20px 20px; border-radius: 24px; color: #fff; }
 .hero-wrap::after { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; border-radius: inherit; opacity: .16; mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
@@ -333,8 +333,8 @@ body.p-olya .liquid { --sheen: .4; }
 }
 /* після бліку світло лишається на краях: розмита рамка й тонкий кант біля лівого верхнього й правого нижнього кутів,
    повільно ковзають уздовж країв і перетікають (дві точки дзеркальні одна одній) */
-.liquid .after { -webkit-mask: linear-gradient(var(--a), #000 calc(var(--p) - 14%), transparent calc(var(--p) + 6%)), linear-gradient(rgba(0, 0, 0, .5) 0 0);
-  mask: linear-gradient(var(--a), #000 calc(var(--p) - 14%), transparent calc(var(--p) + 6%)), linear-gradient(rgba(0, 0, 0, .5) 0 0); }
+.liquid .after { -webkit-mask: linear-gradient(var(--a), #000 calc(var(--p) - 14%), transparent calc(var(--p) + 6%)), linear-gradient(rgba(0, 0, 0, .7) 0 0);
+  mask: linear-gradient(var(--a), #000 calc(var(--p) - 14%), transparent calc(var(--p) + 6%)), linear-gradient(rgba(0, 0, 0, .7) 0 0); }
 .liquid .after > span { position: absolute; inset: 0; border-radius: inherit; }
 .liquid .ehalo { opacity: .38; } .liquid .erim { opacity: .34; }
 .liquid .ehalo { filter: blur(8px); }
@@ -356,12 +356,12 @@ body.p-olya .liquid { --sheen: .4; }
 .liquid .amb { inset: auto; width: 80%; aspect-ratio: 1.7; border-radius: 50%; filter: blur(34px); mix-blend-mode: screen;
   will-change: transform; opacity: .7; }
 body.p-olya .liquid .amb { opacity: .75; }
-.liquid .a1 { left: -38%; top: -48%; background: radial-gradient(closest-side, var(--l2), color-mix(in srgb, var(--l2) 35%, transparent) 40%, color-mix(in srgb, var(--l2) 10%, transparent) 70%, transparent);
+.liquid .a1 { right: -38%; top: -48%; background: radial-gradient(closest-side, var(--l2), color-mix(in srgb, var(--l2) 35%, transparent) 40%, color-mix(in srgb, var(--l2) 10%, transparent) 70%, transparent);
   animation: drift1 15s cubic-bezier(.45, 0, .55, 1) infinite; }
-.liquid .a2 { right: -40%; bottom: -52%; background: radial-gradient(closest-side, var(--l3), color-mix(in srgb, var(--l3) 35%, transparent) 40%, color-mix(in srgb, var(--l3) 10%, transparent) 70%, transparent);
+.liquid .a2 { left: -40%; bottom: -52%; background: radial-gradient(closest-side, var(--l3), color-mix(in srgb, var(--l3) 35%, transparent) 40%, color-mix(in srgb, var(--l3) 10%, transparent) 70%, transparent);
   opacity: .5; animation: drift2 19s cubic-bezier(.45, 0, .55, 1) infinite; }
-@keyframes drift1 { 0%, 100% { transform: translate(0, 0) rotate(0) scale(1, 1); } 33% { transform: translate(38%, -4%) rotate(12deg) scale(1.2, .85); } 66% { transform: translate(-6%, 34%) rotate(-10deg) scale(.9, 1.15); } }
-@keyframes drift2 { 0%, 100% { transform: translate(0, 0) rotate(0) scale(1, 1); } 40% { transform: translate(-38%, 4%) rotate(-12deg) scale(1.2, .85); } 75% { transform: translate(6%, -34%) rotate(10deg) scale(.88, 1.15); } }
+@keyframes drift1 { 0%, 100% { transform: translate(0, 0) rotate(0) scale(1, 1); } 33% { transform: translate(-36%, -4%) rotate(-12deg) scale(1.2, .85); } 66% { transform: translate(6%, 30%) rotate(10deg) scale(.9, 1.15); } }
+@keyframes drift2 { 0%, 100% { transform: translate(0, 0) rotate(0) scale(1, 1); } 40% { transform: translate(36%, 4%) rotate(12deg) scale(1.2, .85); } 75% { transform: translate(-6%, -30%) rotate(-10deg) scale(.88, 1.15); } }
 /* легка тінь під білим текстом — підпис лишається читабельним, коли блік пропливає під ним */
 .hero .lbl, .hero .num, .hero .sub, .hero .lt, .hero .lg2 b { text-shadow: 0 1px 10px rgba(5, 10, 30, .28); }
 .hero .sub .inc { color: inherit; }
