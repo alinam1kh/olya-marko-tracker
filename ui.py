@@ -673,14 +673,14 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .op .ask { flex: none; display: flex; gap: 6px; }
 .swipe { position: relative; z-index: 1; clip-path: inset(-6px -16px -8px 0); }
 .swipe .op { position: relative; z-index: 1; background: var(--card); touch-action: pan-y; transition: transform .45s cubic-bezier(.32, .72, 0, 1); }
-.swdel { position: absolute; right: -16px; top: 0; bottom: -1px; width: 104px; padding-left: 0 !important; z-index: 0; border: 0; border-radius: 0; background: var(--bad-bg); color: var(--bad);
+.swdel { position: absolute; right: -8px; top: 8px; bottom: 8px; width: 88px; z-index: 0; border: 0; border-radius: 14px; background: var(--bad-bg); color: var(--bad);
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font: 500 12px var(--font); cursor: pointer; opacity: 0; transition: opacity .3s var(--ease); }
 .swdel svg { width: 18px; height: 18px; }
 /* під кнопкою ховаємо лінію наступного рядка на всю ширину кнопки (і під її заокругленими кутами) */
-.swipe::after { content: ""; position: absolute; right: -16px; bottom: -1px; width: 104px; height: 1px; background: var(--card); opacity: 0; transition: opacity .2s ease; }
+.swipe::after { content: ""; position: absolute; right: -16px; bottom: -1px; width: 112px; height: 1px; background: var(--card); opacity: 0; transition: opacity .2s ease; }
 .swipe.on::after { opacity: 1; }
-.day .card .swipe:first-child .swdel { top: -6px; border-top-right-radius: 19px; }
-.card .swipe:last-child .swdel { bottom: -8px; border-bottom-right-radius: 19px; }
+.day .card .swipe:first-child .swdel { top: 2px; }   /* 8 px від верху картки (відступ картки 6 px) */
+.card .swipe:last-child .swdel { bottom: 0; }            /* 8 px від низу картки (відступ картки 8 px) */
 .card .swipe:last-child::after { display: none; }
 .swipe.on .swdel { opacity: 1; }
 .swipe.gone { pointer-events: none; overflow: hidden; transition: height .35s cubic-bezier(.4, 0, .2, 1) .28s, opacity .3s ease .3s; }
@@ -1571,7 +1571,9 @@ function renderJournal(P) {
   ops.forEach(function (o) {
     if (o.day !== day) {
       flush(); day = o.day;
-      var e = ops.filter(function (x) { return x.day === day && !x.income; }).reduce(function (s, x) { return s + x.amount; }, 0);
+      // сума дня — лише якщо операцій у дні хоча б дві (для однієї вона повторює суму рядка)
+      var dayOps = ops.filter(function (x) { return x.day === day; });
+      var e = dayOps.length > 1 ? dayOps.filter(function (x) { return !x.income; }).reduce(function (s, x) { return s + x.amount; }, 0) : 0;
       var d = dayFmt.format(new Date(day + "T12:00:00")).split(", ");
       buf = '<section class="day" data-day="' + day + '"><div class="dh"><b>' + esc(d[1] || d[0]) + (d[1] ? ", <span>" + esc(d[0]) + "</span>" : "") + "</b><span>" + (e ? "−" + nf2.format(e) + " зл" : "") +
         '</span></div><div class="card list">';
@@ -1584,9 +1586,9 @@ function renderJournal(P) {
 }
 
 // свайп рядка вліво відкриває кнопку «Видалити» справа; відпустили не дотягнувши — рядок повертається
-var SW_OPEN = 88;  // = ширина .swdel
+var SW_OPEN = 96;  // ширина .swdel (88) − її вихід за край (8) + повітря до суми (16)
 function swipeWrap(o, row) {
-  return o.cash && o.line ? '<div class="swipe" data-line="' + o.line + '" data-day="' + o.day + '" data-title="' + esc(o.title) + '">' +
+  return o.cash && o.line ? '<div class="swipe" data-line="' + o.line + '" data-day="' + o.day + '" data-title="' + esc(o.title) + '" data-amount="' + o.amount + '" data-cat="' + esc(o.cat.replace(/ /g, "-")) + '">' +
     '<button type="button" class="swdel" tabindex="-1" aria-label="Видалити запис «' + esc(o.title) + '»">' + TRASH + "<span>Видалити</span></button>" + row + "</div>" : row;
 }
 function swipeRow(sw, P, back) {
@@ -1612,11 +1614,12 @@ function swipeRow(sw, P, back) {
   sw.querySelector(".swdel").onclick = function () {
     sw.style.height = sw.offsetHeight + "px"; void sw.offsetHeight;
     sw.classList.add("gone"); sw.style.height = "0px"; sw.style.opacity = "0";
-    setTimeout(function () { delCash(P, +sw.dataset.line, sw.dataset.day, sw.dataset.title, back); }, 620);
+    var undo = { amount: sw.dataset.amount, category: sw.dataset.cat, title: sw.dataset.title, date: sw.dataset.day };
+    setTimeout(function () { delCash(P, +sw.dataset.line, sw.dataset.day, sw.dataset.title, back, undo); }, 620);
   };
 }
 // видалення одного готівкового запису; після — перезавантаження зі свіжими даними і тостом
-function delCash(P, line, day, title, back) {
+function delCash(P, line, day, title, back, undo) {
   fetch("api/cash/delete", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "same-origin",
     body: JSON.stringify({ person: P.key, line: line, date: day, title: title }) })
     .then(function (r) { return r.json().catch(function () { return { ok: false, error: "Сервер не відповів" }; }); })
@@ -1629,11 +1632,24 @@ function delCash(P, line, day, title, back) {
       month = ms.indexOf(mk) >= 0 ? ms.indexOf(mk) : lastFull(D.people[person]);
       saved = null; reportKey = null;
       if (back && location.hash !== back) location.hash = back; else render();
-      toast(OKI + 'Запис видалено');
+      // «Скасувати» записує той самий запис назад (та сама сума, категорія, опис і дата)
+      toast(OKI + 'Запис видалено', undo ? ["Скасувати", function () { restoreCash(P, undo); }] : null);
     })
     .catch(function (err) { toast(err.message || "Немає звʼязку, спробуйте ще раз"); });
 }
 var OKI = '<i aria-hidden="true"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5.5 12.5 4 4 9-9"/></svg></i>';
+function restoreCash(P, u) {
+  fetch("api/cash", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "same-origin",
+    body: JSON.stringify({ person: P.key, amount: u.amount, category: u.category, title: u.title, date: u.date }) })
+    .then(function (r) { return r.json().catch(function () { return { ok: false, error: "Сервер не відповів" }; }); })
+    .then(function (res) {
+      if (!res.ok) throw new Error(res.error || "Не вдалося відновити");
+      document.querySelectorAll(".toast").forEach(function (x) { x.remove(); });
+      D = res.data; saved = { amount: +u.amount, day: res.date, line: res.line, title: res.title }; reportKey = null; render();
+      toast(OKI + "Запис відновлено");
+    })
+    .catch(function (err) { toast(err.message || "Немає звʼязку, спробуйте ще раз"); });
+}
 function toast(html, action) {
   var t = h("div", "toast", html); t.setAttribute("role", "status");
   if (action) { var b = h("button", "", action[0]); b.type = "button"; b.onclick = action[1]; t.appendChild(b); }
