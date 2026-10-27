@@ -260,7 +260,7 @@ a { color: inherit; text-decoration: none; }
 .hero-wrap { position: relative; isolation: isolate; margin-top: 12px; border-radius: 24px; overflow: hidden; clip-path: inset(0 round 24px); -webkit-mask-image: -webkit-radial-gradient(white, black);
   background: linear-gradient(160deg, color-mix(in srgb, var(--g2) 74%, var(--g3)) 0%, color-mix(in srgb, var(--g2) 58%, var(--g3)) 50%, color-mix(in srgb, var(--g2) 42%, var(--g3)) 100%); }
 .hero { position: relative; z-index: 1; padding: 22px 20px 20px; border-radius: 24px; color: #fff; }
-.hero-wrap::after { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; border-radius: inherit; opacity: .16; mix-blend-mode: overlay;
+.hero-wrap::after { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; border-radius: inherit; opacity: .26; mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
 /* Під час відкриття — один живий прохід бліку: світло збирається в лівому верхньому куті, смугою на всю картку
    хвилясто (кут смуги «гуляє») проходить до правого нижнього кута й зникає. Кант і розмита рамка по краях
@@ -671,14 +671,17 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .op .del:hover { background: var(--bad-bg); color: var(--bad); }
 .op .del svg { width: 18px; height: 18px; }
 .op .ask { flex: none; display: flex; gap: 6px; }
-.swipe { position: relative; z-index: 1; clip-path: inset(0 0 -1px 0); }
+.swipe { position: relative; z-index: 1; clip-path: inset(-6px -16px -8px 0); }
 .swipe .op { position: relative; z-index: 1; background: var(--card); touch-action: pan-y; transition: transform .45s cubic-bezier(.32, .72, 0, 1); }
-.swdel { position: absolute; right: 0; top: 0; bottom: -1px; width: 88px; z-index: 0; border: 0; border-radius: 0 16px 16px 0; background: var(--bad-bg); color: var(--bad);
+.swdel { position: absolute; right: -16px; top: 0; bottom: -1px; width: 104px; padding-left: 0 !important; z-index: 0; border: 0; border-radius: 0; background: var(--bad-bg); color: var(--bad);
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font: 500 12px var(--font); cursor: pointer; opacity: 0; transition: opacity .3s var(--ease); }
 .swdel svg { width: 18px; height: 18px; }
 /* під кнопкою ховаємо лінію наступного рядка на всю ширину кнопки (і під її заокругленими кутами) */
-.swipe::after { content: ""; position: absolute; right: 0; bottom: -1px; width: 88px; height: 1px; background: var(--card); opacity: 0; transition: opacity .2s ease; }
+.swipe::after { content: ""; position: absolute; right: -16px; bottom: -1px; width: 104px; height: 1px; background: var(--card); opacity: 0; transition: opacity .2s ease; }
 .swipe.on::after { opacity: 1; }
+.day .card .swipe:first-child .swdel { top: -6px; border-top-right-radius: 19px; }
+.card .swipe:last-child .swdel { bottom: -8px; border-bottom-right-radius: 19px; }
+.card .swipe:last-child::after { display: none; }
 .swipe.on .swdel { opacity: 1; }
 .swipe.gone { pointer-events: none; overflow: hidden; transition: height .35s cubic-bezier(.4, 0, .2, 1) .28s, opacity .3s ease .3s; }
 .swipe.gone .op { transform: translateX(-110%) !important; transition: transform .35s cubic-bezier(.4, 0, .2, 1) !important; }
@@ -1300,9 +1303,9 @@ function renderReport(P) {
   if (noIncome) {
     var usual = prevI ? prevI.income : 0, share = usual ? M.expenses / usual * 100 : 0, days = payDays(P);
     hero.innerHTML = tag + '<div class="lbl">Витрачено до зарплати</div><div class="num">' + approx + zl(M.expenses) + "</div>" +
-      (usual ? '<div class="meter"><b data-to="' + Math.min(100, share) + '%"></b></div><div class="sub">' + nf1.format(share) + " % звичної зарплати " + nf0.format(usual) + " зл</div>" : "") +
-      '<div class="hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>' +
-      "<span>Зарплата зазвичай " + (days ? days + " числа" : "наприкінці місяця") + ". Залишок зʼявиться після неї.</span></div>";
+      (usual ? '<div class="meter"><b data-to="' + Math.min(100, share) + '%"></b></div><div class="sub">Це ' + nf1.format(share) + " % від зарплати " + nf0.format(usual) + " зл</div>" : "") +
+      '<div class="hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="7.8" r=".6" fill="currentColor"/></svg>' +
+      "<span>Залишок зʼявиться після зарплати " + (days ? days + " числа" : "наприкінці місяця") + ".</span></div>";
   } else {
     var inc = M.incomplete ? "" : (prevI ? heroBadge(M.income, prevI.income, false, LOC[mi(prevI)]) : "");
     var exp = M.incomplete ? "" : (prevM ? heroBadge(M.expenses, prevM.expenses, true, LOC[mi(prevM)]) : "");
@@ -1310,7 +1313,7 @@ function renderReport(P) {
     // увесь дохід — це смуга; витрати й залишок — її частини
     var ep = M.income > 0 ? Math.min(100, M.expenses / M.income * 100) : 100, sp = 100 - ep;
     hero.innerHTML = tag + '<div class="lbl">Лишилось у ' + LOC[k] + '</div><div class="num">' + approx + zl(M.saved) + "</div>" +
-      '<div class="sub">Норма заощаджень ' + nf1.format(M.rate) + " % · дохід " + '<a href="#journal" data-filter="inc" class="inc">' + nf0.format(M.income) + " зл" + "</a>" + inc + (P.ok ? "" : ", потребує перевірки") + "</div>" +
+      '<div class="sub">Норма заощаджень ' + nf1.format(M.rate) + " % з доходу " + '<a href="#journal" data-filter="inc" class="inc">' + nf0.format(M.income) + " зл" + "</a>" + inc + (P.ok ? "" : ", потребує перевірки") + "</div>" +
       '<div class="split2" role="img" aria-label="Витрати ' + nf0.format(ep) + " %, лишилось " + nf0.format(sp) + ' % доходу">' +
         '<b class="e" data-to="calc(' + ep.toFixed(2) + '% - 2px)"></b><b class="s"></b></div>' +
       '<div class="lg2"><a href="#journal" data-filter="exp" class="le"><span class="lt"><i></i>Витрати' + (M.incomplete ? " за " + dn + " " + plural(dn, "день", "дні", "днів") : "") + ", " + nf0.format(ep) + " %</span>" +
@@ -1323,6 +1326,10 @@ function renderReport(P) {
   renderInsights(P, M);
   $("cats-all").innerHTML = "<span>Усі " + M.categories.length + "</span>" + CHR;
   $("cats").innerHTML = catRows(M, 3);
+  $("cats-all").onclick = function (e) {
+    e.preventDefault(); amode = "month"; location.hash = "#analytics";
+    setTimeout(function () { var s = $("fcats").closest("section"); if (s) window.scrollTo({ top: s.getBoundingClientRect().top + scrollY - 76, behavior: "smooth" }); }, 120);
+  };
   var mb = $("more-btn");
   if (mb) mb.onclick = function () {
     var open = mb.getAttribute("aria-expanded") !== "true", n = $("more-rows").querySelectorAll(".crow").length;
@@ -1822,13 +1829,13 @@ window.addEventListener("hashchange", function () {
 });
 render();
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(function () {});
-// сплеш зникає, коли готовий шрифт (але не довше 2,2 с і не швидше 1,5 с — щоб гроші й повзунок встигли спокійно зіграти)
+// сплеш зникає, коли готовий шрифт (але не довше 3 с і не швидше 2,4 с — повний цикл анімації знака — щоб гроші й повзунок встигли спокійно зіграти)
 (function () {
   var s = $("splash"), t = Date.now(), done = false, fill = $("sp-fill");
   requestAnimationFrame(function () { fill.style.width = "85%"; });
-  function hide() { if (done) return; done = true; setTimeout(function () { s.classList.add("done"); fill.style.width = "100%"; setTimeout(function () { lastBase = null; render(); requestAnimationFrame(function () { requestAnimationFrame(function () { $("app").classList.remove("pre"); s.classList.add("out"); $("liquid").classList.add("sheen"); }); }); setTimeout(function () { s.remove(); }, 1500); }, 550); }, Math.max(0, 1500 - (Date.now() - t))); }
+  function hide() { if (done) return; done = true; setTimeout(function () { s.classList.add("done"); fill.style.width = "100%"; setTimeout(function () { lastBase = null; render(); requestAnimationFrame(function () { requestAnimationFrame(function () { $("app").classList.remove("pre"); s.classList.add("out"); $("liquid").classList.add("sheen"); }); }); setTimeout(function () { s.remove(); }, 1500); }, 550); }, Math.max(0, 2400 - (Date.now() - t))); }
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(hide);
-  setTimeout(hide, 2200);
+  setTimeout(hide, 3000);
 })();
 })();
 </script>

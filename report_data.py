@@ -56,6 +56,8 @@ def _ledger(path):
                              "title": entry.narration or entry.payee or "", "fixed": fixed, "cash": cash, "line": line, **op})
         if touched and (m["last"] is None or entry.date > m["last"]):
             m["last"] = entry.date
+        if touched and not in_cash_file and (m.get("last_bank") is None or entry.date > m["last_bank"]):
+            m["last_bank"] = entry.date
     return errors, months, accounts
 
 
@@ -70,7 +72,7 @@ def report():
             m = months[(year, month)]
             spent = m["fixed"] + m["variable"]
             saved = m["income"] - spent
-            last = m["last"]
+            last = m.get("last_bank") or m["last"]
             incomplete = (year, month) == keys[-1] and last < date(year, month, monthrange(year, month)[1])
             out.append({
                 "key": f"{year}-{month:02}",
