@@ -1464,7 +1464,6 @@ function renderAnalytics(P) {
   });
   $("wnote").textContent = rent.length ? (useOut ? "Оренду " + nf0.format(rentSum) + " зл, сплачену " + rent[0].date.slice(0, 2).replace(/^0/, "") + "." + rent[0].date.slice(3) + ", винесено з графіка. Разом з орендою — " + zl(M.expenses) + "."
     : "Оренда — світла частина першого тижня. Без оренди — " + zl(M.expenses - rentSum) + ".") : "Усього за місяць — " + zl(M.expenses) + (M.incomplete ? ", дані до " + M.last_op : "") + ".";
-  $("w-title").textContent = "Витрати по тижнях у " + LOC[mi(M)];
   var labels = ["1–7", "8–14", "15–21", "22–28", "29+"];
   capsules("bars", "wticks", weeks.map(function (w, i) { return { v: w, rent: rentW[i], label: labels[i], sub: nf0.format(w) + " зл" }; }), niceMax(Math.max.apply(null, weeks.concat([1]))), -1, null);
 
