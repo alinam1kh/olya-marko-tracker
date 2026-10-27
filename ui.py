@@ -144,10 +144,11 @@ PAGE = r"""<!doctype html>
   --ink: #111318; --ink2: #6B7180; --ink3: #4A5060; --ink4: #2A2E38; --mute: #C4C8D0;
   --blue: #1F63E6; --blue-g: linear-gradient(180deg, #3B82F6, #1D5FE0); --blue-soft: #EAF1FF; --blue-txt: #1F55C9; --blue-l: #A9C6F8;
   --good: #15803D; --good-bg: #E3F7EA; --bad: #C0261B; --bad-bg: #FDE8E6; --cash: #7A4E00; --cash-bg: #FFF2DB;
-  --hero-on: #DCE3F4; --glow: rgba(120, 160, 245, .24); --g1: #3A62C2; --g2: #1E3778; --g3: #0B132B;
+  --hero-on: #DCE3F4; --glow: rgba(120, 160, 245, .24); --glow2: rgba(130, 175, 255, .62); --glow3: rgba(190, 215, 255, .45); --glow4: rgba(90, 120, 255, .55); --glow5: rgba(150, 130, 255, .5); --g1: #3A62C2; --g2: #1E3778; --g3: #0B132B;
+  --ease: cubic-bezier(.22, 1, .36, 1); --spring: cubic-bezier(.34, 1.36, .64, 1);
   --font: "Onest", "Outfit", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
-body.p-olya { --hero-on: #F1DDEA; --glow: rgba(214, 120, 182, .34); --g1: #9A4783; --g2: #5A2149; --g3: #1C0A17; }
+body.p-olya { --hero-on: #F1DDEA; --glow: rgba(214, 120, 182, .34); --glow2: rgba(232, 130, 200, .6); --glow3: rgba(255, 190, 230, .42); --glow4: rgba(255, 110, 170, .5); --glow5: rgba(190, 100, 230, .48); --g1: #9A4783; --g2: #5A2149; --g3: #1C0A17; }
 * { box-sizing: border-box; }
 html, body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.4 var(--font); -webkit-font-smoothing: antialiased; font-variant-numeric: tabular-nums; }
 .app { max-width: 440px; margin: 0 auto; padding: 8px 14px 130px; }
@@ -167,10 +168,10 @@ a { color: inherit; text-decoration: none; }
 .av::after { left: 10%; top: 66%; width: 80%; height: 60%; }
 .av.olya { background: #E9E1FB; }
 .av.olya::before, .av.olya::after { background: #8B6CE0; }
-.mpick > button, .mstatic { display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 14px 0 12px; border: 1px solid var(--border); border-radius: 22px; background: var(--card); font-size: 14px; white-space: nowrap; cursor: pointer; }
+.mpick > button, .mstatic { display: flex; align-items: center; gap: 8px; height: 48px; padding: 0 14px 0 12px; border: 1px solid var(--border); border-radius: 24px; background: var(--card); font-size: 14px; white-space: nowrap; cursor: pointer; }
 .mstatic { cursor: default; }
 .who > button[aria-expanded="true"] .chev, .mpick > button[aria-expanded="true"] .chev { transform: rotate(180deg); }
-.chev { transition: transform .2s; }
+.chev { transition: transform .35s var(--ease); }
 .pop { position: absolute; top: 56px; padding: 6px; border: 1px solid var(--border); border-radius: 24px; background: var(--card); box-shadow: 0 20px 40px rgba(17,19,24,.16); }
 .who .pop { left: 0; width: 272px; }
 .pop > p { margin: 10px 12px 6px; font-size: 12px; color: var(--ink2); }
@@ -199,12 +200,30 @@ a { color: inherit; text-decoration: none; }
 .cal-grid button[aria-pressed="true"].has::after { background: #fff; opacity: .8; }
 .cal-note { margin: 10px 4px 0; font-size: 12px; color: var(--ink2); }
 
-/* головна картка: біла рамка, всередині наш градієнт у кольорі людини */
-.hero-wrap { margin-top: 12px; }
-.hero { position: relative; padding: 22px 20px 20px; border-radius: 24px; color: #fff; overflow: hidden;
-  background: radial-gradient(70% 55% at 0% 0%, var(--glow), transparent 72%), radial-gradient(45% 40% at 0% 78%, var(--glow), transparent 70%),
-    linear-gradient(162deg, var(--g1) 0%, var(--g2) 48%, var(--g3) 100%); }
+/* головна картка: градієнт у кольорі людини, а над ним «рідкі» плями світла */
+.hero-wrap { position: relative; isolation: isolate; margin-top: 12px; border-radius: 24px; overflow: hidden;
+  background: linear-gradient(162deg, var(--g1) 0%, var(--g2) 48%, var(--g3) 100%); }
+.hero { position: relative; z-index: 1; padding: 22px 20px 20px; border-radius: 24px; color: #fff; }
+/* п'ять м'яких плям повільно пливуть кожна своїм шляхом і з різною швидкістю (13–31 с), ще й змінюють форму;
+   спільне розмиття зливає їх між собою, тож світло наче розтікається. Старт кожної — випадковий */
+.liquid { position: absolute; inset: 0; z-index: 0; pointer-events: none; filter: blur(26px); }
+.liquid i { position: absolute; width: 58%; aspect-ratio: 1; border-radius: 42% 58% 63% 37% / 45% 40% 60% 55%; mix-blend-mode: screen; will-change: transform, border-radius;
+  animation: var(--path) var(--dur) ease-in-out infinite, morph calc(var(--dur) * .6) ease-in-out infinite alternate; }
+.liquid i:nth-child(1) { --path: flow1; --dur: 19s; left: 48%; top: -30%; background: radial-gradient(circle at 40% 40%, var(--glow2), transparent 68%); }
+.liquid i:nth-child(2) { --path: flow2; --dur: 23s; left: -15%; top: 40%; width: 50%; background: radial-gradient(circle at 60% 50%, var(--glow3), transparent 68%); }
+.liquid i:nth-child(3) { --path: flow3; --dur: 29s; left: 30%; top: 50%; width: 66%; background: radial-gradient(circle, var(--glow4), transparent 66%); }
+.liquid i:nth-child(4) { --path: flow4; --dur: 13s; left: 70%; top: 35%; width: 38%; background: radial-gradient(circle, var(--glow3), transparent 66%); }
+.liquid i:nth-child(5) { --path: flow2; --dur: 31s; left: 5%; top: -35%; width: 46%; background: radial-gradient(circle, var(--glow5), transparent 66%); animation-direction: reverse, alternate; }
+@keyframes flow1 { 0%, 100% { transform: translate(0, 0) rotate(0); } 25% { transform: translate(-38%, 30%) rotate(40deg) scale(1.15); } 50% { transform: translate(-12%, 72%) rotate(95deg) scale(.9); } 75% { transform: translate(24%, 26%) rotate(150deg) scale(1.1); } }
+@keyframes flow2 { 0%, 100% { transform: translate(0, 0) rotate(0); } 30% { transform: translate(85%, -30%) rotate(-60deg) scale(1.25); } 60% { transform: translate(140%, 25%) rotate(-120deg) scale(.85); } 80% { transform: translate(50%, 20%) rotate(-160deg) scale(1.05); } }
+@keyframes flow3 { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(-45%, -55%) scale(1.2); } 66% { transform: translate(30%, -35%) scale(.8); } }
+@keyframes flow4 { 0%, 100% { transform: translate(0, 0) scale(1); } 20% { transform: translate(-90%, 60%) scale(1.3); } 45% { transform: translate(-150%, -10%) scale(.9); } 70% { transform: translate(-40%, -70%) scale(1.15); } }
+@keyframes morph { 0% { border-radius: 42% 58% 63% 37% / 45% 40% 60% 55%; } 50% { border-radius: 63% 37% 41% 59% / 58% 62% 38% 42%; } 100% { border-radius: 35% 65% 55% 45% / 38% 52% 48% 62%; } }
+/* легка тінь під білим текстом — підпис лишається читабельним, коли блік пропливає під ним */
+.hero .lbl, .hero .num, .hero .sub, .hero .cols .t, .hero .cols b { text-shadow: 0 1px 10px rgba(5, 10, 30, .28); }
 .hero .lbl { font-size: 14px; }
+.hero .num.cu { animation: numin .7s var(--ease) both .1s; }
+@keyframes numin { from { opacity: 0; transform: translateY(8px); filter: blur(4px); } to { opacity: 1; transform: none; filter: none; } }
 .hero .num { margin-top: 6px; font-size: 40px; font-weight: 500; letter-spacing: -.02em; line-height: 1.05; }
 .hero .sub { margin-top: 6px; font-size: 14px; }
 .hero .tag { position: absolute; top: 18px; right: 18px; height: 24px; padding: 0 8px; border-radius: 12px; background: rgba(255,255,255,.92); color: var(--ink3); font-size: 12px; font-weight: 500; display: flex; align-items: center; }
@@ -214,7 +233,7 @@ a { color: inherit; text-decoration: none; }
 .hero .cols b { font-size: 18px; font-weight: 500; }
 .hero .cols i { font-style: normal; font-size: 12px; color: var(--hero-on); }
 .hero .meter { height: 8px; margin: 14px 0 8px; border-radius: 4px; background: rgba(255,255,255,.25); overflow: hidden; }
-.hero .meter b { display: block; height: 100%; width: 0; border-radius: 4px; background: #fff; transition: width 1s cubic-bezier(.2,.8,.2,1); }
+.hero .meter b { display: block; height: 100%; width: 0; border-radius: 4px; background: #fff; transition: width 1.6s var(--ease); }
 .hero .hint { display: flex; gap: 10px; align-items: flex-start; margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.35); font-size: 14px; line-height: 1.4; }
 .hero .hint svg { flex: none; width: 18px; height: 18px; margin-top: 1px; }
 /* бейджі: маленькі заокруглені плашки, стрілка діагональна */
@@ -242,7 +261,7 @@ a { color: inherit; text-decoration: none; }
 .fx.now { background: var(--blue); color: #fff; }
 /* «Вересень коротко» */
 .ins { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 52px; border-top: 1px solid var(--soft); font-size: 14px; line-height: 1.45; color: var(--ink4); }
-.fadein { animation: rise .3s ease-out both; }
+.fadein { animation: rise .6s var(--ease) both; }
 @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 /* категорії: кольорова іконка, назва, сума, частка, шкала */
 .crow { display: grid; grid-template-columns: 36px 1fr auto auto; gap: 8px 12px; align-items: center; padding: 8px 0; }
@@ -250,9 +269,10 @@ a { color: inherit; text-decoration: none; }
 .crow .nm { font-size: 15px; display: flex; align-items: center; gap: 6px; min-width: 0; }
 .crow .am { font-size: 14px; font-weight: 500; }
 .crow .bar6 { grid-column: 2 / -1; height: 6px; border-radius: 999px; background: var(--track); overflow: hidden; }
-.crow .bar6 b { display: block; height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, #3B82F6, #1D5FE0); transition: width 1s cubic-bezier(.2,.8,.2,1); }
+.crow .bar6 b { display: block; height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, #3B82F6, #1D5FE0); transition: width 1.6s var(--ease); }
 .cic { flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--soft); }
 .cic svg { width: 18px; height: 18px; }
+.cic.inc { background: var(--good-bg); }
 .more { display: flex; justify-content: space-between; align-items: center; min-height: 48px; margin-top: 4px; border-top: 1px solid var(--soft); font-size: 15px; color: var(--ink2); }
 /* операції */
 .op { display: flex; align-items: center; gap: 12px; min-height: 60px; padding: 10px 0; border-top: 1px solid var(--soft); }
@@ -265,7 +285,8 @@ a { color: inherit; text-decoration: none; }
 .op .r { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
 .op .am { font-size: 15px; font-weight: 500; white-space: nowrap; }
 .op .am.inc { color: var(--good); }
-.op .dt { display: flex; align-items: center; gap: 4px; font-size: 13px; color: var(--ink2); }
+/* тонка вертикальна риска між категорією і датою */
+.sep { display: inline-block; width: 1px; height: .85em; margin: 0 7px; vertical-align: -.08em; background: currentColor; opacity: .4; }
 /* видалення готівкового запису: кнопка-кошик у рядку журналу, а потім підтвердження в тому ж місці */
 .op .del { flex: none; width: 44px; height: 44px; margin-right: -10px; border: 0; border-radius: 22px; background: transparent; color: var(--ink2); display: grid; place-items: center; cursor: pointer; }
 .op .del:hover { background: var(--bad-bg); color: var(--bad); }
@@ -281,14 +302,14 @@ a { color: inherit; text-decoration: none; }
 .goal .gbig span { font-size: 14px; line-height: 1.35; color: var(--ink4); padding-top: 3px; }
 .segs { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
 .segs i { position: relative; height: 8px; border-radius: 4px; background: var(--track); overflow: hidden; }
-.segs i b { position: absolute; inset: 0; width: 0; border-radius: 4px; background: var(--blue-g); transition: width .9s cubic-bezier(.2,.8,.2,1); }
+.segs i b { position: absolute; inset: 0; width: 0; border-radius: 4px; background: var(--blue-g); transition: width 1.6s var(--ease); }
 .seglab { display: grid; grid-template-columns: repeat(6, 1fr); margin-top: 6px; font-size: 12px; color: var(--ink2); }
 .seglab span:last-child { text-align: right; }
 .gcols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0 12px; padding-top: 14px; border-top: 1px solid var(--soft); }
 .gcols span { display: block; font-size: 12px; color: var(--ink2); }
 .gcols b { display: block; margin: 3px 0 2px; font-size: 18px; font-weight: 500; }
 .gcols small { display: block; font-size: 12px; color: var(--ink2); }
-.gpace { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 14px; background: var(--soft); font-size: 13px; line-height: 1.4; color: var(--ink4); }
+.gpace { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 14px; background: #F8F9FB; font-size: 13px; line-height: 1.4; color: var(--ink4); }
 /* помилка обліку */
 .alert { margin-top: 12px; padding: 16px; border-radius: 20px; background: var(--bad-bg); color: #7A1D15; font-size: 14px; line-height: 1.45; }
 .alert b { display: block; margin-bottom: 4px; color: var(--bad); font-weight: 500; }
@@ -302,14 +323,14 @@ a { color: inherit; text-decoration: none; }
 .seg.sm button { min-height: 36px; padding: 0 10px; border-radius: 11px; font-size: 12px; white-space: nowrap; }
 
 /* капсульні графіки: сіра доріжка, синя заливка, неповний місяць — штрих */
-.chart { display: flex; gap: 8px; margin-top: 14px; }
+.chart { display: flex; gap: 8px; margin-top: 28px; }
 .ticks { display: flex; flex-direction: column; justify-content: space-between; height: 150px; min-width: 54px; font-size: 12px; color: var(--ink2); text-align: right; }
 .ticks span { line-height: 1; }
 .caps { flex: 1; display: flex; justify-content: space-around; }
 .cap { display: flex; flex-direction: column; align-items: center; gap: 6px; }
 .cap.pick { cursor: pointer; }
 .cap .trk { width: 40px; height: 150px; border-radius: 10px; background: var(--track); display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; }
-.cap .fill { display: flex; flex-direction: column; height: 0; border-radius: 10px; overflow: hidden; transition: height .9s cubic-bezier(.2,.8,.2,1); }
+.cap .fill { display: flex; flex-direction: column; height: 0; border-radius: 10px; overflow: hidden; transition: height 1.6s var(--ease); }
 .cap .fill .rent { background: repeating-linear-gradient(135deg, #A9C6F8 0 5px, #D7E4FC 5px 10px); }
 .cap .fill .main { flex: 1; background: var(--blue-g); }
 .cap.dim .fill .main { background: linear-gradient(180deg, #A9C6F8, #7FA9F1); }
@@ -363,9 +384,9 @@ a { color: inherit; text-decoration: none; }
 .empty { padding: 26px 10px; text-align: center; color: var(--ink2); }
 
 /* шторка «Витрата готівкою» */
-.sheet-bg { position: fixed; inset: 0; z-index: 40; background: rgba(17,19,24,.38); opacity: 0; transition: opacity .25s; }
+.sheet-bg { position: fixed; inset: 0; z-index: 40; background: rgba(17,19,24,.38); opacity: 0; transition: opacity .4s var(--ease); }
 .sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 41; max-width: 440px; max-height: 92vh; margin: 0 auto; display: flex; flex-direction: column;
-  background: var(--card); border-radius: 28px 28px 0 0; transform: translateY(100%); transition: transform .3s cubic-bezier(.2,.8,.2,1); }
+  background: var(--card); border-radius: 28px 28px 0 0; transform: translateY(100%); transition: transform .5s var(--ease); }
 .sheet.open { transform: none; }
 .sheet-bg.open { opacity: 1; }
 .sheet-head { display: grid; grid-template-columns: 1fr 44px; align-items: center; padding: 8px 16px 0; touch-action: none; }
@@ -377,7 +398,8 @@ a { color: inherit; text-decoration: none; }
 .amount { display: flex; justify-content: center; align-items: baseline; gap: 6px; padding: 22px 0 0; cursor: text; }
 .amount input { width: 1.6ch; min-width: 1.6ch; max-width: 100%; border: 0; outline: 0; background: transparent; text-align: right;
   font: 500 48px/1.1 var(--font); letter-spacing: -0.02em; color: var(--ink); caret-color: var(--blue); }
-.amount input::placeholder { color: var(--mute); }
+.amount input::placeholder { color: var(--mute); opacity: 1; }
+.amount input::-webkit-input-placeholder { color: var(--mute); opacity: 1; }
 .amount span { font-size: 22px; color: var(--ink2); }
 .amount-sub { margin: 4px 0 14px; text-align: center; font-size: 12px; color: var(--ink2); }
 .lab { margin: 14px 2px 8px; font-size: 13px; font-weight: 500; }
@@ -407,12 +429,64 @@ a { color: inherit; text-decoration: none; }
 .fade { z-index: 19; position: fixed; left: 0; right: 0; bottom: 0; height: 130px; pointer-events: none; background: linear-gradient(rgba(245,246,248,0), var(--bg) 70%); }
 .nav { z-index: 20; position: fixed; left: 50%; bottom: calc(22px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); width: min(342px, calc(100vw - 48px)); height: 64px;
   display: flex; align-items: center; padding: 0 8px; border: 1px solid var(--border); border-radius: 32px; background: rgba(255,255,255,.96); box-shadow: 0 10px 30px rgba(17,19,24,.10); }
-.nav a { flex: 1; height: 48px; border-radius: 24px; display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--ink3); }
-.nav a.on { background: var(--blue-soft); color: var(--blue); font-weight: 500; }
-@media (prefers-reduced-motion: reduce) { .cap .fill, .crow .bar6 b, .segs i b, .hero .meter b { transition: none; } .fadein { animation: none; } }
+.nav a { position: relative; flex: 1; height: 48px; border-radius: 24px; display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--ink3); transition: color .35s var(--ease); }
+.nav a.on { color: var(--blue); font-weight: 500; }
+/* плашка активної вкладки — одна на всіх, переїжджає з пружинкою */
+.nav .ind { position: absolute; left: 8px; top: 7px; width: calc((100% - 16px) / 3); height: 48px; border-radius: 24px; background: var(--blue-soft);
+  transform: translateX(calc(var(--n, 0) * 100%)); transition: transform .55s var(--spring); }
+.nav { padding: 0 8px; }
+/* ---------- рух ---------- */
+/* екран завантаження: знак із градієнтом, назва, три крапки; зникає, щойно готові шрифт і дані */
+.splash { position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; background: var(--bg);
+  transition: opacity .6s var(--ease), visibility 0s linear .6s; }
+.splash.out { opacity: 0; visibility: hidden; }
+.splash.out .sp-mark { transform: scale(.9); }
+.sp-mark { position: relative; width: 84px; height: 84px; border-radius: 30px; display: grid; place-items: center; overflow: hidden; isolation: isolate;
+  background: var(--blue-g); box-shadow: 0 10px 24px rgba(29,95,224,.34), inset 0 1px 0 rgba(255,255,255,.3);
+  animation: breathe 2.4s ease-in-out infinite; transition: transform .6s var(--ease); }
+/* відблиск, що проходить по кнопці */
+.sp-mark::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(110deg, transparent 35%, rgba(255,255,255,.28) 50%, transparent 65%);
+  transform: translateX(-100%); animation: shine 1.8s ease-in-out infinite; }
+.sp-mark svg { width: 40px; height: 40px; }
+.sp-name { font-size: 16px; font-weight: 500; color: var(--ink); opacity: 0; animation: rise .5s .15s var(--ease) both; }
+/* повзунок: швидко доходить до ~85 %, а коли все готово — до кінця */
+.sp-bar { width: 148px; height: 6px; margin-top: 4px; border-radius: 3px; background: var(--track); overflow: hidden; }
+.sp-bar b { display: block; height: 100%; width: 0; border-radius: 3px; background: var(--blue-g); transition: width 1.2s var(--ease); }
+.splash.done .sp-bar b { transition-duration: .3s; }
+@keyframes shine { 0% { transform: translateX(-100%); } 60%, 100% { transform: translateX(100%); } }
+@keyframes breathe { 50% { transform: scale(1.05); } }
+/* поява екрана: картки виїжджають знизу одна за одною */
+.stag > *:not([hidden]), .stag .stagk:not([hidden]) { animation: lift .8s var(--ease) both; animation-delay: calc(var(--i, 0) * 60ms); }
+@keyframes lift { from { opacity: 0; transform: translateY(18px) scale(.98); } to { opacity: 1; transform: none; } }
+/* натискання: кнопка трохи «вдавлюється» */
+button, .cashbtn, .ch a, .hero .cols a, .more, .op { transition: transform .35s var(--spring), background-color .3s var(--ease), box-shadow .3s var(--ease), color .3s var(--ease); }
+button:active:not(:disabled), .cashbtn:active, .ch a:active, .more:active { transition-duration: .12s; }
+button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .more:active { transform: scale(.96); }
+.cashbtn:hover { box-shadow: 0 10px 22px rgba(29,95,224,.4), inset 0 1px 0 rgba(255,255,255,.3); }
+/* спливаючі меню розкриваються від кнопки */
+.pop:not([hidden]) { animation: popin .35s var(--ease) both; transform-origin: top left; }
+.mmenu:not([hidden]) { transform-origin: top right; }
+@keyframes popin { from { opacity: 0; transform: translateY(-6px) scale(.96); } to { opacity: 1; transform: none; } }
+/* тост виринає знизу */
+.toast { animation: toastin .55s var(--spring) both; }
+@keyframes toastin { from { opacity: 0; transform: translate(-50%, 16px) scale(.96); } to { opacity: 1; transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) {
+  .splash, .sp-mark, .sp-mark::before, .sp-bar b, .sp-name, .stag > *, .hero .num.cu, .pop:not([hidden]), .toast { animation: none !important; transition: none !important; }
+  .nav .ind { transition: none; }
+}
+@media (prefers-reduced-motion: reduce) { .cap .fill, .crow .bar6 b, .segs i b, .hero .meter b { transition: none; } .fadein, .liquid i { animation: none; } }
 </style>
 </head>
 <body class="p-marko">
+<div class="splash" id="splash" role="progressbar" aria-label="Завантаження">
+  <div class="sp-mark"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true">
+    <rect x="5" y="4.5" width="16" height="10" rx="2.6" opacity=".45"/>
+    <path fill-rule="evenodd" d="M5.6 8.5h12.8a2.6 2.6 0 0 1 2.6 2.6v5.8a2.6 2.6 0 0 1-2.6 2.6H5.6A2.6 2.6 0 0 1 3 16.9v-5.8a2.6 2.6 0 0 1 2.6-2.6zM12 11.2a2.8 2.8 0 1 0 0 5.6 2.8 2.8 0 0 0 0-5.6z"/>
+  </svg></div>
+  <div class="sp-name">Фінанси Олі й Марка</div>
+  <div class="sp-bar" aria-hidden="true"><b id="sp-fill"></b></div>
+</div>
+</div>
 <div class="app">
   <div class="top">
     <div class="who">
@@ -435,7 +509,7 @@ a { color: inherit; text-decoration: none; }
 
   <div id="v-report">
     <div id="h-alert"></div>
-    <div class="hero-wrap"><section class="hero" id="hero" aria-live="polite"></section></div>
+    <div class="hero-wrap"><div class="liquid" id="liquid" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div><section class="hero" id="hero" aria-live="polite"></section></div>
     <a class="cashbtn" id="cash" href="#add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg>Додати готівку</a>
     <section class="card goal" id="goal" hidden></section>
     <section class="card list fadein" id="insights" hidden></section>
@@ -448,7 +522,7 @@ a { color: inherit; text-decoration: none; }
     <div id="an-month">
       <section class="card">
         <div class="ch"><h2>Витрати по тижнях</h2><div class="seg sm" id="rent-mode" role="group" aria-label="Оренда в графіку" hidden></div></div>
-        <div class="note" id="wnote"></div>
+        <div class="note" id="wnote" style="margin-top:10px"></div>
         <div class="chart"><div class="ticks" id="wticks" aria-hidden="true"></div><div class="caps" id="bars"></div></div>
       </section>
       <section class="card"><div class="ch" style="min-height:0;margin-bottom:12px"><h2>Фіксовані й змінні</h2></div><div class="split" id="fvsplit" aria-hidden="true"></div><div class="fv2" id="fv"></div><p class="note" id="fvnote" style="margin:14px 0 0"></p></section>
@@ -470,8 +544,8 @@ a { color: inherit; text-decoration: none; }
   <div id="v-journal" hidden>
     <div class="filters" id="j-filters" role="group" aria-label="Фільтр"></div>
     <div class="jsum">
-      <div class="card"><span class="ji" style="background:var(--blue-soft);color:var(--blue)" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg></span><div><span>Операцій</span><b id="j-count"></b></div></div>
-      <div class="card"><span class="ji" style="background:var(--bad-bg);color:var(--bad)" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg></span><div><span>Витрати</span><b id="j-sum"></b></div></div>
+      <div class="card"><span class="ji" style="background:var(--blue-soft);color:var(--blue)" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 2.5h12a1 1 0 0 1 1 1v17.2a.6.6 0 0 1-.95.5L15.5 19.4l-2.9 1.9a1 1 0 0 1-1.1 0l-2.9-1.9-2.55 1.8A.6.6 0 0 1 5 20.7V3.5a1 1 0 0 1 1-1z"/><path fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" d="M9 8h6M9 12h6M9 15.5h3"/></svg></span><div><span>Операцій</span><b id="j-count"></b></div></div>
+      <div class="card"><span class="ji" style="background:var(--bad-bg);color:var(--bad)" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 16.5 7.5M9.5 7.5h7v7"/></svg></span><div><span>Витрати</span><b id="j-sum"></b></div></div>
     </div>
     <div id="j-list"></div>
   </div>
@@ -496,6 +570,7 @@ a { color: inherit; text-decoration: none; }
 </div>
 <div class="fade" aria-hidden="true"></div>
 <nav class="nav" aria-label="Навігація">
+  <i class="ind" id="nav-ind" aria-hidden="true"></i>
   <a id="navr" href="#report">Головна</a>
   <a id="navt" href="#analytics">Аналітика</a>
   <a id="navj" href="#journal">Журнал</a>
@@ -522,48 +597,44 @@ function mi(m) { return parseInt(m.key.slice(5), 10) - 1; }
 function iso(d) { return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
 function grow(sel, attr) {  // плавне заповнення після першого кадру
   requestAnimationFrame(function () { requestAnimationFrame(function () {
-    document.querySelectorAll(sel).forEach(function (e) { e.style[attr] = e.dataset.to; });
+    document.querySelectorAll(sel).forEach(function (e, i) { e.style.transitionDelay = Math.min(i, 8) * 80 + 150 + "ms"; e.style[attr] = e.dataset.to; });
   }); });
 }
 function plural(n, one, few, many) { var a = n % 10, b = n % 100; return a === 1 && b !== 11 ? one : a >= 2 && a <= 4 && (b < 12 || b > 14) ? few : many; }
 function svgI(color, body, size) {
-  return '<svg viewBox="0 0 24 24" width="' + (size || 18) + '" height="' + (size || 18) + '" fill="none" stroke="' + color + '" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + body + "</svg>";
+  return '<svg viewBox="0 0 24 24" width="' + (size || 18) + '" height="' + (size || 18) + '" fill="none" stroke="' + color + '" stroke-width="' + (color === "#fff" || color === "currentColor" || color === "#6B7180" ? 1.8 : 2.1) + '" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + body + "</svg>";
 }
 var CHR = svgI("currentColor", '<path d="m9 6 6 6-6 6"/>', 16);
 var CAL = svgI("#6B7180", '<rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/>', 16);
 // кольорові іконки категорій (з макета v2): фон, колір лінії, малюнок
 var CATS = {
-  "Продукти": ["#E3F7EA", "#15803D", '<circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2.5 3.5h2.6l2.3 11.2a1.5 1.5 0 0 0 1.5 1.2h8.6a1.5 1.5 0 0 0 1.5-1.1L21 7H6"/>'],
-  "Кафе": ["#FDE8EC", "#BE123C", '<path d="M4 8h13v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z"/><path d="M17 9h1.5a2.5 2.5 0 0 1 0 5H17"/><path d="M8 2.5V5M12 2.5V5"/>'],
-  "Доставка Їжі": ["#E6EFFE", "#1D4ED8", '<path d="M5 8h14l-1 12H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>'],
-  "Звязок": ["#F1E8FD", "#7E22CE", '<rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/>'],
-  "Дохід": ["#E3F7EA", "#15803D", '<path d="M17 7 7 17M7 9v8h8"/>'],
-  "Комунальні": ["#DFF5F2", "#0F766E", '<path d="M13 2.5 5 13.5h6l-1 8 8-11h-6z"/>'],
-  "Спорт": ["#FFEDDF", "#C2410C", '<path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/>'],
-  "Житло": ["#E9EAFD", "#4338CA", '<path d="M3.5 10.5 12 3.5l8.5 7"/><path d="M5.5 9v11h13V9"/>'],
-  "Транспорт": ["#E0F2FE", "#0369A1", '<rect x="5" y="3.5" width="14" height="14" rx="3"/><path d="M5 11h14M8 20.5v-3M16 20.5v-3"/>'],
-  "Підписки": ["#FEF6D8", "#854D0E", '<path d="M4 12a8 8 0 0 1 13.7-5.6L20 8.5M20 4v4.5h-4.5M20 12a8 8 0 0 1-13.7 5.6L4 15.5M4 20v-4.5h4.5"/>'],
-  "Краса і Побут": ["#FDE8F4", "#BE185D", '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/>'],
-  "Розваги": ["#EDE9FE", "#6D28D9", '<path d="M6 9h12a3 3 0 0 1 3 3v2a3 3 0 0 1-5.2 2L14 14h-4l-1.8 2A3 3 0 0 1 3 14v-2a3 3 0 0 1 3-3z"/><path d="M8 11v3M6.5 12.5h3"/>'],
-  "Покупки": ["#FCE7F3", "#9D174D", '<path d="M6 7h12l1 13H5z"/><path d="M9 7a3 3 0 0 1 6 0"/>'],
-  "Інші": ["#F1F2F5", "#6B7180", '<circle cx="6" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18" cy="12" r="1.3"/>']
+  "Продукти": ["#E3F7EA", "#16A34A", '<path d="M2 3.25A.75.75 0 0 1 2.75 2.5h1.6c.6 0 1.1.42 1.22 1L5.8 5H20a1 1 0 0 1 .97 1.24l-1.6 6.6A2 2 0 0 1 17.4 14.4H8.1l.3 1.6H18a.9.9 0 0 1 0 1.8H7.7a1 1 0 0 1-.98-.8L4 4H2.75A.75.75 0 0 1 2 3.25z"/><circle cx="9" cy="20.2" r="1.6"/><circle cx="17.5" cy="20.2" r="1.6"/>'],
+  "Кафе": ["#FDE8EC", "#E11D48", '<path fill-rule="evenodd" d="M4 7.5a.5.5 0 0 1 .5-.5h12a.5.5 0 0 1 .5.5V9h1.3a3.2 3.2 0 0 1 0 6.4h-1.7A6 6 0 0 1 11.2 19H9.8A5.8 5.8 0 0 1 4 13.2zM17 10.8v2.8h1.3a1.4 1.4 0 0 0 0-2.8z"/><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M8 2.5V4.5M12 2.5V4.5"/>'],
+  "Доставка Їжі": ["#E6EFFE", "#0284C7", '<path fill-rule="evenodd" d="M8 7V6a4 4 0 0 1 8 0v1h2.1a1 1 0 0 1 1 .92l.9 11A2 2 0 0 1 18 21H6a2 2 0 0 1-2-2.08l.9-11A1 1 0 0 1 5.9 7zm1.8 0h4.4V6a2.2 2.2 0 0 0-4.4 0z"/>'],
+  "Звязок": ["#F1E8FD", "#9333EA", '<path fill-rule="evenodd" d="M8.5 2h7A2.5 2.5 0 0 1 18 4.5v15a2.5 2.5 0 0 1-2.5 2.5h-7A2.5 2.5 0 0 1 6 19.5v-15A2.5 2.5 0 0 1 8.5 2zm2.5 16a1 1 0 0 0 0 2h2a1 1 0 0 0 0-2z"/>'],
+  "Дохід": ["#E3F7EA", "#16A34A", '<path fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" d="M17 7 7.5 16.5M7.5 9.5v7h7"/>'],
+  "Комунальні": ["#DFF5F2", "#0D9488", '<path d="M13.6 2.2a.6.6 0 0 1 1 .5L13.5 10H18a.6.6 0 0 1 .5 1l-8.1 10.8a.6.6 0 0 1-1-.5L10.5 14H6a.6.6 0 0 1-.5-1z"/>'],
+  "Спорт": ["#FFEDDF", "#EA580C", '<rect x="5" y="5.5" width="3.2" height="13" rx="1.2"/><rect x="15.8" y="5.5" width="3.2" height="13" rx="1.2"/><rect x="2" y="8.5" width="2.6" height="7" rx="1"/><rect x="19.4" y="8.5" width="2.6" height="7" rx="1"/><rect x="8" y="11" width="8" height="2" rx=".5"/>'],
+  "Житло": ["#E9EAFD", "#4F46E5", '<path d="M11.3 2.8a1.1 1.1 0 0 1 1.4 0l8 6.6a1 1 0 0 1-.65 1.8H19V20a1 1 0 0 1-1 1h-4v-5h-4v5H6a1 1 0 0 1-1-1v-8.8H3.95a1 1 0 0 1-.65-1.8z"/>'],
+  "Транспорт": ["#E0F2FE", "#2563EB", '<path fill-rule="evenodd" d="M8 3h8a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3zm-1 3.5v4h10v-4z"/><circle cx="8.5" cy="14.5" r="1.1" fill="#fff"/><circle cx="15.5" cy="14.5" r="1.1" fill="#fff"/><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M8 18.5V21M16 18.5V21"/>'],
+  "Підписки": ["#FEF6D8", "#D97706", '<circle cx="12" cy="12" r="9.5"/><path fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M8 12a4 4 0 0 1 6.9-2.8M16 12a4 4 0 0 1-6.9 2.8M15.4 6.8v2.6h-2.6M8.6 17.2v-2.6h2.6"/>'],
+  "Краса і Побут": ["#FDE8F4", "#DB2777", '<path stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" d="M11 3.5l1.8 5.2L18 10.5l-5.2 1.8L11 17.5l-1.8-5.2L4 10.5l5.2-1.8z"/><path d="M18.5 14.5l.75 1.75L21 17l-1.75.75-.75 1.75-.75-1.75L16 17l1.75-.75z"/>'],
+  "Розваги": ["#EDE9FE", "#C026D3", '<path fill-rule="evenodd" d="M7 7h10a5 5 0 0 1 4.9 6l-.5 2.6a3 3 0 0 1-5.1 1.5L14.6 15H9.4l-1.7 2.1a3 3 0 0 1-5.1-1.5L2.1 13A5 5 0 0 1 7 7zm.2 3a.9.9 0 0 0-.9.9v.9h-.9a.9.9 0 0 0 0 1.8h.9v.9a.9.9 0 0 0 1.8 0v-.9h.9a.9.9 0 0 0 0-1.8h-.9v-.9a.9.9 0 0 0-.9-.9zm8.8 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>'],
+  "Покупки": ["#FCE7F3", "#7C3AED", '<path fill-rule="evenodd" d="M8.2 7a3.8 3.8 0 0 1 7.6 0h2.3a1 1 0 0 1 1 .9l1 12A1 1 0 0 1 19 21H5a1 1 0 0 1-1-1.1l1-12A1 1 0 0 1 6 7zm1.8 0h4a2 2 0 0 0-4 0z"/>'],
+  "Інші": ["#F1F2F5", "#64748B", '<circle cx="5.5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="18.5" cy="12" r="2"/>']
 };
-// малюнки іконок не завжди по центру квадрата 24×24 — один раз міряємо межі й зсуваємо до центру кола
-var SHIFT = {};
-(function () {
-  var ns = "http://www.w3.org/2000/svg", s = document.createElementNS(ns, "svg");
-  s.setAttribute("style", "position:absolute;width:24px;height:24px;visibility:hidden");
-  document.body.appendChild(s);
-  Object.keys(CATS).forEach(function (k) {
-    var g = document.createElementNS(ns, "g"); g.innerHTML = CATS[k][2]; s.appendChild(g);
-    var b = g.getBBox(); SHIFT[k] = [(12 - (b.x + b.width / 2)).toFixed(2), (12 - (b.y + b.height / 2)).toFixed(2)];
-  });
-  s.remove();
-})();
-// іконка категорії: світло-сірий круг, малюнок у кольорі категорії, по центру
+// зсув малюнка до центру кола: виміряно за видимими пікселями (разом із товщиною ліній)
+// плюс невелика оптична поправка на «вагу» — щоб сумки, чашка й кошик не здавались зміщеними
+var SHIFT = {"Продукти": [0.18, 0.25], "Кафе": [-0.2, 1.08], "Доставка Їжі": [0, -0.19], "Звязок": [0, 0.09], "Дохід": [0.14, -0.15], "Комунальні": [0, 0], "Спорт": [0, 0], "Житло": [0, 0.01], "Транспорт": [0, -0.2], "Підписки": [0, 0], "Краса і Побут": [0.06, 0.89], "Розваги": [-0.15, -0.3], "Покупки": [-0.05, -0.67], "Інші": [0, 0]};
+// іконка категорії: світло-сірий круг, залитий малюнок у кольорі категорії, по центру
+// яскраві кольори категорій — для шкал, часток і крапок; малюнки іконок беруть темніший відтінок
+var BRIGHT = {"Продукти": "#22C55E", "Кафе": "#F43F5E", "Доставка Їжі": "#0EA5E9", "Звязок": "#A855F7", "Дохід": "#22C55E", "Комунальні": "#14B8A6", "Спорт": "#FB923C", "Житло": "#6366F1", "Транспорт": "#3B82F6", "Підписки": "#F59E0B", "Краса і Побут": "#EC4899", "Розваги": "#D946EF", "Покупки": "#8B5CF6", "Інші": "#94A3B8"};
+function bright(n) { return BRIGHT[n] || BRIGHT["Інші"]; }
 function cic(name, big) {
   var k = CATS[name] ? name : "Інші", c = CATS[k], sh = SHIFT[k] || [0, 0];
-  return '<span class="cic">' + svgI(c[1], '<g transform="translate(' + sh[0] + " " + sh[1] + ')">' + c[2] + "</g>", big ? 20 : 18) + "</span>";
+  var s = big ? 20 : 18;
+  return '<span class="cic' + (k === "Дохід" ? " inc" : "") + '"><svg viewBox="0 0 24 24" width="' + s + '" height="' + s + '" fill="currentColor" style="color:' + c[1] + '" aria-hidden="true">' +
+    '<g transform="translate(' + sh[0] + " " + sh[1] + ')">' + c[2] + "</g></svg></span>";
 }
 // стрілка зміни: діагональна вгору/вниз
 function arr(d) { return d > 0 ? "↗" : "↘"; }
@@ -679,9 +750,9 @@ function nice(s) { return s === s.toUpperCase() ? s.toLowerCase().replace(/(^|[\
 var TRASH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>';
 function opRow(o, recent, fresh) {
   return '<div class="op' + (fresh ? " fresh" : "") + '">' + cic(o.income ? "Дохід" : o.cat, true) + '<div class="t"><div class="t1' + (recent ? " one" : "") + '">' + esc(nice(o.title)) + "</div>" +
-    '<div class="t2"><span>' + esc(o.income ? "Дохід" : o.cat) + "</span>" + (o.fixed ? '<span class="fx">фіксована</span>' : "") + (o.cash ? '<span class="fx cash">готівка</span>' : "") +
+    '<div class="t2"><span>' + esc(o.income ? "Дохід" : o.cat) + (recent ? '<i class="sep" aria-hidden="true"></i>' + o.date : "") + "</span>" + (o.fixed ? '<span class="fx">фіксована</span>' : "") + (o.cash ? '<span class="fx cash">готівка</span>' : "") +
     (fresh ? '<span class="fx now">щойно</span>' : "") + '</div></div><div class="r"><span class="am' + (o.income ? " inc" : "") + '">' + (o.income ? "+" : "−") + zl(o.amount) + "</span>" +
-    (recent ? '<span class="dt">' + CAL + o.date + "</span>" : "") + "</div>" +
+    "</div>" +
     // у журналі готівку з форми можна видалити (записи з банківської виписки — ні)
     (!recent && o.line ? '<button type="button" class="del" data-line="' + o.line + '" data-day="' + o.day + '" data-title="' + esc(o.title) + '" aria-label="Видалити запис «' + esc(o.title) + '»">' + TRASH + "</button>" : "") + "</div>";
 }
@@ -691,7 +762,7 @@ function catRows(M, limit) {
   shown.forEach(function (c) {
     var p = M.expenses ? c.amount / M.expenses * 100 : 0;
     out += '<div class="crow">' + cic(c.name) + '<span class="nm">' + esc(c.name) + (fx[c.name] ? '<span class="fx">фіксована</span>' : "") + '</span><span class="am">' + zl(c.amount) +
-      '</span><span class="bd blue">' + pct(c.amount) + '</span><div class="bar6"><b style="background:' + (CATS[c.name] || CATS["Інші"])[1] + '" data-to="' + Math.max(p, 1) + '%"></b></div></div>';
+      '</span><span class="bd blue">' + pct(c.amount) + '</span><div class="bar6"><b style="background:' + bright(c.name) + '" data-to="' + Math.max(p, 1) + '%"></b></div></div>';
   });
   var rest = M.categories.slice(shown.length);
   if (rest.length) {
@@ -703,7 +774,7 @@ function catRows(M, limit) {
 // частки категорій: 3 найбільші відтінками синього + «Інші»
 var SH = ["", "", "", "#DDE1E7"];  // «Інші» — сірим
 function slices(M) {
-  var top = M.categories.slice(0, 3).map(function (c) { return { name: c.name, amount: c.amount, color: (CATS[c.name] || CATS["Інші"])[1] }; });
+  var top = M.categories.slice(0, 3).map(function (c) { return { name: c.name, amount: c.amount, color: bright(c.name) }; });
   var rest = M.categories.slice(3).reduce(function (s, c) { return s + c.amount; }, 0);
   if (rest > 0) top.push({ name: "Інші " + (M.categories.length - 3), amount: rest, color: SH[3] });
   return top;
@@ -1027,6 +1098,7 @@ function sheet(open, P) {
     renderAdd(P);
     if (!was) {
       s.hidden = bg.hidden = false; document.body.style.overflow = "hidden";
+      $("a-amount").value = ""; $("a-amount").style.width = ""; check();
       requestAnimationFrame(function () { s.classList.add("open"); bg.classList.add("open"); });
       $("a-amount").focus({ preventScroll: true });
     }
@@ -1070,11 +1142,41 @@ function render() {
   ["report", "analytics", "journal"].forEach(function (k) { $("v-" + k).hidden = k !== base; });
   [["navr", "report"], ["navt", "analytics"], ["navj", "journal"]].forEach(function (n) {
     $(n[0]).classList.toggle("on", n[1] === base);
+    if (n[1] === base) $("nav-ind").style.setProperty("--n", ["report", "analytics", "journal"].indexOf(base));
     if (n[1] === base) $(n[0]).setAttribute("aria-current", "page"); else $(n[0]).removeAttribute("aria-current");
   });
   if (base === "analytics") renderAnalytics(P); else if (base === "journal") renderJournal(P); else renderReport(P);
+  if (base !== lastBase) { lastBase = base; enter(base); }
   sheet(v === "add", P);
 }
+// поява: при першому показі екрана картки виїжджають по черзі, а головна сума «набігає»
+var lastBase = null;
+function enter(base) {
+  var root = $("v-" + base), inner = [].slice.call(root.querySelectorAll("#j-list > *, #an-month > *, #an-trends > *"), 0, 8);
+  root.classList.remove("stag"); void root.offsetWidth;
+  [].slice.call(root.children).concat(inner).forEach(function (k, i) { k.style.setProperty("--i", Math.min(i, 8)); });
+  inner.forEach(function (k) { k.classList.add("stagk"); });
+  root.classList.add("stag");
+  if (base === "report") countUp(document.querySelector("#hero .num"));
+}
+function countUp(el) {
+  if (!el || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  el.classList.add("cu");
+  var txt = el.textContent, m = txt.match(/\d[\d\s\u00a0\u202f]*,\d{2}/);
+  if (!m) return;
+  var to = Math.floor(parseFloat(m[0].replace(/[\s\u00a0\u202f]/g, "").replace(",", "."))), from = Math.round(to * .85), cents = m[0].slice(-3), t0 = null, dur = 1400;
+  function step(ts) {
+    if (t0 === null) t0 = ts;
+    var k = Math.min(1, (ts - t0) / dur), e = k === 1 ? 1 : 1 - Math.pow(2, -10 * k);
+    el.textContent = txt.replace(m[0], nf0.format(Math.round(from + (to - from) * e)) + cents);
+    if (k < 1) requestAnimationFrame(step); else el.textContent = txt;
+  }
+  requestAnimationFrame(step);
+}
+$("liquid").querySelectorAll("i").forEach(function (b) {
+  var d = parseFloat(getComputedStyle(b).getPropertyValue("--dur")) || 20;
+  b.style.animationDelay = -(Math.random() * d).toFixed(1) + "s, " + -(Math.random() * d * .6).toFixed(1) + "s";
+});
 var lastView = view();
 window.addEventListener("hashchange", function () {
   var v = view();
@@ -1083,6 +1185,14 @@ window.addEventListener("hashchange", function () {
   lastView = v; render();
 });
 render();
+// сплеш зникає, коли готовий шрифт (але не довше 1,2 с і не швидше 0,5 с, щоб не блимав)
+(function () {
+  var s = $("splash"), t = Date.now(), done = false, fill = $("sp-fill");
+  requestAnimationFrame(function () { fill.style.width = "85%"; });
+  function hide() { if (done) return; done = true; setTimeout(function () { s.classList.add("done"); fill.style.width = "100%"; setTimeout(function () { s.classList.add("out"); lastBase = null; render(); setTimeout(function () { s.remove(); }, 700); }, 320); }, Math.max(0, 500 - (Date.now() - t))); }
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(hide);
+  setTimeout(hide, 1200);
+})();
 })();
 </script>
 </body>
