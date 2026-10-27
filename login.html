@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F5F6F8">
+<title>Вхід · Фінанси Олі й Марка</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="static/icon-192.png">
+<link rel="apple-touch-icon" href="static/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Фінанси">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* сторінка входу в стилі трекера: світлий фон, біла картка, синя кнопка як «Додати готівку» */
+:root {
+  --bg: #F5F6F8; --card: #FFFFFF; --border: #ECEEF2; --soft: #F1F2F5;
+  --ink: #111318; --ink2: #6B7180; --blue: #1F63E6; --blue-g: linear-gradient(180deg, #3B82F6, #1D5FE0); --blue-soft: #EAF1FF;
+  --bad: #C0261B; --bad-bg: #FDE8E6; --ease: cubic-bezier(.33, 1, .68, 1);
+  --font: "Onest", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--ink); font: 15px/1.4 var(--font); -webkit-font-smoothing: antialiased; }
+main { max-width: 400px; min-height: 100vh; min-height: 100dvh; margin: 0 auto; padding: 48px 16px calc(32px + env(safe-area-inset-bottom, 0px));
+  display: flex; flex-direction: column; justify-content: center; }
+.mark { width: 76px; height: 76px; margin: 0 auto; border-radius: 23px; box-shadow: 0 10px 24px rgba(29,95,224,.34); display: block; }
+h1 { margin: 20px 0 6px; text-align: center; font-size: 22px; font-weight: 500; letter-spacing: -.01em; }
+.sub { margin: 0 0 24px; text-align: center; font-size: 14px; color: var(--ink2); }
+form { padding: 20px; border: 1px solid var(--border); border-radius: 24px; background: var(--card); }
+label { display: block; margin: 0 2px 8px; font-size: 13px; font-weight: 500; }
+label + .field, .pw { margin-bottom: 16px; }
+.field { width: 100%; height: 52px; padding: 0 16px; border: 1.5px solid #DDE1E8; border-radius: 16px; background: var(--card); font: 16px var(--font); color: var(--ink);
+  -webkit-appearance: none; appearance: none; transition: border-color .3s var(--ease), box-shadow .3s var(--ease); }
+.field:focus { outline: 0; border-color: var(--blue); box-shadow: 0 0 0 4px var(--blue-soft); }
+.pw { position: relative; }
+.pw .field { padding-right: 52px; }
+.pw button { position: absolute; top: 4px; right: 4px; width: 44px; height: 44px; border: 0; border-radius: 22px; background: transparent; color: var(--ink2);
+  display: grid; place-items: center; cursor: pointer; }
+.pw button:hover { background: var(--soft); }
+.pw svg { width: 20px; height: 20px; }
+.err { margin: 0 0 16px; padding: 12px 14px; border-radius: 14px; background: var(--bad-bg); color: var(--bad); font-size: 14px; }
+.go { width: 100%; height: 56px; margin-top: 4px; border: 0; border-radius: 28px; background: var(--blue-g); color: #fff; font: 500 16px var(--font); cursor: pointer;
+  box-shadow: 0 8px 18px rgba(29,95,224,.32), inset 0 1px 0 rgba(255,255,255,.3); transition: transform .45s cubic-bezier(.34, 1.2, .64, 1), box-shadow .4s var(--ease); }
+.go:active { transform: scale(.97); transition-duration: .12s; }
+.go:disabled { opacity: .7; }
+:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+.note { margin: 16px 0 0; text-align: center; font-size: 12px; color: var(--ink2); }
+/* поява: знак, заголовок і картка тихо проявляються по черзі */
+.in { animation: lift 1s var(--ease) both; }
+.in:nth-child(2) { animation-delay: 60ms; } .in:nth-child(3) { animation-delay: 120ms; } .in:nth-child(4) { animation-delay: 180ms; } .in:nth-child(5) { animation-delay: 240ms; }
+@keyframes lift { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .in { animation: none; } .go, .field { transition: none; } }
+</style>
+</head>
+<body>
+<main>
+  <img class="mark in" src="static/apple-touch-icon.png" alt="" width="76" height="76">
+  <h1 class="in">Фінанси Олі й Марка</h1>
+  <p class="sub in">Увійдіть, щоб побачити звіт</p>
+  <form class="in" method="post" action="login" novalidate>
+    __ERROR__
+    <input type="hidden" name="next" value="__NEXT__">
+    <label for="user">Логін</label>
+    <input class="field" id="user" name="user" value="__USER__" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" required>
+    <label for="password">Пароль</label>
+    <div class="pw">
+      <input class="field" id="password" name="password" type="password" autocomplete="current-password" required>
+      <button type="button" id="eye" aria-label="Показати пароль" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg></button>
+    </div>
+    <button class="go" type="submit" id="go">Увійти</button>
+  </form>
+  <p class="note in">Вхід запамʼятається на цьому пристрої на 30 днів</p>
+</main>
+<script>
+(function () {
+  var pw = document.getElementById("password"), eye = document.getElementById("eye"), user = document.getElementById("user");
+  eye.onclick = function () {
+    var show = pw.type === "password"; pw.type = show ? "text" : "password";
+    eye.setAttribute("aria-pressed", show); eye.setAttribute("aria-label", show ? "Сховати пароль" : "Показати пароль");
+  };
+  document.querySelector("form").addEventListener("submit", function () { var b = document.getElementById("go"); b.disabled = true; b.textContent = "Входжу…"; });
+  (user.value ? pw : user).focus();
+})();
+</script>
+</body>
+</html>
