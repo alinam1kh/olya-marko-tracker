@@ -671,9 +671,10 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .op .del:hover { background: var(--bad-bg); color: var(--bad); }
 .op .del svg { width: 18px; height: 18px; }
 .op .ask { flex: none; display: flex; gap: 6px; }
-.swipe { position: relative; overflow: hidden; }
+.swipe { position: relative; overflow: hidden; border-top: 1px solid var(--soft); }
+.swipe > .op { border-top: 0; }
 .swipe .op { position: relative; z-index: 1; background: var(--card); touch-action: pan-y; transition: transform .45s cubic-bezier(.32, .72, 0, 1); }
-.swdel { position: absolute; right: 0; top: 1px; bottom: 0; width: 88px; z-index: 0; border: 0; border-radius: 0 16px 16px 0; background: var(--bad-bg); color: var(--bad);
+.swdel { position: absolute; right: 0; top: 0; bottom: 0; width: 88px; z-index: 0; border: 0; border-radius: 0 16px 16px 0; background: var(--bad-bg); color: var(--bad);
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font: 500 12px var(--font); cursor: pointer; opacity: 0; transition: opacity .3s var(--ease); }
 .swdel svg { width: 18px; height: 18px; }
 .swipe.on .swdel { opacity: 1; }
@@ -823,7 +824,7 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .dh > span { color: var(--ink2); white-space: nowrap; }
 .day { scroll-margin-top: 12px; }
 .day .card { margin-top: 0; }
-.day .card .op:first-child { border-top: 0; }
+.day .card .op:first-child, .day .card .swipe:first-child { border-top: 0; }
 .empty { padding: 26px 10px; text-align: center; color: var(--ink2); }
 
 /* шторка «Витрата готівкою» */
@@ -1244,8 +1245,7 @@ function opRow(o, recent, fresh) {
     '<div class="t2"><span>' + esc(o.income ? "Дохід" : o.cat) + (recent ? '<i class="sep" aria-hidden="true"></i>' + o.date : "") + "</span>" + (o.fixed ? '<span class="fx">фіксована</span>' : "") + (o.cash ? '<span class="fx cash">готівка</span>' : "") +
     (fresh ? '<span class="fx now">щойно</span>' : "") + '</div></div><div class="r"><span class="am' + (o.income ? " inc" : "") + '">' + (o.income ? "+" : "−") + zl(o.amount) + "</span>" +
     "</div>" +
-    // у журналі готівку з форми можна видалити (записи з банківської виписки — ні)
-    (!recent && o.line ? '<button type="button" class="del" data-line="' + o.line + '" data-day="' + o.day + '" data-title="' + esc(o.title) + '" aria-label="Видалити запис «' + esc(o.title) + '»">' + TRASH + "</button>" : "") + "</div>";
+    "</div>";
 }
 function catRows(M, limit) {
   var fx = fixedCats(M), shown = limit ? M.categories.slice(0, limit) : M.categories, out = "";
@@ -1327,11 +1327,9 @@ function renderReport(P) {
   $("recent").innerHTML = ops.length ? ops.map(function (o) {
     var fresh = saved && !freshDone && o.cash && Math.abs(o.amount - saved.amount) < 0.005 && (!saved.day || o.day === saved.day);
     if (fresh) freshDone = true;
-    var row = opRow(o, true, fresh);
-    return o.cash && o.line ? '<div class="swipe" data-line="' + o.line + '" data-day="' + o.day + '" data-title="' + esc(o.title) + '">' +
-      '<button type="button" class="swdel" tabindex="-1" aria-label="Видалити запис «' + esc(o.title) + '»">' + TRASH + "<span>Видалити</span></button>" + row + "</div>" : row;
+    return swipeWrap(o, opRow(o, true, fresh));
   }).join("") : '<div class="empty">Операцій немає</div>';
-  $("recent").querySelectorAll(".swipe").forEach(function (sw) { swipeRow(sw, P); });
+  $("recent").querySelectorAll(".swipe").forEach(function (sw) { swipeRow(sw, P, "#report"); });
   grow("#hero .meter b, #hero .split2 .e, #v-report .bar6 b", "width");
 }
 // «Головне за вересень»: факт і бейдж праворуч; у неповному місяці — що вже відомо
@@ -1565,25 +1563,20 @@ function renderJournal(P) {
       buf = '<section class="day" data-day="' + day + '"><div class="dh"><b>' + esc(d[1] || d[0]) + (d[1] ? ", <span>" + esc(d[0]) + "</span>" : "") + "</b><span>" + (e ? "−" + nf2.format(e) + " зл" : "") +
         '</span></div><div class="card list">';
     }
-    buf += opRow(o, false, false);
+    buf += swipeWrap(o, opRow(o, false, false));
   });
   flush();
   $("j-list").innerHTML = html || '<section class="card empty">Операцій не знайдено</section>';
-  $("j-list").querySelectorAll(".del").forEach(function (b) {
-    b.onclick = function () {
-      // підтвердження прямо в рядку: «Видалити» / «Ні»
-      var ask = h("div", "ask", '<button type="button" class="no">Ні</button><button type="button" class="yes">Видалити</button>');
-      b.replaceWith(ask);
-      ask.querySelector(".no").focus();
-      ask.querySelector(".no").onclick = function () { render(); };
-      ask.querySelector(".yes").onclick = function () { delCash(P, +b.dataset.line, b.dataset.day, b.dataset.title, "#journal"); };
-    };
-  });
+  $("j-list").querySelectorAll(".swipe").forEach(function (sw) { swipeRow(sw, P, "#journal"); });
 }
 
 // свайп рядка вліво відкриває кнопку «Видалити» справа; відпустили не дотягнувши — рядок повертається
 var SW_OPEN = 96;
-function swipeRow(sw, P) {
+function swipeWrap(o, row) {
+  return o.cash && o.line ? '<div class="swipe" data-line="' + o.line + '" data-day="' + o.day + '" data-title="' + esc(o.title) + '">' +
+    '<button type="button" class="swdel" tabindex="-1" aria-label="Видалити запис «' + esc(o.title) + '»">' + TRASH + "<span>Видалити</span></button>" + row + "</div>" : row;
+}
+function swipeRow(sw, P, back) {
   var op = sw.querySelector(".op"), x0 = null, y0 = 0, dx = 0, base = 0, horiz = null;
   // x — наскільки рядок зсунутий уліво (додатне число)
   var set = function (x, anim) { op.style.transition = anim ? "" : "none"; op.style.transform = x ? "translateX(" + -x + "px)" : ""; sw.classList.toggle("on", x > 0); };
@@ -1599,13 +1592,13 @@ function swipeRow(sw, P) {
     if (x0 === null) return; x0 = null;
     if (!horiz) { if (sw.classList.contains("open") ) { sw.classList.remove("open"); set(0, true); } return; }
     var open = base + dx > SW_OPEN * .55;
-    document.querySelectorAll("#recent .swipe.open").forEach(function (o) { if (o !== sw) { o.classList.remove("open"); o.querySelector(".op").style.transform = ""; o.classList.remove("on"); } });
+    document.querySelectorAll(".swipe.open").forEach(function (o) { if (o !== sw) { o.classList.remove("open"); o.querySelector(".op").style.transform = ""; o.classList.remove("on"); } });
     sw.classList.toggle("open", open); set(open ? SW_OPEN : 0, true);
   };
   op.addEventListener("pointerup", end); op.addEventListener("pointercancel", end);
   sw.querySelector(".swdel").onclick = function () {
     sw.classList.add("gone");
-    delCash(P, +sw.dataset.line, sw.dataset.day, sw.dataset.title, "#report");
+    delCash(P, +sw.dataset.line, sw.dataset.day, sw.dataset.title, back);
   };
 }
 // видалення одного готівкового запису; після — перезавантаження зі свіжими даними і тостом
