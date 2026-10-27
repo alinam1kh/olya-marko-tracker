@@ -266,62 +266,70 @@ a { color: inherit; text-decoration: none; }
 @property --ex { syntax: "<percentage>"; inherits: true; initial-value: 0%; }
 @property --ey { syntax: "<percentage>"; inherits: true; initial-value: 20%; }
 @property --a { syntax: "<angle>"; inherits: true; initial-value: 115deg; }
-.liquid { position: absolute; inset: 0; z-index: 0; pointer-events: none; border-radius: inherit; --sheen: .6; }
-.liquid.sheen { animation: sheen 7.5s linear both, edge 24s cubic-bezier(.45, 0, .55, 1) infinite; }
-body.p-olya .liquid { --sheen: .52; }
+.liquid { position: absolute; inset: 0; z-index: 0; pointer-events: none; border-radius: inherit; --sheen: .45; }
+.liquid.sheen { animation: sheen 6.2s linear both, edge 24s cubic-bezier(.45, 0, .55, 1) infinite; }
+body.p-olya .liquid { --sheen: .4; }
 .liquid > span { position: absolute; inset: 0; border-radius: inherit; }
 .liquid .glow, .liquid .halo, .liquid .rim { opacity: var(--sheen); }
-.liquid .glow { filter: blur(22px);
-  background: linear-gradient(var(--a), transparent calc(var(--p) - 36%), color-mix(in srgb, var(--l2) 40%, transparent) calc(var(--p) - 18%),
-    var(--l2) calc(var(--p) - 6%), var(--l1) var(--p), var(--l2) calc(var(--p) + 7%),
-    color-mix(in srgb, var(--l2) 40%, transparent) calc(var(--p) + 20%), transparent calc(var(--p) + 38%)); }
+.liquid .glow { filter: blur(24px);
+  background: linear-gradient(var(--a), transparent calc(var(--p) - 27%), color-mix(in srgb, var(--l2) 40%, transparent) calc(var(--p) - 13%),
+    var(--l2) calc(var(--p) - 4.5%), var(--l1) var(--p), var(--l2) calc(var(--p) + 5%),
+    color-mix(in srgb, var(--l2) 40%, transparent) calc(var(--p) + 15%), transparent calc(var(--p) + 28%)); }
 .liquid .halo { filter: blur(8px); }
 .liquid .halo i, .liquid .rim { position: absolute; inset: 0; border-radius: inherit;
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
-.liquid .halo i { padding: 12px; background: linear-gradient(var(--a), transparent calc(var(--p) - 26%), var(--l2) calc(var(--p) - 8%), var(--l1) var(--p), var(--l2) calc(var(--p) + 8%), transparent calc(var(--p) + 26%)); }
-.liquid .rim { padding: 1.5px; background: linear-gradient(var(--a), transparent calc(var(--p) - 20%), var(--l2) calc(var(--p) - 7%), #fff var(--p), var(--l2) calc(var(--p) + 7%), transparent calc(var(--p) + 20%)); }
+.liquid .halo i { padding: 12px; background: linear-gradient(var(--a), transparent calc(var(--p) - 20%), var(--l2) calc(var(--p) - 6%), var(--l1) var(--p), var(--l2) calc(var(--p) + 6%), transparent calc(var(--p) + 20%)); }
+.liquid .rim { padding: 1.5px; background: linear-gradient(var(--a), transparent calc(var(--p) - 15%), var(--l2) calc(var(--p) - 5%), #fff var(--p), var(--l2) calc(var(--p) + 5%), transparent calc(var(--p) + 15%)); }
 @keyframes sheen {
   0.0% { --p: -40.0%; --a: 120.0deg; }
-  2.5% { --p: -38.1%; --a: 122.5deg; }
-  5.0% { --p: -35.8%; --a: 125.0deg; }
-  7.5% { --p: -33.0%; --a: 127.2deg; }
-  10.0% { --p: -29.9%; --a: 129.2deg; }
-  12.5% { --p: -26.4%; --a: 130.8deg; }
-  15.0% { --p: -22.5%; --a: 132.0deg; }
-  17.5% { --p: -18.3%; --a: 132.8deg; }
-  20.0% { --p: -13.9%; --a: 133.0deg; }
-  22.5% { --p: -9.1%; --a: 132.8deg; }
-  25.0% { --p: -4.1%; --a: 132.0deg; }
-  27.5% { --p: 1.2%; --a: 130.8deg; }
-  30.0% { --p: 6.6%; --a: 129.2deg; }
-  32.5% { --p: 12.3%; --a: 127.2deg; }
-  35.0% { --p: 18.1%; --a: 125.0deg; }
-  37.5% { --p: 24.0%; --a: 122.5deg; }
-  40.0% { --p: 30.1%; --a: 120.0deg; }
-  42.5% { --p: 36.2%; --a: 117.5deg; }
-  45.0% { --p: 42.4%; --a: 115.0deg; }
-  47.5% { --p: 48.7%; --a: 112.8deg; }
-  50.0% { --p: 55.0%; --a: 110.8deg; }
-  52.5% { --p: 61.3%; --a: 109.2deg; }
-  55.0% { --p: 67.6%; --a: 108.0deg; }
-  57.5% { --p: 73.8%; --a: 107.2deg; }
-  60.0% { --p: 79.9%; --a: 107.0deg; }
-  62.5% { --p: 86.0%; --a: 107.2deg; }
-  65.0% { --p: 91.9%; --a: 108.0deg; }
-  67.5% { --p: 97.7%; --a: 109.2deg; }
-  70.0% { --p: 103.4%; --a: 110.8deg; }
-  72.5% { --p: 108.8%; --a: 112.8deg; }
-  75.0% { --p: 114.1%; --a: 115.0deg; }
-  77.5% { --p: 119.1%; --a: 117.5deg; }
-  80.0% { --p: 123.9%; --a: 120.0deg; }
-  82.5% { --p: 128.3%; --a: 122.5deg; }
-  85.0% { --p: 132.5%; --a: 125.0deg; }
-  87.5% { --p: 136.4%; --a: 127.2deg; }
-  90.0% { --p: 139.9%; --a: 129.2deg; }
-  92.5% { --p: 143.0%; --a: 130.8deg; }
-  95.0% { --p: 145.8%; --a: 132.0deg; }
-  97.5% { --p: 148.1%; --a: 132.8deg; }
-  100.0% { --p: 150.0%; --a: 133.0deg; }
+  2.1% { --p: -38.5%; --a: 120.8deg; }
+  4.2% { --p: -36.6%; --a: 121.7deg; }
+  6.2% { --p: -34.5%; --a: 122.5deg; }
+  8.3% { --p: -32.0%; --a: 123.3deg; }
+  10.4% { --p: -29.3%; --a: 124.0deg; }
+  12.5% { --p: -26.4%; --a: 124.7deg; }
+  14.6% { --p: -23.2%; --a: 125.4deg; }
+  16.7% { --p: -19.8%; --a: 125.9deg; }
+  18.8% { --p: -16.1%; --a: 126.5deg; }
+  20.8% { --p: -12.3%; --a: 126.9deg; }
+  22.9% { --p: -8.3%; --a: 127.3deg; }
+  25.0% { --p: -4.1%; --a: 127.6deg; }
+  27.1% { --p: 0.3%; --a: 127.8deg; }
+  29.2% { --p: 4.8%; --a: 128.0deg; }
+  31.2% { --p: 9.4%; --a: 128.0deg; }
+  33.3% { --p: 14.2%; --a: 128.0deg; }
+  35.4% { --p: 19.1%; --a: 127.8deg; }
+  37.5% { --p: 24.0%; --a: 127.6deg; }
+  39.6% { --p: 29.1%; --a: 127.3deg; }
+  41.7% { --p: 34.2%; --a: 126.9deg; }
+  43.8% { --p: 39.3%; --a: 126.5deg; }
+  45.8% { --p: 44.5%; --a: 125.9deg; }
+  47.9% { --p: 49.8%; --a: 125.4deg; }
+  50.0% { --p: 55.0%; --a: 124.7deg; }
+  52.1% { --p: 60.2%; --a: 124.0deg; }
+  54.2% { --p: 65.5%; --a: 123.3deg; }
+  56.2% { --p: 70.7%; --a: 122.5deg; }
+  58.3% { --p: 75.8%; --a: 121.7deg; }
+  60.4% { --p: 80.9%; --a: 120.8deg; }
+  62.5% { --p: 86.0%; --a: 120.0deg; }
+  64.6% { --p: 90.9%; --a: 119.2deg; }
+  66.7% { --p: 95.8%; --a: 118.3deg; }
+  68.8% { --p: 100.6%; --a: 117.5deg; }
+  70.8% { --p: 105.2%; --a: 116.7deg; }
+  72.9% { --p: 109.7%; --a: 116.0deg; }
+  75.0% { --p: 114.1%; --a: 115.3deg; }
+  77.1% { --p: 118.3%; --a: 114.6deg; }
+  79.2% { --p: 122.3%; --a: 114.1deg; }
+  81.2% { --p: 126.1%; --a: 113.5deg; }
+  83.3% { --p: 129.8%; --a: 113.1deg; }
+  85.4% { --p: 133.2%; --a: 112.7deg; }
+  87.5% { --p: 136.4%; --a: 112.4deg; }
+  89.6% { --p: 139.3%; --a: 112.2deg; }
+  91.7% { --p: 142.0%; --a: 112.0deg; }
+  93.8% { --p: 144.5%; --a: 112.0deg; }
+  95.8% { --p: 146.6%; --a: 112.0deg; }
+  97.9% { --p: 148.5%; --a: 112.2deg; }
+  100.0% { --p: 150.0%; --a: 112.4deg; }
 }
 /* після бліку світло лишається на краях: розмита рамка й тонкий кант біля лівого верхнього й правого нижнього кутів,
    повільно ковзають уздовж країв і перетікають (дві точки дзеркальні одна одній) */
