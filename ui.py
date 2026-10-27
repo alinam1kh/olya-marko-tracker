@@ -255,7 +255,7 @@ a { color: inherit; text-decoration: none; }
 
 /* головна картка: градієнт у кольорі людини, а над ним «рідкі» плями світла */
 .hero-wrap { position: relative; isolation: isolate; margin-top: 12px; border-radius: 24px; overflow: hidden; clip-path: inset(0 round 24px); -webkit-mask-image: -webkit-radial-gradient(white, black);
-  background: linear-gradient(160deg, color-mix(in srgb, var(--g2) 84%, var(--g3)) 0%, color-mix(in srgb, var(--g2) 70%, var(--g3)) 50%, color-mix(in srgb, var(--g2) 54%, var(--g3)) 100%); }
+  background: linear-gradient(160deg, color-mix(in srgb, var(--g2) 74%, var(--g3)) 0%, color-mix(in srgb, var(--g2) 58%, var(--g3)) 50%, color-mix(in srgb, var(--g2) 42%, var(--g3)) 100%); }
 .hero { position: relative; z-index: 1; padding: 22px 20px 20px; border-radius: 24px; color: #fff; }
 .hero-wrap::after { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; border-radius: inherit; opacity: .16; mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
