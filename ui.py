@@ -808,7 +808,7 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .vs-parts { margin-top: 12px; }
 .vs-parts:empty { display: none; }
 /* пояснення під назвою — тим самим шрифтом, що й .note */
-.ch .wsub { display: flex; align-items: center; gap: 6px; margin-top: 2px; font-size: 13px; line-height: 1.45; }
+.ch .wsub { display: flex; align-items: center; gap: 4px; margin-top: 2px; font-size: 13px; line-height: 1.45; }
 .wsub svg { flex: none; width: 15px; height: 15px; }
 .wleg { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 12px; margin-top: 24px; }
 .wleg .vs-part { padding: 0; background: none; margin: 0; gap: 8px; }
