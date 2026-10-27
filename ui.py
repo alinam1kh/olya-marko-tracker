@@ -1242,7 +1242,7 @@ function renderReport(P) {
     hero.innerHTML = tag + '<div class="lbl">Витрачено до зарплати</div><div class="num">' + approx + zl(M.expenses) + "</div>" +
       (usual ? '<div class="meter"><b data-to="' + Math.min(100, share) + '%"></b></div><div class="sub">' + nf1.format(share) + " % звичної зарплати " + nf0.format(usual) + " зл</div>" : "") +
       '<div class="hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>' +
-      "<span>Зарплата зазвичай надходить " + (days ? days + " числа" : "наприкінці місяця") + ". Залишок місяця зʼявиться після її надходження.</span></div>";
+      "<span>Зарплата зазвичай " + (days ? days + " числа" : "наприкінці місяця") + ". Залишок зʼявиться після неї.</span></div>";
   } else {
     var inc = M.incomplete ? "" : (prevI ? heroBadge(M.income, prevI.income, false, LOC[mi(prevI)]) : "");
     var exp = M.incomplete ? "" : (prevM ? heroBadge(M.expenses, prevM.expenses, true, LOC[mi(prevM)]) : "");
