@@ -254,7 +254,7 @@ a { color: inherit; text-decoration: none; }
 .acal { margin-top: 10px; padding: 12px; border: 1px solid var(--border); border-radius: 20px; background: var(--card); animation: popin .45s var(--ease) both; transform-origin: top right; }
 
 /* головна картка: градієнт у кольорі людини, а над ним «рідкі» плями світла */
-.hero-wrap { position: relative; isolation: isolate; margin-top: 12px; border-radius: 24px; overflow: hidden;
+.hero-wrap { position: relative; isolation: isolate; margin-top: 12px; border-radius: 24px; overflow: hidden; clip-path: inset(0 round 24px); -webkit-mask-image: -webkit-radial-gradient(white, black);
   background: radial-gradient(120% 100% at 40% 30%, color-mix(in srgb, var(--g2) 70%, var(--g3)) 0%, var(--g3) 85%); }
 .hero { position: relative; z-index: 1; padding: 22px 20px 20px; border-radius: 24px; color: #fff; }
 .hero-wrap::after { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; border-radius: inherit; opacity: .16; mix-blend-mode: overlay;
