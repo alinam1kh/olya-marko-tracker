@@ -591,7 +591,7 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .hero .lbl { font-size: 14px; }
 .hero .num.cu { animation: numin .7s var(--ease) both .1s; }
 @keyframes numin { from { opacity: 0; transform: translateY(8px); filter: blur(4px); } to { opacity: 1; transform: none; filter: none; } }
-.hero .num { margin-top: 6px; font-size: 40px; font-weight: 500; letter-spacing: -.02em; line-height: 1.05; }
+.hero .num { margin-top: 12px; font-size: 40px; font-weight: 500; letter-spacing: -.02em; line-height: 1.05; }
 .hero .sub { margin-top: 6px; font-size: 14px; }
 .hero .lbl { display: flex; align-items: center; gap: 8px; }
 .hero .tag { flex: none; height: 22px; padding: 0 8px; border-radius: 11px; background: rgba(255,255,255,.16); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); color: #fff; font-size: 12px; font-weight: 500; display: flex; align-items: center; }
