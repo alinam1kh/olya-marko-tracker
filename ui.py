@@ -484,12 +484,12 @@ a { color: inherit; text-decoration: none; }
 /* ---------- рух ---------- */
 /* екран завантаження: знак із градієнтом, назва, три крапки; зникає, щойно готові шрифт і дані */
 .splash { position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; background: var(--bg);
-  transition: opacity .6s var(--ease), visibility 0s linear .6s; }
+  transition: opacity .9s var(--ease), visibility 0s linear .9s; }
 .splash.out { opacity: 0; visibility: hidden; }
 .splash.out .sp-mark { transform: scale(.9); }
 .sp-mark { position: relative; width: 84px; height: 84px; border-radius: 25px; display: grid; place-items: center; overflow: hidden; isolation: isolate;
   background: var(--blue-g); box-shadow: 0 10px 24px rgba(29,95,224,.34), inset 0 1px 0 rgba(255,255,255,.3);
-  animation: breathe 2.4s ease-in-out infinite; transition: transform .6s var(--ease); }
+  animation: breathe 2.4s ease-in-out infinite; transition: transform .9s var(--ease); }
 /* відблиск, що проходить по кнопці */
 .sp-mark::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(110deg, transparent 35%, rgba(255,255,255,.28) 50%, transparent 65%);
   transform: translateX(-100%); animation: shine 1.8s ease-in-out infinite; }
@@ -504,8 +504,8 @@ a { color: inherit; text-decoration: none; }
 .sp-name { font-size: 16px; font-weight: 500; color: var(--ink); opacity: 0; animation: rise .5s .15s var(--ease) both; }
 /* повзунок: швидко доходить до ~85 %, а коли все готово — до кінця */
 .sp-bar { width: 148px; height: 6px; margin-top: 4px; border-radius: 3px; background: var(--track); overflow: hidden; }
-.sp-bar b { display: block; height: 100%; width: 0; border-radius: 3px; background: var(--blue-g); transition: width 1.2s var(--ease); }
-.splash.done .sp-bar b { transition-duration: .3s; }
+.sp-bar b { display: block; height: 100%; width: 0; border-radius: 3px; background: var(--blue-g); transition: width 1.8s cubic-bezier(.25, .8, .35, 1); }
+.splash.done .sp-bar b { transition-duration: .55s; }
 @keyframes shine { 0% { transform: translateX(-100%); } 60%, 100% { transform: translateX(100%); } }
 @keyframes breathe { 50% { transform: scale(1.05); } }
 /* поява екрана: картки виїжджають знизу одна за одною */
@@ -1294,13 +1294,13 @@ window.addEventListener("hashchange", function () {
 });
 render();
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(function () {});
-// сплеш зникає, коли готовий шрифт (але не довше 1,6 с і не швидше 0,9 с — щоб встигли зіграти гроші)
+// сплеш зникає, коли готовий шрифт (але не довше 2,2 с і не швидше 1,5 с — щоб гроші й повзунок встигли спокійно зіграти)
 (function () {
   var s = $("splash"), t = Date.now(), done = false, fill = $("sp-fill");
   requestAnimationFrame(function () { fill.style.width = "85%"; });
-  function hide() { if (done) return; done = true; setTimeout(function () { s.classList.add("done"); fill.style.width = "100%"; setTimeout(function () { s.classList.add("out"); lastBase = null; render(); setTimeout(function () { s.remove(); }, 700); }, 320); }, Math.max(0, 900 - (Date.now() - t))); }
+  function hide() { if (done) return; done = true; setTimeout(function () { s.classList.add("done"); fill.style.width = "100%"; setTimeout(function () { s.classList.add("out"); lastBase = null; render(); setTimeout(function () { s.remove(); }, 1000); }, 550); }, Math.max(0, 1500 - (Date.now() - t))); }
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(hide);
-  setTimeout(hide, 1600);
+  setTimeout(hide, 2200);
 })();
 })();
 </script>
