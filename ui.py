@@ -143,7 +143,8 @@ def delete_cash():
         if len(errors) > len(before):
             cash.write_bytes(original)
             return _fail("Журнал не прийняв зміну, нічого не видалено")
-    return jsonify({"ok": True, "month": body.get("date", "")[:7]})
+    # свіжі цифри одразу у відповіді — сторінка оновлюється на місці, без перезавантаження
+    return jsonify({"ok": True, "month": body.get("date", "")[:7], "data": report_data.report()})
 
 
 @ui_app.route("/")
@@ -1484,7 +1485,14 @@ function delCash(P, line, day, title, back) {
     .then(function (r) { return r.json().catch(function () { return { ok: false, error: "Сервер не відповів" }; }); })
     .then(function (res) {
       if (!res.ok) throw new Error(res.error || "Не вдалося видалити");
-      location.href = location.pathname + "?p=" + P.key + "&m=" + res.month + "&deleted=1" + back;
+      // оновлюємо дані на місці: той самий екран, місяць і прокрутка, лише без видаленого запису
+      var mk = D.people[person].months[month] && D.people[person].months[month].key;
+      D = res.data;
+      var ms = D.people[person].months.map(function (m) { return m.key; });
+      month = ms.indexOf(mk) >= 0 ? ms.indexOf(mk) : lastFull(D.people[person]);
+      saved = null; reportKey = null;
+      if (back && location.hash !== back) location.hash = back; else render();
+      toast('<i aria-hidden="true">✓</i>Запис видалено');
     })
     .catch(function (err) { toast(err.message || "Немає звʼязку, спробуйте ще раз"); });
 }
