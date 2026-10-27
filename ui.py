@@ -1459,7 +1459,7 @@ function renderTrends(P) {
   capsules("mbars", "mticks", list.map(function (m, i) {
     var skip = metric !== "exp" && !(m.income > 0);
     return { v: skip ? 0 : val(m), label: m.name, part: m.incomplete, sub: skip ? "—" : nf0.format(val(m)) + " зл",
-      sub2: m.incomplete ? "1–" + upTo(m) + " " + GEN[mi(m)] : "", mark: sameDays !== null && i === trendMonth - 1 ? sameDays : 0 };
+      mark: sameDays !== null && i === trendMonth - 1 ? sameDays : 0 };
   }), ax.max, trendMonth, function (i) { trendMonth = i; render(); }, ax.n);
 
   var full = P.months.filter(function (m) { return m.income > 0 && !m.incomplete; });
