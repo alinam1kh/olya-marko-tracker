@@ -1275,7 +1275,7 @@ function renderInsights(P, M) {
   if (M.incomplete) {
     add("Фіксовані платежі вже сплачено", '<span class="bd">' + zl(M.fixed) + "</span>");
     add("Змінні витрати за " + (+M.last_op.slice(0, 2)) + " " + plural(+M.last_op.slice(0, 2), "день", "дні", "днів"), '<span class="bd">' + zl(M.variable) + "</span>");
-    add("Норма заощаджень (попередньо)", '<span class="bd new">' + nf1.format(M.rate) + " %</span>");
+    add("Лишилось від доходу (попередньо)", '<span class="bd new">' + nf1.format(M.rate) + " %</span>");
   } else {
     var pi = prevWithIncome(P, month);
     if (pi) {
@@ -1409,7 +1409,7 @@ function renderTrends(P) {
   var sum = full.reduce(function (s, m) { return s + m.saved; }, 0);
   var last = full[full.length - 1], before = full[full.length - 2], pp = last && before ? last.rate - before.rate : 0;
   $("t-duo").innerHTML = '<div class="card"><span>Лишилось разом</span><b>' + zl(sum) + "</b><small>у середньому " + zl(full.length ? sum / full.length : 0) + " на місяць</small></div>" +
-    '<div class="card"><span>Норма заощаджень</span><b>' + nf1.format(last ? last.rate : 0) + " %</b>" +
+    '<div class="card"><span>Лишилось від доходу</span><b>' + nf1.format(last ? last.rate : 0) + " %</b>" +
     (before ? '<div class="duo-cmp"><span class="bd ' + (pp >= 0 ? "good" : "bad") + '">' + arr(pp) + " з " + nf1.format(before.rate) + " %</span><small>у " + LOC[mi(before)] + "</small></div>" : "") + "</div>";
   var out = P.months.filter(function (m) { return !(m.income > 0 && !m.incomplete); });
   $("t-note").textContent = "Враховано лише повні місяці, " + full.map(function (m) { return m.name.toLowerCase(); }).join(" і ") + "." +
