@@ -208,6 +208,14 @@ a { color: inherit; text-decoration: none; }
 .mstatic { cursor: default; }
 .who > button[aria-expanded="true"] .chev, .mpick > button[aria-expanded="true"] .chev { transform: rotate(180deg); }
 .chev { transition: transform .45s var(--ease); }
+.sw { overflow: visible; }
+.sw path { transition: transform .45s var(--spring); }
+.who > button:hover .sw-a { transform: translateX(2px); }
+.who > button:hover .sw-b { transform: translateX(-2px); }
+.who > button[aria-expanded="true"] .sw-a { animation: swA .6s var(--spring); }
+.who > button[aria-expanded="true"] .sw-b { animation: swB .6s var(--spring); }
+@keyframes swA { 0% { transform: none; } 40% { transform: translateX(5px); } 100% { transform: none; } }
+@keyframes swB { 0% { transform: none; } 40% { transform: translateX(-5px); } 100% { transform: none; } }
 .pop { position: absolute; top: 56px; padding: 6px; border: 1px solid var(--border); border-radius: 24px; background: var(--card); box-shadow: 0 20px 40px rgba(17,19,24,.16); }
 .who .pop { left: 0; width: 272px; }
 .pop > p { margin: 10px 12px 6px; font-size: 12px; color: var(--ink2); }
@@ -291,6 +299,12 @@ a { color: inherit; text-decoration: none; }
 .hero .cols a { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; min-height: 44px; }
 .hero .cols .t { font-size: 13px; }
 .hero .cols .hd { display: flex; justify-content: flex-start; align-items: center; gap: 8px; width: 100%; min-height: 24px; }
+/* маленькі кола зі стрілками: надходження — мʼяко-зелене, витрати — мʼяко-червоне (приглушені, щоб не сперечатися з плашкою зміни) */
+.hero .hi { flex: none; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; }
+.hero .hi svg { width: 13px; height: 13px; }
+.hero .hi.in { background: rgba(74, 222, 128, .2); color: #86EFAC; }
+.hero .hi.out { background: rgba(248, 113, 113, .2); color: #FCA5A5; }
+.hero .cols .hd .hi + .t { margin-left: -2px; }
 .hero .cols b { font-size: 18px; font-weight: 500; }
 .hero .cols i { font-style: normal; font-size: 12px; color: var(--hero-on); }
 .hero .meter { height: 8px; margin: 14px 0 8px; border-radius: 4px; background: rgba(255,255,255,.25); overflow: hidden; }
@@ -546,7 +560,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
 @keyframes toastin { from { opacity: 0; transform: translate(-50%, 16px) scale(.96); } to { opacity: 1; transform: translateX(-50%); } }
 @media (prefers-reduced-motion: reduce) {
   .splash, .sp-mark, .sp-mark::before, .sp-mark g, .sp-bar b, .sp-name, .stag > *, .hero .num.cu, .pop:not([hidden]), .toast { animation: none !important; transition: none !important; }
-  .nav .ind { transition: none; }
+  .nav .ind, .sw path { transition: none; animation: none !important; }
 }
 @media (prefers-reduced-motion: reduce) { .cap .fill, .crow .bar6 b, .segs i b, .hero .meter b { transition: none !important; } .fadein, .liquid i, .pair { animation: none; } }
 </style>
@@ -561,7 +575,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
 <div class="app">
   <div class="top">
     <div class="who">
-      <button type="button" id="who-btn" aria-haspopup="menu" aria-expanded="false" aria-controls="who-menu"><span class="av" id="who-av"></span><span id="who-name"></span><svg class="ico16" viewBox="0 0 24 24" fill="none" stroke="#6B7180" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6.5h18M16.5 2 21 6.5 16.5 11M21 17.5H3M7.5 13 3 17.5 7.5 22"/></svg></button>
+      <button type="button" id="who-btn" aria-haspopup="menu" aria-expanded="false" aria-controls="who-menu"><span class="av" id="who-av"></span><span id="who-name"></span><svg class="ico16 sw" viewBox="0 0 24 24" fill="none" stroke="#6B7180" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="sw-a" d="M3 6.5h18M16.5 2 21 6.5 16.5 11"/><path class="sw-b" d="M21 17.5H3M7.5 13 3 17.5 7.5 22"/></svg></button>
       <div class="pop" id="who-menu" role="menu" aria-label="Чиї дані показати" hidden><p>Чиї дані показати</p><div id="who-opts"></div>
         <form class="logout" method="post" action="logout"><button type="submit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 16l-4-4 4-4M6 12h10"/></svg>Вийти</button></form>
 </div>
@@ -908,8 +922,8 @@ function renderReport(P) {
     var dn = +M.last_op.slice(0, 2);
     hero.innerHTML = tag + '<div class="lbl">Лишилось у ' + LOC[k] + '</div><div class="num">' + approx + zl(M.saved) + "</div>" +
       '<div class="sub">' + nf1.format(M.rate) + " % від доходу" + (P.ok ? "" : ", потребує перевірки") + "</div>" +
-      '<div class="cols"><a href="#journal" data-filter="inc"><span class="hd"><span class="t">Дохід</span>' + inc + "</span><b>" + zl(M.income) + "</b></a>" +
-      '<a href="#journal" data-filter="exp"><span class="hd"><span class="t">Витрати' + (M.incomplete ? " за " + dn + " " + plural(dn, "день", "дні", "днів") : "") + "</span>" + exp + "</span><b>" + zl(M.expenses) + "</b></a></div>";
+      '<div class="cols"><a href="#journal" data-filter="inc"><span class="hd"><span class="hi in" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 7 7.5 16.5M7.5 9.5v7h7"/></svg></span><span class="t">Дохід</span>' + inc + "</span><b>" + zl(M.income) + "</b></a>" +
+      '<a href="#journal" data-filter="exp"><span class="hd"><span class="hi out" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 16.5 7.5M9.5 7.5h7v7"/></svg></span><span class="t">Витрати' + (M.incomplete ? " за " + dn + " " + plural(dn, "день", "дні", "днів") : "") + "</span>" + exp + "</span><b>" + zl(M.expenses) + "</b></a></div>";
   }
   hero.querySelectorAll("[data-filter]").forEach(function (a) { a.onclick = function () { filter = a.dataset.filter; }; });
   $("cash").hidden = !P.cash;
