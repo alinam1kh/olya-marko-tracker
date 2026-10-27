@@ -891,7 +891,7 @@ function renderInsights(P, M) {
       var pp = M.rate - pi.rate;
       add("Лишилось " + nf1.format(M.rate) + " % доходу",
         Math.abs(pp) < 0.05 ? '<span class="bd">як у ' + LOC[mi(pi)] + "</span>" :
-        '<span class="bd ' + (pp > 0 ? "good" : "bad") + '" aria-label="' + (pp > 0 ? "більше" : "менше") + ", ніж у " + LOC[mi(pi)] + ": " + nf1.format(pi.rate) + ' %">' + arr(pp) + " у " + LOC[mi(pi)] + " " + nf1.format(pi.rate) + " %</span>");
+        '<span class="bd ' + (pp > 0 ? "good" : "bad") + '" aria-label="' + (pp > 0 ? "більше" : "менше") + ", ніж у " + LOC[mi(pi)] + ": " + nf1.format(pi.rate) + ' %">' + arr(pp) + " з " + nf1.format(pi.rate) + " %</span>");
     }
     var top = M.categories[0];
     if (top && M.expenses) {
@@ -899,7 +899,7 @@ function renderInsights(P, M) {
       add(share > 50 && top.name === "Житло" ? "Більше половини забрала оренда" : "Найбільше пішло на " + top.name.toLowerCase(), '<span class="bd blue">' + nf0.format(share) + " % витрат</span>");
     }
     var pm = P.months[month - 1];
-    if (pm && pm.variable) add("Змінні витрати проти " + GEN[mi(pm)], badge(M.variable, pm.variable, true, "", true));
+    if (pm && pm.variable) add("Змінні витрати " + (M.variable >= pm.variable ? "зросли" : "зменшились") + " проти " + GEN[mi(pm)], badge(M.variable, pm.variable, true, "", true));
   }
   box.hidden = !rows.length;
   box.innerHTML = '<div class="ch"><h2>' + title + "</h2></div>" + rows.join("");
@@ -1009,7 +1009,7 @@ function renderTrends(P) {
   var last = full[full.length - 1], before = full[full.length - 2], pp = last && before ? last.rate - before.rate : 0;
   $("t-duo").innerHTML = '<div class="card"><span>Лишилось разом</span><b>' + zl(sum) + "</b><small>у середньому " + zl(full.length ? sum / full.length : 0) + " на місяць</small></div>" +
     '<div class="card"><span>Норма заощаджень</span><b>' + nf1.format(last ? last.rate : 0) + " %</b>" +
-    (before ? '<span class="bd ' + (pp >= 0 ? "good" : "bad") + '" style="display:inline-flex">' + arr(pp) + " у " + LOC[mi(before)] + " " + nf1.format(before.rate) + " %</span>" : "") + "</div>";
+    (before ? '<span class="bd ' + (pp >= 0 ? "good" : "bad") + '" style="display:inline-flex">' + arr(pp) + " з " + nf1.format(before.rate) + " %</span><small>у " + LOC[mi(before)] + "</small>" : "") + "</div>";
   var out = P.months.filter(function (m) { return !(m.income > 0 && !m.incomplete); });
   $("t-note").textContent = "Враховано лише повні місяці, " + full.map(function (m) { return m.name.toLowerCase(); }).join(" і ") + "." +
     (out.length ? " " + out.map(function (m) { return m.name; }).join(", ") + (out[0].income > 0 ? " ще триває." : " ще без зарплати.") : "");
