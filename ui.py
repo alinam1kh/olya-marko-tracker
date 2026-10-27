@@ -145,7 +145,7 @@ PAGE = r"""<!doctype html>
   --blue: #1F63E6; --blue-g: linear-gradient(180deg, #3B82F6, #1D5FE0); --blue-soft: #EAF1FF; --blue-txt: #1F55C9; --blue-l: #A9C6F8;
   --good: #15803D; --good-bg: #E3F7EA; --bad: #C0261B; --bad-bg: #FDE8E6; --cash: #7A4E00; --cash-bg: #FFF2DB;
   --hero-on: #DCE3F4; --glow: rgba(120, 160, 245, .24); --glow2: rgba(130, 175, 255, .62); --glow3: rgba(190, 215, 255, .45); --glow4: rgba(90, 120, 255, .55); --glow5: rgba(150, 130, 255, .5); --h1: rgba(120, 165, 255, .6); --h2: rgba(80, 200, 255, .45); --h3: rgba(150, 120, 255, .5); --h4: rgba(200, 225, 255, .42); --h5: rgba(70, 105, 255, .55); --h6: rgba(120, 235, 230, .3); --g1: #3A62C2; --g2: #1A2F6A; --g3: #04070F;
-  --ease: cubic-bezier(.22, 1, .36, 1); --spring: cubic-bezier(.34, 1.36, .64, 1);
+  --ease: cubic-bezier(.33, 1, .68, 1); --spring: cubic-bezier(.34, 1.2, .64, 1);
   --font: "Onest", "Outfit", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 body.p-olya { --hero-on: #F1DDEA; --glow: rgba(214, 120, 182, .34); --glow2: rgba(232, 130, 200, .6); --glow3: rgba(255, 190, 230, .42); --glow4: rgba(255, 110, 170, .5); --glow5: rgba(190, 100, 230, .48); --h1: rgba(232, 130, 200, .58); --h2: rgba(255, 150, 140, .4); --h3: rgba(180, 100, 235, .5); --h4: rgba(255, 200, 230, .4); --h5: rgba(255, 100, 165, .5); --h6: rgba(255, 190, 120, .28); --g1: #9A4783; --g2: #4E1B3F; --g3: #0B0309; }
@@ -171,7 +171,7 @@ a { color: inherit; text-decoration: none; }
 .mpick > button, .mstatic { display: flex; align-items: center; gap: 8px; height: 48px; padding: 0 14px 0 12px; border: 1px solid var(--border); border-radius: 24px; background: var(--card); font-size: 14px; white-space: nowrap; cursor: pointer; }
 .mstatic { cursor: default; }
 .who > button[aria-expanded="true"] .chev, .mpick > button[aria-expanded="true"] .chev { transform: rotate(180deg); }
-.chev { transition: transform .35s var(--ease); }
+.chev { transition: transform .45s var(--ease); }
 .pop { position: absolute; top: 56px; padding: 6px; border: 1px solid var(--border); border-radius: 24px; background: var(--card); box-shadow: 0 20px 40px rgba(17,19,24,.16); }
 .who .pop { left: 0; width: 272px; }
 .pop > p { margin: 10px 12px 6px; font-size: 12px; color: var(--ink2); }
@@ -263,7 +263,7 @@ a { color: inherit; text-decoration: none; }
 .fx.now { background: var(--blue); color: #fff; }
 /* «Вересень коротко» */
 .ins { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 56px; padding: 14px 0; border-top: 1px solid var(--soft); font-size: 14px; line-height: 1.45; color: var(--ink4); }
-.fadein { animation: rise .6s var(--ease) both; }
+.fadein { animation: rise .8s var(--ease) both; }
 @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 /* категорії: кольорова іконка, назва, сума, частка, шкала */
 .crow { display: grid; grid-template-columns: 36px 1fr auto auto; gap: 8px 12px; align-items: center; padding: 12px 0; }
@@ -386,9 +386,9 @@ a { color: inherit; text-decoration: none; }
 .empty { padding: 26px 10px; text-align: center; color: var(--ink2); }
 
 /* шторка «Витрата готівкою» */
-.sheet-bg { position: fixed; inset: 0; z-index: 40; background: rgba(17,19,24,.38); opacity: 0; transition: opacity .4s var(--ease); }
+.sheet-bg { position: fixed; inset: 0; z-index: 40; background: rgba(17,19,24,.38); opacity: 0; transition: opacity .55s var(--ease); }
 .sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 41; max-width: 440px; max-height: 92vh; margin: 0 auto; display: flex; flex-direction: column;
-  background: var(--card); border-radius: 28px 28px 0 0; transform: translateY(100%); transition: transform .5s var(--ease); }
+  background: var(--card); border-radius: 28px 28px 0 0; transform: translateY(100%); transition: transform .6s var(--ease); }
 .sheet.open { transform: none; }
 .sheet-bg.open { opacity: 1; }
 .sheet-head { display: grid; grid-template-columns: 1fr 44px; align-items: center; padding: 8px 16px 0; touch-action: none; }
@@ -435,7 +435,7 @@ a { color: inherit; text-decoration: none; }
 .nav a.on { color: var(--blue); font-weight: 500; }
 /* плашка активної вкладки — одна на всіх, переїжджає з пружинкою */
 .nav .ind { position: absolute; left: 8px; top: 7px; width: calc((100% - 16px) / 3); height: 48px; border-radius: 24px; background: var(--blue-soft);
-  transform: translateX(calc(var(--n, 0) * 100%)); transition: transform .55s var(--spring); }
+  transform: translateX(calc(var(--n, 0) * 100%)); transition: transform .7s var(--spring); }
 .nav { padding: 0 8px; }
 /* ---------- рух ---------- */
 /* екран завантаження: знак із градієнтом, назва, три крапки; зникає, щойно готові шрифт і дані */
@@ -458,19 +458,19 @@ a { color: inherit; text-decoration: none; }
 @keyframes shine { 0% { transform: translateX(-100%); } 60%, 100% { transform: translateX(100%); } }
 @keyframes breathe { 50% { transform: scale(1.05); } }
 /* поява екрана: картки виїжджають знизу одна за одною */
-.stag > *:not([hidden]), .stag .stagk:not([hidden]) { animation: lift .8s var(--ease) both; animation-delay: calc(var(--i, 0) * 60ms); }
-@keyframes lift { from { opacity: 0; transform: translateY(18px) scale(.98); } to { opacity: 1; transform: none; } }
+.stag > *:not([hidden]), .stag .stagk:not([hidden]) { animation: lift 1s var(--ease) both; animation-delay: calc(var(--i, 0) * 45ms); }
+@keyframes lift { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 /* натискання: кнопка трохи «вдавлюється» */
-button, .cashbtn, .ch a, .hero .cols a, .more, .op { transition: transform .35s var(--spring), background-color .3s var(--ease), box-shadow .3s var(--ease), color .3s var(--ease); }
+button, .cashbtn, .ch a, .hero .cols a, .more, .op { transition: transform .45s var(--spring), background-color .4s var(--ease), box-shadow .4s var(--ease), color .4s var(--ease); }
 button:active:not(:disabled), .cashbtn:active, .ch a:active, .more:active { transition-duration: .12s; }
 button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .more:active { transform: scale(.96); }
 .cashbtn:hover { box-shadow: 0 10px 22px rgba(29,95,224,.4), inset 0 1px 0 rgba(255,255,255,.3); }
 /* спливаючі меню розкриваються від кнопки */
-.pop:not([hidden]) { animation: popin .35s var(--ease) both; transform-origin: top left; }
+.pop:not([hidden]) { animation: popin .45s var(--ease) both; transform-origin: top left; }
 .mmenu:not([hidden]) { transform-origin: top right; }
 @keyframes popin { from { opacity: 0; transform: translateY(-6px) scale(.96); } to { opacity: 1; transform: none; } }
 /* тост виринає знизу */
-.toast { animation: toastin .55s var(--spring) both; }
+.toast { animation: toastin .7s var(--spring) both; }
 @keyframes toastin { from { opacity: 0; transform: translate(-50%, 16px) scale(.96); } to { opacity: 1; transform: translateX(-50%); } }
 @media (prefers-reduced-motion: reduce) {
   .splash, .sp-mark, .sp-mark::before, .sp-bar b, .sp-name, .stag > *, .hero .num.cu, .pop:not([hidden]), .toast { animation: none !important; transition: none !important; }
