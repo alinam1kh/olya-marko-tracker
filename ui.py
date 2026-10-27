@@ -284,6 +284,7 @@ a { color: inherit; text-decoration: none; }
 .cashbtn { display: flex; align-items: center; justify-content: center; gap: 10px; height: 56px; margin-top: 12px; border-radius: 28px; background: var(--blue-g);
   box-shadow: 0 8px 18px rgba(29,95,224,.32), inset 0 1px 0 rgba(255,255,255,.3); color: #fff; font-size: 16px; font-weight: 500; }
 .cashbtn svg { width: 22px; height: 22px; }
+.cashnote { margin: 12px 0 0; text-align: center; font-size: 13px; color: var(--ink2); }
 
 /* картки */
 .card { margin-top: 12px; padding: 16px; border: 1px solid var(--border); border-radius: 20px; background: var(--card); }
@@ -536,7 +537,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
     <div class="who">
       <button type="button" id="who-btn" aria-haspopup="menu" aria-expanded="false" aria-controls="who-menu"><span class="av" id="who-av"></span><span id="who-name"></span><svg class="ico16 chev" viewBox="0 0 24 24" fill="none" stroke="#6B7180" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
       <div class="pop" id="who-menu" role="menu" aria-label="Чиї дані показати" hidden><p>Чиї дані показати</p><div id="who-opts"></div>
-        <div class="foot">Вхід спільний: це не акаунт, а лише чиї дані на екрані. Обоє бачать обидва журнали.</div></div>
+</div>
     </div>
     <div class="mpick" id="mpick">
       <button type="button" id="mcal" aria-haspopup="dialog" aria-expanded="false" aria-controls="mmenu"><svg class="ico16" viewBox="0 0 24 24" fill="none" stroke="#6B7180" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span id="mcal-name"></span><svg class="ico16 chev" viewBox="0 0 24 24" fill="none" stroke="#6B7180" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
@@ -555,6 +556,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
     <div id="h-alert"></div>
     <div class="hero-wrap"><div class="liquid" id="liquid" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div><section class="hero" id="hero" aria-live="polite"></section></div>
     <a class="cashbtn" id="cash" href="#add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg>Додати готівку</a>
+    <p class="cashnote" id="cashnote" hidden>Готівку вносить Марко — у його журналі</p>
     <section class="card goal" id="goal" hidden></section>
     <section class="card list fadein" id="insights" hidden></section>
     <section class="card list"><div class="ch"><h2>Категорії</h2><a href="#analytics" id="cats-all"></a></div><div id="cats"></div></section>
@@ -718,7 +720,6 @@ function view() {
 }
 
 // ---------- шапка: людина ----------
-var ROLE = { marko: "тут вноситься готівка", olya: "тут подушка безпеки" };
 function renderPeople() {
   var P = D.people[person];
   document.body.className = "p-" + P.key;
@@ -727,7 +728,7 @@ function renderPeople() {
   $("who-btn").setAttribute("aria-label", "Дані: " + P.name + ". Змінити");
   var box = $("who-opts"); box.innerHTML = "";
   D.people.forEach(function (p, i) {
-    var b = h("button", "opt", '<span class="av ' + p.key + '"></span><span><b>' + esc(p.name) + "</b><small>" + (ROLE[p.key] || "") + '</small></span><span class="radio" aria-hidden="true"></span>');
+    var b = h("button", "opt", '<span class="av ' + p.key + '"></span><span><b>' + esc(p.name) + '</b></span><span class="radio" aria-hidden="true"></span>');
     b.type = "button"; b.setAttribute("role", "menuitemradio"); b.setAttribute("aria-checked", i === person);
     b.onclick = function () { popMenu("w", false); if (i === person) return; person = i; month = lastFull(D.people[i]); trendMonth = null; selDay = null; render(); };
     box.appendChild(b);
@@ -860,7 +861,7 @@ function renderReport(P) {
       '<a href="#journal" data-filter="exp"><span class="t">Витрати' + (M.incomplete ? " за " + dn + " " + plural(dn, "день", "дні", "днів") : "") + "</span><b>" + zl(M.expenses) + "</b>" + exp + "</a></div>";
   }
   hero.querySelectorAll("[data-filter]").forEach(function (a) { a.onclick = function () { filter = a.dataset.filter; }; });
-  $("cash").hidden = !P.cash;
+  $("cash").hidden = !P.cash; $("cashnote").hidden = !!P.cash;
   renderGoal(P);
   renderInsights(P, M);
   $("cats-all").innerHTML = "<span>Усі " + M.categories.length + "</span>" + CHR;
