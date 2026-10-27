@@ -208,14 +208,17 @@ a { color: inherit; text-decoration: none; }
 .mstatic { cursor: default; }
 .who > button[aria-expanded="true"] .chev, .mpick > button[aria-expanded="true"] .chev { transform: rotate(180deg); }
 .chev { transition: transform .45s var(--ease); }
-.sw { overflow: visible; }
-.sw path { transition: transform .45s var(--spring); }
-.who > button:hover .sw-a { transform: translateX(2px); }
-.who > button:hover .sw-b { transform: translateX(-2px); }
-.who > button[aria-expanded="true"] .sw-a { animation: swA .6s var(--spring); }
-.who > button[aria-expanded="true"] .sw-b { animation: swB .6s var(--spring); }
-@keyframes swA { 0% { transform: none; } 40% { transform: translateX(5px); } 100% { transform: none; } }
-@keyframes swB { 0% { transform: none; } 40% { transform: translateX(-5px); } 100% { transform: none; } }
+.sw { overflow: hidden; }
+/* «світч»: стрілки виїжджають кожна у свій бік і заходять з протилежного — ніби міняються місцями.
+   Грає, коли меню відкривається і коли закривається (після вибору людини) */
+.who > button[aria-expanded="true"] .sw-a { animation: swOutR .6s cubic-bezier(.65, 0, .35, 1); }
+.who > button[aria-expanded="true"] .sw-b { animation: swOutL .6s cubic-bezier(.65, 0, .35, 1); }
+.who > button[aria-expanded="false"] .sw-a { animation: swOutR2 .6s cubic-bezier(.65, 0, .35, 1); }
+.who > button[aria-expanded="false"] .sw-b { animation: swOutL2 .6s cubic-bezier(.65, 0, .35, 1); }
+@keyframes swOutR { 0% { transform: none; } 48% { transform: translateX(22px); } 49% { transform: translateX(-22px); } 100% { transform: none; } }
+@keyframes swOutL { 0% { transform: none; } 48% { transform: translateX(-22px); } 49% { transform: translateX(22px); } 100% { transform: none; } }
+@keyframes swOutR2 { 0% { transform: none; } 48% { transform: translateX(22px); } 49% { transform: translateX(-22px); } 100% { transform: none; } }
+@keyframes swOutL2 { 0% { transform: none; } 48% { transform: translateX(-22px); } 49% { transform: translateX(22px); } 100% { transform: none; } }
 .pop { position: absolute; top: 56px; padding: 6px; border: 1px solid var(--border); border-radius: 24px; background: var(--card); box-shadow: 0 20px 40px rgba(17,19,24,.16); }
 .who .pop { left: 0; width: 272px; }
 .pop > p { margin: 10px 12px 6px; font-size: 12px; color: var(--ink2); }
