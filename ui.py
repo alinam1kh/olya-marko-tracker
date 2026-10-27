@@ -354,6 +354,8 @@ a { color: inherit; text-decoration: none; }
 .cic { flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--soft); }
 .cic svg { width: 18px; height: 18px; }
 .cic.inc { background: var(--good-bg); }
+.cic .glyph, .ji .glyph { font-weight: 500; line-height: 1; }
+.ji .glyph { font-size: 20px; }
 .more { display: flex; justify-content: space-between; align-items: center; min-height: 52px; margin-top: 4px; border-top: 1px solid var(--soft); font-size: 15px; color: var(--ink2); }
 /* операції */
 .op { display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 12px 0; border-top: 1px solid var(--soft); }
@@ -637,7 +639,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
     <div class="filters" id="j-filters" role="group" aria-label="Фільтр"></div>
     <div class="jsum">
       <div class="card"><span class="ji" style="background:var(--blue-soft);color:var(--blue)" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 2.5h12a1 1 0 0 1 1 1v17.2a.6.6 0 0 1-.95.5L15.5 19.4l-2.9 1.9a1 1 0 0 1-1.1 0l-2.9-1.9-2.55 1.8A.6.6 0 0 1 5 20.7V3.5a1 1 0 0 1 1-1z"/><path fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" d="M9 8h6M9 12h6M9 15.5h3"/></svg></span><div><span>Операцій</span><b id="j-count"></b></div></div>
-      <div class="card"><span class="ji" style="background:var(--bad-bg);color:var(--bad)" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 16.5 7.5M9.5 7.5h7v7"/></svg></span><div><span>Витрати</span><b id="j-sum"></b></div></div>
+      <div class="card"><span class="ji" style="background:var(--bad-bg);color:var(--bad)" aria-hidden="true"><span class="glyph">↗</span></span><div><span>Витрати</span><b id="j-sum"></b></div></div>
     </div>
     <div id="j-list"></div>
   </div>
@@ -747,6 +749,7 @@ function bright(n) { return BRIGHT[n] || BRIGHT["Інші"]; }
 function cic(name, big) {
   var k = CATS[name] ? name : "Інші", c = CATS[k], sh = SHIFT[k] || [0, 0];
   var s = big ? 20 : 18;
+  if (k === "Дохід") return '<span class="cic inc"><span class="glyph" style="color:' + c[1] + ';font-size:' + (s + 2) + 'px" aria-hidden="true">↙</span></span>';
   return '<span class="cic' + (k === "Дохід" ? " inc" : "") + '"><svg viewBox="0 0 24 24" width="' + s + '" height="' + s + '" fill="currentColor" style="color:' + c[1] + '" aria-hidden="true">' +
     '<g transform="translate(' + sh[0] + " " + sh[1] + ')">' + c[2] + "</g></svg></span>";
 }
