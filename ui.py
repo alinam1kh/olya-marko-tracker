@@ -745,6 +745,21 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .duo .duo-cmp { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 6px; }
 .duo .duo-cmp small { margin-top: 0; }
 .duo .duo-cmp .bd { display: inline-flex; font-size: 12px; }
+#t-duo { display: block; }
+.vs > span { display: block; font-size: 13px; color: var(--ink2); }
+.vs .vs-big { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; margin: 6px 0 2px; }
+.vs .vs-big b { margin: 0; font-size: 28px; font-weight: 500; letter-spacing: -.01em; }
+.vs .vs-big .bd { display: inline-flex; font-size: 12px; color: inherit; }
+.vs .vs-big .bd.bad { color: var(--bad); } .vs .vs-big .bd.good { color: var(--good); }
+.vs b.vs-one { margin: 6px 0 2px; font-size: 17px; }
+.vs-avg { display: flex; justify-content: space-between; align-items: baseline; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--soft); }
+.vs-avg span { display: inline; font-size: 14px; color: var(--ink2); }
+.vs-avg b { display: inline; margin: 0; font-size: 15px; font-weight: 500; }
+.vs-parts { margin-top: 12px; }
+.vs-part { display: flex; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 14px; background: var(--soft); }
+.vs-part + .vs-part { margin-top: 8px; }
+.vs-part i { flex: none; width: 22px; height: 16px; border-radius: 4px; background: repeating-linear-gradient(135deg, #CBD1DA 0 4px, #E6E9EE 4px 8px); }
+.vs-part span { display: inline; font-size: 13px; line-height: 1.4; color: var(--ink); }
 .share { display: flex; gap: 3px; height: 10px; margin: 6px 0 12px; }
 .share i { display: block; height: 100%; border-radius: 5px; min-width: 6px; }
 .leg { display: grid; grid-template-columns: 12px 1fr auto auto; gap: 10px; align-items: center; min-height: 36px; font-size: 14px; }
@@ -1423,16 +1438,38 @@ function renderTrends(P) {
 
   var full = P.months.filter(function (m) { return m.income > 0 && !m.incomplete; });
   var sum = full.reduce(function (s, m) { return s + m.saved; }, 0);
-  var last = full[full.length - 1], before = full[full.length - 2], pp = last && before ? last.rate - before.rate : 0;
-  var period = full.map(function (m) { return m.name.toLowerCase(); }).join(full.length > 2 ? ", " : " і ");
-  $("t-duo").innerHTML = '<div class="card"><span>Лишилось за ' + period + "</span><b>" + zl(sum) + "</b><small>в середньому " + zl(full.length ? sum / full.length : 0) + " за місяць</small></div>" +
-    '<div class="card"><span>' + (last ? "У " + LOC[mi(last)] + " лишилось" : "Лишилось") + "</span><b>" + nf1.format(last ? last.rate : 0) + ' %<i style="font-style:normal;font-size:15px;font-weight:400;color:var(--ink2)"> доходу</i></b>' +
-    (before ? '<div class="duo-cmp"><span class="bd ' + (pp >= 0 ? "good" : "bad") + '">' + arr(pp) + " з " + nf1.format(before.rate) + " %</span><small>у " + LOC[mi(before)] + "</small></div>" : "") + "</div>";
+  // картка під графіком відповідає на вибраний показник: на скільки змінився останній повний місяць проти попереднього,
+  // середнє за повний місяць і окремим рядком — неповний місяць (зі штрихуванням, як на графіку)
+  var last = full[full.length - 1], before = full[full.length - 2];
+  var NAME = { exp: "Витрати", inc: "Дохід", saved: "Лишилось" }[metric];
+  var z0 = function (v) { return nf0.format(Math.round(v)) + " зл"; };
+  var sgn = function (d) { return (d > 0 ? "+" : d < 0 ? "−" : "") + nf0.format(Math.abs(Math.round(d))) + " зл"; };
+  var avg = full.length ? full.reduce(function (s, m) { return s + val(m); }, 0) / full.length : 0;
+  var card = "";
+  if (last && before) {
+    var d = val(last) - val(before), head = NAME + ": " + last.name.toLowerCase() + " проти " + GEN[mi(before)];
+    if (metric === "inc" && Math.abs(d) < 0.5) {
+      card = '<span>Дохід</span><b class="vs-one">Зарплата стабільна: ' + z0(last.income) + " щомісяця</b>";
+    } else {
+      var bd = metric === "saved"
+        ? '<span class="bd ' + (last.rate >= before.rate ? "good" : "bad") + '">' + nf1.format(last.rate) + " % доходу (у " + LOC[mi(before)] + " " + nf1.format(before.rate) + " %)</span>"
+        : badge(val(last), val(before), metric === "exp", "", false);
+      card = "<span>" + head + '</span><div class="vs-big"><b>' + sgn(d) + "</b>" + bd + "</div>" +
+        '<div class="vs-avg"><span>Середнє за повний місяць</span><b>' + z0(avg) + "</b></div>";
+    }
+  } else if (last) {
+    card = "<span>" + NAME + ": " + last.name.toLowerCase() + '</span><div class="vs-big"><b>' + z0(val(last)) + "</b></div>";
+  }
   var out = P.months.filter(function (m) { return !(m.income > 0 && !m.incomplete); });
-  // примітка з іконкою «i», як підказка в головній картці
-  $("t-note").innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="7.8" r=".6" fill="currentColor"/></svg><span>' +
-    esc("Враховано лише повні місяці, " + full.map(function (m) { return m.name.toLowerCase(); }).join(" і ") + "." +
-    (out.length ? " " + out.map(function (m) { return m.name; }).join(", ") + (out[0].income > 0 ? " ще триває." : " ще без зарплати.") : "")) + "</span>";
+  var part = out.map(function (m) {
+    var days = m.last_op ? +m.last_op.slice(0, 2) : 0, paid = m.income > 0, pd = payDays(P), txt;
+    if (metric === "exp") txt = m.name + " поки неповний: " + z0(m.expenses) + (days ? " за " + days + " " + plural(days, "день", "дні", "днів") : "") + ". У середнє не входить.";
+    else if (metric === "inc") txt = paid ? m.name + " ще триває: зарплата " + z0(m.income) + " вже прийшла." : m.name + ": зарплата ще не прийшла, зазвичай " + (pd ? pd + " числа" : "наприкінці місяця") + ".";
+    else txt = paid ? m.name + " ще триває: поки лишилось " + z0(m.saved) + ". У середнє не входить." : m.name + " порахуємо, коли прийде зарплата. Поки що він не входить у середнє.";
+    return '<div class="vs-part"><i aria-hidden="true"></i><span>' + esc(txt) + "</span></div>";
+  }).join("");
+  $("t-duo").innerHTML = '<div class="card vs">' + card + (part ? '<div class="vs-parts">' + part + "</div>" : "") + "</div>";
+  $("t-note").hidden = true;
 
   $("t-dmon").textContent = "Категорії у " + LOC[mi(S)];
   var sl = slices(S), tot = sl.reduce(function (s, x) { return s + x.amount; }, 0) || 1;
