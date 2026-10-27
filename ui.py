@@ -1408,8 +1408,9 @@ function renderTrends(P) {
   var full = P.months.filter(function (m) { return m.income > 0 && !m.incomplete; });
   var sum = full.reduce(function (s, m) { return s + m.saved; }, 0);
   var last = full[full.length - 1], before = full[full.length - 2], pp = last && before ? last.rate - before.rate : 0;
-  $("t-duo").innerHTML = '<div class="card"><span>Лишилось разом</span><b>' + zl(sum) + "</b><small>у середньому " + zl(full.length ? sum / full.length : 0) + " на місяць</small></div>" +
-    '<div class="card"><span>Лишилось від доходу</span><b>' + nf1.format(last ? last.rate : 0) + " %</b>" +
+  var period = full.map(function (m) { return m.name.toLowerCase(); }).join(full.length > 2 ? ", " : " і ");
+  $("t-duo").innerHTML = '<div class="card"><span>Лишилось за ' + period + "</span><b>" + zl(sum) + "</b><small>≈ " + zl(full.length ? sum / full.length : 0) + " щомісяця</small></div>" +
+    '<div class="card"><span>' + (last ? "У " + LOC[mi(last)] + " лишилось" : "Лишилось") + "</span><b>" + nf1.format(last ? last.rate : 0) + ' %<i style="font-style:normal;font-size:15px;font-weight:400;color:var(--ink2)"> доходу</i></b>' +
     (before ? '<div class="duo-cmp"><span class="bd ' + (pp >= 0 ? "good" : "bad") + '">' + arr(pp) + " з " + nf1.format(before.rate) + " %</span><small>у " + LOC[mi(before)] + "</small></div>" : "") + "</div>";
   var out = P.months.filter(function (m) { return !(m.income > 0 && !m.incomplete); });
   $("t-note").textContent = "Враховано лише повні місяці, " + full.map(function (m) { return m.name.toLowerCase(); }).join(" і ") + "." +
