@@ -676,8 +676,13 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .swdel { position: absolute; right: 0; top: 0; bottom: -1px; width: 88px; z-index: 0; border: 0; border-radius: 0 16px 16px 0; background: var(--bad-bg); color: var(--bad);
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font: 500 12px var(--font); cursor: pointer; opacity: 0; transition: opacity .3s var(--ease); }
 .swdel svg { width: 18px; height: 18px; }
+/* під кнопкою ховаємо лінію наступного рядка на всю ширину кнопки (і під її заокругленими кутами) */
+.swipe::after { content: ""; position: absolute; right: 0; bottom: -1px; width: 88px; height: 1px; background: var(--card); opacity: 0; transition: opacity .2s ease; }
+.swipe.on::after { opacity: 1; }
 .swipe.on .swdel { opacity: 1; }
-.swipe.gone { opacity: .4; pointer-events: none; transition: opacity .3s var(--ease); }
+.swipe.gone { pointer-events: none; overflow: hidden; transition: height .35s cubic-bezier(.4, 0, .2, 1) .28s, opacity .3s ease .3s; }
+.swipe.gone .op { transform: translateX(-110%) !important; transition: transform .35s cubic-bezier(.4, 0, .2, 1) !important; }
+.swipe.gone .swdel { opacity: 0; transition: opacity .25s ease; }
 .op .ask button { min-height: 44px; padding: 0 12px; border: 0; border-radius: 22px; background: var(--soft); font-size: 13px; font-weight: 500; cursor: pointer; }
 .op .ask button.yes { background: var(--bad); color: #fff; }
 .toast button { min-height: 36px; margin-left: 4px; padding: 0 12px; border: 0; border-radius: 18px; background: rgba(255,255,255,.16); color: #fff; font-size: 13px; font-weight: 500; cursor: pointer; }
@@ -929,6 +934,8 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
 @keyframes popin { from { opacity: 0; transform: translateY(-6px) scale(.96); } to { opacity: 1; transform: none; } }
 /* тост виринає знизу */
 .toast { animation: toastin .7s var(--spring) both; }
+.toast.out { animation: toastout .45s ease forwards; }
+@keyframes toastout { from { opacity: 1; transform: translateX(-50%); } to { opacity: 0; transform: translate(-50%, 8px); } }
 @keyframes toastin { from { opacity: 0; transform: translate(-50%, 16px) scale(.96); } to { opacity: 1; transform: translateX(-50%); } }
 @media (prefers-reduced-motion: reduce) {
   .splash, .sp-mark, .sp-mark::before, .sp-mark g, .sp-bar b, .sp-name, .stag > *, .more-rows, .more-rows .crow, .hero .num.cu, .pop:not([hidden]), .toast { animation: none !important; transition: none !important; }
@@ -1570,7 +1577,7 @@ function renderJournal(P) {
 }
 
 // свайп рядка вліво відкриває кнопку «Видалити» справа; відпустили не дотягнувши — рядок повертається
-var SW_OPEN = 96;
+var SW_OPEN = 88;  // = ширина .swdel
 function swipeWrap(o, row) {
   return o.cash && o.line ? '<div class="swipe" data-line="' + o.line + '" data-day="' + o.day + '" data-title="' + esc(o.title) + '">' +
     '<button type="button" class="swdel" tabindex="-1" aria-label="Видалити запис «' + esc(o.title) + '»">' + TRASH + "<span>Видалити</span></button>" + row + "</div>" : row;
@@ -1596,8 +1603,9 @@ function swipeRow(sw, P, back) {
   };
   op.addEventListener("pointerup", end); op.addEventListener("pointercancel", end);
   sw.querySelector(".swdel").onclick = function () {
-    sw.classList.add("gone");
-    delCash(P, +sw.dataset.line, sw.dataset.day, sw.dataset.title, back);
+    sw.style.height = sw.offsetHeight + "px"; void sw.offsetHeight;
+    sw.classList.add("gone"); sw.style.height = "0px"; sw.style.opacity = "0";
+    setTimeout(function () { delCash(P, +sw.dataset.line, sw.dataset.day, sw.dataset.title, back); }, 620);
   };
 }
 // видалення одного готівкового запису; після — перезавантаження зі свіжими даними і тостом
@@ -1622,7 +1630,8 @@ var OKI = '<i aria-hidden="true"><svg viewBox="0 0 24 24" width="12" height="12"
 function toast(html, action) {
   var t = h("div", "toast", html); t.setAttribute("role", "status");
   if (action) { var b = h("button", "", action[0]); b.type = "button"; b.onclick = action[1]; t.appendChild(b); }
-  document.body.appendChild(t); setTimeout(function () { t.remove(); }, action ? 7000 : 3200);
+  document.body.appendChild(t);
+  setTimeout(function () { t.classList.add("out"); setTimeout(function () { t.remove(); }, 500); }, action ? 7000 : 3200);
 }
 
 // ---------- шторка «Витрата готівкою» ----------
