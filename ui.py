@@ -257,30 +257,23 @@ a { color: inherit; text-decoration: none; }
 .hero-wrap { position: relative; isolation: isolate; margin-top: 12px; border-radius: 24px; overflow: hidden;
   background: radial-gradient(120% 100% at 40% 30%, color-mix(in srgb, var(--g2) 70%, var(--g3)) 0%, var(--g3) 85%); }
 .hero { position: relative; z-index: 1; padding: 22px 20px 20px; border-radius: 24px; color: #fff; }
-/* одне світло, що обходить картку по краю (як підсвітка за склом): де воно зараз, там загоряється тонкий кант,
-   довкола нього — розмита «рамка» вздовж країв, а всередину мʼяко тягнеться блік. Усі три шари беруть ту саму
-   точку (--gx, --gy), тож це одна цілісна пляма світла: акцент у серці → основний колір → темна середина */
-@property --gx { syntax: "<percentage>"; inherits: true; initial-value: 0%; }
-@property --gy { syntax: "<percentage>"; inherits: true; initial-value: 100%; }
+/* блік-смуга: світло збирається в лівому верхньому куті, потім широкою діагональною смугою проходить
+   через усю картку до правого нижнього кута й повертається назад. Тонкий кант і розмита рамка по краях
+   загоряються там, де зараз смуга, — усе з однієї позиції (--p), тож це один цілісний блік */
+@property --p { syntax: "<percentage>"; inherits: true; initial-value: 0%; }
 .liquid { position: absolute; inset: 0; z-index: 0; pointer-events: none; border-radius: inherit;
-  animation: orbit 15s cubic-bezier(.45, 0, .55, 1) infinite; }
+  animation: sheen 9s cubic-bezier(.65, 0, .35, 1) infinite alternate; }
 .liquid > span { position: absolute; inset: 0; border-radius: inherit; }
-.liquid .glow { filter: blur(22px);
-  background: radial-gradient(95% 125% at var(--gx) var(--gy), var(--l1) 0%, var(--l2) 20%, color-mix(in srgb, var(--l2) 45%, transparent) 42%, transparent 70%); }
+.liquid .glow { filter: blur(18px);
+  background: linear-gradient(125deg, transparent calc(var(--p) - 34%), color-mix(in srgb, var(--l2) 45%, transparent) calc(var(--p) - 16%),
+    var(--l2) calc(var(--p) - 5%), var(--l1) var(--p), var(--l2) calc(var(--p) + 5%),
+    color-mix(in srgb, var(--l2) 45%, transparent) calc(var(--p) + 16%), transparent calc(var(--p) + 34%)); opacity: .9; }
 .liquid .halo { filter: blur(8px); }
 .liquid .halo i, .liquid .rim { position: absolute; inset: 0; border-radius: inherit;
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
-.liquid .halo i { padding: 12px; background: radial-gradient(115% 145% at var(--gx) var(--gy), var(--l1) 0%, var(--l2) 32%, transparent 70%); }
-.liquid .rim { padding: 1.5px; background: radial-gradient(90% 120% at var(--gx) var(--gy), #fff 0%, var(--l1) 25%, var(--l2) 52%, transparent 78%); }
-/* кути — повільніше (світло «огортає» кут), проміжки між ними — плавним перетіканням */
-@keyframes orbit {
-  0%, 100% { --gx: -2%; --gy: 104%; }
-  20% { --gx: 102%; --gy: 104%; }
-  34% { --gx: 106%; --gy: 50%; }
-  50% { --gx: 102%; --gy: -4%; }
-  70% { --gx: -2%; --gy: -4%; }
-  84% { --gx: -6%; --gy: 50%; }
-}
+.liquid .halo i { padding: 12px; background: linear-gradient(125deg, transparent calc(var(--p) - 26%), var(--l2) calc(var(--p) - 8%), var(--l1) var(--p), var(--l2) calc(var(--p) + 8%), transparent calc(var(--p) + 26%)); }
+.liquid .rim { padding: 1.5px; background: linear-gradient(125deg, transparent calc(var(--p) - 20%), var(--l2) calc(var(--p) - 7%), #fff var(--p), var(--l2) calc(var(--p) + 7%), transparent calc(var(--p) + 20%)); }
+@keyframes sheen { from { --p: 0%; } to { --p: 100%; } }
 /* легка тінь під білим текстом — підпис лишається читабельним, коли блік пропливає під ним */
 .hero .lbl, .hero .num, .hero .sub, .hero .lt, .hero .lg2 b { text-shadow: 0 1px 10px rgba(5, 10, 30, .28); }
 .hero .sub .inc { color: inherit; }
@@ -1344,7 +1337,7 @@ function countUp(el) {
   requestAnimationFrame(step);
 }
 // випадковий старт: композиція щоразу починається з іншого положення
-$("liquid").style.animationDelay = -(Math.random() * 16).toFixed(1) + "s";
+$("liquid").style.animationDelay = -(Math.random() * 18).toFixed(1) + "s";
 var lastView = view(), prevView = null, reportKey = null;
 window.addEventListener("hashchange", function () {
   var v = view();
