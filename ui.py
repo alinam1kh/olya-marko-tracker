@@ -362,18 +362,18 @@ body.p-olya .liquid { --sheen: .4; }
   75% { --ex: 20%; --ey: 0%; }
 }
 /* мʼякі абстрактні форми після бліку: дві великі розмиті плями повільно пливуть, тягнуться й перетікають */
-.liquid .amb { inset: auto; width: 80%; aspect-ratio: 1.7; border-radius: 50%; filter: blur(34px); mix-blend-mode: screen;
+.liquid .amb { inset: auto; width: 96%; aspect-ratio: 1.7; border-radius: 50%; filter: blur(34px); mix-blend-mode: screen;
   will-change: transform; opacity: .7; }
 body.p-olya .liquid .amb { opacity: .75; }
-.liquid .a3 { right: -46%; top: 14%; width: 70%; background: radial-gradient(closest-side, var(--l4), color-mix(in srgb, var(--l4) 35%, transparent) 40%, color-mix(in srgb, var(--l4) 10%, transparent) 70%, transparent);
-  animation: drift3 17s cubic-bezier(.45, 0, .55, 1) infinite, breathe3 9s ease-in-out infinite; }
-.liquid .a1 { animation: drift1 15s cubic-bezier(.45, 0, .55, 1) infinite, breathe1 7s ease-in-out infinite; }
-.liquid .a2 { animation: drift2 19s cubic-bezier(.45, 0, .55, 1) infinite, breathe2 11s ease-in-out infinite; }
+.liquid .a3 { right: -50%; top: 10%; width: 86%; background: radial-gradient(closest-side, var(--l4), color-mix(in srgb, var(--l4) 35%, transparent) 40%, color-mix(in srgb, var(--l4) 10%, transparent) 70%, transparent);
+  animation: drift3 13s cubic-bezier(.45, 0, .55, 1) infinite, breathe3 9s ease-in-out infinite; }
+.liquid .a1 { animation: drift1 12s cubic-bezier(.45, 0, .55, 1) infinite, breathe1 7s ease-in-out infinite; }
+.liquid .a2 { animation: drift2 15s cubic-bezier(.45, 0, .55, 1) infinite, breathe2 11s ease-in-out infinite; }
 @keyframes drift3 { 0%, 100% { transform: translate(0, 0) scale(1, 1); } 40% { transform: translate(-6%, 14%) scale(1.1, .92); } 75% { transform: translate(-26%, 4%) scale(1, 1); } }
 /* «дихання»: форми то світлішають, то темнішають, кожна у своєму ритмі */
-@keyframes breathe1 { 0%, 100% { opacity: .15; } 50% { opacity: .8; } }
-@keyframes breathe2 { 0%, 100% { opacity: .75; } 50% { opacity: .12; } }
-@keyframes breathe3 { 0%, 100% { opacity: .1; } 35% { opacity: .55; } 70% { opacity: .2; } }
+@keyframes breathe1 { 0%, 100% { opacity: .35; } 50% { opacity: .85; } }
+@keyframes breathe2 { 0%, 100% { opacity: .8; } 50% { opacity: .3; } }
+@keyframes breathe3 { 0%, 100% { opacity: .25; } 40% { opacity: .7; } 75% { opacity: .35; } }
 .liquid .ehalo i { animation: glint 6s ease-in-out infinite; }
 @keyframes glint { 0%, 100% { opacity: .6; } 50% { opacity: 1; } }
 .liquid .a1 { right: -38%; top: -48%; background: radial-gradient(closest-side, var(--l2), color-mix(in srgb, var(--l2) 35%, transparent) 40%, color-mix(in srgb, var(--l2) 10%, transparent) 70%, transparent);
