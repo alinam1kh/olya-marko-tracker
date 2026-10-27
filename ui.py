@@ -482,7 +482,7 @@ a { color: inherit; text-decoration: none; }
   transition: opacity .6s var(--ease), visibility 0s linear .6s; }
 .splash.out { opacity: 0; visibility: hidden; }
 .splash.out .sp-mark { transform: scale(.9); }
-.sp-mark { position: relative; width: 84px; height: 84px; border-radius: 30px; display: grid; place-items: center; overflow: hidden; isolation: isolate;
+.sp-mark { position: relative; width: 84px; height: 84px; border-radius: 25px; display: grid; place-items: center; overflow: hidden; isolation: isolate;
   background: var(--blue-g); box-shadow: 0 10px 24px rgba(29,95,224,.34), inset 0 1px 0 rgba(255,255,255,.3);
   animation: breathe 2.4s ease-in-out infinite; transition: transform .6s var(--ease); }
 /* відблиск, що проходить по кнопці */
