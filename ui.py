@@ -697,6 +697,7 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .op .ask button { min-height: 44px; padding: 0 12px; border: 0; border-radius: 22px; background: var(--soft); font-size: 13px; font-weight: 500; cursor: pointer; }
 .op .ask button.yes { background: var(--bad); color: #fff; }
 .toast button { min-height: 36px; margin-left: 9px; padding: 0 12px; border: 0; border-radius: 12px; background: var(--blue-soft, #EAF1FF); color: var(--blue); font: 500 13px var(--font); cursor: pointer; }
+.toast button.bad { background: var(--bad-bg); color: var(--bad); }  /* «Скасувати» після додавання — прибирає запис */
 
 /* подушка безпеки (Оля) */
 .goal .gbig { display: flex; align-items: flex-start; gap: 10px; margin: 16px 0 16px; }
@@ -1168,7 +1169,7 @@ function markFresh(s) { if (s) justAdded.push({ amount: +s.amount, day: s.day, t
     setTimeout(function () {
       toast(okMsg("Готівку додано"), saved.line ? ["Скасувати", function () {
         delCash(D.people[person], saved.line, saved.day, saved.title, "#report", null, true);
-      }] : null);
+      }, "bad"] : null);
     }, 100);
   }
   if (q.get("deleted")) setTimeout(function () { toast(okMsg("Запис видалено")); }, 100);
@@ -1665,7 +1666,7 @@ function restoreCash(P, u) {
 function toast(html, action) {
   document.querySelectorAll(".toast").forEach(function (x) { x.remove(); });
   var t = h("div", "toast", html); t.setAttribute("role", "status");
-  if (action) { var b = h("button", "", action[0]); b.type = "button"; b.onclick = action[1]; t.appendChild(b); }
+  if (action) { var b = h("button", action[2] || "", action[0]); b.type = "button"; b.onclick = action[1]; t.appendChild(b); }
   document.body.appendChild(t);
   setTimeout(function () { t.classList.add("out"); setTimeout(function () { t.remove(); }, 500); }, action ? 7000 : 3200);
 }
@@ -1759,7 +1760,7 @@ $("v-add").addEventListener("submit", function (e) {
       location.replace("#report");
       toast(okMsg("Готівку додано", D.people[person], saved.amount, cat), ["Скасувати", function () {
         delCash(D.people[person], saved.line, saved.day, saved.title, "#report", null, true);
-      }]);
+      }, "bad"]);
     })
     .catch(function (err) { $("a-msg").textContent = err.message || "Немає звʼязку, спробуйте ще раз"; check(); });
 });
