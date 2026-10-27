@@ -1012,7 +1012,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
       <section class="card"><div class="ch" style="min-height:0;margin-bottom:12px"><h2>Фіксовані й змінні</h2></div><div class="split" id="fvsplit" aria-hidden="true"></div><div class="fv2" id="fv"></div><p class="note" id="fvnote" style="margin:14px 0 0"></p></section>
       <section class="card list"><div class="ch"><h2 id="t-dmon"></h2></div><div class="share" id="t-share" aria-hidden="true"></div><div id="t-leg" style="padding-bottom:8px"></div></section>
       <section class="card">
-        <div class="ch" style="min-height:0"><h2 id="w-title">Витрати по тижнях</h2></div>
+        <div class="ch" style="min-height:0;flex-direction:column;align-items:flex-start;gap:2px"><h2 id="w-title">Витрати по тижнях</h2><span class="sub" id="w-sub" style="font-size:13px" hidden></span></div>
         <div class="chart"><div class="ticks" id="wticks" aria-hidden="true"></div><div class="caps" id="bars"></div></div>
         <div class="wleg" id="wnote"></div>
       </section>
@@ -1475,8 +1475,10 @@ function renderAnalytics(P) {
   });
   var BLUE ="linear-gradient(180deg, #3B82F6, #1D5FE0)";
   var row = function (bg, txt) { return '<div class="vs-part"><i aria-hidden="true" style="background:' + bg + '"></i><span>' + txt + "</span></div>"; };
+  // оренда — разова фіксована сума, тож графік показує решту витрат; пояснення — під назвою
+  $("w-sub").hidden = !useOut; $("w-sub").textContent = useOut ? "Без оренди (" + nf0.format(Math.round(rentSum)) + " зл)" : "";
   $("wnote").innerHTML = useOut
-    ? (row(BLUE, "Без оренди — " + nf0.format(Math.round(M.expenses - rentSum)) + " зл") + '<div class="vs-part"><span>Оренда ' + nf0.format(Math.round(rentSum)) + " зл не показана</span></div>")
+    ? row(BLUE, "Витрати — " + nf0.format(Math.round(M.expenses - rentSum)) + " зл")
     : row(BLUE, "Усього за місяць — " + nf0.format(Math.round(M.expenses)) + " зл" + (M.incomplete ? ", дані до " + M.last_op : ""));
   var labels = ["1–7", "8–14", "15–21", "22–28", "29+"];
   capsules("bars", "wticks", weeks.map(function (w, i) { return { v: w, rent: rentW[i], label: labels[i], sub: nf0.format(w) + " зл" }; }), niceMax(Math.max.apply(null, weeks.concat([1]))), -1, null);
