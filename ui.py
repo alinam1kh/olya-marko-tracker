@@ -661,6 +661,9 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .op .t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
 .op .t1 { font-size: 15px; }
 .op .t1.one { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.op .t1row { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.op .t1row .t1 { min-width: 0; }
+.op .t1row .fx { flex: none; }
 .op .t1:not(.one) { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; overflow-wrap: anywhere; }
 .op .t2 { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 13px; color: var(--ink2); }
 .op .r { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
@@ -1161,12 +1164,12 @@ var saved = null;  // після збереження готівки: сума �
   if (q.get("saved")) {
     saved = { amount: +q.get("a") || 0, day: q.get("d") || "", line: +q.get("l") || 0, title: q.get("t") || "" };
     setTimeout(function () {
-      toast(OKI + 'Збережено: −' + zl(saved.amount), saved.line ? ["Скасувати", function () {
-        delCash(D.people[person], saved.line, saved.day, saved.title, "#report");
+      toast(okMsg("Готівку додано"), saved.line ? ["Скасувати", function () {
+        delCash(D.people[person], saved.line, saved.day, saved.title, "#report", null, true);
       }] : null);
     }, 100);
   }
-  if (q.get("deleted")) setTimeout(function () { toast(OKI + 'Запис видалено'); }, 100);
+  if (q.get("deleted")) setTimeout(function () { toast(okMsg("Запис видалено")); }, 100);
   history.replaceState(null, "", location.pathname + location.hash);
 })();
 function view() {
@@ -1265,9 +1268,10 @@ function fixedCats(M) {
 function nice(s) { return s === s.toUpperCase() ? s.toLowerCase().replace(/(^|[\s\/*.-])(\S)/g, function (_, a, b) { return a + b.toUpperCase(); }) : s; }
 var TRASH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>';
 function opRow(o, recent, fresh) {
-  return '<div class="op' + (fresh ? " fresh" : "") + '">' + cic(o.income ? "Дохід" : o.cat, true) + '<div class="t"><div class="t1' + (recent ? " one" : "") + '">' + esc(nice(o.title)) + "</div>" +
+  return '<div class="op' + (fresh ? " fresh" : "") + '">' + cic(o.income ? "Дохід" : o.cat, true) + '<div class="t">' + (fresh ? '<div class="t1row"><div class="t1 one">' + esc(nice(o.title)) + '</div><span class="fx now">щойно</span></div>'
+      : '<div class="t1' + (recent ? " one" : "") + '">' + esc(nice(o.title)) + "</div>") +
     '<div class="t2"><span>' + esc(o.income ? "Дохід" : o.cat) + (recent ? '<i class="sep" aria-hidden="true"></i>' + o.date : "") + "</span>" + (o.fixed ? '<span class="fx">фіксована</span>' : "") + (o.cash ? '<span class="fx cash">готівка</span>' : "") +
-    (fresh ? '<span class="fx now">щойно</span>' : "") + '</div></div><div class="r"><span class="am' + (o.income ? " inc" : "") + '">' + (o.income ? "+" : "−") + zl(o.amount) + "</span>" +
+    '</div></div><div class="r"><span class="am' + (o.income ? " inc" : "") + '">' + (o.income ? "+" : "−") + zl(o.amount) + "</span>" +
     "</div>" +
     "</div>";
 }
@@ -1627,7 +1631,7 @@ function swipeRow(sw, P, back) {
   };
 }
 // видалення одного готівкового запису; після — перезавантаження зі свіжими даними і тостом
-function delCash(P, line, day, title, back, undo) {
+function delCash(P, line, day, title, back, undo, cancel) {
   fetch("api/cash/delete", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "same-origin",
     body: JSON.stringify({ person: P.key, line: line, date: day, title: title }) })
     .then(function (r) { return r.json().catch(function () { return { ok: false, error: "Сервер не відповів" }; }); })
@@ -1641,14 +1645,14 @@ function delCash(P, line, day, title, back, undo) {
       saved = null; reportKey = null;
       if (back && location.hash !== back) location.hash = back; else render();
       // «Скасувати» записує той самий запис назад (та сама сума, категорія, опис і дата)
-      toast(okMsg("Запис видалено", P, undo && undo.amount, undo && undo.category, "з"), undo ? ["Скасувати", function () { restoreCash(P, undo); }] : null);
+      toast(okMsg(cancel ? "Скасовано" : "Запис видалено"), undo ? ["Скасувати", function () { restoreCash(P, undo); }] : null);
     })
     .catch(function (err) { toast(err.message || "Немає звʼязку, спробуйте ще раз"); });
 }
 // тост успіху у два рядки: що сталося + сума й категорія
-function okMsg(title, P, amount, cat, prep) {
+function okMsg(title, P, amount, cat) {
   var a = P && P.accounts.filter(function (x) { return x.key === cat; })[0];
-  return OKI + '<span class="tx"><b>' + title + "</b>" + (a ? "<small>" + zl(+amount) + " " + (prep || "в") + " «" + esc(a.name) + "»</small>" : "") + "</span>";
+  return OKI + '<span class="tx"><b>' + title + "</b>" + (a ? "<small>" + zl(+amount) + " в «" + esc(a.name) + "»</small>" : "") + "</span>";
 }
 var OKI = '<i aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="m5.5 12.5 4 4 9-9"/></svg></i>';
 function restoreCash(P, u) {
@@ -1658,7 +1662,7 @@ function restoreCash(P, u) {
     .then(function (res) {
       if (!res.ok) throw new Error(res.error || "Не вдалося відновити");
       D = res.data; saved = { amount: +u.amount, day: res.date, line: res.line, title: res.title }; reportKey = null; render();
-      toast(okMsg("Запис відновлено", P, u.amount, u.category));
+      toast(okMsg("Скасовано"));
     })
     .catch(function (err) { toast(err.message || "Немає звʼязку, спробуйте ще раз"); });
 }
@@ -1755,7 +1759,7 @@ $("v-add").addEventListener("submit", function (e) {
       reportKey = null; btn.disabled = false;
       location.replace("#report");
       toast(okMsg("Готівку додано", D.people[person], saved.amount, pick), ["Скасувати", function () {
-        delCash(D.people[person], saved.line, saved.day, saved.title, "#report");
+        delCash(D.people[person], saved.line, saved.day, saved.title, "#report", null, true);
       }]);
     })
     .catch(function (err) { $("a-msg").textContent = err.message || "Немає звʼязку, спробуйте ще раз"; check(); });
