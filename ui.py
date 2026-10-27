@@ -634,7 +634,16 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .cic.inc { background: var(--good-bg); }
 .cic .glyph, .ji .glyph { font-weight: 400; line-height: 1; }
 .jsum .ji .glyph { display: inline; font-size: 20px; color: inherit; }
-.more { display: flex; justify-content: space-between; align-items: center; min-height: 52px; margin-top: 4px; border-top: 1px solid var(--soft); font-size: 15px; color: var(--ink2); }
+.more { display: flex; justify-content: space-between; align-items: center; width: 100%; min-height: 52px; margin-top: 4px; padding: 0; border: 0; border-top: 1px solid var(--soft);
+  background: none; font: inherit; font-size: 15px; color: var(--ink2); cursor: pointer; text-align: left; }
+.more-r { display: inline-flex; align-items: center; gap: 6px; }
+.more svg { transition: transform .45s var(--ease); }
+.more[aria-expanded="true"] svg { transform: rotate(180deg); }
+.more[aria-expanded="true"] .more-sum { opacity: 0; }
+.more-sum { transition: opacity .3s var(--ease); }
+.more-rows { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .5s var(--ease); }
+.more-rows > div { overflow: hidden; min-height: 0; }
+.more-rows.open { grid-template-rows: 1fr; }
 /* операції */
 .op { display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 12px 0; border-top: 1px solid var(--soft); }
 .op .cic { width: 40px; height: 40px; border-radius: 20px; }
@@ -1171,15 +1180,21 @@ function opRow(o, recent, fresh) {
 function catRows(M, limit) {
   var fx = fixedCats(M), shown = limit ? M.categories.slice(0, limit) : M.categories, out = "";
   var pct = function (a) { var p = M.expenses ? a / M.expenses * 100 : 0; return (limit ? nf0 : nf1).format(p) + " %"; };
-  shown.forEach(function (c) {
-    var p = M.expenses ? c.amount / M.expenses * 100 : 0;
-    out += '<div class="crow">' + cic(c.name) + '<span class="nm">' + esc(c.name) + (fx[c.name] ? '<span class="fx">фіксована</span>' : "") + '</span><span class="am">' + zl(c.amount) +
-      '</span><span class="bd blue">' + pct(c.amount) + '</span><div class="bar6"><b style="background:' + bright(c.name) + '" data-to="' + Math.max(p, 1) + '%"></b></div></div>';
-  });
+  // static — для рядків у згорнутому блоці: шкала одразу потрібної ширини (вони зʼявляються вже на місці)
+  var row = function (c, static_) {
+    var p = Math.max(M.expenses ? c.amount / M.expenses * 100 : 0, 1);
+    return '<div class="crow">' + cic(c.name) + '<span class="nm">' + esc(c.name) + (fx[c.name] ? '<span class="fx">фіксована</span>' : "") + '</span><span class="am">' + zl(c.amount) +
+      '</span><span class="bd blue">' + pct(c.amount) + '</span><div class="bar6"><b style="background:' + bright(c.name) + (static_ ? ";width:" + p + '%"' : '" data-to="' + p + '%"') + "></b></div></div>";
+  };
+  shown.forEach(function (c) { out += row(c); });
   var rest = M.categories.slice(shown.length);
   if (rest.length) {
+    // «Ще N категорій» розгортає решту просто тут, у картці (а не веде на іншу сторінку)
     var sum = rest.reduce(function (s, c) { return s + c.amount; }, 0);
-    out += '<a class="more" href="#analytics"><span>Ще ' + rest.length + " " + plural(rest.length, "категорія", "категорії", "категорій") + "</span><span>" + zl(sum) + "</span></a>";
+    out += '<div class="more-rows" id="more-rows"><div>' + rest.map(function (c) { return row(c, true); }).join("") + "</div></div>" +
+      '<button type="button" class="more" id="more-btn" aria-expanded="false" aria-controls="more-rows"><span class="more-l">Ще ' + rest.length + " " +
+      plural(rest.length, "категорія", "категорії", "категорій") + '</span><span class="more-r"><span class="more-sum">' + zl(sum) + "</span>" +
+      '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></span></button>';
   }
   return out;
 }
@@ -1232,6 +1247,12 @@ function renderReport(P) {
   renderInsights(P, M);
   $("cats-all").innerHTML = "<span>Усі " + M.categories.length + "</span>" + CHR;
   $("cats").innerHTML = catRows(M, 3);
+  var mb = $("more-btn");
+  if (mb) mb.onclick = function () {
+    var open = mb.getAttribute("aria-expanded") !== "true", n = $("more-rows").querySelectorAll(".crow").length;
+    mb.setAttribute("aria-expanded", open); $("more-rows").classList.toggle("open", open);
+    mb.querySelector(".more-l").textContent = open ? "Згорнути" : "Ще " + n + " " + plural(n, "категорія", "категорії", "категорій");
+  };
   var last = P.months[P.months.length - 1], ops = last ? last.ops.slice(0, 5) : [], freshDone = false;
   $("recent").innerHTML = ops.length ? ops.map(function (o) {
     var fresh = saved && !freshDone && o.cash && Math.abs(o.amount - saved.amount) < 0.005 && (!saved.day || o.day === saved.day);
