@@ -345,7 +345,7 @@ body.p-olya .liquid { --sheen: .4; }
   mask: linear-gradient(var(--a), #000 calc(var(--p) - 14%), transparent calc(var(--p) + 6%)), linear-gradient(rgba(0, 0, 0, .7) 0 0); }
 .liquid .after > .ehalo, .liquid .after > .erim { position: absolute; inset: 0; border-radius: inherit; }
 .liquid .after > .amb { position: absolute; }
-body.p-olya .liquid .after { opacity: .8; }  /* в Олі світлі тони яскравіші — трохи тихіше, щоб лишалась глибина */
+body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони яскравіші — трохи тихіше, щоб лишалась глибина */
 .liquid .ehalo { opacity: .46; } .liquid .erim { opacity: .5; }
 .liquid .ehalo { filter: blur(8px); }
 .liquid .ehalo i, .liquid .erim { position: absolute; inset: 0; border-radius: inherit;
