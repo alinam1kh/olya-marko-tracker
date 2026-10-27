@@ -1419,7 +1419,7 @@ function renderTrends(P) {
   var sl = slices(S), tot = sl.reduce(function (s, x) { return s + x.amount; }, 0) || 1;
   $("t-share").innerHTML = sl.map(function (x) { return '<i style="flex:' + x.amount + ";background:" + x.color + '"></i>'; }).join("");
   $("t-leg").innerHTML = sl.map(function (x) { return '<div class="leg"><i style="background:' + x.color + '"></i><span>' + esc(x.name) + '</span><span class="v" style="color:var(--ink2)">' + zl(x.amount) + '</span><span class="bd blue">' + nf1.format(x.amount / tot * 100) + " %</span></div>"; }).join("");
-  $("t-chg").innerHTML = "Змінити місяць" + svgI("currentColor", '<path d="M3 6.5h18M16.5 2 21 6.5 16.5 11M21 17.5H3M7.5 13 3 17.5 7.5 22"/>', 16);
+  $("t-chg").innerHTML = "Змінити місяць" + '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6.5h18M16.5 2 21 6.5 16.5 11M21 17.5H3M7.5 13 3 17.5 7.5 22"/></svg>';
   $("t-chg").onclick = function () { trendMonth = (trendMonth + list.length - 1) % list.length; render(); };
 
   var idx = P.months.indexOf(S), prev = P.months[idx - 1], pm = {};
