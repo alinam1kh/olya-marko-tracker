@@ -295,7 +295,7 @@ a { color: inherit; text-decoration: none; }
 .hero .sub .inc { color: inherit; }
 .hero .sub .bd { display: inline-flex; margin-left: 6px; vertical-align: 1px; }
 /* смуга доходу: біла — залишок, світло-червона — витрати; червона росте зліва й стискає білу */
-.hero .split2 { display: flex; gap: 4px; height: 8px; margin-top: 18px; }
+.hero .split2 { display: flex; gap: 4px; height: 8px; margin-top: 26px; }
 .hero .split2 b { display: block; height: 100%; width: 0; border-radius: 4px; transition: width 2.1s var(--ease); }
 .hero .split2 .e { background: #FCA5A5; }
 .hero .split2 .s { flex: 1; min-width: 0; background: #fff; }
