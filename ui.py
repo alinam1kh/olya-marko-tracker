@@ -415,11 +415,13 @@ a { color: inherit; text-decoration: none; }
 .cap .fill { display: flex; flex-direction: column; height: 0; border-radius: 10px; overflow: hidden; transition: height 2.1s var(--ease); }
 .cap .fill .rent { background: repeating-linear-gradient(135deg, #A9C6F8 0 5px, #D7E4FC 5px 10px); }
 .cap .fill .main { flex: 1; background: var(--blue-g); }
-.cap.dim .fill .main { background: linear-gradient(180deg, #A9C6F8, #7FA9F1); }
-.cap.part .fill .main { background: repeating-linear-gradient(135deg, #A9C6F8 0 5px, #D7E4FC 5px 10px); }
-.cap .r1 { font-size: 12px; color: var(--ink3); }
+.cap.dim .fill .main { background: #D5DAE2; }
+.cap.part .fill .main { background: repeating-linear-gradient(135deg, #7FA9F1 0 5px, #C9DAFA 5px 10px); }
+.cap.part.dim .fill .main { background: repeating-linear-gradient(135deg, #CBD1DA 0 5px, #E6E9EE 5px 10px); }
+.cap .r1 { font-size: 12px; color: var(--ink2); }
 .cap .r2 { font-size: 12px; color: var(--ink2); }
 .cap.on .r1 { color: var(--ink); font-weight: 500; }
+.cap.on .r2 { color: var(--ink3); font-weight: 500; }
 /* фіксовані й змінні */
 .split { display: flex; gap: 3px; height: 10px; margin: 4px 0 14px; }
 .split i { display: block; height: 100%; border-radius: 5px; }
