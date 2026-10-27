@@ -618,7 +618,7 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .ch a { display: inline-flex; align-items: center; gap: 2px; min-height: 44px; font-size: 14px; font-weight: 500; color: var(--blue); }
 .ch .sub { font-size: 14px; color: var(--ink2); }
 .note { font-size: 13px; line-height: 1.45; color: var(--ink2); }
-#t-note { display: flex; gap: 8px; align-items: flex-start; }
+#t-note { display: flex; gap: 5px; align-items: flex-start; }
 #t-note svg { flex: none; width: 16px; height: 16px; margin-top: 1px; }
 .fx { display: inline-block; padding: 0 8px; border-radius: 10px; line-height: 20px; background: var(--soft); color: var(--ink3); font-size: 12px; }
 .fx.cash { background: var(--cash-bg); color: var(--cash); }
