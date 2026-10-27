@@ -808,7 +808,7 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .wleg .vs-part { padding: 0; background: none; margin: 0; gap: 8px; }
 .wleg .vs-part + .vs-part { margin: 0; text-align: right; }
 .wleg .vs-part i { width: 14px; height: 14px; border-radius: 4px; }
-.wleg .vs-part span { color: var(--ink2); }
+.wleg .vs-part span { font-size: 12px; color: var(--ink2); white-space: nowrap; }
 .vs-part { display: flex; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 14px; background: var(--soft); }
 .vs-part + .vs-part { margin-top: 8px; }
 .vs-part i { flex: none; width: 22px; height: 16px; border-radius: 4px; background: repeating-linear-gradient(135deg, #CBD1DA 0 4px, #E6E9EE 4px 8px); }
@@ -1471,9 +1471,9 @@ function renderAnalytics(P) {
   var RENT = "repeating-linear-gradient(135deg, #A9C6F8 0 4px, #D7E4FC 4px 8px)", BLUE = "linear-gradient(180deg, #3B82F6, #1D5FE0)";
   var row = function (bg, txt) { return '<div class="vs-part"><i aria-hidden="true" style="background:' + bg + '"></i><span>' + txt + "</span></div>"; };
   $("wnote").innerHTML = rent.length
-    ? (useOut ? row(BLUE, "Витрати без оренди — " + zl(M.expenses - rentSum)) + row(RENT, "Оренду " + zl(rentSum) + " не показано на графіку")
-              : row(RENT, "Оренда — " + zl(rentSum)) + row(BLUE, "Решта витрат — " + zl(M.expenses - rentSum)))
-    : row(BLUE, "Усього за місяць — " + zl(M.expenses) + (M.incomplete ? ", дані до " + M.last_op : ""));
+    ? (useOut ? row(BLUE, "Витрати без оренди — " + nf0.format(Math.round(M.expenses - rentSum)) + " зл") + row(RENT, "Оренду " + nf0.format(Math.round(rentSum)) + " зл" + " не показано на графіку")
+              : row(RENT, "Оренда — " + nf0.format(Math.round(rentSum)) + " зл") + row(BLUE, "Решта витрат — " + nf0.format(Math.round(M.expenses - rentSum)) + " зл"))
+    : row(BLUE, "Усього за місяць — " + nf0.format(Math.round(M.expenses)) + " зл" + (M.incomplete ? ", дані до " + M.last_op : ""));
   var labels = ["1–7", "8–14", "15–21", "22–28", "29+"];
   capsules("bars", "wticks", weeks.map(function (w, i) { return { v: w, rent: rentW[i], label: labels[i], sub: nf0.format(w) + " зл" }; }), niceMax(Math.max.apply(null, weeks.concat([1]))), -1, null);
 
