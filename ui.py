@@ -267,7 +267,7 @@ a { color: inherit; text-decoration: none; }
 @property --ey { syntax: "<percentage>"; inherits: true; initial-value: 20%; }
 @property --a { syntax: "<angle>"; inherits: true; initial-value: 115deg; }
 .liquid { position: absolute; inset: 0; z-index: 0; pointer-events: none; border-radius: inherit; --sheen: .45; }
-.liquid.sheen { animation: sheen 6.2s linear both, edge 24s cubic-bezier(.45, 0, .55, 1) infinite; }
+.liquid.sheen { animation: sheen 6.2s linear both, edge 15s cubic-bezier(.45, 0, .55, 1) infinite; }
 body.p-olya .liquid { --sheen: .4; }
 .liquid > span { position: absolute; inset: 0; border-radius: inherit; }
 .liquid .glow, .liquid .halo, .liquid .rim { opacity: var(--sheen); }
@@ -347,19 +347,19 @@ body.p-olya .liquid { --sheen: .4; }
   radial-gradient(55% 75% at var(--ex) var(--ey), #fff 0%, var(--l1) 25%, var(--l2) 50%, transparent 78%),
   radial-gradient(45% 65% at calc(100% - var(--ex)) calc(100% - var(--ey)), var(--l1) 0%, var(--l2) 40%, transparent 75%); }
 @keyframes edge {
-  0%, 100% { --ex: 0%; --ey: 20%; }
-  30% { --ex: 30%; --ey: 0%; }
-  60% { --ex: 0%; --ey: 65%; }
-  80% { --ex: 12%; --ey: 0%; }
+  0%, 100% { --ex: 0%; --ey: 15%; }
+  25% { --ex: 45%; --ey: 0%; }
+  50% { --ex: 0%; --ey: 80%; }
+  75% { --ex: 20%; --ey: 0%; }
 }
 /* мʼякі абстрактні форми після бліку: дві великі розмиті плями повільно пливуть, тягнуться й перетікають */
 .liquid .amb { inset: auto; width: 90%; aspect-ratio: 1.6; border-radius: 50%; filter: blur(30px); mix-blend-mode: screen;
   will-change: transform; opacity: .7; }
 body.p-olya .liquid .amb { opacity: .75; }
 .liquid .a1 { left: -30%; top: -40%; background: radial-gradient(closest-side, var(--l2), color-mix(in srgb, var(--l2) 40%, transparent) 55%, transparent);
-  animation: drift1 21s cubic-bezier(.45, 0, .55, 1) infinite; }
+  animation: drift1 15s cubic-bezier(.45, 0, .55, 1) infinite; }
 .liquid .a2 { right: -35%; bottom: -45%; background: radial-gradient(closest-side, var(--l3), color-mix(in srgb, var(--l3) 50%, transparent) 45%, transparent);
-  opacity: .5; animation: drift2 26s cubic-bezier(.45, 0, .55, 1) infinite; }
+  opacity: .5; animation: drift2 19s cubic-bezier(.45, 0, .55, 1) infinite; }
 @keyframes drift1 { 0%, 100% { transform: translate(0, 0) rotate(0) scale(1, 1); } 33% { transform: translate(28%, 22%) rotate(40deg) scale(1.25, .8); } 66% { transform: translate(8%, 45%) rotate(-20deg) scale(.9, 1.15); } }
 @keyframes drift2 { 0%, 100% { transform: translate(0, 0) rotate(0) scale(1, 1); } 40% { transform: translate(-32%, -28%) rotate(-35deg) scale(1.2, .85); } 75% { transform: translate(-10%, -50%) rotate(25deg) scale(.85, 1.2); } }
 /* легка тінь під білим текстом — підпис лишається читабельним, коли блік пропливає під ним */
@@ -1426,7 +1426,7 @@ function countUp(el) {
   requestAnimationFrame(step);
 }
 // абстрактні форми щоразу стартують з іншого положення
-$("liquid").querySelectorAll(".amb").forEach(function (s) { s.style.animationDelay = -(Math.random() * 26).toFixed(1) + "s"; });
+$("liquid").querySelectorAll(".amb").forEach(function (s) { s.style.animationDelay = -(Math.random() * 19).toFixed(1) + "s"; });
 var lastView = view(), prevView = null, reportKey = null;
 window.addEventListener("hashchange", function () {
   var v = view();
