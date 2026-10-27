@@ -999,7 +999,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
         <div class="chart"><div class="ticks" id="wticks" aria-hidden="true"></div><div class="caps" id="bars"></div></div>
       </section>
       <section class="card"><div class="ch" style="min-height:0;margin-bottom:12px"><h2>Фіксовані й змінні</h2></div><div class="split" id="fvsplit" aria-hidden="true"></div><div class="fv2" id="fv"></div><p class="note" id="fvnote" style="margin:14px 0 0"></p></section>
-      <a class="fava" id="fava">Повний журнал у Fava<span id="arr-f"></span></a>
+      <section class="card list"><div class="ch"><h2 id="t-dmon"></h2></div><div class="share" id="t-share" aria-hidden="true"></div><div id="t-leg" style="padding-bottom:8px"></div></section>
     </div>
     <div id="an-trends" hidden>
       <section class="card">
@@ -1008,7 +1008,6 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
       </section>
       <div class="duo" id="t-duo"></div>
       <p class="note" id="t-note" style="margin:8px 4px 0"></p>
-      <section class="card list"><div class="ch"><h2 id="t-dmon"></h2><button type="button" class="sub" id="t-chg" style="border:0;background:none;color:var(--blue);font-weight:500;min-height:44px;display:inline-flex;align-items:center;gap:4px;cursor:pointer">Змінити місяць</button></div><div class="share" id="t-share" aria-hidden="true"></div><div id="t-leg" style="padding-bottom:8px"></div></section>
       <section class="card list"><div class="ch" style="flex-direction:column;align-items:flex-start;gap:2px;padding:10px 0 8px"><h2 id="t-cmp"></h2><span class="sub" id="t-cmpsub" style="font-size:13px"></span></div><div id="t-cats"></div><p class="note" id="t-cmpnote" style="margin:6px 0 8px"></p></section>
     </div>
   </div>
@@ -1020,6 +1019,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
       <div class="card"><span class="ji" style="background:var(--bad-bg);color:var(--bad)" aria-hidden="true"><span class="glyph">↗</span></span><div><span>Витрати</span><b id="j-sum"></b></div></div>
     </div>
     <div id="j-list"></div>
+    <a class="fava" id="fava">Повний журнал у Fava<span id="arr-f"></span></a>
   </div>
 
   <div class="sheet-bg" id="sheet-bg" hidden></div>
@@ -1472,7 +1472,10 @@ function renderAnalytics(P) {
   $("fv").innerHTML = '<div><span><i style="background:#A9C6F8"></i>Фіксовані, ' + nf1.format(fp) + " %</span><b>" + zl(M.fixed) + "</b>" + (cmp ? badge(M.fixed, pm.fixed, true, "", false) : "") + "</div>" +
     '<div><span><i style="background:#1F63E6"></i>Змінні, ' + nf1.format(100 - fp) + " %</span><b>" + zl(M.variable) + "</b>" + (cmp ? badge(M.variable, pm.variable, true, "", false) : "") + "</div>";
   $("fvnote").textContent = "Фіксовані: " + FIXED[P.key] + ". Змінні — решта витрат, саме їх можна зменшити.";
-  $("fava").href = FAVA[P.key] + "query/";
+  $("t-dmon").textContent = "Категорії у " + LOC[mi(M)];
+  var sl = slices(M), tot = sl.reduce(function (s, x) { return s + x.amount; }, 0) || 1;
+  $("t-share").innerHTML = sl.map(function (x) { return '<i style="flex:' + x.amount + ";background:" + x.color + '"></i>'; }).join("");
+  $("t-leg").innerHTML = sl.map(function (x) { return '<div class="leg"><i style="background:' + x.color + '"></i><span>' + esc(x.name) + '</span><span class="v" style="color:var(--ink2)">' + zl(x.amount) + '</span><span class="bd blue">' + nf1.format(x.amount / tot * 100) + " %</span></div>"; }).join("");
 }
 function renderTrends(P) {
   var METRICS = [["exp", "Витрати"], ["inc", "Дохід"], ["saved", "Лишилось"]];
@@ -1525,12 +1528,6 @@ function renderTrends(P) {
     '<div class="vs-r">' + right + "</div></div>";
   $("t-note").hidden = true;
 
-  $("t-dmon").textContent = "Категорії у " + LOC[mi(S)];
-  var sl = slices(S), tot = sl.reduce(function (s, x) { return s + x.amount; }, 0) || 1;
-  $("t-share").innerHTML = sl.map(function (x) { return '<i style="flex:' + x.amount + ";background:" + x.color + '"></i>'; }).join("");
-  $("t-leg").innerHTML = sl.map(function (x) { return '<div class="leg"><i style="background:' + x.color + '"></i><span>' + esc(x.name) + '</span><span class="v" style="color:var(--ink2)">' + zl(x.amount) + '</span><span class="bd blue">' + nf1.format(x.amount / tot * 100) + " %</span></div>"; }).join("");
-  $("t-chg").innerHTML = "Змінити місяць" + '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6.5h18M16.5 2 21 6.5 16.5 11M21 17.5H3M7.5 13 3 17.5 7.5 22"/></svg>';
-  $("t-chg").onclick = function () { trendMonth = (trendMonth + list.length - 1) % list.length; render(); };
 
   var idx = P.months.indexOf(S), prev = P.months[idx - 1], pm = {};
   if (prev) prev.categories.forEach(function (c) { pm[c.name] = c.amount; });
@@ -1577,6 +1574,7 @@ function renderJournal(P) {
   flush();
   $("j-list").innerHTML = html || '<section class="card empty">Операцій не знайдено</section>';
   $("j-list").querySelectorAll(".swipe").forEach(function (sw) { swipeRow(sw, P, "#journal"); });
+  $("fava").href = FAVA[P.key] + "journal/";
 }
 
 // свайп рядка вліво відкриває кнопку «Видалити» справа; відпустили не дотягнувши — рядок повертається
