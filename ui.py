@@ -755,6 +755,17 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .vs-avg { display: flex; justify-content: space-between; align-items: baseline; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--soft); }
 .vs-avg span { display: inline; font-size: 14px; color: var(--ink2); }
 .vs-avg b { display: inline; margin: 0; font-size: 15px; font-weight: 500; }
+.vs .vs-sub { display: block; margin-top: 2px; font-size: 13px; color: var(--ink2); }
+.vs-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--soft); }
+.vs-row > span:first-child { display: inline; font-size: 14px; color: var(--ink2); line-height: 1.35; }
+.vs-row .nw { display: inline; margin: 0; font-size: inherit; font-weight: 400; white-space: nowrap; }
+.vs-row .bd { flex: none; display: inline-flex; font-size: 12px; white-space: nowrap; }
+.vs-row .bd.bad { color: var(--bad); } .vs-row .bd.good { color: var(--good); }
+.vs-row .dash { display: inline-block; width: 14px; height: 0; margin: 0 8px 3px 0; border-top: 2px dashed var(--blue); vertical-align: middle; }
+.vs .vs-avg { margin-top: 0; border-top: 0; padding-top: 10px; }
+.cap .trk { position: relative; }
+.cap .mark { position: absolute; left: 6px; right: 6px; height: 0; border-top: 2px dashed var(--blue); }
+.cap .r3 { display: block; margin-top: 2px; font-size: 11px; color: var(--ink2); }
 .vs-parts { margin-top: 12px; }
 .vs-part { display: flex; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 14px; background: var(--soft); }
 .vs-part + .vs-part { margin-top: 8px; }
@@ -1365,14 +1376,22 @@ function renderGoal(P) {
 // ---------- аналітика ----------
 // шкала осі: «гарний» максимум і 4 позначки
 function niceMax(v) { var s = [400, 800, 1200, 1500, 2000, 3000, 4500, 6000, 8000, 10000, 15000]; for (var i = 0; i < s.length; i++) if (v <= s[i]) return s[i]; return Math.ceil(v / 5000) * 5000; }
-function capsules(boxId, tickId, items, max, sel, onPick) {
+// вісь з круглим кроком: не більше 4 поділок (наприклад 0–8 000 по 2 000)
+function niceAxis(v) {
+  var steps = [100, 200, 250, 500, 1000, 2000, 2500, 5000, 10000];
+  for (var i = 0; i < steps.length; i++) { var n = Math.max(2, Math.ceil(v / steps[i])); if (n <= 4) return { max: n * steps[i], n: n }; }
+  return { max: Math.ceil(v / 10000) * 10000, n: 4 };
+}
+function capsules(boxId, tickId, items, max, sel, onPick, n) {
   var H = 150, box = $(boxId); box.innerHTML = "";
-  $(tickId).innerHTML = [1, 2 / 3, 1 / 3, 0].map(function (f) { return "<span>" + nf0.format(Math.round(max * f)) + " зл</span>"; }).join("");
+  if (n) $(tickId).innerHTML = Array.apply(null, Array(n + 1)).map(function (_, k) { return "<span>" + nf0.format(Math.round(max * (n - k) / n)) + "</span>"; }).join("");
+  else $(tickId).innerHTML = [1, 2 / 3, 1 / 3, 0].map(function (f) { return "<span>" + nf0.format(Math.round(max * f)) + " зл</span>"; }).join("");
   items.forEach(function (x, i) {
     var c = h("div", "cap" + (onPick ? " pick" : "") + (i === sel ? " on" : "") + (x.part ? " part" : "") + (onPick && i !== sel ? " dim" : ""));
     var hh = Math.max(8, Math.round(x.v / max * H)), rent = x.rent ? Math.round(x.rent / max * H) : 0;
-    c.innerHTML = '<div class="trk"><div class="fill" data-to="' + hh + 'px">' + (rent ? '<div class="rent" style="height:' + rent + 'px"></div>' : "") + '<div class="main"></div></div></div>' +
-      '<span class="r1">' + esc(x.label) + '</span><span class="r2">' + esc(x.sub) + "</span>";
+    c.innerHTML = '<div class="trk"><div class="fill" data-to="' + hh + 'px">' + (rent ? '<div class="rent" style="height:' + rent + 'px"></div>' : "") + '<div class="main"></div></div>' +
+      (x.mark ? '<i class="mark" style="bottom:' + Math.round(x.mark / max * H) + 'px" aria-hidden="true"></i>' : "") + "</div>" +
+      '<span class="r1">' + esc(x.label) + '</span><span class="r2">' + esc(x.sub) + "</span>" + (x.sub2 ? '<span class="r3">' + esc(x.sub2) + "</span>" : "");
     c.setAttribute("aria-label", x.label + ": " + zl(x.v));
     if (onPick) { c.setAttribute("role", "button"); c.tabIndex = 0;
       c.onclick = c.onkeydown = function (e) { if (e.type === "keydown" && e.key !== "Enter" && e.key !== " ") return; onPick(i); }; }
@@ -1431,45 +1450,40 @@ function renderTrends(P) {
   var val = function (m) { return metric === "exp" ? m.expenses : metric === "inc" ? m.income : Math.max(0, m.saved); };
   var list = P.months;
   if (trendMonth === null || trendMonth >= list.length) trendMonth = lastFull(P);
-  capsules("mbars", "mticks", list.map(function (m) {
-    var skip = metric !== "exp" && (m.incomplete || !(m.income > 0));
-    return { v: skip ? 0 : val(m), label: m.name, part: m.incomplete, sub: m.incomplete ? "до " + m.last_op : nf0.format(val(m)) + " зл" };
-  }), niceMax(Math.max.apply(null, list.map(val).concat([1]))), trendMonth, function (i) { trendMonth = i; render(); });
-  var S = list[trendMonth];
+  var S = list[trendMonth], prev = list[trendMonth - 1] || null;
+  var upTo = function (m) { return m.last_op ? +m.last_op.slice(0, 2) : 0; };
+  // витрати попереднього місяця за ті самі дні (з операцій), щоб чесно порівняти неповний місяць
+  var sameDays = S.incomplete && prev && metric === "exp" ? prev.ops.reduce(function (s, o) { return s + (!o.income && +o.day.slice(8) <= upTo(S) ? o.amount : 0); }, 0) : null;
+  var ax = niceAxis(Math.max.apply(null, list.map(val).concat([1])));
+  capsules("mbars", "mticks", list.map(function (m, i) {
+    var skip = metric !== "exp" && !(m.income > 0);
+    return { v: skip ? 0 : val(m), label: m.name, part: m.incomplete, sub: skip ? "—" : nf0.format(val(m)) + " зл",
+      sub2: m.incomplete ? "1–" + upTo(m) + " " + GEN[mi(m)] : "", mark: sameDays !== null && i === trendMonth - 1 ? sameDays : 0 };
+  }), ax.max, trendMonth, function (i) { trendMonth = i; render(); }, ax.n);
 
   var full = P.months.filter(function (m) { return m.income > 0 && !m.incomplete; });
   var sum = full.reduce(function (s, m) { return s + m.saved; }, 0);
-  // картка під графіком відповідає на вибраний показник: на скільки змінився останній повний місяць проти попереднього,
-  // середнє за повний місяць і окремим рядком — неповний місяць (зі штрихуванням, як на графіку)
-  var last = full[full.length - 1], before = full[full.length - 2];
+  // картка говорить про той самий місяць, що виділений на графіку: сума, з чим порівнюємо, середнє за повний місяць
   var NAME = { exp: "Витрати", inc: "Дохід", saved: "Лишилось" }[metric];
   var z0 = function (v) { return nf0.format(Math.round(v)) + " зл"; };
-  var sgn = function (d) { return (d > 0 ? "+" : d < 0 ? "−" : "") + nf0.format(Math.abs(Math.round(d))) + " зл"; };
   var avg = full.length ? full.reduce(function (s, m) { return s + val(m); }, 0) / full.length : 0;
-  var card = "";
-  if (last && before) {
-    var d = val(last) - val(before), head = NAME + ": " + last.name.toLowerCase() + " проти " + GEN[mi(before)];
-    if (metric === "inc" && Math.abs(d) < 0.5) {
-      card = '<span>Дохід</span><b class="vs-one">Зарплата стабільна: ' + z0(last.income) + " щомісяця</b>";
-    } else {
-      var bd = metric === "saved"
-        ? '<span class="bd ' + (last.rate >= before.rate ? "good" : "bad") + '">' + nf1.format(last.rate) + " % доходу (у " + LOC[mi(before)] + " " + nf1.format(before.rate) + " %)</span>"
-        : badge(val(last), val(before), metric === "exp", "", false);
-      card = "<span>" + head + '</span><div class="vs-big"><b>' + sgn(d) + "</b>" + bd + "</div>" +
-        '<div class="vs-avg"><span>Середнє за повний місяць</span><b>' + z0(avg) + "</b></div>";
-    }
-  } else if (last) {
-    card = "<span>" + NAME + ": " + last.name.toLowerCase() + '</span><div class="vs-big"><b>' + z0(val(last)) + "</b></div>";
-  }
-  var out = P.months.filter(function (m) { return !(m.income > 0 && !m.incomplete); });
-  var part = out.map(function (m) {
-    var days = m.last_op ? +m.last_op.slice(0, 2) : 0, paid = m.income > 0, pd = payDays(P), txt;
-    if (metric === "exp") txt = m.name + " поки неповний: " + z0(m.expenses) + (days ? " за " + days + " " + plural(days, "день", "дні", "днів") : "") + ". У середнє не входить.";
-    else if (metric === "inc") txt = paid ? m.name + " ще триває: зарплата " + z0(m.income) + " вже прийшла." : m.name + ": зарплата ще не прийшла, зазвичай " + (pd ? pd + " числа" : "наприкінці місяця") + ".";
-    else txt = paid ? m.name + " ще триває: поки лишилось " + z0(m.saved) + ". У середнє не входить." : m.name + " порахуємо, коли прийде зарплата. Поки що він не входить у середнє.";
-    return '<div class="vs-part' + (list.indexOf(m) === trendMonth ? " on" : "") + '"><i aria-hidden="true"></i><span>' + esc(txt) + "</span></div>";
-  }).join("");
-  $("t-duo").innerHTML = '<div class="card vs">' + card + (part ? '<div class="vs-parts">' + part + "</div>" : "") + "</div>";
+  var paid = S.income > 0, known = metric === "exp" || paid;
+  var cmpBadge = function (now, was) {
+    var d = now - was, ch = was ? d / was * 100 : 0, up = d > 0, good = up !== (metric === "exp");
+    if (Math.abs(d) < 0.5) return '<span class="bd">0 %</span>';
+    return '<span class="bd ' + (good ? "good" : "bad") + '">' + arr(d) + " " + nf0.format(Math.abs(Math.round(d))) + " зл, " + nf1.format(Math.abs(ch)) + " %</span>";
+  };
+  var row = "";
+  if (!known) row = '<div class="vs-row"><span>' + (metric === "inc" ? "Зарплата ще не прийшла, зазвичай " + (payDays(P) ? payDays(P) + " числа" : "наприкінці місяця") : "Порахуємо, коли прийде зарплата") + "</span></div>";
+  else if (!prev) row = '<div class="vs-row"><span>' + S.name + ' — перший місяць з даними</span><span class="bd">немає з чим порівняти</span></div>';
+  else if (S.incomplete && metric === "exp") row = '<div class="vs-row"><span><i class="dash" aria-hidden="true"></i>Проти тих самих днів ' + GEN[mi(prev)] + ', <b class="nw">' + z0(sameDays) + "</b></span>" + cmpBadge(val(S), sameDays) + "</div>";
+  else if (S.incomplete) row = '<div class="vs-row"><span>Місяць ще триває — порівняємо, коли закінчиться</span></div>';
+  else row = '<div class="vs-row"><span>Проти ' + GEN[mi(prev)] + ', <b class="nw">' + z0(val(prev)) + "</b></span>" + cmpBadge(val(S), val(prev)) + "</div>";
+  var sub = S.incomplete ? "1–" + upTo(S) + " " + GEN[mi(S)] + ", місяць ще триває" : "повний місяць";
+  if (metric === "saved" && paid) sub += " · " + nf1.format(S.rate) + " % доходу";
+  $("t-duo").innerHTML = '<div class="card vs"><span>' + NAME + " у " + LOC[mi(S)] + '</span><div class="vs-big"><b>' + (known ? z0(val(S)) : "—") + "</b></div>" +
+    '<small class="vs-sub">' + sub + "</small>" + row +
+    '<div class="vs-avg"><span>Середнє за повний місяць</span><b>' + z0(avg) + "</b></div></div>";
   $("t-note").hidden = true;
 
   $("t-dmon").textContent = "Категорії у " + LOC[mi(S)];
