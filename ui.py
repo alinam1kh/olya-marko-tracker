@@ -1641,14 +1641,14 @@ function delCash(P, line, day, title, back, undo) {
       saved = null; reportKey = null;
       if (back && location.hash !== back) location.hash = back; else render();
       // «Скасувати» записує той самий запис назад (та сама сума, категорія, опис і дата)
-      toast(okMsg("Запис видалено", P, undo && undo.amount, undo && undo.category), undo ? ["Скасувати", function () { restoreCash(P, undo); }] : null);
+      toast(okMsg("Запис видалено", P, undo && undo.amount, undo && undo.category, "з"), undo ? ["Скасувати", function () { restoreCash(P, undo); }] : null);
     })
     .catch(function (err) { toast(err.message || "Немає звʼязку, спробуйте ще раз"); });
 }
 // тост успіху у два рядки: що сталося + сума й категорія
-function okMsg(title, P, amount, cat) {
+function okMsg(title, P, amount, cat, prep) {
   var a = P && P.accounts.filter(function (x) { return x.key === cat; })[0];
-  return OKI + '<span class="tx"><b>' + title + "</b>" + (a ? "<small>" + zl(+amount) + " · " + esc(a.name) + "</small>" : "") + "</span>";
+  return OKI + '<span class="tx"><b>' + title + "</b>" + (a ? "<small>" + zl(+amount) + " " + (prep || "в") + " «" + esc(a.name) + "»</small>" : "") + "</span>";
 }
 var OKI = '<i aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="m5.5 12.5 4 4 9-9"/></svg></i>';
 function restoreCash(P, u) {
@@ -1848,8 +1848,16 @@ function countUp(el) {
 // старт форм зміщений випадково, але спільно — щоб протифаза яскравості зберігалась
 var ambD = -(Math.random() * 60).toFixed(1) + "s"; $("liquid").querySelectorAll(".amb").forEach(function (s) { s.style.animationDelay = ambD; });
 var lastView = view(), prevView = null, reportKey = null;
+// діагональний блік на головній картці: програти ще раз (крайове світло не перезапускається)
+function replaySheen() {
+  var l = $("liquid");
+  if (!l || !l.classList.contains("sheen") || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  l.getAnimations().forEach(function (a) { if (a.animationName === "sheen" && a.playState !== "running") { a.currentTime = 0; a.play(); } });
+}
+setInterval(function () { if (!document.hidden && view() === "report") replaySheen(); }, 60000);
 window.addEventListener("hashchange", function () {
   var v = view();
+  if (v === "report" && lastView !== "report" && lastView !== "add") setTimeout(replaySheen, 250);
   if (v !== "add" && lastView !== "add") window.scrollTo(0, 0);
   if (lastView === "add" && v !== "add") sheetFromApp = false;
   if (lastView === "report" && v !== "report" && v !== "add") reportKey = null;
