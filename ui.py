@@ -852,8 +852,8 @@ function renderReport(P) {
       '<div class="hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>' +
       "<span>Зарплата зазвичай приходить " + (days ? days + " числа" : "наприкінці місяця") + ". «Лишилось» порахуємо після неї.</span></div>";
   } else {
-    var inc = M.incomplete ? "<i>надійшов</i>" : (prevI ? badge(M.income, prevI.income, false, GEN[mi(prevI)]) : "");
-    var exp = M.incomplete ? "<i>порівняємо після кінця місяця</i>" : (prevM ? badge(M.expenses, prevM.expenses, true, GEN[mi(prevM)]) : "");
+    var inc = M.incomplete ? "" : (prevI ? badge(M.income, prevI.income, false, GEN[mi(prevI)]) : "");
+    var exp = M.incomplete ? "" : (prevM ? badge(M.expenses, prevM.expenses, true, GEN[mi(prevM)]) : "");
     var dn = +M.last_op.slice(0, 2);
     hero.innerHTML = tag + '<div class="lbl">Лишилось у ' + LOC[k] + '</div><div class="num">' + approx + zl(M.saved) + "</div>" +
       '<div class="sub">' + nf1.format(M.rate) + " % від доходу" + (M.incomplete ? ", поки що" : "") + (P.ok ? "" : ", потребує перевірки") + "</div>" +
@@ -889,8 +889,9 @@ function renderInsights(P, M) {
     var pi = prevWithIncome(P, month);
     if (pi) {
       var pp = M.rate - pi.rate;
-      add("Лишилось " + nf1.format(M.rate) + " % доходу, у " + LOC[mi(pi)] + " — " + nf1.format(pi.rate) + " %",
-        Math.abs(pp) < 0.05 ? '<span class="bd">без змін</span>' : '<span class="bd ' + (pp > 0 ? "good" : "bad") + '">' + arr(pp) + " " + nf1.format(Math.abs(pp)) + " п. п.</span>");
+      add("Лишилось " + nf1.format(M.rate) + " % доходу",
+        Math.abs(pp) < 0.05 ? '<span class="bd">як у ' + LOC[mi(pi)] + "</span>" :
+        '<span class="bd ' + (pp > 0 ? "good" : "bad") + '" aria-label="' + (pp > 0 ? "більше" : "менше") + ", ніж у " + LOC[mi(pi)] + ": " + nf1.format(pi.rate) + ' %">' + arr(pp) + " у " + LOC[mi(pi)] + " " + nf1.format(pi.rate) + " %</span>");
     }
     var top = M.categories[0];
     if (top && M.expenses) {
@@ -1008,7 +1009,7 @@ function renderTrends(P) {
   var last = full[full.length - 1], before = full[full.length - 2], pp = last && before ? last.rate - before.rate : 0;
   $("t-duo").innerHTML = '<div class="card"><span>Лишилось разом</span><b>' + zl(sum) + "</b><small>у середньому " + zl(full.length ? sum / full.length : 0) + " на місяць</small></div>" +
     '<div class="card"><span>Норма заощаджень</span><b>' + nf1.format(last ? last.rate : 0) + " %</b>" +
-    (before ? '<span class="bd ' + (pp >= 0 ? "good" : "bad") + '" style="display:inline-flex">' + arr(pp) + " " + nf1.format(Math.abs(pp)) + " п. п.</span><small>у " + LOC[mi(before)] + " " + nf1.format(before.rate) + " %</small>" : "") + "</div>";
+    (before ? '<span class="bd ' + (pp >= 0 ? "good" : "bad") + '" style="display:inline-flex">' + arr(pp) + " у " + LOC[mi(before)] + " " + nf1.format(before.rate) + " %</span>" : "") + "</div>";
   var out = P.months.filter(function (m) { return !(m.income > 0 && !m.incomplete); });
   $("t-note").textContent = "Враховано лише повні місяці, " + full.map(function (m) { return m.name.toLowerCase(); }).join(" і ") + "." +
     (out.length ? " " + out.map(function (m) { return m.name; }).join(", ") + (out[0].income > 0 ? " ще триває." : " ще без зарплати.") : "");
