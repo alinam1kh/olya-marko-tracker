@@ -458,6 +458,8 @@ a { color: inherit; text-decoration: none; }
 .dates button { min-height: 52px; border: 0; border-radius: 14px; background: var(--soft); font-size: 14px; font-weight: 500; line-height: 1.2; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .dates button small { font-size: 12px; font-weight: 400; color: var(--ink2); }
 .dates button.other { flex-direction: row; gap: 6px; }
+.dates button.other svg { color: var(--ink2); }
+.dates button.other[aria-pressed="true"] svg { color: #fff; }
 .dates button[aria-pressed="true"] { background: var(--blue-g); color: #fff; }
 .dates button[aria-pressed="true"] small { color: rgba(255,255,255,.8); }
 .vh { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
@@ -473,23 +475,25 @@ a { color: inherit; text-decoration: none; }
 
 /* нижня навігація v2: біла плаваюча панель, активний пункт — синя капсула; fade під нею */
 .fade { z-index: 19; position: fixed; left: 0; right: 0; bottom: 0; height: 130px; pointer-events: none; background: linear-gradient(rgba(245,246,248,0), var(--bg) 70%); }
-.nav { z-index: 20; position: fixed; left: 50%; bottom: calc(22px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); width: min(342px, calc(100vw - 48px)); height: 64px;
+.nav { z-index: 20; position: fixed; left: 50%; bottom: calc(22px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); width: min(342px, calc(100vw - 48px)); height: 68px;
   display: flex; align-items: center; padding: 0 8px; border: 1px solid var(--border); border-radius: 32px; background: rgba(255,255,255,.96); box-shadow: 0 10px 30px rgba(17,19,24,.10); }
-.nav a { position: relative; flex: 1; height: 48px; border-radius: 24px; display: flex; align-items: center; justify-content: center; font-size: 15px; color: var(--ink3); transition: color .35s var(--ease); }
+.nav a { position: relative; flex: 1; height: 54px; border-radius: 27px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 13px; color: var(--ink3); transition: color .35s var(--ease); }
 .nav a.on { color: var(--blue); font-weight: 500; }
+.nav a svg { width: 22px; height: 22px; transition: transform .45s var(--spring); }
+.nav a.on svg { transform: scale(1.06); }
 /* плашка активної вкладки — одна на всіх, переїжджає з пружинкою */
-.nav .ind { position: absolute; left: 8px; top: 7px; width: calc((100% - 16px) / 3); height: 48px; border-radius: 24px; background: var(--blue-soft);
+.nav .ind { position: absolute; left: 8px; top: 6px; width: calc((100% - 16px) / 3); height: 54px; border-radius: 27px; background: var(--blue-soft);
   transform: translateX(calc(var(--n, 0) * 100%)); transition: transform .7s var(--spring); }
 .nav { padding: 0 8px; }
 /* ---------- рух ---------- */
 /* екран завантаження: знак із градієнтом, назва, три крапки; зникає, щойно готові шрифт і дані */
 .splash { position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; background: var(--bg);
-  transition: opacity .9s var(--ease), visibility 0s linear .9s; }
+  transition: opacity 1.2s cubic-bezier(.4, 0, .2, 1), visibility 0s linear 1.2s; }
 .splash.out { opacity: 0; visibility: hidden; }
-.splash.out .sp-mark { transform: scale(.9); }
+.splash.out .sp-mark { transform: scale(.96) translateY(-4px); }
 .sp-mark { position: relative; width: 84px; height: 84px; border-radius: 25px; display: grid; place-items: center; overflow: hidden; isolation: isolate;
   background: var(--blue-g); box-shadow: 0 10px 24px rgba(29,95,224,.34), inset 0 1px 0 rgba(255,255,255,.3);
-  animation: breathe 2.4s ease-in-out infinite; transition: transform .9s var(--ease); }
+  animation: breathe 2.4s ease-in-out infinite; transition: transform 1.2s cubic-bezier(.4, 0, .2, 1); }
 /* відблиск, що проходить по кнопці */
 .sp-mark::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(110deg, transparent 35%, rgba(255,255,255,.28) 50%, transparent 65%);
   transform: translateX(-100%); animation: shine 1.8s ease-in-out infinite; }
@@ -629,9 +633,9 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
 <div class="fade" aria-hidden="true"></div>
 <nav class="nav" aria-label="Навігація">
   <i class="ind" id="nav-ind" aria-hidden="true"></i>
-  <a id="navr" href="#report">Головна</a>
-  <a id="navt" href="#analytics">Аналітика</a>
-  <a id="navj" href="#journal">Журнал</a>
+  <a id="navr" href="#report"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.3 2.8a1.1 1.1 0 0 1 1.4 0l8 6.6a1 1 0 0 1-.65 1.8H19V20a1 1 0 0 1-1 1h-4v-5h-4v5H6a1 1 0 0 1-1-1v-8.8H3.95a1 1 0 0 1-.65-1.8z"/></svg>Головна</a>
+  <a id="navt" href="#analytics"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="3.5" y="12" width="4.2" height="8.5" rx="1.4"/><rect x="9.9" y="4" width="4.2" height="16.5" rx="1.4"/><rect x="16.3" y="8.5" width="4.2" height="12" rx="1.4"/></svg>Аналітика</a>
+  <a id="navj" href="#journal"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M6 2.5h12a1 1 0 0 1 1 1v17.2a.6.6 0 0 1-.95.5L15.5 19.4l-2.9 1.9a1 1 0 0 1-1.1 0l-2.9-1.9-2.55 1.8A.6.6 0 0 1 5 20.7V3.5a1 1 0 0 1 1-1zM9 7.2a.85.85 0 0 0 0 1.7h6a.85.85 0 0 0 0-1.7zm0 4a.85.85 0 0 0 0 1.7h6a.85.85 0 0 0 0-1.7zm0 4a.85.85 0 0 0 0 1.7h3a.85.85 0 0 0 0-1.7z"/></svg>Журнал</a>
 </nav>
 
 <script type="application/json" id="data">__DATA__</script>
@@ -881,7 +885,7 @@ function renderReport(P) {
     hero.innerHTML = tag + '<div class="lbl">Витрачено до зарплати</div><div class="num">' + approx + zl(M.expenses) + "</div>" +
       (usual ? '<div class="meter"><b data-to="' + Math.min(100, share) + '%"></b></div><div class="sub">' + nf1.format(share) + " % звичної зарплати " + nf0.format(usual) + " зл</div>" : "") +
       '<div class="hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>' +
-      "<span>Зарплата зазвичай приходить " + (days ? days + " числа" : "наприкінці місяця") + ". «Лишилось» порахуємо після неї.</span></div>";
+      "<span>Зарплата зазвичай надходить " + (days ? days + " числа" : "наприкінці місяця") + ". Залишок місяця зʼявиться після її надходження.</span></div>";
   } else {
     var inc = M.incomplete ? "" : (prevI ? heroBadge(M.income, prevI.income, false, LOC[mi(prevI)]) : "");
     var exp = M.incomplete ? "" : (prevM ? heroBadge(M.expenses, prevM.expenses, true, LOC[mi(prevM)]) : "");
@@ -902,7 +906,7 @@ function renderReport(P) {
     var fresh = saved && !freshDone && o.cash && Math.abs(o.amount - saved.amount) < 0.005 && (!saved.day || o.day === saved.day);
     if (fresh) freshDone = true;
     return opRow(o, true, fresh);
-  }).join("") : '<div class="empty">Операцій поки немає</div>';
+  }).join("") : '<div class="empty">Операцій немає</div>';
   grow("#hero .meter b, #v-report .bar6 b, #goal .segs b", "width");
 }
 // «Головне за вересень»: факт і бейдж праворуч; у неповному місяці — що вже відомо
@@ -912,24 +916,24 @@ function renderInsights(P, M) {
   if (!(M.income > 0)) { box.hidden = true; return; }
   var title = "Головне за " + MONTHS_FULL[k].toLowerCase();
   if (M.incomplete) {
-    add("Фіксовані вже сплачено, далі переважно змінні", '<span class="bd">' + zl(M.fixed) + "</span>");
-    add("Змінні за " + (+M.last_op.slice(0, 2)) + " " + plural(+M.last_op.slice(0, 2), "день", "дні", "днів"), '<span class="bd blue">' + zl(M.variable) + "</span>");
-    add("Частка ще зменшиться, місяць не закінчився", '<span class="bd new">' + nf1.format(M.rate) + " %</span>");
+    add("Фіксовані платежі вже сплачено", '<span class="bd">' + zl(M.fixed) + "</span>");
+    add("Змінні витрати за " + (+M.last_op.slice(0, 2)) + " " + plural(+M.last_op.slice(0, 2), "день", "дні", "днів"), '<span class="bd blue">' + zl(M.variable) + "</span>");
+    add("Норма заощаджень (попередньо)", '<span class="bd new">' + nf1.format(M.rate) + " %</span>");
   } else {
     var pi = prevWithIncome(P, month);
     if (pi) {
       var pp = M.rate - pi.rate;
-      add("Лишилось " + nf1.format(M.rate) + " % доходу",
+      add("Заощаджено " + nf1.format(M.rate) + " % доходу",
         Math.abs(pp) < 0.05 ? '<span class="bd">як у ' + LOC[mi(pi)] + "</span>" :
         '<span class="bd ' + (pp > 0 ? "good" : "bad") + '" aria-label="' + (pp > 0 ? "більше" : "менше") + ", ніж у " + LOC[mi(pi)] + ": " + nf1.format(pi.rate) + ' %">' + arr(pp) + " з " + nf1.format(pi.rate) + " %</span>");
     }
     var top = M.categories[0];
     if (top && M.expenses) {
       var share = top.amount / M.expenses * 100;
-      add(share > 50 && top.name === "Житло" ? "Більше половини забрала оренда" : "Найбільше пішло на " + top.name.toLowerCase(), '<span class="bd blue">' + nf0.format(share) + " % витрат</span>");
+      add(share > 50 && top.name === "Житло" ? "Оренда — понад половину витрат" : "Найбільша категорія — " + top.name.toLowerCase(), '<span class="bd blue">' + nf0.format(share) + " % витрат</span>");
     }
     var pm = P.months[month - 1];
-    if (pm && pm.variable) add("Змінні витрати " + (M.variable >= pm.variable ? "зросли" : "зменшились") + " проти " + GEN[mi(pm)], badge(M.variable, pm.variable, true, "", true));
+    if (pm && pm.variable) add("Змінні витрати порівняно з " + INS[mi(pm)], badge(M.variable, pm.variable, true, "", true));
   }
   box.hidden = !rows.length;
   box.innerHTML = '<div class="ch"><h2>' + title + "</h2></div>" + rows.join("");
@@ -957,13 +961,13 @@ function renderGoal(P) {
     labs += "<span>" + (i === 0 ? "1 міс." : i + 1) + "</span>";
   }
   box.innerHTML = '<div class="ch" style="min-height:0"><h2>' + G.title + '</h2><span class="sub" style="font-size:12px">до 1 червня ' + G.deadline[0] + "</span></div>" +
-    '<div class="gbig"><b>' + nf1.format(life) + "</b><span>" + (Math.round(life * 10) % 10 ? "місяця" : plural(Math.round(life), "місяць", "місяці", "місяців")) + " спокійного життя<br>з шести запланованих</span></div>" +
+    '<div class="gbig"><b>' + nf1.format(life) + "</b><span>" + (Math.round(life * 10) % 10 ? "місяця" : plural(Math.round(life), "місяць", "місяці", "місяців")) + " витрат покрито<br>із 6 запланованих</span></div>" +
     '<div class="segs" role="img" aria-label="' + nf1.format(life) + " з " + G.months + ' місяців">' + segs + '</div><div class="seglab" aria-hidden="true">' + labs + "</div>" +
     '<div class="gcols"><div><span>Накопичено</span><b>' + nf0.format(have) + " зл</b><small>з " + nf0.format(target) + " зл, " + nf0.format(have / target * 100) + " %</small></div>" +
-    "<div><span>Відкладаєте на місяць</span><b>" + nf0.format(pace) + " зл</b><small>треба " + nf0.format(need) + " зл</small></div></div>" +
+    "<div><span>Відкладено за місяць</span><b>" + nf0.format(pace) + " зл</b><small>треба " + nf0.format(need) + " зл</small></div></div>" +
     '<div class="gpace"><span>' + (pace >= need
-      ? "Якщо відкладати стільки ж, подушка буде готова " + (early ? "вже в " + LOC[etaM] + " " + etaY + ", на " + ahead + " " + plural(ahead, "місяць", "місяці", "місяців") + " раніше плану" : "якраз вчасно")
-      : "Щоб встигнути до червня " + G.deadline[0] + ", відкладайте щомісяця більше") + "</span>" +
+      ? "За поточного темпу ціль буде досягнуто " + (early ? "в " + LOC[etaM] + " " + etaY + " — на " + ahead + " " + plural(ahead, "місяць", "місяці", "місяців") + " раніше плану" : "вчасно")
+      : "Щоб досягти цілі до червня " + G.deadline[0] + ", потрібно відкладати більше") + "</span>" +
     '<span class="bd ' + (pace >= need ? "good" : "bad") + '" title="' + (pace >= need ? "на стільки більше, ніж треба щомісяця" : "на стільки треба більше щомісяця") + '">' +
     (pace >= need ? "+" : "−") + nf0.format(Math.abs(pace - need)) + " зл/міс.</span></div>";
 }
@@ -1011,7 +1015,7 @@ function renderAnalytics(P) {
     rm.appendChild(b);
   });
   $("wnote").textContent = rent.length ? (useOut ? "Оренду " + nf0.format(rentSum) + " зл, сплачену " + rent[0].date.slice(0, 2).replace(/^0/, "") + "." + rent[0].date.slice(3) + ", винесено з графіка. Разом з орендою — " + zl(M.expenses) + "."
-    : "Оренда — світла верхівка першого тижня. Без неї — " + zl(M.expenses - rentSum) + ".") : "Усього за місяць — " + zl(M.expenses) + (M.incomplete ? ", дані до " + M.last_op : "") + ".";
+    : "Оренда — світла частина першого тижня. Без оренди — " + zl(M.expenses - rentSum) + ".") : "Усього за місяць — " + zl(M.expenses) + (M.incomplete ? ", дані до " + M.last_op : "") + ".";
   var labels = ["1–7", "8–14", "15–21", "22–28", "29+"];
   capsules("bars", "wticks", weeks.map(function (w, i) { return { v: w, rent: rentW[i], label: labels[i], sub: nf0.format(w) + " зл" }; }), niceMax(Math.max.apply(null, weeks.concat([1]))), -1, null);
 
@@ -1069,7 +1073,7 @@ function renderTrends(P) {
     if (prev) { var was = pm[c.name] || 0; d = !was ? '<span class="bd new" title="у попередньому місяці цих витрат не було">вперше</span>' : badge(c.amount, was, true, "", true); }
     return '<div class="cmp"><span class="n">' + esc(c.name) + '</span><span class="v">' + zl(c.amount) + "</span>" + d + "</div>";
   }).join("");
-  $("t-cmpnote").textContent = S.incomplete ? "Місяць ще триває, тож порівняння неповне." : "";
+  $("t-cmpnote").textContent = S.incomplete ? "Місяць триває, дані попередні." : "";
 }
 
 // ---------- журнал ----------
@@ -1101,7 +1105,7 @@ function renderJournal(P) {
     buf += opRow(o, false, false);
   });
   flush();
-  $("j-list").innerHTML = html || '<section class="card empty">Тут поки порожньо</section>';
+  $("j-list").innerHTML = html || '<section class="card empty">Операцій не знайдено</section>';
   $("j-list").querySelectorAll(".del").forEach(function (b) {
     b.onclick = function () {
       // підтвердження прямо в рядку: «Видалити» / «Ні»
@@ -1142,7 +1146,7 @@ function renderDates() {
   [["Сьогодні", t], ["Вчора", y], ["Інша дата", null]].forEach(function (x, i) {
     var b;
     if (x[1]) b = h("button", "", x[0] + "<small>" + wd.format(x[1]) + ", " + dm.format(x[1]) + "</small>");
-    else b = h("button", other ? "" : "other", other ? "Інша дата<small>" + v.slice(8) + "." + v.slice(5, 7) + "</small>" : CAL + "Інша дата");
+    else b = h("button", other ? "" : "other", other ? "Інша дата<small>" + v.slice(8) + "." + v.slice(5, 7) + "</small>" : CAL.replace('stroke="#6B7180"', 'stroke="currentColor"') + "Інша дата");
     var calOpen = !$("a-cal").hidden;
     b.type = "button"; b.setAttribute("aria-pressed", calOpen || other ? i === 2 : i === dpick);
     b.onclick = function () {
@@ -1311,7 +1315,7 @@ if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catc
 (function () {
   var s = $("splash"), t = Date.now(), done = false, fill = $("sp-fill");
   requestAnimationFrame(function () { fill.style.width = "85%"; });
-  function hide() { if (done) return; done = true; setTimeout(function () { s.classList.add("done"); fill.style.width = "100%"; setTimeout(function () { s.classList.add("out"); lastBase = null; render(); setTimeout(function () { s.remove(); }, 1000); }, 550); }, Math.max(0, 1500 - (Date.now() - t))); }
+  function hide() { if (done) return; done = true; setTimeout(function () { s.classList.add("done"); fill.style.width = "100%"; setTimeout(function () { s.classList.add("out"); setTimeout(function () { lastBase = null; render(); }, 180); setTimeout(function () { s.remove(); }, 1300); }, 550); }, Math.max(0, 1500 - (Date.now() - t))); }
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(hide);
   setTimeout(hide, 2200);
 })();
