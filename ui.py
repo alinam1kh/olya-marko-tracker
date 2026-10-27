@@ -807,7 +807,7 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .cap .r3 { display: block; margin-top: 2px; font-size: 11px; color: var(--ink2); }
 .vs-parts { margin-top: 12px; }
 .vs-parts:empty { display: none; }
-.wleg { display: flex; justify-content: space-between; gap: 12px; margin-top: 24px; }
+.wleg { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 12px; margin-top: 24px; }
 .wleg .vs-part { padding: 0; background: none; margin: 0; gap: 8px; }
 .wleg .vs-part + .vs-part { margin: 0; text-align: right; }
 .wleg .vs-part i { width: 14px; height: 14px; border-radius: 4px; }
@@ -872,7 +872,7 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .chips button { min-height: 44px; padding: 0 14px; border: 1px solid var(--border); border-radius: 22px; background: var(--card); font-size: 14px; cursor: pointer; }
 .chips button[aria-pressed="true"] { border-color: transparent; background: var(--blue-g); color: #fff; font-weight: 500; }
-.field { width: 100%; height: 52px; margin-top: 16px; padding: 0 16px; border: 1.5px solid #DDE1E8; border-radius: 16px; background: var(--card); font: 16px var(--font); color: var(--ink);
+.field { width: 100%; height: 52px; margin-top: 16px; padding: 0 16px; border: 1px solid #DDE1E8; border-radius: 16px; background: var(--card); font: 16px var(--font); color: var(--ink);
   -webkit-appearance: none; appearance: none; transition: border-color .3s var(--ease), box-shadow .3s var(--ease); }
 .field::placeholder { color: #8A90A0; opacity: 1; }
 .field:focus { outline: 0; border-color: var(--blue); box-shadow: 0 0 0 4px var(--blue-soft); }
@@ -932,9 +932,9 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .sp-back { transform-origin: 13px 9px; animation: spBack 2.4s var(--ease) infinite; }
 .sp-note { transform-origin: 10px 13px; animation: spNote 2.4s var(--ease) infinite; }
 .sp-coin { transform-origin: 18.6px 17.6px; animation: spCoin 2.4s var(--ease) infinite; }
-@keyframes spBack { 0% { opacity: 0; transform: translate(-3px, 3px) rotate(-6deg); } 24%, 100% { opacity: 1; transform: none; } }
-@keyframes spNote { 0% { opacity: 0; transform: translateY(4px) scale(.9); } 30%, 100% { opacity: 1; transform: none; } }
-@keyframes spCoin { 0%, 18% { opacity: 0; transform: translate(6px, 0) rotate(160deg); } 46%, 100% { opacity: 1; transform: none; } }
+@keyframes spBack { 0%, 30%, 100% { transform: none; } 45% { transform: translate(.4px, -.8px) rotate(2deg); } 60% { transform: none; } }
+@keyframes spNote { 0%, 100% { transform: none; } 14% { transform: translateY(-1.2px) scale(1.03); } 28% { transform: none; } 52% { transform: translateY(-.6px) rotate(-1.5deg); } 66% { transform: none; } }
+@keyframes spCoin { 0%, 18%, 100% { transform: none; } 30% { transform: translateY(-2.6px); } 40% { transform: none; } 48% { transform: translateY(-1px); } 56% { transform: none; } }
 .sp-name { font-size: 16px; font-weight: 500; color: var(--ink); opacity: 0; animation: rise .5s .15s var(--ease) both; }
 /* повзунок: швидко доходить до ~85 %, а коли все готово — до кінця */
 .sp-bar { width: 148px; height: 6px; margin-top: 4px; border-radius: 3px; background: var(--track); overflow: hidden; }
@@ -1482,7 +1482,7 @@ function renderAnalytics(P) {
   var RENT = "repeating-linear-gradient(135deg, #A9C6F8 0 4px, #D7E4FC 4px 8px)", BLUE = "linear-gradient(180deg, #3B82F6, #1D5FE0)";
   var row = function (bg, txt) { return '<div class="vs-part"><i aria-hidden="true" style="background:' + bg + '"></i><span>' + txt + "</span></div>"; };
   $("wnote").innerHTML = rent.length
-    ? (useOut ? row(BLUE, "Витрати без оренди — " + nf0.format(Math.round(M.expenses - rentSum)) + " зл") + row(RENT, "Оренду " + nf0.format(Math.round(rentSum)) + " зл" + " не показано на графіку")
+    ? (useOut ? row(BLUE, "Без оренди — " + nf0.format(Math.round(M.expenses - rentSum)) + " зл") + '<div class="vs-part"><span>Оренда ' + nf0.format(Math.round(rentSum)) + " зл не показана</span></div>"
               : row(RENT, "Оренда — " + nf0.format(Math.round(rentSum)) + " зл") + row(BLUE, "Решта витрат — " + nf0.format(Math.round(M.expenses - rentSum)) + " зл"))
     : row(BLUE, "Усього за місяць — " + nf0.format(Math.round(M.expenses)) + " зл" + (M.incomplete ? ", дані до " + M.last_op : ""));
   var labels = ["1–7", "8–14", "15–21", "22–28", "29+"];
@@ -1868,6 +1868,7 @@ window.addEventListener("hashchange", function () {
   if (v !== "add" && lastView !== "add") window.scrollTo(0, 0);
   if (lastView === "add" && v !== "add") sheetFromApp = false;
   if (lastView === "report" && v !== "report" && v !== "add") reportKey = null;
+  if (lastView === "journal" && v !== "journal" && v !== "add") filter = "all";
   prevView = lastView; lastView = v; render();
 });
 render();
