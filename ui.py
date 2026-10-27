@@ -593,7 +593,7 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 @keyframes numin { from { opacity: 0; transform: translateY(8px); filter: blur(4px); } to { opacity: 1; transform: none; filter: none; } }
 .hero .num { margin-top: 6px; font-size: 40px; font-weight: 500; letter-spacing: -.02em; line-height: 1.05; }
 .hero .sub { margin-top: 6px; font-size: 14px; }
-.hero .tag { position: absolute; top: 18px; right: 18px; height: 24px; padding: 0 8px; border-radius: 12px; background: rgba(255,255,255,.92); color: var(--ink3); font-size: 12px; font-weight: 500; display: flex; align-items: center; }
+.hero .tag { position: absolute; top: 18px; right: 18px; height: 24px; padding: 0 8px; border-radius: 12px; background: rgba(255,255,255,.16); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,.22); color: #fff; font-size: 12px; font-weight: 500; display: flex; align-items: center; }
 .hero .meter { height: 8px; margin: 14px 0 8px; border-radius: 4px; background: rgba(255,255,255,.25); overflow: hidden; }
 .hero .meter b { display: block; height: 100%; width: 0; border-radius: 4px; background: #fff; transition: width 2.1s var(--ease); }
 .hero .hint { display: flex; gap: 6px; align-items: flex-start; margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.35); font-size: 14px; line-height: 1.4; }
