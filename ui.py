@@ -558,7 +558,7 @@ body.p-olya .liquid .after { opacity: .8; }  /* в Олі світлі тони 
 /* мʼякі абстрактні форми після бліку: три великі розмиті плями біля країв (рух і яскравість — у кадрах flow1–3) */
 .liquid .amb { inset: auto; width: 96%; aspect-ratio: 1.7; border-radius: 50%; filter: blur(34px); mix-blend-mode: screen;
   will-change: transform; opacity: .7; }
-.liquid .a3 { right: -44%; top: 6%; width: 68%; aspect-ratio: 1.2; background: radial-gradient(42% 38% at 30% 26%, var(--l4) 0%, color-mix(in srgb, var(--l4) 50%, transparent) 50%, transparent 100%), radial-gradient(40% 36% at 66% 76%, var(--l3) 0%, color-mix(in srgb, var(--l3) 45%, transparent) 50%, transparent 100%);
+.liquid .a3 { right: -44%; top: 6%; width: 68%; aspect-ratio: 1.2; background: radial-gradient(42% 38% at 30% 26%, var(--l4) 0%, color-mix(in srgb, var(--l4) 50%, transparent) 50%, transparent 100%), radial-gradient(32% 28% at 66% 76%, var(--l3) 0%, color-mix(in srgb, var(--l3) 45%, transparent) 50%, transparent 100%);
   animation: flow3 9.5s linear infinite; }
 .liquid .a1 { animation: flow1 11s linear infinite; }
 .liquid .a2 { animation: flow2 13s linear infinite; }
@@ -566,8 +566,8 @@ body.p-olya .liquid .after { opacity: .8; }  /* в Олі світлі тони 
 .liquid .erim { animation: glintR 5s ease-in-out infinite; }
 @keyframes glintR { 0%, 100% { opacity: .3; } 50% { opacity: .62; } }
 @keyframes glint { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
-.liquid .a1 { right: -38%; top: -48%; background: radial-gradient(60% 70% at 35% 40%, var(--l2) 0%, color-mix(in srgb, var(--l2) 55%, transparent) 55%, transparent 100%), radial-gradient(65% 60% at 68% 62%, var(--l4) 0%, color-mix(in srgb, var(--l4) 50%, transparent) 50%, transparent 100%); }
-.liquid .a2 { left: -40%; bottom: -52%; background: radial-gradient(60% 70% at 35% 40%, var(--l3) 0%, color-mix(in srgb, var(--l3) 55%, transparent) 55%, transparent 100%), radial-gradient(65% 60% at 68% 62%, var(--l2) 0%, color-mix(in srgb, var(--l2) 50%, transparent) 50%, transparent 100%); }
+.liquid .a1 { right: -38%; top: -48%; background: radial-gradient(44% 52% at 35% 40%, var(--l2) 0%, color-mix(in srgb, var(--l2) 55%, transparent) 55%, transparent 100%), radial-gradient(65% 60% at 68% 62%, var(--l4) 0%, color-mix(in srgb, var(--l4) 50%, transparent) 50%, transparent 100%); }
+.liquid .a2 { left: -36%; bottom: -50%; width: 74%; background: radial-gradient(46% 54% at 35% 40%, var(--l3) 0%, color-mix(in srgb, var(--l3) 55%, transparent) 55%, transparent 100%), radial-gradient(48% 44% at 68% 62%, var(--l2) 0%, color-mix(in srgb, var(--l2) 50%, transparent) 50%, transparent 100%); }
 /* легка тінь під білим текстом — підпис лишається читабельним, коли блік пропливає під ним */
 .hero .lbl, .hero .num, .hero .sub, .hero .lt, .hero .lg2 b { text-shadow: 0 1px 10px rgba(5, 10, 30, .28); }
 .hero .sub .inc { color: inherit; }
