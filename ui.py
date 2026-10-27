@@ -561,7 +561,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
 <div class="app">
   <div class="top">
     <div class="who">
-      <button type="button" id="who-btn" aria-haspopup="menu" aria-expanded="false" aria-controls="who-menu"><span class="av" id="who-av"></span><span id="who-name"></span><svg class="ico16 chev" viewBox="0 0 24 24" fill="none" stroke="#6B7180" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+      <button type="button" id="who-btn" aria-haspopup="menu" aria-expanded="false" aria-controls="who-menu"><span class="av" id="who-av"></span><span id="who-name"></span><svg class="ico16" viewBox="0 0 24 24" fill="none" stroke="#6B7180" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h15M15 4l4 4-4 4M20 16H5M9 12l-4 4 4 4"/></svg></button>
       <div class="pop" id="who-menu" role="menu" aria-label="Чиї дані показати" hidden><p>Чиї дані показати</p><div id="who-opts"></div>
         <form class="logout" method="post" action="logout"><button type="submit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 16l-4-4 4-4M6 12h10"/></svg>Вийти</button></form>
 </div>
