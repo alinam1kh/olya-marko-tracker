@@ -144,11 +144,11 @@ PAGE = r"""<!doctype html>
   --ink: #111318; --ink2: #6B7180; --ink3: #4A5060; --ink4: #2A2E38; --mute: #C4C8D0;
   --blue: #1F63E6; --blue-g: linear-gradient(180deg, #3B82F6, #1D5FE0); --blue-soft: #EAF1FF; --blue-txt: #1F55C9; --blue-l: #A9C6F8;
   --good: #15803D; --good-bg: #E3F7EA; --bad: #C0261B; --bad-bg: #FDE8E6; --cash: #7A4E00; --cash-bg: #FFF2DB;
-  --hero-on: #DCE3F4; --glow: rgba(120, 160, 245, .24); --glow2: rgba(130, 175, 255, .62); --glow3: rgba(190, 215, 255, .45); --glow4: rgba(90, 120, 255, .55); --glow5: rgba(150, 130, 255, .5); --g1: #3A62C2; --g2: #1E3778; --g3: #0B132B;
+  --hero-on: #DCE3F4; --glow: rgba(120, 160, 245, .24); --glow2: rgba(130, 175, 255, .62); --glow3: rgba(190, 215, 255, .45); --glow4: rgba(90, 120, 255, .55); --glow5: rgba(150, 130, 255, .5); --l1: #9DBEFF; --l2: #E2ECFF; --l3: #8A9BFF; --g1: #3A62C2; --g2: #1A2F6A; --g3: #04070F;
   --ease: cubic-bezier(.22, 1, .36, 1); --spring: cubic-bezier(.34, 1.36, .64, 1);
   --font: "Onest", "Outfit", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
-body.p-olya { --hero-on: #F1DDEA; --glow: rgba(214, 120, 182, .34); --glow2: rgba(232, 130, 200, .6); --glow3: rgba(255, 190, 230, .42); --glow4: rgba(255, 110, 170, .5); --glow5: rgba(190, 100, 230, .48); --g1: #9A4783; --g2: #5A2149; --g3: #1C0A17; }
+body.p-olya { --hero-on: #F1DDEA; --glow: rgba(214, 120, 182, .34); --glow2: rgba(232, 130, 200, .6); --glow3: rgba(255, 190, 230, .42); --glow4: rgba(255, 110, 170, .5); --glow5: rgba(190, 100, 230, .48); --l1: #E57DC8; --l2: #FFB7E0; --l3: #C25BD6; --g1: #9A4783; --g2: #4E1B3F; --g3: #0B0309; }
 * { box-sizing: border-box; }
 html, body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.4 var(--font); -webkit-font-smoothing: antialiased; font-variant-numeric: tabular-nums; }
 .app { max-width: 440px; margin: 0 auto; padding: 8px 14px 130px; }
@@ -204,21 +204,21 @@ a { color: inherit; text-decoration: none; }
 .hero-wrap { position: relative; isolation: isolate; margin-top: 12px; border-radius: 24px; overflow: hidden;
   background: linear-gradient(162deg, var(--g1) 0%, var(--g2) 48%, var(--g3) 100%); }
 .hero { position: relative; z-index: 1; padding: 22px 20px 20px; border-radius: 24px; color: #fff; }
-/* п'ять м'яких плям повільно пливуть кожна своїм шляхом і з різною швидкістю (13–31 с), ще й змінюють форму;
-   спільне розмиття зливає їх між собою, тож світло наче розтікається. Старт кожної — випадковий */
-.liquid { position: absolute; inset: 0; z-index: 0; pointer-events: none; filter: blur(26px); }
-.liquid i { position: absolute; width: 58%; aspect-ratio: 1; border-radius: 42% 58% 63% 37% / 45% 40% 60% 55%; mix-blend-mode: screen; will-change: transform, border-radius;
-  animation: var(--path) var(--dur) ease-in-out infinite, morph calc(var(--dur) * .6) ease-in-out infinite alternate; }
-.liquid i:nth-child(1) { --path: flow1; --dur: 19s; left: 48%; top: -30%; background: radial-gradient(circle at 40% 40%, var(--glow2), transparent 68%); }
-.liquid i:nth-child(2) { --path: flow2; --dur: 23s; left: -15%; top: 40%; width: 50%; background: radial-gradient(circle at 60% 50%, var(--glow3), transparent 68%); }
-.liquid i:nth-child(3) { --path: flow3; --dur: 29s; left: 30%; top: 50%; width: 66%; background: radial-gradient(circle, var(--glow4), transparent 66%); }
-.liquid i:nth-child(4) { --path: flow4; --dur: 13s; left: 70%; top: 35%; width: 38%; background: radial-gradient(circle, var(--glow3), transparent 66%); }
-.liquid i:nth-child(5) { --path: flow2; --dur: 31s; left: 5%; top: -35%; width: 46%; background: radial-gradient(circle, var(--glow5), transparent 66%); animation-direction: reverse, alternate; }
-@keyframes flow1 { 0%, 100% { transform: translate(0, 0) rotate(0); } 25% { transform: translate(-38%, 30%) rotate(40deg) scale(1.15); } 50% { transform: translate(-12%, 72%) rotate(95deg) scale(.9); } 75% { transform: translate(24%, 26%) rotate(150deg) scale(1.1); } }
-@keyframes flow2 { 0%, 100% { transform: translate(0, 0) rotate(0); } 30% { transform: translate(85%, -30%) rotate(-60deg) scale(1.25); } 60% { transform: translate(140%, 25%) rotate(-120deg) scale(.85); } 80% { transform: translate(50%, 20%) rotate(-160deg) scale(1.05); } }
-@keyframes flow3 { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(-45%, -55%) scale(1.2); } 66% { transform: translate(30%, -35%) scale(.8); } }
-@keyframes flow4 { 0%, 100% { transform: translate(0, 0) scale(1); } 20% { transform: translate(-90%, 60%) scale(1.3); } 45% { transform: translate(-150%, -10%) scale(.9); } 70% { transform: translate(-40%, -70%) scale(1.15); } }
-@keyframes morph { 0% { border-radius: 42% 58% 63% 37% / 45% 40% 60% 55%; } 50% { border-radius: 63% 37% 41% 59% / 58% 62% 38% 42%; } 100% { border-radius: 35% 65% 55% 45% / 38% 52% 48% 62%; } }
+/* «рідке» світло: плями пливуть, розтягуються й зливаються, як краплі. Фільтр #goo спершу розмиває їх,
+   потім робить краї чіткими (там, де плями близько, вони злипаються в одну), а тоді знову м'яко розмиває.
+   Кожна пляма — свій шлях і своя швидкість (11–23 с), старт випадковий */
+.liquid { position: absolute; inset: -10%; z-index: 0; pointer-events: none; filter: url(#goo); opacity: .5; mix-blend-mode: soft-light; }
+.liquid i { position: absolute; width: 44%; aspect-ratio: 1; border-radius: 50%; will-change: transform;
+  animation: var(--path) var(--dur) ease-in-out infinite; }
+.liquid i:nth-child(1) { --path: flow1; --dur: 17s; left: 52%; top: -6%; background: var(--l1); }
+.liquid i:nth-child(2) { --path: flow2; --dur: 21s; left: 4%; top: 52%; width: 36%; background: var(--l2); }
+.liquid i:nth-child(3) { --path: flow3; --dur: 23s; left: 34%; top: 48%; width: 40%; background: var(--l3); }
+.liquid i:nth-child(4) { --path: flow4; --dur: 11s; left: 72%; top: 42%; width: 26%; background: var(--l2); }
+.liquid i:nth-child(5) { --path: flow2; --dur: 19s; left: 16%; top: -14%; width: 30%; background: var(--l3); animation-direction: reverse; }
+@keyframes flow1 { 0%, 100% { transform: translate(0, 0) scale(1, 1); } 25% { transform: translate(-45%, 40%) scale(1.35, .8) rotate(25deg); } 50% { transform: translate(-20%, 85%) scale(.8, 1.2); } 75% { transform: translate(30%, 35%) scale(1.15, .9) rotate(-20deg); } }
+@keyframes flow2 { 0%, 100% { transform: translate(0, 0) scale(1, 1); } 30% { transform: translate(110%, -40%) scale(1.4, .75) rotate(-30deg); } 60% { transform: translate(170%, 20%) scale(.85, 1.15); } 80% { transform: translate(60%, 25%) scale(1.2, .9); } }
+@keyframes flow3 { 0%, 100% { transform: translate(0, 0) scale(1, 1); } 33% { transform: translate(-60%, -70%) scale(1.3, .85) rotate(30deg); } 66% { transform: translate(45%, -45%) scale(.8, 1.25); } }
+@keyframes flow4 { 0%, 100% { transform: translate(0, 0) scale(1); } 20% { transform: translate(-120%, 80%) scale(1.5, .8); } 45% { transform: translate(-200%, -10%) scale(.9, 1.2); } 70% { transform: translate(-60%, -90%) scale(1.25); } }
 /* легка тінь під білим текстом — підпис лишається читабельним, коли блік пропливає під ним */
 .hero .lbl, .hero .num, .hero .sub, .hero .cols .t, .hero .cols b { text-shadow: 0 1px 10px rgba(5, 10, 30, .28); }
 .hero .lbl { font-size: 14px; }
@@ -250,7 +250,7 @@ a { color: inherit; text-decoration: none; }
 
 /* картки */
 .card { margin-top: 12px; padding: 16px; border: 1px solid var(--border); border-radius: 20px; background: var(--card); }
-.card.list { padding: 6px 16px 4px; }
+.card.list { padding: 6px 16px 8px; }
 .ch { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 6px 10px; min-height: 44px; }
 .ch h2 { margin: 0; font-size: 18px; font-weight: 500; white-space: nowrap; letter-spacing: -.01em; }
 .ch a { display: inline-flex; align-items: center; gap: 2px; min-height: 44px; font-size: 14px; font-weight: 500; color: var(--blue); }
@@ -260,11 +260,11 @@ a { color: inherit; text-decoration: none; }
 .fx.cash { background: var(--cash-bg); color: var(--cash); }
 .fx.now { background: var(--blue); color: #fff; }
 /* «Вересень коротко» */
-.ins { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 52px; border-top: 1px solid var(--soft); font-size: 14px; line-height: 1.45; color: var(--ink4); }
+.ins { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 56px; padding: 14px 0; border-top: 1px solid var(--soft); font-size: 14px; line-height: 1.45; color: var(--ink4); }
 .fadein { animation: rise .6s var(--ease) both; }
 @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 /* категорії: кольорова іконка, назва, сума, частка, шкала */
-.crow { display: grid; grid-template-columns: 36px 1fr auto auto; gap: 8px 12px; align-items: center; padding: 8px 0; }
+.crow { display: grid; grid-template-columns: 36px 1fr auto auto; gap: 8px 12px; align-items: center; padding: 12px 0; }
 .crow + .crow { border-top: 1px solid var(--soft); }
 .crow .nm { font-size: 15px; display: flex; align-items: center; gap: 6px; min-width: 0; }
 .crow .am { font-size: 14px; font-weight: 500; }
@@ -273,9 +273,9 @@ a { color: inherit; text-decoration: none; }
 .cic { flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--soft); }
 .cic svg { width: 18px; height: 18px; }
 .cic.inc { background: var(--good-bg); }
-.more { display: flex; justify-content: space-between; align-items: center; min-height: 48px; margin-top: 4px; border-top: 1px solid var(--soft); font-size: 15px; color: var(--ink2); }
+.more { display: flex; justify-content: space-between; align-items: center; min-height: 52px; margin-top: 4px; border-top: 1px solid var(--soft); font-size: 15px; color: var(--ink2); }
 /* операції */
-.op { display: flex; align-items: center; gap: 12px; min-height: 60px; padding: 10px 0; border-top: 1px solid var(--soft); }
+.op { display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 12px 0; border-top: 1px solid var(--soft); }
 .op .cic { width: 40px; height: 40px; border-radius: 20px; }
 .op .cic svg { width: 20px; height: 20px; }
 .op .t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
@@ -354,9 +354,9 @@ a { color: inherit; text-decoration: none; }
 .duo small { display: block; margin-top: 6px; font-size: 13px; color: var(--ink2); }
 .share { display: flex; gap: 3px; height: 10px; margin: 6px 0 12px; }
 .share i { display: block; height: 100%; border-radius: 5px; min-width: 6px; }
-.leg { display: grid; grid-template-columns: 12px 1fr auto auto; gap: 10px; align-items: center; min-height: 30px; font-size: 14px; }
+.leg { display: grid; grid-template-columns: 12px 1fr auto auto; gap: 10px; align-items: center; min-height: 36px; font-size: 14px; }
 .leg i { width: 8px; height: 8px; border-radius: 4px; }
-.cmp { display: flex; align-items: center; gap: 10px; min-height: 44px; border-top: 1px solid var(--soft); font-size: 15px; }
+.cmp { display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 12px 0; border-top: 1px solid var(--soft); font-size: 15px; }
 .cmp .n { flex: 1; min-width: 0; }
 .cmp .v { color: var(--ink2); }
 .cmp .bd { min-width: 64px; justify-content: center; }
@@ -368,7 +368,7 @@ a { color: inherit; text-decoration: none; }
 .filters button { flex: none; min-height: 44px; padding: 0 16px; border: 1px solid var(--border); border-radius: 22px; background: var(--card); font-size: 14px; cursor: pointer; }
 .filters button[aria-pressed="true"] { border-color: transparent; background: var(--blue-g); color: #fff; font-weight: 500; }
 .jsum { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
-.jsum .card { margin: 0; padding: 12px 14px; display: flex; align-items: center; gap: 12px; }
+.jsum .card { margin: 0; padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
 .jsum .ji { flex: none; width: 36px; height: 36px; border-radius: 18px; display: grid; place-items: center; }
 .jsum .ji svg { width: 18px; height: 18px; }
 .jsum span { display: block; font-size: 12px; color: var(--ink2); }
@@ -429,7 +429,7 @@ a { color: inherit; text-decoration: none; }
 .fade { z-index: 19; position: fixed; left: 0; right: 0; bottom: 0; height: 130px; pointer-events: none; background: linear-gradient(rgba(245,246,248,0), var(--bg) 70%); }
 .nav { z-index: 20; position: fixed; left: 50%; bottom: calc(22px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); width: min(342px, calc(100vw - 48px)); height: 64px;
   display: flex; align-items: center; padding: 0 8px; border: 1px solid var(--border); border-radius: 32px; background: rgba(255,255,255,.96); box-shadow: 0 10px 30px rgba(17,19,24,.10); }
-.nav a { position: relative; flex: 1; height: 48px; border-radius: 24px; display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--ink3); transition: color .35s var(--ease); }
+.nav a { position: relative; flex: 1; height: 48px; border-radius: 24px; display: flex; align-items: center; justify-content: center; font-size: 15px; color: var(--ink3); transition: color .35s var(--ease); }
 .nav a.on { color: var(--blue); font-weight: 500; }
 /* плашка активної вкладки — одна на всіх, переїжджає з пружинкою */
 .nav .ind { position: absolute; left: 8px; top: 7px; width: calc((100% - 16px) / 3); height: 48px; border-radius: 24px; background: var(--blue-soft);
@@ -509,7 +509,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
 
   <div id="v-report">
     <div id="h-alert"></div>
-    <div class="hero-wrap"><div class="liquid" id="liquid" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div><section class="hero" id="hero" aria-live="polite"></section></div>
+    <div class="hero-wrap"><svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="goo" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur in="SourceGraphic" stdDeviation="16"/><feColorMatrix values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -8"/><feGaussianBlur stdDeviation="7"/></filter></svg><div class="liquid" id="liquid" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div><section class="hero" id="hero" aria-live="polite"></section></div>
     <a class="cashbtn" id="cash" href="#add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg>Додати готівку</a>
     <section class="card goal" id="goal" hidden></section>
     <section class="card list fadein" id="insights" hidden></section>
@@ -1175,7 +1175,7 @@ function countUp(el) {
 }
 $("liquid").querySelectorAll("i").forEach(function (b) {
   var d = parseFloat(getComputedStyle(b).getPropertyValue("--dur")) || 20;
-  b.style.animationDelay = -(Math.random() * d).toFixed(1) + "s, " + -(Math.random() * d * .6).toFixed(1) + "s";
+  b.style.animationDelay = -(Math.random() * d).toFixed(1) + "s";
 });
 var lastView = view();
 window.addEventListener("hashchange", function () {
