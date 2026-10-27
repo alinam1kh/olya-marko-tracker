@@ -178,11 +178,11 @@ PAGE = r"""<!doctype html>
   --ink: #111318; --ink2: #6B7180; --ink3: #4A5060; --ink4: #2A2E38; --mute: #C4C8D0;
   --blue: #1F63E6; --blue-g: linear-gradient(180deg, #3B82F6, #1D5FE0); --blue-soft: #EAF1FF; --blue-txt: #1F55C9; --blue-l: #A9C6F8;
   --good: #15803D; --good-bg: #E3F7EA; --bad: #C0261B; --bad-bg: #FDE8E6; --cash: #7A4E00; --cash-bg: #FFF2DB;
-  --hero-on: #DCE3F4; --glow: rgba(120, 160, 245, .24); --glow2: rgba(130, 175, 255, .62); --glow3: rgba(190, 215, 255, .45); --glow4: rgba(90, 120, 255, .55); --glow5: rgba(150, 130, 255, .5); --h1: rgba(86, 146, 255, .72); --h2: rgba(56, 189, 248, .5); --h3: rgba(139, 92, 246, .58); --h4: rgba(4, 8, 32, .9); --h5: rgba(59, 91, 255, .62); --h6: rgba(110, 231, 255, .78); --g1: #3A62C2; --g2: #142456; --g3: #010205;
+  --hero-on: #DCE3F4; --glow: rgba(120, 160, 245, .24); --glow2: rgba(130, 175, 255, .62); --glow3: rgba(190, 215, 255, .45); --glow4: rgba(90, 120, 255, .55); --glow5: rgba(150, 130, 255, .5); --h1: rgba(86, 146, 255, .72); --h2: rgba(56, 189, 248, .5); --h3: rgba(139, 92, 246, .58); --h4: rgba(4, 8, 32, .9); --h5: rgba(59, 91, 255, .62); --h6: rgba(110, 231, 255, .78); --g1: #3A62C2; --g2: #142456; --g3: #010205; --l1: #8AF2FF; --l2: #2F6BFF;
   --ease: cubic-bezier(.33, 1, .68, 1); --spring: cubic-bezier(.34, 1.2, .64, 1);
   --font: "Onest", "Outfit", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
-body.p-olya { --hero-on: #F1DDEA; --glow: rgba(214, 120, 182, .34); --glow2: rgba(232, 130, 200, .6); --glow3: rgba(255, 190, 230, .42); --glow4: rgba(255, 110, 170, .5); --glow5: rgba(190, 100, 230, .48); --h1: rgba(244, 114, 182, .62); --h2: rgba(251, 146, 120, .42); --h3: rgba(192, 86, 240, .55); --h4: rgba(28, 2, 20, .9); --h5: rgba(255, 72, 150, .55); --h6: rgba(255, 176, 120, .68); --g1: #9A4783; --g2: #3F1433; --g3: #040103; }
+body.p-olya { --hero-on: #F1DDEA; --glow: rgba(214, 120, 182, .34); --glow2: rgba(232, 130, 200, .6); --glow3: rgba(255, 190, 230, .42); --glow4: rgba(255, 110, 170, .5); --glow5: rgba(190, 100, 230, .48); --h1: rgba(244, 114, 182, .62); --h2: rgba(251, 146, 120, .42); --h3: rgba(192, 86, 240, .55); --h4: rgba(28, 2, 20, .9); --h5: rgba(255, 72, 150, .55); --h6: rgba(255, 176, 120, .68); --g1: #9A4783; --g2: #3F1433; --g3: #040103; --l1: #FFC29A; --l2: #E8449A; }
 * { box-sizing: border-box; }
 html, body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.4 var(--font); -webkit-font-smoothing: antialiased; font-variant-numeric: tabular-nums; }
 .app { max-width: 440px; margin: 0 auto; padding: 8px 14px 130px; }
@@ -255,25 +255,32 @@ a { color: inherit; text-decoration: none; }
 
 /* головна картка: градієнт у кольорі людини, а над ним «рідкі» плями світла */
 .hero-wrap { position: relative; isolation: isolate; margin-top: 12px; border-radius: 24px; overflow: hidden;
-  background: linear-gradient(162deg, var(--g1) 0%, var(--g2) 48%, var(--g3) 100%); }
+  background: radial-gradient(120% 100% at 40% 30%, color-mix(in srgb, var(--g2) 70%, var(--g3)) 0%, var(--g3) 85%); }
 .hero { position: relative; z-index: 1; padding: 22px 20px 20px; border-radius: 24px; color: #fff; }
-/* «рідке» світло як одна композиція: два великі кольорові кола (conic-gradient) повільно обертаються
-   назустріч одне одному, тож відтінки безперервно перетікають один в одний по всій картці й краях.
-   Темне «ядро» пливе під текстом — середина лишається глибокою, а світло живе ближче до країв */
-.liquid { position: absolute; inset: 0; z-index: 0; pointer-events: none; filter: blur(34px) saturate(1.35); }
-.liquid span { position: absolute; left: 50%; top: 50%; border-radius: 50%; will-change: transform; }
-.liquid .f1, .liquid .f2 { width: 190%; aspect-ratio: 1; margin: -95% 0 0 -95%; }
-.liquid .f1 { background: conic-gradient(from 0deg, var(--h1), var(--h4) 16%, var(--h6) 30%, var(--h4) 44%, var(--h3) 58%, var(--h2) 72%, var(--h4) 86%, var(--h1));
-  animation: spinA 18s linear infinite; }
-.liquid .f2 { width: 150%; margin: -75% 0 0 -75%; mix-blend-mode: screen; opacity: .6;
-  background: conic-gradient(from 90deg, var(--h4), var(--h5) 20%, var(--h4) 40%, var(--h6) 55%, var(--h4) 70%, var(--h2) 85%, var(--h4));
-  animation: spinB 23s linear infinite; }
-.liquid .core { width: 105%; aspect-ratio: 2 / 1; margin: -26% 0 0 -60%;
-  background: radial-gradient(closest-side, var(--g3) 0%, color-mix(in srgb, var(--g3) 70%, transparent) 45%, transparent 100%);
-  animation: coreDrift 19s cubic-bezier(.37, 0, .63, 1) infinite; }
-@keyframes spinA { from { transform: rotate(0) translate(5%, 3%); } to { transform: rotate(360deg) translate(5%, 3%); } }
-@keyframes spinB { from { transform: rotate(0) translate(-7%, 4%); } to { transform: rotate(-360deg) translate(-7%, 4%); } }
-@keyframes coreDrift { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(10%, 8%) scale(1.12, .92); } }
+/* одне світло, що обходить картку по краю (як підсвітка за склом): де воно зараз, там загоряється тонкий кант,
+   довкола нього — розмита «рамка» вздовж країв, а всередину мʼяко тягнеться блік. Усі три шари беруть ту саму
+   точку (--gx, --gy), тож це одна цілісна пляма світла: акцент у серці → основний колір → темна середина */
+@property --gx { syntax: "<percentage>"; inherits: true; initial-value: 0%; }
+@property --gy { syntax: "<percentage>"; inherits: true; initial-value: 100%; }
+.liquid { position: absolute; inset: 0; z-index: 0; pointer-events: none; border-radius: inherit;
+  animation: orbit 15s cubic-bezier(.45, 0, .55, 1) infinite; }
+.liquid > span { position: absolute; inset: 0; border-radius: inherit; }
+.liquid .glow { filter: blur(22px);
+  background: radial-gradient(95% 125% at var(--gx) var(--gy), var(--l1) 0%, var(--l2) 20%, color-mix(in srgb, var(--l2) 45%, transparent) 42%, transparent 70%); }
+.liquid .halo { filter: blur(8px); }
+.liquid .halo i, .liquid .rim { position: absolute; inset: 0; border-radius: inherit;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
+.liquid .halo i { padding: 12px; background: radial-gradient(115% 145% at var(--gx) var(--gy), var(--l1) 0%, var(--l2) 32%, transparent 70%); }
+.liquid .rim { padding: 1.5px; background: radial-gradient(90% 120% at var(--gx) var(--gy), #fff 0%, var(--l1) 25%, var(--l2) 52%, transparent 78%); }
+/* кути — повільніше (світло «огортає» кут), проміжки між ними — плавним перетіканням */
+@keyframes orbit {
+  0%, 100% { --gx: -2%; --gy: 104%; }
+  20% { --gx: 102%; --gy: 104%; }
+  34% { --gx: 106%; --gy: 50%; }
+  50% { --gx: 102%; --gy: -4%; }
+  70% { --gx: -2%; --gy: -4%; }
+  84% { --gx: -6%; --gy: 50%; }
+}
 /* легка тінь під білим текстом — підпис лишається читабельним, коли блік пропливає під ним */
 .hero .lbl, .hero .num, .hero .sub, .hero .lt, .hero .lg2 b { text-shadow: 0 1px 10px rgba(5, 10, 30, .28); }
 .hero .sub .inc { color: inherit; }
@@ -562,7 +569,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
   .splash, .sp-mark, .sp-mark::before, .sp-mark g, .sp-bar b, .sp-name, .stag > *, .hero .num.cu, .pop:not([hidden]), .toast { animation: none !important; transition: none !important; }
   .nav .ind, .sw path { transition: none; animation: none !important; }
 }
-@media (prefers-reduced-motion: reduce) { .cap .fill, .crow .bar6 b, .segs i b, .hero .meter b, .hero .split2 b { transition: none !important; } .fadein, .liquid span { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .cap .fill, .crow .bar6 b, .segs i b, .hero .meter b, .hero .split2 b { transition: none !important; } .fadein, .liquid { animation: none; } }
 </style>
 </head>
 <body class="p-marko">
@@ -595,7 +602,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
 
   <div id="v-report">
     <div id="h-alert"></div>
-    <div class="hero-wrap"><div class="liquid" id="liquid" aria-hidden="true"><span class="f1"></span><span class="f2"></span><span class="core"></span></div><section class="hero" id="hero" aria-live="polite"></section></div>
+    <div class="hero-wrap"><div class="liquid" id="liquid" aria-hidden="true"><span class="glow"></span><span class="halo"><i></i></span><span class="rim"></span></div><section class="hero" id="hero" aria-live="polite"></section></div>
     <a class="cashbtn" id="cash" href="#add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg>Додати готівку</a>
     <section class="card goal" id="goal" hidden></section>
     <section class="card list fadein" id="insights" hidden></section>
@@ -1337,7 +1344,7 @@ function countUp(el) {
   requestAnimationFrame(step);
 }
 // випадковий старт: композиція щоразу починається з іншого положення
-$("liquid").querySelectorAll("span").forEach(function (s) { s.style.animationDelay = -(Math.random() * 30).toFixed(1) + "s"; });
+$("liquid").style.animationDelay = -(Math.random() * 16).toFixed(1) + "s";
 var lastView = view(), prevView = null, reportKey = null;
 window.addEventListener("hashchange", function () {
   var v = view();
