@@ -298,7 +298,15 @@ a { color: inherit; text-decoration: none; }
 .hero .num { margin-top: 6px; font-size: 40px; font-weight: 500; letter-spacing: -.02em; line-height: 1.05; }
 .hero .sub { margin-top: 6px; font-size: 14px; }
 .hero .tag { position: absolute; top: 18px; right: 18px; height: 24px; padding: 0 8px; border-radius: 12px; background: rgba(255,255,255,.92); color: var(--ink3); font-size: 12px; font-weight: 500; display: flex; align-items: center; }
-.hero .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.35); }
+/* «Дохід / Витрати» — окрема скляна панель унизу картки: відділена від головної суми, але не сперечається з нею */
+.hero .cols { display: grid; grid-template-columns: 1fr 1fr; margin: 18px -6px -4px; padding: 12px 0; border: 1px solid rgba(255,255,255,.14); border-radius: 18px;
+  background: rgba(255,255,255,.08); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
+.hero .cols a { padding: 0 14px; }
+.hero .cols a + a { border-left: 1px solid rgba(255,255,255,.16); }
+/* маленька крапка-маркер: зелена — надходження, червона — витрати */
+.hero .cols .t { display: inline-flex; align-items: center; gap: 6px; }
+.hero .cols .t::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #4ADE80; }
+.hero .cols a[data-filter="exp"] .t::before { background: #F87171; }
 .hero .cols a { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; min-height: 44px; }
 .hero .cols .t { font-size: 13px; }
 .hero .cols .hd { display: flex; justify-content: flex-start; align-items: center; gap: 8px; width: 100%; min-height: 24px; }
