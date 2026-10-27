@@ -267,7 +267,7 @@ a { color: inherit; text-decoration: none; }
 @property --ey { syntax: "<percentage>"; inherits: true; initial-value: 20%; }
 @property --a { syntax: "<angle>"; inherits: true; initial-value: 115deg; }
 .liquid { position: absolute; inset: 0; z-index: 0; pointer-events: none; border-radius: inherit; --sheen: .45; }
-.liquid.sheen { animation: sheen 7s linear both, edge 15s cubic-bezier(.45, 0, .55, 1) infinite; }
+.liquid.sheen { animation: sheen 7s linear both, edge 12s linear infinite; }
 body.p-olya .liquid { --sheen: .4; }
 .liquid > span { position: absolute; inset: 0; border-radius: inherit; }
 .liquid .glow, .liquid .halo, .liquid .rim { opacity: var(--sheen); }
@@ -345,7 +345,7 @@ body.p-olya .liquid { --sheen: .4; }
   mask: linear-gradient(var(--a), #000 calc(var(--p) - 14%), transparent calc(var(--p) + 6%)), linear-gradient(rgba(0, 0, 0, .7) 0 0); }
 .liquid .after > .ehalo, .liquid .after > .erim { position: absolute; inset: 0; border-radius: inherit; }
 .liquid .after > .amb { position: absolute; }
-.liquid .ehalo { opacity: .38; } .liquid .erim { opacity: .34; }
+.liquid .ehalo { opacity: .46; } .liquid .erim { opacity: .5; }
 .liquid .ehalo { filter: blur(8px); }
 .liquid .ehalo i, .liquid .erim { position: absolute; inset: 0; border-radius: inherit;
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
@@ -356,32 +356,193 @@ body.p-olya .liquid { --sheen: .4; }
   radial-gradient(55% 75% at var(--ex) var(--ey), #fff 0%, var(--l1) 25%, var(--l2) 50%, transparent 78%),
   radial-gradient(45% 65% at calc(100% - var(--ex)) calc(100% - var(--ey)), var(--l1) 0%, var(--l2) 40%, transparent 75%); }
 @keyframes edge {
-  0%, 100% { --ex: 0%; --ey: 15%; }
-  25% { --ex: 45%; --ey: 0%; }
-  50% { --ex: 0%; --ey: 80%; }
-  75% { --ex: 20%; --ey: 0%; }
+  0.0% { --ex: 0.0%; --ey: 0.0%; }
+  2.5% { --ex: 7.2%; --ey: 0.0%; }
+  5.0% { --ex: 14.2%; --ey: 0.0%; }
+  7.5% { --ex: 20.9%; --ey: 0.0%; }
+  10.0% { --ex: 27.0%; --ey: 0.0%; }
+  12.5% { --ex: 32.5%; --ey: 0.0%; }
+  15.0% { --ex: 37.2%; --ey: 0.0%; }
+  17.5% { --ex: 41.0%; --ey: 0.0%; }
+  20.0% { --ex: 43.7%; --ey: 0.0%; }
+  22.5% { --ex: 45.4%; --ey: 0.0%; }
+  25.0% { --ex: 46.0%; --ey: 0.0%; }
+  27.5% { --ex: 45.4%; --ey: 0.0%; }
+  30.0% { --ex: 43.7%; --ey: 0.0%; }
+  32.5% { --ex: 41.0%; --ey: 0.0%; }
+  35.0% { --ex: 37.2%; --ey: 0.0%; }
+  37.5% { --ex: 32.5%; --ey: 0.0%; }
+  40.0% { --ex: 27.0%; --ey: 0.0%; }
+  42.5% { --ex: 20.9%; --ey: 0.0%; }
+  45.0% { --ex: 14.2%; --ey: 0.0%; }
+  47.5% { --ex: 7.2%; --ey: 0.0%; }
+  50.0% { --ex: 0.0%; --ey: 0.0%; }
+  52.5% { --ex: 0.0%; --ey: 12.8%; }
+  55.0% { --ex: 0.0%; --ey: 25.3%; }
+  57.5% { --ex: 0.0%; --ey: 37.2%; }
+  60.0% { --ex: 0.0%; --ey: 48.2%; }
+  62.5% { --ex: 0.0%; --ey: 58.0%; }
+  65.0% { --ex: 0.0%; --ey: 66.3%; }
+  67.5% { --ex: 0.0%; --ey: 73.1%; }
+  70.0% { --ex: 0.0%; --ey: 78.0%; }
+  72.5% { --ex: 0.0%; --ey: 81.0%; }
+  75.0% { --ex: 0.0%; --ey: 82.0%; }
+  77.5% { --ex: 0.0%; --ey: 81.0%; }
+  80.0% { --ex: 0.0%; --ey: 78.0%; }
+  82.5% { --ex: 0.0%; --ey: 73.1%; }
+  85.0% { --ex: 0.0%; --ey: 66.3%; }
+  87.5% { --ex: 0.0%; --ey: 58.0%; }
+  90.0% { --ex: 0.0%; --ey: 48.2%; }
+  92.5% { --ex: 0.0%; --ey: 37.2%; }
+  95.0% { --ex: 0.0%; --ey: 25.3%; }
+  97.5% { --ex: 0.0%; --ey: 12.8%; }
+  100.0% { --ex: 0.0%; --ey: 0.0%; }
 }
-/* мʼякі абстрактні форми після бліку: дві великі розмиті плями повільно пливуть, тягнуться й перетікають */
+/* плавні безупинні траєкторії (згенеровано синусами, лінійно між точками — без «зависань»):
+   форми дрейфують біля своїх кутів, по черзі заходять усередину, змінюють обрис (коло ↔ абстрактна пляма)
+   і яскравість — то розгоряються, то згасають, перетікаючи одна в одну */
+@keyframes flow1 {
+  0.0% { transform: translate(0.0%, 0.0%) rotate(0.0deg) scale(1.086, 0.852); border-radius: 50% 64% 49% 36% / 50% 62% 38% 50%; opacity: 0.55; }
+  2.5% { transform: translate(1.0%, 2.6%) rotate(1.6deg) scale(1.110, 0.850); border-radius: 52% 63% 47% 37% / 54% 61% 36% 52%; opacity: 0.64; }
+  5.0% { transform: translate(1.0%, 5.6%) rotate(3.1deg) scale(1.131, 0.852); border-radius: 54% 61% 45% 39% / 58% 59% 36% 55%; opacity: 0.73; }
+  7.5% { transform: translate(0.0%, 8.7%) rotate(4.5deg) scale(1.149, 0.857); border-radius: 56% 58% 43% 43% / 61% 58% 37% 57%; opacity: 0.79; }
+  10.0% { transform: translate(-1.7%, 11.7%) rotate(5.9deg) scale(1.163, 0.865); border-radius: 58% 54% 41% 47% / 63% 56% 40% 58%; opacity: 0.84; }
+  12.5% { transform: translate(-3.9%, 14.2%) rotate(7.1deg) scale(1.173, 0.877); border-radius: 60% 50% 40% 51% / 64% 54% 43% 60%; opacity: 0.85; }
+  15.0% { transform: translate(-6.3%, 16.0%) rotate(8.1deg) scale(1.179, 0.892); border-radius: 61% 45% 38% 55% / 63% 51% 47% 61%; opacity: 0.84; }
+  17.5% { transform: translate(-8.6%, 16.9%) rotate(8.9deg) scale(1.180, 0.910); border-radius: 62% 41% 37% 59% / 61% 49% 52% 63%; opacity: 0.79; }
+  20.0% { transform: translate(-10.4%, 16.9%) rotate(9.5deg) scale(1.177, 0.930); border-radius: 63% 38% 36% 62% / 58% 47% 56% 63%; opacity: 0.73; }
+  22.5% { transform: translate(-11.6%, 15.9%) rotate(9.9deg) scale(1.170, 0.952); border-radius: 64% 37% 36% 64% / 54% 45% 59% 64%; opacity: 0.64; }
+  25.0% { transform: translate(-12.0%, 14.0%) rotate(10.0deg) scale(1.158, 0.975); border-radius: 64% 36% 36% 64% / 50% 43% 62% 64%; opacity: 0.55; }
+  27.5% { transform: translate(-11.6%, 11.4%) rotate(9.9deg) scale(1.143, 0.998); border-radius: 64% 37% 36% 63% / 46% 41% 64% 64%; opacity: 0.46; }
+  30.0% { transform: translate(-10.4%, 8.4%) rotate(9.5deg) scale(1.124, 1.021); border-radius: 63% 39% 37% 61% / 42% 40% 64% 63%; opacity: 0.37; }
+  32.5% { transform: translate(-8.6%, 5.3%) rotate(8.9deg) scale(1.102, 1.044); border-radius: 62% 42% 38% 57% / 39% 38% 63% 62%; opacity: 0.31; }
+  35.0% { transform: translate(-6.3%, 2.3%) rotate(8.1deg) scale(1.077, 1.066); border-radius: 61% 46% 39% 53% / 37% 37% 60% 61%; opacity: 0.26; }
+  37.5% { transform: translate(-3.9%, -0.2%) rotate(7.1deg) scale(1.051, 1.086); border-radius: 60% 50% 41% 49% / 36% 36% 57% 60%; opacity: 0.25; }
+  40.0% { transform: translate(-1.7%, -2.0%) rotate(5.9deg) scale(1.023, 1.105); border-radius: 58% 55% 42% 45% / 37% 36% 53% 58%; opacity: 0.26; }
+  42.5% { transform: translate(0.0%, -2.9%) rotate(4.5deg) scale(0.995, 1.120); border-radius: 56% 59% 44% 41% / 39% 36% 48% 56%; opacity: 0.31; }
+  45.0% { transform: translate(1.0%, -2.9%) rotate(3.1deg) scale(0.967, 1.133); border-radius: 54% 62% 46% 38% / 42% 36% 44% 54%; opacity: 0.37; }
+  47.5% { transform: translate(1.0%, -1.9%) rotate(1.6deg) scale(0.939, 1.142); border-radius: 52% 63% 49% 36% / 46% 37% 41% 52%; opacity: 0.46; }
+  50.0% { transform: translate(0.0%, -0.0%) rotate(0.0deg) scale(0.914, 1.148); border-radius: 50% 64% 51% 36% / 50% 38% 38% 50%; opacity: 0.55; }
+  52.5% { transform: translate(-2.1%, 2.6%) rotate(-1.6deg) scale(0.890, 1.150); border-radius: 48% 63% 53% 37% / 54% 39% 36% 48%; opacity: 0.64; }
+  55.0% { transform: translate(-5.2%, 5.6%) rotate(-3.1deg) scale(0.869, 1.148); border-radius: 46% 61% 55% 39% / 58% 41% 36% 45%; opacity: 0.73; }
+  57.5% { transform: translate(-9.1%, 8.7%) rotate(-4.5deg) scale(0.851, 1.143); border-radius: 44% 58% 57% 43% / 61% 42% 37% 43%; opacity: 0.79; }
+  60.0% { transform: translate(-13.5%, 11.7%) rotate(-5.9deg) scale(0.837, 1.135); border-radius: 42% 54% 59% 47% / 63% 44% 40% 42%; opacity: 0.84; }
+  62.5% { transform: translate(-18.1%, 14.2%) rotate(-7.1deg) scale(0.827, 1.123); border-radius: 40% 50% 60% 51% / 64% 46% 43% 40%; opacity: 0.85; }
+  65.0% { transform: translate(-22.5%, 16.0%) rotate(-8.1deg) scale(0.821, 1.108); border-radius: 39% 45% 62% 55% / 63% 49% 47% 39%; opacity: 0.84; }
+  67.5% { transform: translate(-26.4%, 16.9%) rotate(-8.9deg) scale(0.820, 1.090); border-radius: 38% 41% 63% 59% / 61% 51% 52% 37%; opacity: 0.79; }
+  70.0% { transform: translate(-29.4%, 16.9%) rotate(-9.5deg) scale(0.823, 1.070); border-radius: 37% 38% 64% 62% / 58% 53% 56% 37%; opacity: 0.73; }
+  72.5% { transform: translate(-31.3%, 15.9%) rotate(-9.9deg) scale(0.830, 1.048); border-radius: 36% 37% 64% 64% / 54% 55% 59% 36%; opacity: 0.64; }
+  75.0% { transform: translate(-32.0%, 14.0%) rotate(-10.0deg) scale(0.842, 1.025); border-radius: 36% 36% 64% 64% / 50% 57% 62% 36%; opacity: 0.55; }
+  77.5% { transform: translate(-31.3%, 11.4%) rotate(-9.9deg) scale(0.857, 1.002); border-radius: 36% 37% 64% 63% / 46% 59% 64% 36%; opacity: 0.46; }
+  80.0% { transform: translate(-29.4%, 8.4%) rotate(-9.5deg) scale(0.876, 0.979); border-radius: 37% 39% 63% 61% / 42% 60% 64% 37%; opacity: 0.37; }
+  82.5% { transform: translate(-26.4%, 5.3%) rotate(-8.9deg) scale(0.898, 0.956); border-radius: 38% 42% 62% 57% / 39% 62% 63% 38%; opacity: 0.31; }
+  85.0% { transform: translate(-22.5%, 2.3%) rotate(-8.1deg) scale(0.923, 0.934); border-radius: 39% 46% 61% 53% / 37% 63% 60% 39%; opacity: 0.26; }
+  87.5% { transform: translate(-18.1%, -0.2%) rotate(-7.1deg) scale(0.949, 0.914); border-radius: 40% 50% 59% 49% / 36% 64% 57% 40%; opacity: 0.25; }
+  90.0% { transform: translate(-13.5%, -2.0%) rotate(-5.9deg) scale(0.977, 0.895); border-radius: 42% 55% 58% 45% / 37% 64% 53% 42%; opacity: 0.26; }
+  92.5% { transform: translate(-9.1%, -2.9%) rotate(-4.5deg) scale(1.005, 0.880); border-radius: 44% 59% 56% 41% / 39% 64% 48% 44%; opacity: 0.31; }
+  95.0% { transform: translate(-5.2%, -2.9%) rotate(-3.1deg) scale(1.033, 0.867); border-radius: 46% 62% 54% 38% / 42% 64% 44% 46%; opacity: 0.37; }
+  97.5% { transform: translate(-2.1%, -1.9%) rotate(-1.6deg) scale(1.061, 0.858); border-radius: 48% 63% 51% 36% / 46% 63% 41% 48%; opacity: 0.46; }
+  100.0% { transform: translate(-0.0%, -0.0%) rotate(-0.0deg) scale(1.086, 0.852); border-radius: 50% 64% 49% 36% / 50% 62% 38% 50%; opacity: 0.55; }
+}
+@keyframes flow2 {
+  0.0% { transform: translate(26.0%, -8.1%) rotate(9.9deg) scale(1.093, 1.053); border-radius: 62% 43% 38% 58% / 62% 38% 50% 62%; opacity: 0.43; }
+  2.5% { transform: translate(27.7%, -11.6%) rotate(10.0deg) scale(1.068, 1.074); border-radius: 61% 39% 40% 61% / 59% 37% 55% 61%; opacity: 0.35; }
+  5.0% { transform: translate(28.4%, -14.7%) rotate(9.8deg) scale(1.041, 1.093); border-radius: 59% 37% 41% 63% / 56% 36% 58% 59%; opacity: 0.29; }
+  7.5% { transform: translate(27.9%, -17.0%) rotate(9.3deg) scale(1.013, 1.111); border-radius: 58% 36% 43% 64% / 51% 36% 61% 57%; opacity: 0.26; }
+  10.0% { transform: translate(26.2%, -18.3%) rotate(8.6deg) scale(0.984, 1.125); border-radius: 56% 36% 45% 63% / 47% 36% 63% 55%; opacity: 0.25; }
+  12.5% { transform: translate(23.3%, -18.5%) rotate(7.7deg) scale(0.957, 1.137); border-radius: 54% 38% 47% 61% / 43% 37% 64% 53%; opacity: 0.28; }
+  15.0% { transform: translate(19.4%, -17.6%) rotate(6.7deg) scale(0.930, 1.145); border-radius: 51% 41% 49% 58% / 40% 37% 63% 51%; opacity: 0.33; }
+  17.5% { transform: translate(14.8%, -15.7%) rotate(5.4deg) scale(0.905, 1.149); border-radius: 49% 45% 52% 54% / 37% 38% 61% 49%; opacity: 0.40; }
+  20.0% { transform: translate(9.7%, -12.9%) rotate(4.0deg) scale(0.882, 1.150); border-radius: 47% 49% 54% 50% / 36% 40% 58% 47%; opacity: 0.49; }
+  22.5% { transform: translate(4.7%, -9.5%) rotate(2.6deg) scale(0.862, 1.147); border-radius: 45% 53% 56% 46% / 36% 41% 54% 45%; opacity: 0.58; }
+  25.0% { transform: translate(-0.1%, -5.9%) rotate(1.0deg) scale(0.846, 1.140); border-radius: 43% 57% 58% 42% / 38% 43% 50% 43%; opacity: 0.67; }
+  27.5% { transform: translate(-4.2%, -2.4%) rotate(-0.6deg) scale(0.833, 1.131); border-radius: 41% 61% 59% 39% / 41% 45% 45% 41%; opacity: 0.75; }
+  30.0% { transform: translate(-7.3%, 0.7%) rotate(-2.1deg) scale(0.825, 1.117); border-radius: 40% 63% 61% 37% / 44% 47% 42% 39%; opacity: 0.81; }
+  32.5% { transform: translate(-9.2%, 3.0%) rotate(-3.6deg) scale(0.820, 1.101); border-radius: 38% 64% 62% 36% / 49% 49% 39% 38%; opacity: 0.84; }
+  35.0% { transform: translate(-9.8%, 4.3%) rotate(-5.0deg) scale(0.821, 1.083); border-radius: 37% 64% 63% 37% / 53% 52% 37% 37%; opacity: 0.85; }
+  37.5% { transform: translate(-9.1%, 4.5%) rotate(-6.3deg) scale(0.825, 1.062); border-radius: 36% 62% 64% 39% / 57% 54% 36% 36%; opacity: 0.82; }
+  40.0% { transform: translate(-7.3%, 3.6%) rotate(-7.5deg) scale(0.834, 1.040); border-radius: 36% 59% 64% 42% / 60% 56% 37% 36%; opacity: 0.77; }
+  42.5% { transform: translate(-4.4%, 1.7%) rotate(-8.4deg) scale(0.847, 1.017); border-radius: 36% 55% 64% 46% / 63% 58% 39% 36%; opacity: 0.70; }
+  45.0% { transform: translate(-0.8%, -1.1%) rotate(-9.2deg) scale(0.864, 0.993); border-radius: 36% 51% 63% 50% / 64% 59% 42% 36%; opacity: 0.61; }
+  47.5% { transform: translate(3.1%, -4.5%) rotate(-9.7deg) scale(0.884, 0.970); border-radius: 37% 47% 63% 54% / 64% 61% 46% 37%; opacity: 0.52; }
+  50.0% { transform: translate(7.1%, -8.1%) rotate(-9.9deg) scale(0.907, 0.947); border-radius: 38% 43% 62% 58% / 62% 62% 50% 38%; opacity: 0.43; }
+  52.5% { transform: translate(10.7%, -11.6%) rotate(-10.0deg) scale(0.932, 0.926); border-radius: 39% 39% 60% 61% / 59% 63% 55% 39%; opacity: 0.35; }
+  55.0% { transform: translate(13.8%, -14.7%) rotate(-9.8deg) scale(0.959, 0.907); border-radius: 41% 37% 59% 63% / 56% 64% 58% 41%; opacity: 0.29; }
+  57.5% { transform: translate(16.0%, -17.0%) rotate(-9.3deg) scale(0.987, 0.889); border-radius: 42% 36% 57% 64% / 51% 64% 61% 43%; opacity: 0.26; }
+  60.0% { transform: translate(17.3%, -18.3%) rotate(-8.6deg) scale(1.016, 0.875); border-radius: 44% 36% 55% 63% / 47% 64% 63% 45%; opacity: 0.25; }
+  62.5% { transform: translate(17.7%, -18.5%) rotate(-7.7deg) scale(1.043, 0.863); border-radius: 46% 38% 53% 61% / 43% 63% 64% 47%; opacity: 0.28; }
+  65.0% { transform: translate(17.2%, -17.6%) rotate(-6.7deg) scale(1.070, 0.855); border-radius: 49% 41% 51% 58% / 40% 63% 63% 49%; opacity: 0.33; }
+  67.5% { transform: translate(16.1%, -15.7%) rotate(-5.4deg) scale(1.095, 0.851); border-radius: 51% 45% 48% 54% / 37% 62% 61% 51%; opacity: 0.40; }
+  70.0% { transform: translate(14.4%, -12.9%) rotate(-4.0deg) scale(1.118, 0.850); border-radius: 53% 49% 46% 50% / 36% 60% 58% 53%; opacity: 0.49; }
+  72.5% { transform: translate(12.7%, -9.5%) rotate(-2.6deg) scale(1.138, 0.853); border-radius: 55% 53% 44% 46% / 36% 59% 54% 55%; opacity: 0.58; }
+  75.0% { transform: translate(11.0%, -5.9%) rotate(-1.0deg) scale(1.154, 0.860); border-radius: 57% 57% 42% 42% / 38% 57% 50% 57%; opacity: 0.67; }
+  77.5% { transform: translate(9.8%, -2.4%) rotate(0.6deg) scale(1.167, 0.869); border-radius: 59% 61% 41% 39% / 41% 55% 45% 59%; opacity: 0.75; }
+  80.0% { transform: translate(9.1%, 0.7%) rotate(2.1deg) scale(1.175, 0.883); border-radius: 60% 63% 39% 37% / 44% 53% 42% 61%; opacity: 0.81; }
+  82.5% { transform: translate(9.3%, 3.0%) rotate(3.6deg) scale(1.180, 0.899); border-radius: 62% 64% 38% 36% / 49% 51% 39% 62%; opacity: 0.84; }
+  85.0% { transform: translate(10.3%, 4.3%) rotate(5.0deg) scale(1.179, 0.917); border-radius: 63% 64% 37% 37% / 53% 48% 37% 63%; opacity: 0.85; }
+  87.5% { transform: translate(12.1%, 4.5%) rotate(6.3deg) scale(1.175, 0.938); border-radius: 64% 62% 36% 39% / 57% 46% 36% 64%; opacity: 0.82; }
+  90.0% { transform: translate(14.6%, 3.6%) rotate(7.5deg) scale(1.166, 0.960); border-radius: 64% 59% 36% 42% / 60% 44% 37% 64%; opacity: 0.77; }
+  92.5% { transform: translate(17.6%, 1.7%) rotate(8.4deg) scale(1.153, 0.983); border-radius: 64% 55% 36% 46% / 63% 42% 39% 64%; opacity: 0.70; }
+  95.0% { transform: translate(20.7%, -1.1%) rotate(9.2deg) scale(1.136, 1.007); border-radius: 64% 51% 37% 50% / 64% 41% 42% 64%; opacity: 0.61; }
+  97.5% { transform: translate(23.6%, -4.5%) rotate(9.7deg) scale(1.116, 1.030); border-radius: 63% 47% 37% 54% / 64% 39% 46% 63%; opacity: 0.52; }
+  100.0% { transform: translate(26.0%, -8.1%) rotate(9.9deg) scale(1.093, 1.053); border-radius: 62% 43% 38% 58% / 62% 38% 50% 62%; opacity: 0.43; }
+}
+@keyframes flow3 {
+  0.0% { transform: translate(-21.9%, -4.7%) rotate(2.0deg) scale(0.820, 1.095); border-radius: 38% 43% 63% 56% / 38% 50% 62% 38%; opacity: 0.66; }
+  2.5% { transform: translate(-19.5%, -2.9%) rotate(0.4deg) scale(0.822, 1.075); border-radius: 37% 48% 63% 52% / 36% 52% 59% 37%; opacity: 0.71; }
+  5.0% { transform: translate(-16.7%, -0.7%) rotate(-1.1deg) scale(0.828, 1.054); border-radius: 36% 52% 64% 47% / 36% 55% 55% 36%; opacity: 0.73; }
+  7.5% { transform: translate(-13.8%, 1.6%) rotate(-2.7deg) scale(0.839, 1.032); border-radius: 36% 56% 64% 43% / 37% 57% 51% 36%; opacity: 0.72; }
+  10.0% { transform: translate(-11.2%, 3.9%) rotate(-4.1deg) scale(0.853, 1.008); border-radius: 36% 60% 64% 40% / 40% 58% 47% 36%; opacity: 0.69; }
+  12.5% { transform: translate(-9.0%, 5.8%) rotate(-5.5deg) scale(0.871, 0.985); border-radius: 37% 62% 63% 37% / 43% 60% 43% 37%; opacity: 0.63; }
+  15.0% { transform: translate(-7.5%, 7.4%) rotate(-6.7deg) scale(0.892, 0.962); border-radius: 37% 64% 62% 36% / 47% 61% 39% 37%; opacity: 0.56; }
+  17.5% { transform: translate(-6.7%, 8.2%) rotate(-7.8deg) scale(0.916, 0.939); border-radius: 38% 64% 61% 36% / 52% 63% 37% 38%; opacity: 0.47; }
+  20.0% { transform: translate(-6.8%, 8.4%) rotate(-8.7deg) scale(0.942, 0.919); border-radius: 40% 63% 60% 38% / 56% 63% 36% 40%; opacity: 0.39; }
+  22.5% { transform: translate(-7.6%, 7.9%) rotate(-9.4deg) scale(0.970, 0.900); border-radius: 41% 60% 58% 41% / 59% 64% 36% 41%; opacity: 0.31; }
+  25.0% { transform: translate(-9.0%, 6.7%) rotate(-9.8deg) scale(0.998, 0.884); border-radius: 43% 57% 56% 44% / 62% 64% 38% 43%; opacity: 0.24; }
+  27.5% { transform: translate(-10.8%, 4.9%) rotate(-10.0deg) scale(1.026, 0.870); border-radius: 45% 52% 54% 48% / 64% 64% 41% 45%; opacity: 0.19; }
+  30.0% { transform: translate(-12.7%, 2.7%) rotate(-9.9deg) scale(1.053, 0.860); border-radius: 47% 48% 52% 53% / 64% 63% 45% 47%; opacity: 0.17; }
+  32.5% { transform: translate(-14.5%, 0.4%) rotate(-9.6deg) scale(1.080, 0.853); border-radius: 49% 44% 50% 57% / 63% 62% 49% 50%; opacity: 0.18; }
+  35.0% { transform: translate(-15.8%, -1.9%) rotate(-9.1deg) scale(1.104, 0.850); border-radius: 52% 40% 48% 60% / 60% 61% 53% 52%; opacity: 0.21; }
+  37.5% { transform: translate(-16.6%, -3.8%) rotate(-8.3deg) scale(1.126, 0.851); border-radius: 54% 38% 45% 63% / 57% 60% 57% 54%; opacity: 0.27; }
+  40.0% { transform: translate(-16.5%, -5.4%) rotate(-7.4deg) scale(1.144, 0.855); border-radius: 56% 36% 43% 64% / 53% 58% 61% 56%; opacity: 0.34; }
+  42.5% { transform: translate(-15.5%, -6.2%) rotate(-6.2deg) scale(1.159, 0.863); border-radius: 58% 36% 42% 64% / 48% 56% 63% 58%; opacity: 0.43; }
+  45.0% { transform: translate(-13.7%, -6.4%) rotate(-4.9deg) scale(1.170, 0.874); border-radius: 59% 37% 40% 62% / 44% 54% 64% 60%; opacity: 0.51; }
+  47.5% { transform: translate(-11.1%, -5.9%) rotate(-3.5deg) scale(1.177, 0.888); border-radius: 61% 40% 39% 59% / 41% 52% 64% 61%; opacity: 0.59; }
+  50.0% { transform: translate(-7.9%, -4.7%) rotate(-2.0deg) scale(1.180, 0.905); border-radius: 62% 43% 37% 56% / 38% 50% 62% 62%; opacity: 0.66; }
+  52.5% { transform: translate(-4.5%, -2.9%) rotate(-0.4deg) scale(1.178, 0.925); border-radius: 63% 48% 37% 52% / 36% 48% 59% 63%; opacity: 0.71; }
+  55.0% { transform: translate(-1.0%, -0.7%) rotate(1.1deg) scale(1.172, 0.946); border-radius: 64% 52% 36% 47% / 36% 45% 55% 64%; opacity: 0.73; }
+  57.5% { transform: translate(2.2%, 1.6%) rotate(2.7deg) scale(1.161, 0.968); border-radius: 64% 56% 36% 43% / 37% 43% 51% 64%; opacity: 0.72; }
+  60.0% { transform: translate(4.7%, 3.9%) rotate(4.1deg) scale(1.147, 0.992); border-radius: 64% 60% 36% 40% / 40% 42% 47% 64%; opacity: 0.69; }
+  62.5% { transform: translate(6.4%, 5.8%) rotate(5.5deg) scale(1.129, 1.015); border-radius: 63% 62% 37% 37% / 43% 40% 43% 63%; opacity: 0.63; }
+  65.0% { transform: translate(7.1%, 7.4%) rotate(6.7deg) scale(1.108, 1.038); border-radius: 63% 64% 38% 36% / 47% 39% 39% 63%; opacity: 0.56; }
+  67.5% { transform: translate(6.6%, 8.2%) rotate(7.8deg) scale(1.084, 1.061); border-radius: 62% 64% 39% 36% / 52% 37% 37% 62%; opacity: 0.47; }
+  70.0% { transform: translate(5.0%, 8.4%) rotate(8.7deg) scale(1.058, 1.081); border-radius: 60% 63% 40% 38% / 56% 37% 36% 60%; opacity: 0.39; }
+  72.5% { transform: translate(2.3%, 7.9%) rotate(9.4deg) scale(1.030, 1.100); border-radius: 59% 60% 42% 41% / 59% 36% 36% 59%; opacity: 0.31; }
+  75.0% { transform: translate(-1.2%, 6.7%) rotate(9.8deg) scale(1.002, 1.116); border-radius: 57% 57% 44% 44% / 62% 36% 38% 57%; opacity: 0.24; }
+  77.5% { transform: translate(-5.2%, 4.9%) rotate(10.0deg) scale(0.974, 1.130); border-radius: 55% 52% 46% 48% / 64% 36% 41% 55%; opacity: 0.19; }
+  80.0% { transform: translate(-9.6%, 2.7%) rotate(9.9deg) scale(0.947, 1.140); border-radius: 53% 48% 48% 53% / 64% 37% 45% 53%; opacity: 0.17; }
+  82.5% { transform: translate(-13.8%, 0.4%) rotate(9.6deg) scale(0.920, 1.147); border-radius: 51% 44% 50% 57% / 63% 38% 49% 50%; opacity: 0.18; }
+  85.0% { transform: translate(-17.7%, -1.9%) rotate(9.1deg) scale(0.896, 1.150); border-radius: 48% 40% 52% 60% / 60% 39% 53% 48%; opacity: 0.21; }
+  87.5% { transform: translate(-20.9%, -3.8%) rotate(8.3deg) scale(0.874, 1.149); border-radius: 46% 38% 55% 63% / 57% 40% 57% 46%; opacity: 0.27; }
+  90.0% { transform: translate(-23.1%, -5.4%) rotate(7.4deg) scale(0.856, 1.145); border-radius: 44% 36% 57% 64% / 53% 42% 61% 44%; opacity: 0.34; }
+  92.5% { transform: translate(-24.4%, -6.2%) rotate(6.2deg) scale(0.841, 1.137); border-radius: 42% 36% 58% 64% / 48% 44% 63% 42%; opacity: 0.43; }
+  95.0% { transform: translate(-24.5%, -6.4%) rotate(4.9deg) scale(0.830, 1.126); border-radius: 41% 37% 60% 62% / 44% 46% 64% 40%; opacity: 0.51; }
+  97.5% { transform: translate(-23.6%, -5.9%) rotate(3.5deg) scale(0.823, 1.112); border-radius: 39% 40% 61% 59% / 41% 48% 64% 39%; opacity: 0.59; }
+  100.0% { transform: translate(-21.9%, -4.7%) rotate(2.0deg) scale(0.820, 1.095); border-radius: 38% 43% 63% 56% / 38% 50% 62% 38%; opacity: 0.66; }
+}
+/* мʼякі абстрактні форми після бліку: три великі розмиті плями біля країв (рух і яскравість — у кадрах flow1–3) */
 .liquid .amb { inset: auto; width: 96%; aspect-ratio: 1.7; border-radius: 50%; filter: blur(34px); mix-blend-mode: screen;
   will-change: transform; opacity: .7; }
-body.p-olya .liquid .amb { opacity: .75; }
 .liquid .a3 { right: -50%; top: 10%; width: 86%; background: radial-gradient(closest-side, var(--l4), color-mix(in srgb, var(--l4) 35%, transparent) 40%, color-mix(in srgb, var(--l4) 10%, transparent) 70%, transparent);
-  animation: drift3 13s cubic-bezier(.45, 0, .55, 1) infinite, breathe3 9s ease-in-out infinite; }
-.liquid .a1 { animation: drift1 12s cubic-bezier(.45, 0, .55, 1) infinite, breathe1 7s ease-in-out infinite; }
-.liquid .a2 { animation: drift2 15s cubic-bezier(.45, 0, .55, 1) infinite, breathe2 11s ease-in-out infinite; }
-@keyframes drift3 { 0%, 100% { transform: translate(0, 0) scale(1, 1); } 40% { transform: translate(-6%, 14%) scale(1.1, .92); } 75% { transform: translate(-26%, 4%) scale(1, 1); } }
-/* «дихання»: форми то світлішають, то темнішають, кожна у своєму ритмі */
-@keyframes breathe1 { 0%, 100% { opacity: .35; } 50% { opacity: .85; } }
-@keyframes breathe2 { 0%, 100% { opacity: .8; } 50% { opacity: .3; } }
-@keyframes breathe3 { 0%, 100% { opacity: .25; } 40% { opacity: .7; } 75% { opacity: .35; } }
-.liquid .ehalo i { animation: glint 6s ease-in-out infinite; }
-@keyframes glint { 0%, 100% { opacity: .6; } 50% { opacity: 1; } }
-.liquid .a1 { right: -38%; top: -48%; background: radial-gradient(closest-side, var(--l2), color-mix(in srgb, var(--l2) 35%, transparent) 40%, color-mix(in srgb, var(--l2) 10%, transparent) 70%, transparent);
-  animation: drift1 15s cubic-bezier(.45, 0, .55, 1) infinite; }
-.liquid .a2 { left: -40%; bottom: -52%; background: radial-gradient(closest-side, var(--l3), color-mix(in srgb, var(--l3) 35%, transparent) 40%, color-mix(in srgb, var(--l3) 10%, transparent) 70%, transparent);
-  opacity: .5; animation: drift2 19s cubic-bezier(.45, 0, .55, 1) infinite; }
-@keyframes drift1 { 0%, 100% { transform: translate(0, 0) rotate(0) scale(1, 1); } 25% { transform: translate(-12%, 4%) rotate(-8deg) scale(1.12, .9); } 50% { transform: translate(-30%, 16%) rotate(-14deg) scale(1.05, .95); } 75% { transform: translate(3%, 12%) rotate(6deg) scale(.92, 1.1); } }
-@keyframes drift2 { 0%, 100% { transform: translate(0, 0) rotate(0) scale(1, 1); } 20% { transform: translate(28%, -18%) rotate(10deg) scale(1.08, .92); } 45% { transform: translate(12%, -4%) rotate(8deg) scale(1.12, .9); } 75% { transform: translate(-3%, -12%) rotate(-6deg) scale(.9, 1.1); } }
+  animation: flow3 9.5s linear infinite; }
+.liquid .a1 { animation: flow1 11s linear infinite; }
+.liquid .a2 { animation: flow2 13s linear infinite; }
+.liquid .ehalo i { animation: glint 5s ease-in-out infinite; }
+.liquid .erim { animation: glintR 5s ease-in-out infinite; }
+@keyframes glintR { 0%, 100% { opacity: .3; } 50% { opacity: .62; } }
+@keyframes glint { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+.liquid .a1 { right: -38%; top: -48%; background: radial-gradient(closest-side, var(--l2), color-mix(in srgb, var(--l2) 35%, transparent) 40%, color-mix(in srgb, var(--l2) 10%, transparent) 70%, transparent); }
+.liquid .a2 { left: -40%; bottom: -52%; background: radial-gradient(closest-side, var(--l3), color-mix(in srgb, var(--l3) 35%, transparent) 40%, color-mix(in srgb, var(--l3) 10%, transparent) 70%, transparent); }
 /* легка тінь під білим текстом — підпис лишається читабельним, коли блік пропливає під ним */
 .hero .lbl, .hero .num, .hero .sub, .hero .lt, .hero .lg2 b { text-shadow: 0 1px 10px rgba(5, 10, 30, .28); }
 .hero .sub .inc { color: inherit; }
