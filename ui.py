@@ -590,9 +590,8 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
     <div class="seg" id="a-mode" role="group" aria-label="Розділ аналітики"></div>
     <div id="an-month">
       <section class="card">
-        <div class="ch" style="min-height:0"><h2>Витрати по тижнях</h2></div>
+        <div class="ch" style="min-height:0"><h2>Витрати по тижнях</h2><div class="seg sm" id="rent-mode" role="group" aria-label="Оренда в графіку" style="grid-auto-columns:auto" hidden></div></div>
         <div class="note" id="wnote" style="margin-top:6px"></div>
-        <div class="seg sm" id="rent-mode" role="group" aria-label="Оренда в графіку" style="margin-top:14px;width:fit-content" hidden></div>
         <div class="chart"><div class="ticks" id="wticks" aria-hidden="true"></div><div class="caps" id="bars"></div></div>
       </section>
       <section class="card"><div class="ch" style="min-height:0;margin-bottom:12px"><h2>Фіксовані й змінні</h2></div><div class="split" id="fvsplit" aria-hidden="true"></div><div class="fv2" id="fv"></div><p class="note" id="fvnote" style="margin:14px 0 0"></p></section>
@@ -1023,7 +1022,7 @@ function renderAnalytics(P) {
     if (o.cat === "Житло") { if (!useOut) { weeks[w] += o.amount; rentW[w] += o.amount; } } else weeks[w] += o.amount;
   });
   var rm = $("rent-mode"); rm.hidden = !rent.length; rm.innerHTML = "";
-  if (rent.length) [[false, "З орендою"], [true, "Без оренди"]].forEach(function (x) {
+  if (rent.length) [[false, "Усі"], [true, "Без оренди"]].forEach(function (x) {
     var b = h("button", "", x[1]); b.type = "button"; b.setAttribute("aria-pressed", x[0] === rentOut);
     b.onclick = function () { rentOut = x[0]; render(); };
     rm.appendChild(b);
