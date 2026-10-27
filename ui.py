@@ -729,9 +729,9 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 /* капсульні графіки: сіра доріжка, синя заливка, неповний місяць — штрих */
 .chart { display: flex; gap: 8px; margin-top: 24px; }
 .ticks { flex: none; display: flex; flex-direction: column; justify-content: space-between; height: 150px; width: 66px; font-size: 12px; color: var(--ink2); text-align: right; }
-.ticks span { line-height: 1; }
+.ticks span { line-height: 1; white-space: nowrap; }
 /* «Динаміка»: числа осі притиснуті праворуч, з відступом до пунктиру середнього */
-#mticks { width: 46px; margin-right: 8px; text-align: right; }
+#mticks, #wticks { width: 46px; margin-right: 8px; text-align: right; }  /* обидва графіки — однакова вісь */
 .caps { position: relative; flex: 1; display: flex; justify-content: space-around; }
 /* середнє: більші заокруглені штрихи (SVG-візерунок), окремим шаром поверх стовпчиків */
 .avgl { position: absolute; left: 0; right: 0; height: 3px; margin-top: -1.5px; pointer-events: none; z-index: 3; transform: translateZ(0);
@@ -807,8 +807,8 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .cap .r3 { display: block; margin-top: 2px; font-size: 11px; color: var(--ink2); }
 .vs-parts { margin-top: 12px; }
 .vs-parts:empty { display: none; }
-.wsub { display: flex; align-items: center; gap: 6px; font-size: 13px; }
-.wsub svg { flex: none; width: 15px; height: 15px; }
+.wsub { display: flex; align-items: center; gap: 6px; margin-top: 2px; font-size: 13px; line-height: 1.4; }
+.wsub svg { flex: none; width: 16px; height: 16px; }
 .wleg { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 12px; margin-top: 24px; }
 .wleg .vs-part { padding: 0; background: none; margin: 0; gap: 8px; }
 .wleg .vs-part + .vs-part { margin: 0; text-align: right; }
@@ -1474,10 +1474,9 @@ function renderAnalytics(P) {
     var w = Math.min(Math.floor((+o.date.slice(0, 2) - 1) / 7), 4);
     if (o.cat === "Житло") { if (!useOut) { weeks[w] += o.amount; rentW[w] += o.amount; } } else weeks[w] += o.amount;
   });
-  // показник один, тож замість легенди — підсумок під назвою; оренда — разова фіксована сума, на графіку її нема
-  $("w-sub").innerHTML = INFO + "<span>" + (useOut
-    ? nf0.format(Math.round(M.expenses - rentSum)) + " зл за місяць, без оренди " + nf0.format(Math.round(rentSum)) + " зл"
-    : nf0.format(Math.round(M.expenses)) + " зл за місяць" + (M.incomplete ? ", дані до " + M.last_op : "")) + "</span>";
+  // легенда не потрібна (показник один); оренда — разова фіксована сума, на графіку її нема — пояснюємо під назвою
+  $("w-sub").hidden = !useOut;
+  $("w-sub").innerHTML = useOut ? INFO + "<span>Оренду " + nf0.format(Math.round(rentSum)) + " зл не враховано</span>" : "";
   var labels = ["1–7", "8–14", "15–21", "22–28", "29+"];
   capsules("bars", "wticks", weeks.map(function (w, i) { return { v: w, rent: rentW[i], label: labels[i], sub: nf0.format(w) + " зл" }; }), niceMax(Math.max.apply(null, weeks.concat([1]))), -1, null);
 
