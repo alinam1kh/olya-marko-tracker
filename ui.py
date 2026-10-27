@@ -894,6 +894,9 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .toast:not(:has(button)) { padding-right: 18px; }
 .toast i { flex: none; width: 19px; height: 19px; border-radius: 50%; display: grid; place-items: center; background: var(--good); font-style: normal; }
 .toast i svg { display: block; }
+.toast .tx { display: flex; flex-direction: column; line-height: 1.3; }
+.toast .tx b { font-weight: 500; }
+.toast .tx small { font-size: 12px; font-weight: 400; color: var(--ink2); }
 
 /* нижня навігація v2: біла плаваюча панель, активний пункт — синя капсула; fade під нею */
 .fade { z-index: 19; position: fixed; left: 0; right: 0; bottom: 0; height: 130px; pointer-events: none; background: linear-gradient(rgba(245,246,248,0), var(--bg) 70%); }
@@ -1638,9 +1641,14 @@ function delCash(P, line, day, title, back, undo) {
       saved = null; reportKey = null;
       if (back && location.hash !== back) location.hash = back; else render();
       // «Скасувати» записує той самий запис назад (та сама сума, категорія, опис і дата)
-      toast(OKI + 'Запис видалено', undo ? ["Скасувати", function () { restoreCash(P, undo); }] : null);
+      toast(okMsg("Запис видалено", P, undo && undo.amount, undo && undo.category), undo ? ["Скасувати", function () { restoreCash(P, undo); }] : null);
     })
     .catch(function (err) { toast(err.message || "Немає звʼязку, спробуйте ще раз"); });
+}
+// тост успіху у два рядки: що сталося + сума й категорія
+function okMsg(title, P, amount, cat) {
+  var a = P && P.accounts.filter(function (x) { return x.key === cat; })[0];
+  return OKI + '<span class="tx"><b>' + title + "</b>" + (a ? "<small>" + zl(+amount) + " · " + esc(a.name) + "</small>" : "") + "</span>";
 }
 var OKI = '<i aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="m5.5 12.5 4 4 9-9"/></svg></i>';
 function restoreCash(P, u) {
@@ -1650,7 +1658,7 @@ function restoreCash(P, u) {
     .then(function (res) {
       if (!res.ok) throw new Error(res.error || "Не вдалося відновити");
       D = res.data; saved = { amount: +u.amount, day: res.date, line: res.line, title: res.title }; reportKey = null; render();
-      toast(OKI + "Запис відновлено");
+      toast(okMsg("Запис відновлено", P, u.amount, u.category));
     })
     .catch(function (err) { toast(err.message || "Немає звʼязку, спробуйте ще раз"); });
 }
@@ -1746,7 +1754,7 @@ $("v-add").addEventListener("submit", function (e) {
       saved = { amount: amountValue(), day: res.date, line: res.line, title: res.title };
       reportKey = null; btn.disabled = false;
       location.replace("#report");
-      toast(OKI + 'Збережено: −' + zl(saved.amount), ["Скасувати", function () {
+      toast(okMsg("Готівку додано", D.people[person], saved.amount, pick), ["Скасувати", function () {
         delCash(D.people[person], saved.line, saved.day, saved.title, "#report");
       }]);
     })
