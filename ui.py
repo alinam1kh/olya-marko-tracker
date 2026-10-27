@@ -1012,7 +1012,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
       <section class="card"><div class="ch" style="min-height:0;margin-bottom:12px"><h2>Фіксовані й змінні</h2></div><div class="split" id="fvsplit" aria-hidden="true"></div><div class="fv2" id="fv"></div><p class="note" id="fvnote" style="margin:14px 0 0"></p></section>
       <section class="card list"><div class="ch"><h2 id="t-dmon"></h2></div><div class="share" id="t-share" aria-hidden="true"></div><div id="t-leg" style="padding-bottom:8px"></div></section>
       <section class="card">
-        <div class="ch" style="min-height:0"><h2 id="w-title">Витрати по тижнях</h2><div class="seg sm" id="rent-mode" role="group" aria-label="Оренда в графіку" style="grid-auto-columns:auto" hidden></div></div>
+        <div class="ch" style="min-height:0"><h2 id="w-title">Витрати по тижнях</h2></div>
         <div class="chart"><div class="ticks" id="wticks" aria-hidden="true"></div><div class="caps" id="bars"></div></div>
         <div class="wleg" id="wnote"></div>
       </section>
@@ -1151,7 +1151,7 @@ function cic(name, big) {
 function arr(d) { return d > 0 ? "↗" : "↘"; }
 
 function lastFull(P) { for (var i = P.months.length - 1; i >= 0; i--) if (P.months[i].income > 0) return i; return P.months.length - 1; }
-var person = 0, month = lastFull(D.people[0]), trendMonth = null, filter = "all", metric = "exp", rentOut = false, amode = "month";
+var person = 0, month = lastFull(D.people[0]), trendMonth = null, filter = "all", metric = "exp", amode = "month";
 var GOAL = { olya: { months: 6, deadline: [2027, 6], title: "Подушка безпеки" } };  // фіча 5 з роадмапу ДЗ
 var VIEWS = { report: 1, analytics: 1, journal: 1, add: 1 };
 var saved = null;  // після збереження готівки: сума й дата, щоб підсвітити новий запис
@@ -1466,24 +1466,17 @@ function renderAnalytics(P) {
   if (amode === "trends") return renderTrends(P);
   var M = P.months[month];
   var rent = M.ops.filter(function (o) { return !o.income && o.cat === "Житло"; });
-  var rentSum = rent.reduce(function (s, o) { return s + o.amount; }, 0), useOut = rent.length && rentOut;
+  var rentSum = rent.reduce(function (s, o) { return s + o.amount; }, 0), useOut = rent.length > 0;  // оренда розтягує перший тиждень — на графіку її не показуємо
   var weeks = [0, 0, 0, 0, 0], rentW = [0, 0, 0, 0, 0];
   M.ops.forEach(function (o) {
     if (o.income) return;
     var w = Math.min(Math.floor((+o.date.slice(0, 2) - 1) / 7), 4);
     if (o.cat === "Житло") { if (!useOut) { weeks[w] += o.amount; rentW[w] += o.amount; } } else weeks[w] += o.amount;
   });
-  var rm = $("rent-mode"); rm.hidden = !rent.length; rm.innerHTML = "";
-  if (rent.length) [[false, "Усі"], [true, "Без оренди"]].forEach(function (x) {
-    var b = h("button", "", x[1]); b.type = "button"; b.setAttribute("aria-pressed", x[0] === rentOut);
-    b.onclick = function () { rentOut = x[0]; render(); };
-    rm.appendChild(b);
-  });
-  var RENT = "repeating-linear-gradient(135deg, #A9C6F8 0 4px, #D7E4FC 4px 8px)", BLUE = "linear-gradient(180deg, #3B82F6, #1D5FE0)";
+  var BLUE ="linear-gradient(180deg, #3B82F6, #1D5FE0)";
   var row = function (bg, txt) { return '<div class="vs-part"><i aria-hidden="true" style="background:' + bg + '"></i><span>' + txt + "</span></div>"; };
-  $("wnote").innerHTML = rent.length
-    ? (useOut ? row(BLUE, "Без оренди — " + nf0.format(Math.round(M.expenses - rentSum)) + " зл") + '<div class="vs-part"><span>Оренда ' + nf0.format(Math.round(rentSum)) + " зл не показана</span></div>"
-              : row(RENT, "Оренда — " + nf0.format(Math.round(rentSum)) + " зл") + row(BLUE, "Решта витрат — " + nf0.format(Math.round(M.expenses - rentSum)) + " зл"))
+  $("wnote").innerHTML = useOut
+    ? (row(BLUE, "Без оренди — " + nf0.format(Math.round(M.expenses - rentSum)) + " зл") + '<div class="vs-part"><span>Оренда ' + nf0.format(Math.round(rentSum)) + " зл не показана</span></div>")
     : row(BLUE, "Усього за місяць — " + nf0.format(Math.round(M.expenses)) + " зл" + (M.incomplete ? ", дані до " + M.last_op : ""));
   var labels = ["1–7", "8–14", "15–21", "22–28", "29+"];
   capsules("bars", "wticks", weeks.map(function (w, i) { return { v: w, rent: rentW[i], label: labels[i], sub: nf0.format(w) + " зл" }; }), niceMax(Math.max.apply(null, weeks.concat([1]))), -1, null);
