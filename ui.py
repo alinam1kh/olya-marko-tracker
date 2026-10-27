@@ -1480,10 +1480,9 @@ function renderTrends(P) {
   else if (S.incomplete && metric === "exp") row = '<div class="vs-row"><span><i class="dash" aria-hidden="true"></i>Проти тих самих днів ' + GEN[mi(prev)] + ', <b class="nw">' + z0(sameDays) + "</b></span>" + cmpBadge(val(S), sameDays) + "</div>";
   else if (S.incomplete) row = '<div class="vs-row"><span>Місяць ще триває — порівняємо, коли закінчиться</span></div>';
   else row = '<div class="vs-row"><span>Проти ' + GEN[mi(prev)] + ', <b class="nw">' + z0(val(prev)) + "</b></span>" + cmpBadge(val(S), val(prev)) + "</div>";
-  var sub = S.incomplete ? "1–" + upTo(S) + " " + GEN[mi(S)] + ", місяць ще триває" : "повний місяць";
-  if (metric === "saved" && paid) sub += " · " + nf1.format(S.rate) + " % доходу";
+  var sub = [S.incomplete ? "1–" + upTo(S) + " " + GEN[mi(S)] + ", місяць ще триває" : "", metric === "saved" && paid ? nf1.format(S.rate) + " % доходу" : ""].filter(Boolean).join(" · ");
   $("t-duo").innerHTML = '<div class="card vs"><span>' + NAME + " у " + LOC[mi(S)] + '</span><div class="vs-big"><b>' + (known ? z0(val(S)) : "—") + "</b></div>" +
-    '<small class="vs-sub">' + sub + "</small>" + row +
+    (sub ? '<small class="vs-sub">' + sub + "</small>" : "") + row +
     '<div class="vs-avg"><span>Середнє за повний місяць</span><b>' + z0(avg) + "</b></div></div>";
   $("t-note").hidden = true;
 
