@@ -263,10 +263,10 @@ a { color: inherit; text-decoration: none; }
 /* «рідке» світло: три пари плям. Кожна пара пливе своїм шляхом (25–33 с), а дві плями в ній сходяться,
    зливаються, розтягуються одна за одною й знову розходяться (11–15 с). Фільтр #melt мʼяко «склеює» плями,
    коли вони близько, а сильне розмиття робить з цього переливи градієнта. Старт кожної пари — випадковий */
-.liquid { position: absolute; inset: -6%; z-index: 0; pointer-events: none; opacity: .95; filter: url(#melt) blur(28px); }
+.liquid { position: absolute; inset: -10%; z-index: 0; pointer-events: none; filter: blur(30px) brightness(1.9) saturate(1.15); }
 .pair { position: absolute; width: 96%; height: 82%; will-change: transform; animation: var(--path) var(--pd) cubic-bezier(.37, 0, .63, 1) infinite; }
-.pair i { position: absolute; top: 8%; width: 64%; aspect-ratio: 1; border-radius: 50%; mix-blend-mode: screen; will-change: transform;
-  background: radial-gradient(circle, var(--c), transparent 70%); animation: apartL var(--sd) cubic-bezier(.37, 0, .63, 1) infinite; }
+.pair i { position: absolute; top: 18%; width: 92%; aspect-ratio: 2.6 / 1; border-radius: 50%; mix-blend-mode: screen; will-change: transform;
+  background: radial-gradient(closest-side, var(--c) 0%, var(--c) 35%, transparent 100%); animation: apartL var(--sd) cubic-bezier(.37, 0, .63, 1) infinite; }
 .pair i:first-child { left: 0; transform-origin: 70% 50%; }
 .pair i:last-child { right: 0; transform-origin: 30% 50%; animation-name: apartR; }
 .pair:nth-child(1) { left: 48%; top: -34%; --path: pathA; --pd: 25s; --sd: 11s; }
@@ -277,17 +277,18 @@ a { color: inherit; text-decoration: none; }
 .pair:nth-child(3) i:first-child { --c: var(--h4); } .pair:nth-child(3) i:last-child { --c: var(--h6); }
 /* сходяться (злиття) → розтягуються одна за одною → розходяться → пауза окремо */
 @keyframes apartL {
-  0%, 100% { transform: translateX(-22%) scale(1); }
-  38% { transform: translateX(42%) scale(1.12, .96); }
-  52% { transform: translateX(30%) scale(1.5, .78); }
-  70% { transform: translateX(-4%) scale(1.18, .9); }
+  0%, 100% { transform: translateX(-20%) rotate(-14deg) scale(1, 1); }
+  38% { transform: translateX(26%) rotate(8deg) scale(1.15, .85); }
+  52% { transform: translateX(18%) rotate(18deg) scale(1.35, .7); }
+  70% { transform: translateX(-4%) rotate(2deg) scale(1.1, .9); }
 }
 @keyframes apartR {
-  0%, 100% { transform: translateX(22%) scale(1); }
-  38% { transform: translateX(-42%) scale(1.12, .96); }
-  52% { transform: translateX(-30%) scale(1.5, .78); }
-  70% { transform: translateX(4%) scale(1.18, .9); }
+  0%, 100% { transform: translateX(20%) rotate(12deg) scale(1, 1); }
+  38% { transform: translateX(-26%) rotate(-10deg) scale(1.15, .85); }
+  52% { transform: translateX(-18%) rotate(-20deg) scale(1.35, .7); }
+  70% { transform: translateX(4%) rotate(-4deg) scale(1.1, .9); }
 }
+
 @keyframes pathA { 0%, 100% { transform: translate(0, 0) rotate(0); } 25% { transform: translate(-10%, 14%) rotate(35deg); } 50% { transform: translate(2%, 30%) rotate(80deg); } 75% { transform: translate(10%, 12%) rotate(130deg); } }
 @keyframes pathB { 0%, 100% { transform: translate(0, 0) rotate(0); } 30% { transform: translate(14%, 22%) rotate(-50deg); } 60% { transform: translate(6%, 40%) rotate(-110deg); } 80% { transform: translate(-4%, 18%) rotate(-150deg); } }
 @keyframes pathC { 0%, 100% { transform: translate(0, 0) rotate(0); } 33% { transform: translate(-12%, -26%) rotate(60deg); } 66% { transform: translate(8%, -14%) rotate(140deg); } }
@@ -524,7 +525,7 @@ a { color: inherit; text-decoration: none; }
 /* нижня навігація v2: біла плаваюча панель, активний пункт — синя капсула; fade під нею */
 .fade { z-index: 19; position: fixed; left: 0; right: 0; bottom: 0; height: 130px; pointer-events: none; background: linear-gradient(rgba(245,246,248,0), var(--bg) 70%); }
 .nav { z-index: 20; position: fixed; left: 50%; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); width: min(342px, calc(100vw - 48px)); height: 68px;
-  display: flex; align-items: center; padding: 0 8px; border: 1px solid var(--border); border-radius: 32px; background: rgba(255,255,255,.96); box-shadow: 0 10px 30px rgba(17,19,24,.10); }
+  display: flex; align-items: center; padding: 0 8px; border: 1px solid var(--border); border-radius: 32px; background: var(--card); box-shadow: 0 10px 30px rgba(17,19,24,.10); }
 .nav a { position: relative; flex: 1; height: 54px; border-radius: 27px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 13px; color: var(--ink3); transition: color .35s var(--ease); }
 .nav a.on { color: var(--blue); font-weight: 500; }
 .nav a svg { width: 22px; height: 22px; transition: transform .45s var(--spring); }
@@ -1324,7 +1325,8 @@ function render() {
     if (n[1] === base) $("nav-ind").style.setProperty("--n", ["report", "analytics", "journal"].indexOf(base));
     if (n[1] === base) $(n[0]).setAttribute("aria-current", "page"); else $(n[0]).removeAttribute("aria-current");
   });
-  if (base === "analytics") renderAnalytics(P); else if (base === "journal") renderJournal(P); else renderReport(P);
+  var rkey = person + "|" + month, sheetOnly = base === "report" && (v === "add" || prevView === "add") && rkey === reportKey;
+  if (base === "analytics") renderAnalytics(P); else if (base === "journal") renderJournal(P); else if (!sheetOnly) { renderReport(P); reportKey = rkey; }
   if (base !== lastBase) { lastBase = base; enter(base); }
   sheet(v === "add", P);
 }
@@ -1359,12 +1361,12 @@ $("liquid").querySelectorAll(".pair").forEach(function (pr) {
   var d = -(Math.random() * sd).toFixed(1) + "s";
   pr.querySelectorAll("i").forEach(function (b) { b.style.animationDelay = d; });
 });
-var lastView = view();
+var lastView = view(), prevView = null, reportKey = null;
 window.addEventListener("hashchange", function () {
   var v = view();
   if (v !== "add" && lastView !== "add") window.scrollTo(0, 0);
   if (lastView === "add" && v !== "add") sheetFromApp = false;
-  lastView = v; render();
+  prevView = lastView; lastView = v; render();
 });
 render();
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(function () {});
