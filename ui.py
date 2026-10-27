@@ -1753,8 +1753,11 @@ $("v-add").addEventListener("submit", function (e) {
       if (ms.indexOf(res.month) >= 0) month = ms.indexOf(res.month);
       saved = { amount: amountValue(), day: res.date, line: res.line, title: res.title }; markFresh(saved);
       reportKey = null; btn.disabled = false;
+      // форма для наступного запису — з чистого аркуша: без суми, категорії й опису, дата «Сьогодні»
+      var cat = pick; pick = null; $("a-title").value = ""; $("a-date").value = iso(new Date()); dpick = 1; $("a-cal").hidden = true;
+      $("a-amount").value = ""; $("a-amount").dispatchEvent(new Event("input", { bubbles: true })); renderAdd(P);
       location.replace("#report");
-      toast(okMsg("Готівку додано", D.people[person], saved.amount, pick), ["Скасувати", function () {
+      toast(okMsg("Готівку додано", D.people[person], saved.amount, cat), ["Скасувати", function () {
         delCash(D.people[person], saved.line, saved.day, saved.title, "#report", null, true);
       }]);
     })
