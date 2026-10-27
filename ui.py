@@ -438,6 +438,7 @@ a { color: inherit; text-decoration: none; }
 .duo small { display: block; margin-top: 6px; font-size: 13px; color: var(--ink2); }
 .duo .duo-cmp { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 6px; }
 .duo .duo-cmp small { margin-top: 0; }
+.duo .duo-cmp .bd { display: inline-flex; font-size: 12px; }
 .share { display: flex; gap: 3px; height: 10px; margin: 6px 0 12px; }
 .share i { display: block; height: 100%; border-radius: 5px; min-width: 6px; }
 .leg { display: grid; grid-template-columns: 12px 1fr auto auto; gap: 10px; align-items: center; min-height: 36px; font-size: 14px; }
