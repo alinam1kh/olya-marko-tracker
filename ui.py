@@ -238,22 +238,22 @@ a { color: inherit; text-decoration: none; }
 .hero-wrap { position: relative; isolation: isolate; margin-top: 12px; border-radius: 24px; overflow: hidden;
   background: linear-gradient(162deg, var(--g1) 0%, var(--g2) 48%, var(--g3) 100%); }
 .hero { position: relative; z-index: 1; padding: 22px 20px 20px; border-radius: 24px; color: #fff; }
-/* шість м'яких плям різних відтінків повільно пливуть кожна своїм шляхом (37–61 с) і змінюють форму;
+/* шість м'яких плям різних відтінків повільно пливуть кожна своїм шляхом (25–40 с), темп чергується: швидше — повільніше, і змінюють форму;
    спільне розмиття зливає їх, тож кольори переливаються. Старт кожної — випадковий */
 .liquid { position: absolute; inset: 0; z-index: 0; pointer-events: none; filter: blur(26px); }
 .liquid i { position: absolute; width: 56%; aspect-ratio: 1; border-radius: 42% 58% 63% 37% / 45% 40% 60% 55%; mix-blend-mode: screen; will-change: transform, border-radius;
   background: radial-gradient(circle, var(--c), transparent 68%);
-  animation: var(--path) var(--dur) cubic-bezier(.45, 0, .55, 1) infinite, morph calc(var(--dur) * .5) ease-in-out infinite alternate; }
-.liquid i:nth-child(1) { --c: var(--h1); --path: flow1; --dur: 43s; left: 48%; top: -30%; }
-.liquid i:nth-child(2) { --c: var(--h2); --path: flow2; --dur: 53s; left: -15%; top: 40%; width: 50%; }
-.liquid i:nth-child(3) { --c: var(--h3); --path: flow3; --dur: 61s; left: 30%; top: 45%; width: 64%; }
-.liquid i:nth-child(4) { --c: var(--h4); --path: flow4; --dur: 37s; left: 68%; top: 30%; width: 40%; }
-.liquid i:nth-child(5) { --c: var(--h5); --path: flow2; --dur: 59s; left: 5%; top: -35%; width: 48%; animation-direction: reverse, alternate; }
-.liquid i:nth-child(6) { --c: var(--h6); --path: flow1; --dur: 47s; left: 20%; top: 60%; width: 44%; animation-direction: reverse, alternate; }
-@keyframes flow1 { 0%, 100% { transform: translate(0, 0) rotate(0); } 25% { transform: translate(-38%, 30%) rotate(40deg) scale(1.15); } 50% { transform: translate(-12%, 72%) rotate(95deg) scale(.9); } 75% { transform: translate(24%, 26%) rotate(150deg) scale(1.1); } }
-@keyframes flow2 { 0%, 100% { transform: translate(0, 0) rotate(0); } 30% { transform: translate(85%, -30%) rotate(-60deg) scale(1.25); } 60% { transform: translate(140%, 25%) rotate(-120deg) scale(.85); } 80% { transform: translate(50%, 20%) rotate(-160deg) scale(1.05); } }
-@keyframes flow3 { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(-45%, -55%) scale(1.2); } 66% { transform: translate(30%, -35%) scale(.8); } }
-@keyframes flow4 { 0%, 100% { transform: translate(0, 0) scale(1); } 20% { transform: translate(-90%, 60%) scale(1.3); } 45% { transform: translate(-150%, -10%) scale(.9); } 70% { transform: translate(-40%, -70%) scale(1.15); } }
+  animation: var(--path) var(--dur) linear infinite, morph calc(var(--dur) * .5) ease-in-out infinite alternate; }
+.liquid i:nth-child(1) { --c: var(--h1); --path: flow1; --dur: 29s; left: 48%; top: -30%; }
+.liquid i:nth-child(2) { --c: var(--h2); --path: flow2; --dur: 35s; left: -15%; top: 40%; width: 50%; }
+.liquid i:nth-child(3) { --c: var(--h3); --path: flow3; --dur: 40s; left: 30%; top: 45%; width: 64%; }
+.liquid i:nth-child(4) { --c: var(--h4); --path: flow4; --dur: 25s; left: 68%; top: 30%; width: 40%; }
+.liquid i:nth-child(5) { --c: var(--h5); --path: flow2; --dur: 38s; left: 5%; top: -35%; width: 48%; animation-direction: reverse, alternate; }
+.liquid i:nth-child(6) { --c: var(--h6); --path: flow1; --dur: 31s; left: 20%; top: 60%; width: 44%; animation-direction: reverse, alternate; }
+@keyframes flow1 { 0%, 100% { animation-timing-function: cubic-bezier(.65, 0, .35, 1); transform: translate(0, 0) rotate(0); } 25% { animation-timing-function: cubic-bezier(.37, 0, .63, 1); transform: translate(-38%, 30%) rotate(40deg) scale(1.15); } 50% { animation-timing-function: cubic-bezier(.65, 0, .35, 1); transform: translate(-12%, 72%) rotate(95deg) scale(.9); } 75% { animation-timing-function: cubic-bezier(.37, 0, .63, 1); transform: translate(24%, 26%) rotate(150deg) scale(1.1); } }
+@keyframes flow2 { 0%, 100% { animation-timing-function: cubic-bezier(.65, 0, .35, 1); transform: translate(0, 0) rotate(0); } 30% { animation-timing-function: cubic-bezier(.37, 0, .63, 1); transform: translate(85%, -30%) rotate(-60deg) scale(1.25); } 60% { animation-timing-function: cubic-bezier(.65, 0, .35, 1); transform: translate(140%, 25%) rotate(-120deg) scale(.85); } 80% { animation-timing-function: cubic-bezier(.37, 0, .63, 1); transform: translate(50%, 20%) rotate(-160deg) scale(1.05); } }
+@keyframes flow3 { 0%, 100% { animation-timing-function: cubic-bezier(.65, 0, .35, 1); transform: translate(0, 0) scale(1); } 33% { animation-timing-function: cubic-bezier(.37, 0, .63, 1); transform: translate(-45%, -55%) scale(1.2); } 66% { animation-timing-function: cubic-bezier(.65, 0, .35, 1); transform: translate(30%, -35%) scale(.8); } }
+@keyframes flow4 { 0%, 100% { animation-timing-function: cubic-bezier(.65, 0, .35, 1); transform: translate(0, 0) scale(1); } 20% { animation-timing-function: cubic-bezier(.37, 0, .63, 1); transform: translate(-90%, 60%) scale(1.3); } 45% { animation-timing-function: cubic-bezier(.65, 0, .35, 1); transform: translate(-150%, -10%) scale(.9); } 70% { animation-timing-function: cubic-bezier(.37, 0, .63, 1); transform: translate(-40%, -70%) scale(1.15); } }
 @keyframes morph { 0% { border-radius: 42% 58% 63% 37% / 45% 40% 60% 55%; } 50% { border-radius: 63% 37% 41% 59% / 58% 62% 38% 42%; } 100% { border-radius: 35% 65% 55% 45% / 38% 52% 48% 62%; } }
 /* легка тінь під білим текстом — підпис лишається читабельним, коли блік пропливає під ним */
 .hero .lbl, .hero .num, .hero .sub, .hero .cols .t, .hero .cols b { text-shadow: 0 1px 10px rgba(5, 10, 30, .28); }
