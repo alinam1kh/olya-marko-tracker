@@ -324,9 +324,6 @@ a { color: inherit; text-decoration: none; }
 .bd.blue { padding: 0 6px; background: var(--blue-soft); color: var(--blue-txt); letter-spacing: -.02em; word-spacing: -.12em; }
 .bd.new { background: var(--cash-bg); color: var(--cash); }
 .hero .bd:not(.good):not(.bad) { background: rgba(255,255,255,.92); color: #3A4050; }
-/* на темній картці плашки зміни залиті: насичений колір і білий текст */
-.hero .bd.bad { background: #DC2626; color: #fff; }
-.hero .bd.good { background: #16A34A; color: #fff; }
 
 .cashbtn { display: flex; align-items: center; justify-content: center; gap: 10px; height: 56px; margin-top: 12px; border-radius: 28px; background: var(--blue-g);
   box-shadow: 0 8px 18px rgba(29,95,224,.32), inset 0 1px 0 rgba(255,255,255,.3); color: #fff; font-size: 16px; font-weight: 500; }
