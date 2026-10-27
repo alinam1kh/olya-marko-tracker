@@ -807,6 +807,8 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .cap .r3 { display: block; margin-top: 2px; font-size: 11px; color: var(--ink2); }
 .vs-parts { margin-top: 12px; }
 .vs-parts:empty { display: none; }
+.wsub { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+.wsub svg { flex: none; width: 15px; height: 15px; }
 .wleg { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 12px; margin-top: 24px; }
 .wleg .vs-part { padding: 0; background: none; margin: 0; gap: 8px; }
 .wleg .vs-part + .vs-part { margin: 0; text-align: right; }
@@ -1012,9 +1014,8 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
       <section class="card"><div class="ch" style="min-height:0;margin-bottom:12px"><h2>Фіксовані й змінні</h2></div><div class="split" id="fvsplit" aria-hidden="true"></div><div class="fv2" id="fv"></div><p class="note" id="fvnote" style="margin:14px 0 0"></p></section>
       <section class="card list"><div class="ch"><h2 id="t-dmon"></h2></div><div class="share" id="t-share" aria-hidden="true"></div><div id="t-leg" style="padding-bottom:8px"></div></section>
       <section class="card">
-        <div class="ch" style="min-height:0;flex-direction:column;align-items:flex-start;gap:2px"><h2 id="w-title">Витрати по тижнях</h2><span class="sub" id="w-sub" style="font-size:13px" hidden></span></div>
+        <div class="ch" style="min-height:0;flex-direction:column;align-items:flex-start;gap:2px"><h2 id="w-title">Витрати по тижнях</h2><span class="sub wsub" id="w-sub"></span></div>
         <div class="chart"><div class="ticks" id="wticks" aria-hidden="true"></div><div class="caps" id="bars"></div></div>
-        <div class="wleg" id="wnote"></div>
       </section>
     </div>
     <div id="an-trends" hidden>
@@ -1473,13 +1474,10 @@ function renderAnalytics(P) {
     var w = Math.min(Math.floor((+o.date.slice(0, 2) - 1) / 7), 4);
     if (o.cat === "Житло") { if (!useOut) { weeks[w] += o.amount; rentW[w] += o.amount; } } else weeks[w] += o.amount;
   });
-  var BLUE ="linear-gradient(180deg, #3B82F6, #1D5FE0)";
-  var row = function (bg, txt) { return '<div class="vs-part"><i aria-hidden="true" style="background:' + bg + '"></i><span>' + txt + "</span></div>"; };
-  // оренда — разова фіксована сума, тож графік показує решту витрат; пояснення — під назвою
-  $("w-sub").hidden = !useOut; $("w-sub").textContent = useOut ? "Без оренди (" + nf0.format(Math.round(rentSum)) + " зл)" : "";
-  $("wnote").innerHTML = useOut
-    ? row(BLUE, "Витрати — " + nf0.format(Math.round(M.expenses - rentSum)) + " зл")
-    : row(BLUE, "Усього за місяць — " + nf0.format(Math.round(M.expenses)) + " зл" + (M.incomplete ? ", дані до " + M.last_op : ""));
+  // показник один, тож замість легенди — підсумок під назвою; оренда — разова фіксована сума, на графіку її нема
+  $("w-sub").innerHTML = INFO + "<span>" + (useOut
+    ? nf0.format(Math.round(M.expenses - rentSum)) + " зл за місяць, без оренди " + nf0.format(Math.round(rentSum)) + " зл"
+    : nf0.format(Math.round(M.expenses)) + " зл за місяць" + (M.incomplete ? ", дані до " + M.last_op : "")) + "</span>";
   var labels = ["1–7", "8–14", "15–21", "22–28", "29+"];
   capsules("bars", "wticks", weeks.map(function (w, i) { return { v: w, rent: rentW[i], label: labels[i], sub: nf0.format(w) + " зл" }; }), niceMax(Math.max.apply(null, weeks.concat([1]))), -1, null);
 
@@ -1652,6 +1650,7 @@ function okMsg(title, P, amount, cat) {
   var a = P && P.accounts.filter(function (x) { return x.key === cat; })[0];
   return OKI + '<span class="tx"><b>' + title + "</b>" + (a ? "<small>" + zl(+amount) + " в «" + esc(a.name) + "»</small>" : "") + "</span>";
 }
+var INFO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="7.8" r=".6" fill="currentColor"/></svg>';
 var OKI = '<i aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="m5.5 12.5 4 4 9-9"/></svg></i>';
 function restoreCash(P, u) {
   fetch("api/cash", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "same-origin",
