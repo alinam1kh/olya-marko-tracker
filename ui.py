@@ -1115,7 +1115,7 @@ function renderTrends(P) {
   $("t-cmpsub").textContent = prev ? S.name + " порівняно з " + INS[mi(prev)] : "";
   $("t-cats").innerHTML = S.categories.map(function (c) {
     var d = "";
-    if (prev) { var was = pm[c.name] || 0; d = !was ? '<span class="bd new" title="у попередньому місяці цих витрат не було">вперше</span>' : badge(c.amount, was, true, "", true); }
+    if (prev) { var was = pm[c.name] || 0; d = !was ? '<span class="bd bad" title="у попередньому місяці цих витрат не було" aria-label="більше на ' + nf0.format(c.amount) + ' зл, минулого місяця не було">↗ +' + nf0.format(c.amount) + " зл</span>" : badge(c.amount, was, true, "", true); }
     return '<div class="cmp"><span class="n">' + esc(c.name) + '</span><span class="v">' + zl(c.amount) + "</span>" + d + "</div>";
   }).join("");
   $("t-cmpnote").textContent = S.incomplete ? "Місяць триває, дані попередні." : "";
