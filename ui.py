@@ -104,7 +104,9 @@ def add_cash():
             return _fail("Журнал не прийняв запис, нічого не збережено")
         # номер рядка нового запису — щоб тост міг одразу «Скасувати»
         line = original.decode("utf-8").count("\n") + 2
-    return jsonify({"ok": True, "month": day.strftime("%Y-%m"), "line": line, "date": day.isoformat(), "title": title})
+    # свіжі цифри одразу у відповіді — звіт оновлюється на місці, без перезавантаження сторінки
+    return jsonify({"ok": True, "month": day.strftime("%Y-%m"), "line": line, "date": day.isoformat(), "title": title,
+                    "data": report_data.report()})
 
 
 @ui_app.post("/api/cash/delete")
@@ -1579,8 +1581,16 @@ $("v-add").addEventListener("submit", function (e) {
     .then(function (r) { return r.json().catch(function () { return { ok: false, error: "Сервер не відповів" }; }); })
     .then(function (res) {
       if (!res.ok) throw new Error(res.error || "Не вдалося зберегти");
-      location.href = location.pathname + "?p=" + P.key + "&m=" + res.month + "&saved=1&a=" + amountValue() + "&d=" + res.date +
-        "&l=" + res.line + "&t=" + encodeURIComponent(res.title) + "#report";
+      // оновлюємо звіт на місці: закриваємо шторку, показуємо місяць запису й підсвічуємо його
+      D = res.data;
+      var ms = D.people[person].months.map(function (m) { return m.key; });
+      if (ms.indexOf(res.month) >= 0) month = ms.indexOf(res.month);
+      saved = { amount: amountValue(), day: res.date, line: res.line, title: res.title };
+      reportKey = null; btn.disabled = false;
+      location.replace("#report");
+      toast('<i aria-hidden="true">✓</i>Збережено: −' + zl(saved.amount), ["Скасувати", function () {
+        delCash(D.people[person], saved.line, saved.day, saved.title, "#report");
+      }]);
     })
     .catch(function (err) { $("a-msg").textContent = err.message || "Немає звʼязку, спробуйте ще раз"; check(); });
 });
