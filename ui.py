@@ -1638,8 +1638,11 @@ function render() {
     if (n[1] === base) $(n[0]).setAttribute("aria-current", "page"); else $(n[0]).removeAttribute("aria-current");
   });
   var rkey = person + "|" + month, sheetOnly = base === "report" && (v === "add" || prevView === "add") && rkey === reportKey;
+  var newReport = base === "report" && !sheetOnly && rkey !== reportKey;
   if (base === "analytics") renderAnalytics(P); else if (base === "journal") renderJournal(P); else if (!sheetOnly) { renderReport(P); reportKey = rkey; }
   if (base !== lastBase) { lastBase = base; enter(base); }
+  // інша людина чи місяць на головній — сума знову «набігає»
+  else if (newReport) countUp(document.querySelector("#hero .num"));
   sheet(v === "add", P);
 }
 // поява: при першому показі екрана картки виїжджають по черзі, а головна сума «набігає»
@@ -1674,6 +1677,7 @@ window.addEventListener("hashchange", function () {
   var v = view();
   if (v !== "add" && lastView !== "add") window.scrollTo(0, 0);
   if (lastView === "add" && v !== "add") sheetFromApp = false;
+  if (lastView === "report" && v !== "report" && v !== "add") reportKey = null;
   prevView = lastView; lastView = v; render();
 });
 render();
