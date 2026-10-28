@@ -808,14 +808,14 @@ a.ins { color: var(--ink4); }
 .limc .lmain { display: block; color: inherit; }
 /* тихий рядок унизу картки: до шторки «Відкладати щомісяця» */
 .lfoot { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 40px; margin-top: 12px; padding: 8px 0 0; border: 0; border-top: 1px solid var(--soft); background: transparent; font: 400 14px var(--font); color: var(--ink3); text-align: left; cursor: pointer; }
-.lfoot .lft { flex: 1; min-width: 0; white-space: nowrap; }
+.lfoot .lft { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }  /* не налазить на «Змінити» */
 .lfoot .lft b { font-weight: 500; color: var(--ink); }
 .lfoot .llink { display: inline-flex; align-items: center; gap: 6px; color: var(--blue); font-weight: 500; }
 .lfoot .llink svg { flex: none; stroke-width: 2.2; }  /* плюс більший і чіткіший за текстовий «+» */
 .lfoot > svg { flex: none; color: var(--ink2); }
 .lpig { flex: none; display: grid; margin-right: -6px; color: var(--ink2); }  /* прапорець цілі без кола, «Відкладено» — впритул */
-.lsegs { flex: none; display: flex; gap: 3px; }
-.lsegs i { display: block; width: 18px; height: 6px; border-radius: 3px; background: var(--track); overflow: hidden; }
+.lsegs { flex: none; display: flex; gap: 3px; width: 120px; }  /* однакова ширина за будь-якої кількості сегментів */
+.lsegs i { display: block; flex: 1; min-width: 0; height: 6px; border-radius: 3px; background: var(--track); overflow: hidden; }
 .lsegs b { display: block; height: 100%; background: var(--blue); }
 /* шторка «Відкладати щомісяця» */
 .plintro { margin: 6px 0 0; font-size: 14px; line-height: 1.45; color: var(--ink3); }
@@ -838,7 +838,7 @@ a.ins { color: var(--ink4); }
 .pldd-w > div { min-height: 0; overflow: hidden; }
 .pldd.open .pldd-w { grid-template-rows: 1fr; opacity: 1; }
 .pldd-b { padding: 0 14px 14px; }
-.pldd-b .pldate { margin-top: 10px; }
+.pldd-b .plcal { animation: none; }  /* календар перемальовується з кожним тапом — без повторної появи */
 .pldd-s { margin: 12px 0 0; font-size: 13px; color: var(--ink3); }
 .pldd-s b { font-weight: 500; color: var(--ink); }
 .pllab { margin: 16px 2px 0; font-size: 13px; color: var(--ink2); }
@@ -1686,6 +1686,15 @@ function payDays(P) {
 }
 
 // ---------- головна ----------
+// скільки місяців у плані з терміном (від місяця from до місяця until) і скільки вже відкладено з того часу (повні місяці)
+function planSpan(pl) { return Math.max(1, (+pl.until.slice(0, 4) * 12 + +pl.until.slice(5, 7)) - (+pl.from.slice(0, 4) * 12 + +pl.from.slice(5, 7))); }
+function planGot(P, pl) { return Math.min(pl.total || Infinity, P.months.reduce(function (s, m) { return s + (!m.incomplete && m.key >= pl.from ? Math.max(0, m.saved) : 0); }, 0)); }
+// прогрес: n сегментів, заповнено «done» (дробове); n поза 2–12 — одна суцільна смужка
+function progSegs(n, done) {
+  if (n < 2 || n > 12) return '<span class="lsegs" aria-hidden="true"><i><b style="width:' + (Math.max(0, Math.min(1, done / n)) * 100).toFixed(2) + '%"></b></i></span>';
+  var s = ""; for (var i = 0; i < n; i++) s += '<i><b style="width:' + (Math.max(0, Math.min(1, done - i)) * 100).toFixed(2) + '%"></b></i>';
+  return '<span class="lsegs" aria-hidden="true">' + s + "</span>";
+}
 // картка ліміту: лише для поточного (неповного) місяця і коли ліміт уже є; тап — Аналітика з увімкненим лімітом.
 // Внизу — тихий рядок до шторки «Відкладати щомісяця»: у Марка «+ Відкладати щомісяця» (або його план), в Олі — подушка
 function renderLimit(P) {
@@ -1700,14 +1709,19 @@ function renderLimit(P) {
   var note = left < 0 ? "Щоденні вже понад ліміт, до кінця місяця ще " + dl + " " + plural(dl, "день", "дні", "днів")
     : "Це ≈ " + zr(left / Math.max(1, dl)) + " на день" + (LM.src !== "best" ? ", щоб відкласти " + zr(LM.save) : " до кінця місяця");
   var pl = LM.plan, foot;
+  // ціль із датою — прапорець і прогрес сегментами (2–12 міс. — по сегменту на місяць, інакше суцільна смужка);
+  // без дати — копілка і «Відкладаєте … на місяць»
+  var FLAG = svgI("currentColor", '<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>', 16);
   if (g) {
-    var segs = "";
-    for (var i = 0; i < g.G.months; i++) segs += '<i><b style="width:' + (Math.max(0, Math.min(1, g.life - i)) * 100).toFixed(2) + '%"></b></i>';
-    foot = '<button type="button" class="lfoot" id="limc-plan"><span class="lpig">' + svgI("currentColor", '<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>', 16) + "</span><span class=\"lft\">Відкладено <b>" + nf1.format(g.life) + " з " + g.G.months + " міс.</b></span>" +
-      '<span class="lsegs" aria-hidden="true">' + segs + "</span>" + CHR + "</button>";
+    foot = '<button type="button" class="lfoot" id="limc-plan"><span class="lpig">' + FLAG + "</span><span class=\"lft\">Відкладено <b>" + nf1.format(g.life) + " з " + g.G.months + " міс.</b></span>" +
+      progSegs(g.G.months, g.life) + CHR + "</button>";
+  } else if (pl && pl.until) {
+    var n = planSpan(pl), got = planGot(P, pl);
+    foot = '<button type="button" class="lfoot" id="limc-plan"><span class="lpig">' + FLAG + "</span><span class=\"lft\">Відкладено <b>" + nf0.format(Math.round(got)) + " з " + zr(pl.total) + "</b></span>" +
+      progSegs(n, pl.total ? got / pl.total * n : 0) + CHR + "</button>";
   } else if (pl) {
-    foot = '<button type="button" class="lfoot" id="limc-plan"><span class="lft">' + "Відкладаєте <b>" + zr(pl.monthly) + "</b> на місяць" + (pl.until ? " до " + dmy(pl.until) : "") +
-      '</span><span class="llink">Змінити</span></button>';
+    foot = '<button type="button" class="lfoot" id="limc-plan"><span class="lpig">' + PIG + '</span><span class="lft">Відкладаєте <b>' + zr(pl.monthly) + "</b> на місяць</span>" +
+      '<span class="llink">Змінити</span></button>';
   } else foot = '<button type="button" class="lfoot ladd" id="limc-plan"><span class="llink">' + svgI("currentColor", '<path d="M12 5v14M5 12h14"/>', 18) + "Відкладати щомісяця</span></button>";
   box.innerHTML = '<a class="lmain" href="#analytics"><div class="ch"><h2>Ліміт на щоденні витрати</h2>' + CHR + "</div>" +
     '<div class="lbig"><b>' + zr(Math.abs(left)) + "</b><span>" + (left < 0 ? "понад ліміт " : "лишилось з ") + nf0.format(Math.round(LM.total)) + "</span></div>" +
@@ -2505,12 +2519,17 @@ function plRender(keepFocus) {
     var c2 = planCalc(P, m || 0), until = plUntil(), n2 = plMonths(until);
     var spans = [[null, "Без терміну"], [3, "3 міс."], [6, "6 міс."], [12, "Рік"], [0, "Інша дата"]];
     if (!LMnow(P).plan) html += '<p class="plintro">Зараз ліміт рахується сам: бажання — як у найекономніший місяць, решта — як зазвичай. З ним лишається ≈ ' + zr(c2.free - c2.auto) + " на місяць.</p>";
+    // ціль із датою — як в Олі: плашка з прапорцем зверху і розрахунок рядками; без дати — плашка з копілкою
+    if (m) html += '<div class="plgoal"><span class="gdue">' + (until ? svgI("currentColor", '<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>', 14) + "ціль до " + dmy(until) : PIG.replace(/width="16" height="16"/, 'width="14" height="14"') + "без терміну") + "</span>" +
+      (until ? "<span>" + zr(m * n2) + " за " + n2 + " " + plural(n2, "місяць", "місяці", "місяців") + "</span>" : "") + "</div>";
     html += amt("pl-amount", m, "1000") + '<div class="chips plchips">' + [500, 1000, 2000, 5000].map(function (v) { return '<button type="button" data-v="' + v + '" aria-pressed="' + (m === v) + '">' + nf0.format(v) + "</button>"; }).join("") + "</div>" +
       '<div class="pldd' + (plS.dd ? " open" : "") + '"><button type="button" class="pldd-h" id="pl-dd" aria-expanded="' + !!plS.dd + '"><span>До коли</span><b>' + (until ? dmy(until) : "без терміну") + "</b>" +
         '<svg class="ico16 chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>' +
       ('<div class="pldd-w"><div><div class="pldd-b"><div class="chips">' + spans.map(function (x) { return '<button type="button" data-span="' + x[0] + '" aria-pressed="' + (plS.span === x[0]) + '">' + x[1] + "</button>"; }).join("") + "</div>" +
-        (plS.span === 0 ? '<input class="pldate" id="pl-until" type="date" min="' + iso(new Date(Date.now() + 864e5)) + '" value="' + (plS.until || "") + '">' : "") +
+        (plS.span === 0 ? plCalHTML() : "") +
         (until && m ? '<p class="pldd-s">До ' + dmy(until) + " збереться <b>" + zr(m * n2) + "</b></p>" : "") + "</div></div></div>") + "</div>" +
+      (until && m ? '<div class="oplist plcalc"><div class="oprow"><span>Дохід</span><b>' + zr(c2.inc) + '</b></div><div class="oprow"><span>Обовʼязкові</span><b>−' + zr(c2.fixU) + "</b></div>" +
+        '<div class="oprow"><span>Відкладати</span><b>−' + zr(m) + '</b></div><div class="oprow tot"><span>Лишається на щоденні</span><b>' + zr(c2.cap) + "</b></div></div>" : "") +
       plResult(c2, m, false);
   }
   plS.m = m;
@@ -2525,10 +2544,27 @@ function plRender(keepFocus) {
   }
   body.querySelectorAll("[data-v]").forEach(function (b) { b.onclick = function () { plS.monthly = +b.dataset.v; plRender(); }; });
   body.querySelectorAll("[data-span]").forEach(function (b) { b.onclick = function () { plS.span = b.dataset.span === "null" ? null : +b.dataset.span; plRender(); }; });
-  if ($("pl-until")) $("pl-until").onchange = function () { plS.until = this.value; plRender(); };
+  body.querySelectorAll("[data-d]").forEach(function (b) { b.onclick = function () { plS.until = b.dataset.d; plRender(); }; });
+  if ($("pl-cal-prev")) $("pl-cal-prev").onclick = function () { plShift(-1); };
+  if ($("pl-cal-next")) $("pl-cal-next").onclick = function () { plShift(1); };
   // розгортання — без перемальовування: міняємо клас, висота плавно їде (grid 0fr → 1fr)
   if ($("pl-dd")) $("pl-dd").onclick = function () { plS.dd = !plS.dd; this.parentNode.classList.toggle("open", plS.dd); this.setAttribute("aria-expanded", String(plS.dd)); };
 }
+// «Інша дата» — наш календар (як у шторці готівки), лише майбутні дні: від завтра до 10 років уперед
+function plCalHTML() {
+  var now = new Date(), today = iso(now), maxKey = iso(new Date(now.getFullYear() + 10, now.getMonth(), 1)).slice(0, 7);
+  if (!plS.calKey) plS.calKey = (plS.until || iso(new Date(now.getFullYear(), now.getMonth() + 1, 1))).slice(0, 7);
+  var y = +plS.calKey.slice(0, 4), mo = +plS.calKey.slice(5) - 1, first = new Date(y, mo, 1), dim = new Date(y, mo + 1, 0).getDate(), start = new Date(y, mo, 1 - WD0(first)), cells = "";
+  for (var c = 0; c < Math.ceil((WD0(first) + dim) / 7) * 7; c++) {
+    var d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + c), key = iso(d), inM = d.getMonth() === mo, off = !inM || key <= today;
+    cells += '<button type="button"' + (key === today ? ' class="today"' : "") + (off ? " disabled" : ' data-d="' + key + '"') + ' aria-pressed="' + (key === plS.until) + '"' +
+      (inM ? ' aria-label="' + d.getDate() + " " + GEN[mo] + " " + y + '"' : "") + ">" + (inM ? d.getDate() : "") + "</button>";
+  }
+  var arr = function (id, dir, dis) { return '<button type="button" id="' + id + '" aria-label="' + (dir < 0 ? "Попередній" : "Наступний") + ' місяць"' + (dis ? " disabled" : "") + '><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="' + (dir < 0 ? "m14 6-6 6 6 6" : "m10 6 6 6-6 6") + '"/></svg></button>'; };
+  return '<div class="acal plcal" role="group" aria-label="Інша дата"><div class="cal-head">' + arr("pl-cal-prev", -1, plS.calKey <= today.slice(0, 7)) + "<b>" + MONTHS_FULL[mo] + " " + y + "</b>" + arr("pl-cal-next", 1, plS.calKey >= maxKey) + "</div>" +
+    '<div class="cal-wd" aria-hidden="true"><span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Нд</span></div><div class="cal-grid">' + cells + "</div></div>";
+}
+function plShift(n) { var y = +plS.calKey.slice(0, 4), mo = +plS.calKey.slice(5) - 1 + n; plS.calKey = iso(new Date(y, mo, 1)).slice(0, 7); plRender(); }
 function LMnow(P) { return limitsFor(P, P.months.length - 1) || {}; }
 function planOpen(P) {
   var pl = planFor(P, P.months[P.months.length - 1].key);
