@@ -57,7 +57,7 @@ for _ in range(40):
 else:
     sys.exit("Консоль не відповіла вчасно:\n" + out[-800:])
 tail = out[out.rfind("check.py | tail -1"):].split("\n", 1)[-1]
-print(re.sub(r"\x1b(\[[0-9;?]*[A-Za-z]|[=>])", "", tail.split(mark)[0]).strip())  # без кольорів і службових кодів терміналу
+print(re.sub(r"\x1b\[[0-9;?]*[A-Za-z][=>]?", "", tail.split(mark)[0]).strip())  # без кольорів і службових кодів терміналу
 if "ЗБІГАЄТЬСЯ" not in tail:
     sys.exit("check.py не підтвердив дані — сайт не перезапускаю")
 
