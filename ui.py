@@ -1990,10 +1990,7 @@ function renderAnalytics(P) {
       if (!LM) return { badge: "", text: "Ліміт зʼявиться, коли буде два повні місяці" };
       var d = l - spent, dl = dimM - dn;
       return { badge: '<span class="bd ' + (d >= 0 ? "good" : "bad") + '">' + (d < 0 ? "+" + zr(-d) + " понад ліміт" : open ? "лишилось " + zr(d) : "вклались") + "</span>",
-        text: (open ? "Ліміт " + per + " — " + zr(l) : "Ліміт був " + zr(l)) + (perDay && open && d > 0 && dl > 0 ? ", до кінця місяця ≈ " + zr(d / dl) + " на день" : ""),
-        note: LM.src === "goal" ? "Рахуємо від цілі «" + G.title + "»: дохід мінус обовʼязкові й " + zr(LM.save) + " відкладень"
-          : LM.src === "plan" ? "Рахуємо від плану: дохід мінус обовʼязкові й " + zr(LM.save) + " відкладень"
-          : "Як у найекономніший місяць: бажання — за мінімумом, решта — як зазвичай" };
+        text: (open ? "Ліміт " + per + " — " + zr(l) : "Ліміт був " + zr(l)) + (perDay && open && d > 0 && dl > 0 ? ", до кінця місяця ≈ " + zr(d / dl) + " на день" : "") };
     };
     if (!weeks) {
       var avgV = avgOf(allFull, function (m) { return m.variable; });
