@@ -1474,8 +1474,8 @@ function renderGoal(P) {
     '<div class="gsub">' + nf0.format(have) + " з " + nf0.format(target) + " зл</div>" +
     '<div class="segs" role="img" aria-label="' + nf1.format(life) + " з " + G.months + ' місяців">' + segs + "</div>" +
     '<div class="gpace"><span>Відкладено ≈ ' + nf0.format(pace) + " зл/міс. при плані " + nf0.format(need) + " зл. " +
-      (ok ? "У такому темпі — " + (early ? "до " + GEN[etaM] + "." : "вчасно.") : "У такому темпі — пізніше за " + MONTHS_FULL[G.deadline[1] - 1].toLowerCase() + ".") + "</span>" +
-      '<span class="bd ' + (ok ? "good" : "bad") + '">' + (ok ? (early ? "на " + (ahead === 1 ? "місяць" : ahead + " " + plural(ahead, "місяць", "місяці", "місяців")) + " раніше" : "вчасно") : "−" + nf0.format(need - pace) + " зл/міс.") + "</span></div>";
+      (ok ? (early ? "У такому темпі ціль буде досягнуто до " + GEN[etaM] + ", на " + (ahead === 1 ? "місяць" : ahead + " " + plural(ahead, "місяць", "місяці", "місяців")) + " раніше плану." : "У такому темпі ціль буде досягнуто вчасно.")
+        : "У такому темпі ціль не буде досягнуто до " + GEN[G.deadline[1] - 1] + ": бракує ≈ " + nf0.format(need - pace) + " зл на місяць.") + "</span></div>";
 }
 
 // ---------- аналітика ----------
