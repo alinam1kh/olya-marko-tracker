@@ -713,9 +713,12 @@ a.ins { color: var(--ink4); }
 .toast button { min-height: 36px; margin-left: 7px; padding: 0 12px; border: 0; border-radius: 12px; background: var(--bad-bg); color: var(--bad); font: 500 13px var(--font); cursor: pointer; }  /* «Скасувати» в плашках — червона */
 
 /* подушка безпеки (Оля) */
-.goal .gbig { display: flex; align-items: flex-start; gap: 10px; margin: 16px 0 16px; }
+.goal .gbig { display: flex; align-items: baseline; gap: 8px; margin: 14px 0 0; }
 .goal .gbig b { font-size: 32px; font-weight: 500; line-height: 1; color: var(--blue); }
-.goal .gbig span { font-size: 14px; line-height: 1.35; color: var(--ink4); padding-top: 3px; }
+.goal .gbig span { font-size: 16px; font-weight: 500; color: var(--ink); }
+.goal .gsub { margin: 6px 0 14px; font-size: 13px; color: var(--ink2); }
+.goal .gdue { flex: none; display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 12px; background: var(--blue-soft); color: var(--blue); font-size: 12px; font-weight: 500; white-space: nowrap; }
+.goal .gpace { margin-top: 16px; }
 .segs { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
 .segs i { position: relative; height: 8px; border-radius: 4px; background: var(--track); overflow: hidden; }
 .segs i b { position: absolute; inset: 0; width: 0; border-radius: 4px; background: var(--blue-g); transition: width 2.1s var(--ease); }
@@ -1454,25 +1457,23 @@ function renderGoal(P) {
   var need = monthsLeft > 0 ? left / monthsLeft : left;
   var eta = pace > 0 ? Math.ceil(left / pace) : 0, etaIdx = y * 12 + m - 1 + eta, etaY = Math.floor(etaIdx / 12), etaM = etaIdx % 12;
   var early = etaY * 12 + etaM < G.deadline[0] * 12 + G.deadline[1] - 1, ahead = (G.deadline[0] * 12 + G.deadline[1] - 1) - (etaY * 12 + etaM);
-  var segs = "", labs = "";
+  var segs = "";
   // смужки подушки статичні: одразу показують, скільки місяців покрито
   for (var i = 0; i < G.months; i++) {
     var f = Math.max(0, Math.min(1, life - i));
     segs += '<i><b style="width:' + (f * 100).toFixed(2) + '%;transition:none"></b></i>';
-    labs += "<span>" + (i === 0 ? "1 міс." : i + 1) + "</span>";
   }
-  box.innerHTML = '<div class="ch" style="min-height:0"><h2>' + G.title + '</h2><span class="sub" style="font-size:12px">до 1 червня ' + G.deadline[0] + "</span></div>" +
-    '<div class="gbig"><b>' + nf1.format(life) + "</b><span>" + (Math.round(life * 10) % 10 ? "місяця" : plural(Math.round(life), "місяць", "місяці", "місяців")) + " витрат покрито<br>із 6 запланованих</span></div>" +
-    '<div class="segs" role="img" aria-label="' + nf1.format(life) + " з " + G.months + ' місяців">' + segs + '</div><div class="seglab" aria-hidden="true">' + labs + "</div>" +
-    '<div class="gcols"><div><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 11.5a6.5 5.5 0 0 1 6.5-5.5h3a6.5 5.5 0 0 1 6 3.4l1.5.4v3.4l-1.6.5a6.5 5.5 0 0 1-2.4 2.7V20h-2.6v-1.8h-3.8V20H8.5v-2.6a5.5 5.5 0 0 1-4-5.9z"/><path d="M11 6V4.2M10 9.5h3.5"/><circle cx="16.5" cy="10.5" r=".6" fill="currentColor"/></svg>Накопичено</span><b>' + nf0.format(have) + '<i class="of"> / ' + nf0.format(target) + " зл</i></b>" +
-      '<span class="bd blue" title="частка всієї цілі">' + nf0.format(have / target * 100) + " % цілі</span></div>" +
-    "<div><span><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"3.5\" y=\"5\" width=\"17\" height=\"15.5\" rx=\"3\"/><path d=\"M3.5 10h17M8 3v4M16 3v4\"/></svg>Відкладено за місяць</span><b>" + nf0.format(pace) + '<i class="of"> / ' + nf0.format(need) + " зл</i></b>" +
-      '<span class="bd ' + (pace >= need ? "good" : "bad") + '" title="від потрібного щомісяця">' + nf0.format(need ? pace / need * 100 : 100) + " % плану</span></div></div>" +
-    '<div class="gpace"><span>' + (pace >= need
-      ? "За поточного темпу ціль буде досягнуто " + (early ? "в " + LOC[etaM] + " " + etaY + " — на " + ahead + " " + plural(ahead, "місяць", "місяці", "місяців") + " раніше плану" : "вчасно")
-      : "Щоб досягти цілі до червня " + G.deadline[0] + ", потрібно відкладати більше") + "</span>" +
-    '<span class="bd ' + (pace >= need ? "good" : "bad") + '" title="' + (pace >= need ? "на стільки більше, ніж треба щомісяця" : "на стільки треба більше щомісяця") + '">' +
-    (pace >= need ? "+" : "−") + nf0.format(Math.abs(pace - need)) + " зл/міс.</span></div>";
+  // термін — окремою плашкою з прапорцем: видно, що це дата цілі, а не блоку
+  var due = "1 " + GEN[G.deadline[1] - 1] + " " + G.deadline[0];
+  var ok = pace >= need;
+  box.innerHTML = '<div class="ch" style="min-height:0"><h2>' + G.title + '</h2><span class="gdue" aria-label="Термін цілі: ' + due + '">' +
+      svgI("currentColor", '<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>', 14) + "зібрати до " + due + "</span></div>" +
+    '<div class="gbig"><b>' + nf1.format(life) + "</b><span>з " + G.months + " місяців витрат</span></div>" +
+    '<div class="gsub">' + nf0.format(have) + " з " + nf0.format(target) + " зл</div>" +
+    '<div class="segs" role="img" aria-label="' + nf1.format(life) + " з " + G.months + ' місяців">' + segs + "</div>" +
+    '<div class="gpace"><span>Щомісяця відкладаєте ≈ ' + nf0.format(pace) + " зл, план — " + nf0.format(need) + " зл. " +
+      (ok ? (early ? "Встигнете до " + GEN[etaM] + "." : "Встигаєте вчасно.") : "Щоб встигнути, треба ще ≈ " + nf0.format(need - pace) + " зл на місяць.") + "</span>" +
+      '<span class="bd ' + (ok ? "good" : "bad") + '">' + (ok ? (early ? "на " + (ahead === 1 ? "місяць" : ahead + " " + plural(ahead, "місяць", "місяці", "місяців")) + " раніше" : "вчасно") : "−" + nf0.format(need - pace) + " зл/міс.") + "</span></div>";
 }
 
 // ---------- аналітика ----------
