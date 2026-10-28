@@ -1028,7 +1028,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
     <div class="seg" id="a-mode" role="group" aria-label="Розділ аналітики"></div>
     <div id="an-month">
       <section class="card"><div class="ch" style="min-height:0;margin-bottom:12px"><h2>Фіксовані й змінні</h2></div><div class="split" id="fvsplit" aria-hidden="true"></div><div class="fv2" id="fv"></div><p class="note" id="fvnote" style="margin:14px 0 0"></p></section>
-      <section class="card list"><div class="ch"><h2 id="t-dmon"></h2></div><div class="share" id="t-share" aria-hidden="true"></div><div id="t-leg" style="padding-bottom:8px"></div></section>
+      <section class="card list"><div class="ch"><h2 id="t-dmon"></h2></div><div id="cats"></div></section>
       <section class="card">
         <div class="ch" style="min-height:0;flex-direction:column;align-items:flex-start;gap:2px"><h2 id="w-title">Витрати по тижнях</h2><span class="sub wsub" id="w-sub"></span></div>
         <div class="chart"><div class="ticks" id="wticks" aria-hidden="true"></div><div class="caps" id="bars"></div></div>
@@ -1398,7 +1398,7 @@ function renderReport(P) {
     return swipeWrap(o, opRow(o, true, fresh));
   }).join("") : '<div class="empty">Операцій немає</div>';
   $("recent").querySelectorAll(".swipe").forEach(function (sw) { swipeRow(sw, P, "#report"); });
-  grow("#hero .meter b, #hero .split2 .e, #v-report .bar6 b", "width");
+  grow("#hero .meter b, #hero .split2 .e", "width");
 }
 // «Що змінилось у жовтні»: лише відхилення від звичного, 0–2 пункти; якщо все звично — блоку немає.
 // Категорія: витрачено помітно більше/менше, ніж зазвичай за місяць (у неповному місяці — лише «вже більше») → Журнал з цією категорією.
@@ -1532,9 +1532,15 @@ function renderAnalytics(P) {
     '<div><span><i style="background:#1F63E6"></i>Змінні, ' + nf1.format(100 - fp) + " %</span><b>" + zl(M.variable) + "</b>" + (cmp ? badge(M.variable, pm.variable, true, "", false) : "") + "</div>";
   $("fvnote").textContent = "Фіксовані: " + FIXED[P.key] + ". Змінні — решта витрат, саме їх можна зменшити.";
   $("t-dmon").textContent = "Категорії у " + LOC[mi(M)];
-  var sl = slices(M), tot = sl.reduce(function (s, x) { return s + x.amount; }, 0) || 1;
-  $("t-share").innerHTML = sl.map(function (x) { return '<i style="flex:' + x.amount + ";background:" + x.color + '"></i>'; }).join("");
-  $("t-leg").innerHTML = sl.map(function (x) { return '<div class="leg"><i style="background:' + x.color + '"></i><span>' + esc(x.name) + '</span><span class="v" style="color:var(--ink2)">' + zl(x.amount) + '</span><span class="bd blue">' + nf1.format(x.amount / tot * 100) + " %</span></div>"; }).join("");
+  // наші рядки категорій (іконка, сума, частка, шкала); решта — під «Ще N категорій»
+  $("cats").innerHTML = catRows(M, 5);
+  grow("#cats .bar6 b", "width");
+  var mb = $("more-btn");
+  if (mb) mb.onclick = function () {
+    var open = mb.getAttribute("aria-expanded") !== "true", n = $("more-rows").querySelectorAll(".crow").length;
+    mb.setAttribute("aria-expanded", open); $("more-rows").classList.toggle("open", open);
+    mb.querySelector(".more-l").textContent = open ? "Згорнути" : "Ще " + n + " " + plural(n, "категорія", "категорії", "категорій");
+  };
 }
 function renderTrends(P) {
   var METRICS = [["exp", "Витрати"], ["saved", "Лишилось"], ["inc", "Дохід"]];  // головні два поруч, стабільний дохід — в кінці
