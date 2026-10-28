@@ -907,6 +907,9 @@ a.ins { color: var(--ink4); }
 .jsearch input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }  /* системний хрестик ховаємо — є наш */
 .jclear { flex: none; width: 32px; height: 32px; margin-right: -8px; border: 0; border-radius: 16px; background: transparent; color: var(--ink2); display: grid; place-items: center; cursor: pointer; }
 .jclear:hover { background: var(--soft); }
+.jsug { position: fixed; z-index: 45; }
+.jsug .opt { min-height: 52px; gap: 10px; }
+.jsug .opt .cic { width: 32px; height: 32px; }
 .jcash { flex: none; display: inline-flex; align-items: center; gap: 6px; height: 48px; padding: 0 16px; border-radius: 24px; background: var(--blue-g); color: #fff; font-size: 15px; font-weight: 500; box-shadow: 0 6px 14px rgba(29,95,224,.24); }
 .jcash svg { width: 16px; height: 16px; }
 .jsum { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
@@ -1120,6 +1123,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
         <button type="button" class="jclear" id="j-clear" aria-label="Очистити пошук" hidden><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"/></svg></button></label>
       <a class="jcash" id="j-cash" href="#add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Готівка</a>
     </div>
+    <div class="pop jsug" id="j-sug" role="listbox" aria-label="Категорії" hidden></div>
     <div class="filters" id="j-filters" role="group" aria-label="Фільтр"></div>
     <div class="jsum" id="j-sum" hidden></div>
     <div id="j-list"></div>
@@ -2057,7 +2061,31 @@ $("cash").addEventListener("click", function () { sheetFromApp = true; sheetBase
 $("j-cash").addEventListener("click", function () { sheetFromApp = true; sheetBase = "journal"; });
 $("ops-all").addEventListener("click", function () { filter = "all"; toCur(D.people[person]); });
 // пошук у Журналі: перемальовуємо лише список, поле лишається у фокусі
-$("j-q").addEventListener("input", function () { jq = this.value; $("j-clear").hidden = !jq; renderJournal(D.people[person]); });
+$("j-q").addEventListener("input", function () { jq = this.value; $("j-clear").hidden = !jq; renderJournal(D.people[person]); sugRender(); });
+// підказки категорій: з перших літер — категорії, у назві яких є таке слово; тап вмикає фільтр «Категорія ✕»
+function sugRender() {
+  var box = $("j-sug"), q = jq.trim().toLowerCase(), P = D.people[person];
+  if (!q || document.activeElement !== $("j-q")) { box.hidden = true; return; }
+  var n = {};
+  P.months.forEach(function (m) { m.ops.forEach(function (o) { if (!o.income) n[o.cat] = (n[o.cat] || 0) + 1; }); });
+  var cats = Object.keys(n).filter(function (c) { return c !== catF && c.toLowerCase().split(/[\s\/*.-]+/).some(function (w) { return w.indexOf(q) === 0; }); })
+    .sort(function (a, b) { return n[b] - n[a]; }).slice(0, 4);
+  box.hidden = !cats.length;
+  if (!cats.length) return;
+  box.innerHTML = '<p>Категорії</p>' + cats.map(function (c) {
+    return '<button type="button" class="opt" role="option" data-c="' + esc(c) + '">' + cic(c, true) + "<span><b>" + esc(c) + "</b><small>" + n[c] + " " + plural(n[c], "операція", "операції", "операцій") + "</small></span></button>";
+  }).join("");
+  var r = $("j-q").closest(".jsearch").getBoundingClientRect();
+  box.style.top = r.bottom + 8 + "px"; box.style.left = r.left + "px"; box.style.width = r.width + "px";
+  box.querySelectorAll("[data-c]").forEach(function (b) {
+    b.onpointerdown = function (e) { e.preventDefault(); };  // поле не втрачає фокус до вибору
+    b.onclick = function () { catF = b.dataset.c; filter = "all"; var q = $("j-q"); q.value = ""; jq = ""; $("j-clear").hidden = true; box.hidden = true; q.blur(); render(); };
+  });
+}
+document.body.appendChild($("j-sug"));  // поза екраном Журналу — поверх чипів і списку
+$("j-q").addEventListener("focus", sugRender);
+$("j-q").addEventListener("blur", function () { setTimeout(function () { $("j-sug").hidden = true; }, 120); });
+window.addEventListener("scroll", function () { $("j-sug").hidden = true; }, { passive: true });
 // наш хрестик замість системного: очищає пошук і лишає курсор у полі
 $("j-clear").onclick = function () { var q = $("j-q"); q.value = ""; q.dispatchEvent(new Event("input")); q.focus(); };
 $("arr-j").outerHTML = CHR; $("arr-f").outerHTML = CHR;
