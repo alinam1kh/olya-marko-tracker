@@ -767,13 +767,17 @@ a.ins { color: var(--ink4); }
 .abig { margin-top: 2px; font-size: 28px; font-weight: 500; letter-spacing: -.01em; white-space: nowrap; }
 .aline { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; margin-top: 6px; font-size: 14px; color: var(--ink2); }
 .legs .avg-leg + .avg-leg { margin-top: 12px; }
+.legs .apace { flex-direction: column; align-items: stretch; gap: 4px; margin-top: 14px; }
+.legs .apace .aline { justify-content: space-between; margin: 0; font-size: 13px; color: var(--ink4); }
+.legs .apace .aline.sub { color: var(--ink2); }
 /* «Куди пішли гроші»: під назвою категорії — дрібно «зазвичай …», як у «Що змінилось» */
 .wrow { color: inherit; }
 .wrow .nm { flex-direction: column; align-items: flex-start; gap: 2px; }
 .wrow .nm small { font-size: 13px; color: var(--ink2); }
 .wrow .ir { display: inline-flex; align-items: center; gap: 4px; color: var(--ink2); }
 #an-where .dh { align-items: baseline; margin: 18px 0 2px; padding: 0 0 10px; border-bottom: 1px solid var(--soft); font-size: 15px; }  /* заголовок розділу: наш шрифт списків, 500, роздільник під ним */
-#an-where .dh b, #an-where .dh > span { font-weight: 500; color: var(--ink); }
+#an-where .dh b { font-weight: 500; color: var(--ink); }
+#an-where .dh > span { font-size: 14px; color: var(--ink2); }  /* сума — сіра, як підсумок дня в Журналі */
 .chart { display: flex; gap: 8px; margin-top: 24px; }
 .ticks { flex: none; display: flex; flex-direction: column; justify-content: space-between; height: 150px; width: 66px; font-size: 12px; color: var(--ink2); text-align: right; }
 .ticks span { line-height: 1; white-space: nowrap; }
@@ -1544,6 +1548,8 @@ function vsUsual(now, u, n, goodIfMore, when) {
 function legRows(rows) {
   return rows.filter(Boolean).map(function (r) { return '<div class="avg-leg">' + (r[2] ? '<i aria-hidden="true"></i>' : "") + "<span>" + r[0] + "</span><b>" + r[1] + "</b></div>"; }).join("");
 }
+// порівняння «зазвичай» — сірим блоком під рядком середнього, як примітка темпу в «Подушці безпеки»
+function aNote(html) { return html ? '<div class="gpace apace">' + html + "</div>" : ""; }
 var ascale = "m";  // масштаб графіка витрат: m — місяці, w — тижні обраного місяця
 function renderAnalytics(P) {
   if (metric !== "saved") metric = "exp";
@@ -1589,7 +1595,8 @@ function renderAnalytics(P) {
       }
       $("t-avg").innerHTML = legRows([uw ? ["Середній тиждень", zr(uw), true] : null]);
     }
-    $("a-sum").innerHTML = '<div class="alab">Щоденні витрати' + (M.incomplete ? '<span class="tag">дані до ' + M.last_op + "</span>" : "") + '</div><div class="abig">' + zr(M.variable) + "</div>" + line1;
+    $("a-sum").innerHTML = '<div class="alab">Щоденні витрати' + (M.incomplete ? '<span class="tag">дані до ' + M.last_op + "</span>" : "") + '</div><div class="abig">' + zr(M.variable) + "</div>";
+    $("t-avg").innerHTML += aNote(line1);
     renderWhere(P, M);
   } else {
     // «Лишилось»: факт для закритих місяців; для неповного — оцінка «≈» (дохід мінус витрати мінус звичне до кінця місяця)
@@ -1609,7 +1616,8 @@ function renderAnalytics(P) {
     var l2 = M.income > 0 ? "З доходу " + zr(M.income) + (M.incomplete ? "" : " — " + nf0.format(Math.round(M.rate)) + " зл з кожних 100")
       : inc ? "Оцінка, якщо дохід як зазвичай (" + zr(inc) + ")" : "Дохід ще не надходив";
     $("a-sum").innerHTML = '<div class="alab">' + (M.incomplete ? "Лишиться" : "Лишилось") + (M.incomplete ? '<span class="tag">попередні дані</span>' : "") + '</div><div class="abig">' +
-      (v === null ? "—" : (M.incomplete ? "≈ " : "") + zr(v)) + "</div>" + l1 + '<div class="aline sub">' + l2 + "</div>";
+      (v === null ? "—" : (M.incomplete ? "≈ " : "") + zr(v)) + "</div>";
+    $("t-avg").innerHTML += aNote(l1 + '<div class="aline sub">' + l2 + "</div>");
     $("an-where").hidden = true;
   }
 }
