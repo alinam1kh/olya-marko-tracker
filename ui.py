@@ -589,7 +589,8 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .hero .ls .lt i { background: #fff; }
 .hero .lv { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; margin-top: 6px; }  /* бейдж «зазвичай» — окремим рядком під сумою */
 .hero .lg2 b { font-size: 18px; font-weight: 500; }
-.hero .ls { flex: none; display: flex; flex-direction: column; align-items: flex-end; text-align: right; white-space: nowrap; }
+.hero .ls { flex: none; max-width: 52%; display: flex; flex-direction: column; align-items: flex-end; text-align: right; }
+.hero .ls .lt { justify-content: flex-end; }
 .hero .le { min-width: 0; } .hero .lg2 b { white-space: nowrap; }
 .hero .ls b { margin-top: 6px; }
 .hero .lbl { font-size: 14px; }
@@ -597,6 +598,16 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 @keyframes numin { from { opacity: 0; transform: translateY(8px); filter: blur(4px); } to { opacity: 1; transform: none; filter: none; } }
 .hero .num { margin-top: 12px; font-size: 40px; font-weight: 500; letter-spacing: -.02em; line-height: 1.05; }
 .hero .sub { margin-top: 6px; font-size: 14px; }
+/* велика цифра й «з доходу» поруч, по нижньому краю */
+.hero .numrow { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 6px 12px; margin-top: 12px; }  /* на вузькому екрані «з доходу» переходить під цифру */
+.hero .numrow .num { margin-top: 0; min-width: 0; white-space: nowrap; }
+.hero .side { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; padding-bottom: 3px; font-size: 13px; line-height: 1.25; color: rgba(255,255,255,.75); text-align: right; text-shadow: 0 1px 10px rgba(5, 10, 30, .28); }
+.hero .side b { font-size: 15px; font-weight: 500; color: #fff; white-space: nowrap; }
+.hero .side .bd { margin-top: 4px; }
+/* прогноз до зарплати: що зазвичай ще піде — ледь видно, що лишиться — штрихування */
+.hero .split2 .f { background: rgba(255, 255, 255, .14); }
+.hero .split2 .x { background: repeating-linear-gradient(-45deg, rgba(255,255,255,.8) 0 3px, rgba(255,255,255,.22) 3px 6px); }
+.hero .ls.x .lt i { background: repeating-linear-gradient(-45deg, #fff 0 2px, rgba(255,255,255,.3) 2px 4px); }
 .hero .lbl { display: flex; align-items: center; gap: 8px; }
 .hero .tag { flex: none; height: 22px; padding: 0 8px; border-radius: 11px; background: rgba(255,255,255,.16); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); color: #fff; font-size: 12px; font-weight: 500; display: flex; align-items: center; }
 .hero .meter { height: 8px; margin: 14px 0 8px; border-radius: 4px; background: rgba(255,255,255,.25); overflow: hidden; }
@@ -1157,7 +1168,8 @@ function cic(name, big) {
 function arr(d) { return d > 0 ? "↗" : "↘"; }
 
 function lastFull(P) { for (var i = P.months.length - 1; i >= 0; i--) if (P.months[i].income > 0) return i; return P.months.length - 1; }
-var person = 0, month = lastFull(D.people[0]), trendMonth = null, filter = "all", metric = "exp", amode = "month";
+function curMonth(P) { return P.months.length - 1; }  // Головна завжди відкривається на поточному місяці, навіть до зарплати
+var person = 0, month = curMonth(D.people[0]), trendMonth = null, filter = "all", metric = "exp", amode = "month";
 var GOAL = { olya: { months: 6, deadline: [2027, 6], title: "Подушка безпеки" } };  // фіча 5 з роадмапу ДЗ
 var VIEWS = { report: 1, analytics: 1, journal: 1, add: 1 };
 var saved = null;  // після збереження готівки: сума й дата, щоб підсвітити новий запис
@@ -1197,7 +1209,7 @@ function renderPeople() {
   D.people.forEach(function (p, i) {
     var b = h("button", "opt", '<span class="av ' + p.key + '"></span><span><b>' + esc(p.name) + '</b></span><span class="radio" aria-hidden="true"></span>');
     b.type = "button"; b.setAttribute("role", "menuitemradio"); b.setAttribute("aria-checked", i === person);
-    b.onclick = function () { popMenu("w", false); if (i === person) return; person = i; month = lastFull(D.people[i]); trendMonth = null; selDay = null; render(); if (view() === "report") setTimeout(replaySheen, 250); };
+    b.onclick = function () { popMenu("w", false); if (i === person) return; person = i; month = curMonth(D.people[i]); trendMonth = null; selDay = null; render(); if (view() === "report") setTimeout(replaySheen, 250); };
     box.appendChild(b);
   });
 }
@@ -1338,23 +1350,34 @@ function renderReport(P) {
   $("h-alert").innerHTML = P.ok ? "" : '<div class="alert" role="alert"><b>Журнал не сходиться</b>Перевірка обліку знайшла помилки, тож цифри нижче можуть бути неточні.<br><a href="' +
     FAVA[P.key] + 'errors/">Переглянути у Fava</a></div>';
   var tag = M.incomplete ? '<span class="tag">дані до ' + M.last_op + "</span>" : "";
+  var dn = M.last_op ? +M.last_op.slice(0, 2) : 0, spent = "Витрати" + (M.incomplete ? " за " + dn + " " + plural(dn, "день", "дні", "днів") : "");
   if (noIncome) {
-    var usual = prevI ? prevI.income : 0, share = usual ? M.expenses / usual * 100 : 0, days = payDays(P);
-    hero.innerHTML = '<div class="lbl">Витрачено до зарплати' + tag + '</div><div class="num">' + approx + zl(M.expenses) + "</div>" +
-      (usual ? '<div class="meter"><b data-to="' + Math.min(100, share) + '%"></b></div><div class="sub">Це ' + nf1.format(share) + " % від зарплати " + nf0.format(usual) + " зл</div>" : "") +
-      '<div class="hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="7.8" r=".6" fill="currentColor"/></svg>' +
-      "<span>Залишок зʼявиться після зарплати " + (days ? days + " числа" : "наприкінці місяця") + ".</span></div>";
+    // до зарплати: прогноз «лишиться» = звичний дохід − (вже витрачено + скільки зазвичай іде після цього числа); прогноз заштрихований
+    var base = prevI ? prevI.income : 0;
+    var fullM = P.months.slice(0, month).filter(function (m) { return m.income > 0 && !m.incomplete; }).slice(-6);
+    var rest = fullM.length ? fullM.reduce(function (s, m) { return s + m.ops.reduce(function (t, o) { return t + (!o.income && +o.day.slice(8) > dn ? o.amount : 0); }, 0); }, 0) / fullM.length : 0;
+    var est = base ? Math.max(0, base - M.expenses - rest) : null, estS = est === null ? "—" : "≈ " + nf0.format(Math.round(est)) + " зл";  // оцінка — без копійок
+    var pe = base ? Math.min(100, M.expenses / base * 100) : 0, pf = base ? Math.min(100 - pe, rest / base * 100) : 0, ps = 100 - pe - pf;
+    hero.innerHTML = '<div class="lbl">Лишиться у ' + LOC[k] + tag + "</div>" +
+      '<div class="numrow"><div class="num">' + estS + "</div>" +
+      '<div class="side">' + (base ? "з доходу<b>≈ " + nf0.format(base) + " зл</b>" : "дохід ще<b>не надходив</b>") + "</div></div>" +
+      '<div class="split2" role="img" aria-label="' + (base ? "Витрати " + nf0.format(pe) + " % звичного доходу, прогноз залишку " + nf0.format(ps) + " %" : "Дохід ще не надходив") + '">' +
+        (base ? '<b class="e" data-to="calc(' + pe.toFixed(2) + '% - 2px)"></b>' + (pf > .5 ? '<b class="f" data-to="calc(' + pf.toFixed(2) + '% - 4px)"></b>' : "") : "") + '<b class="s x"></b></div>' +
+      '<div class="lg2"><a href="#journal" data-filter="exp" class="le"><span class="lt"><i></i>' + spent + (base ? ", " + nf0.format(pe) + " %" : "") + "</span>" +
+        '<span class="lv"><b>' + zl(M.expenses) + "</b></span></a>" +
+      '<div class="ls x"><span class="lt"><i></i>Лишиться після зарплати</span><b>' + estS + "</b></div></div>";
   } else {
     var inc = M.incomplete ? "" : (prevI ? heroBadge(M.income, prevI.income, false, LOC[mi(prevI)]) : "");
     var exp = M.incomplete ? "" : usualBadge(M.expenses, usualExp(P, month));
-    var dn = +M.last_op.slice(0, 2);
     // увесь дохід — це смуга; витрати й залишок — її частини
     var ep = M.income > 0 ? Math.min(100, M.expenses / M.income * 100) : 100, sp = 100 - ep;
-    hero.innerHTML = '<div class="lbl">Лишилось у ' + LOC[k] + tag + '</div><div class="num">' + approx + zl(M.saved) + "</div>" +
-      '<div class="sub">З доходу <a href="#journal" data-filter="inc" class="inc">' + nf0.format(M.income) + " зл" + "</a>" + inc + (P.ok ? "" : ", потребує перевірки") + "</div>" +
+    hero.innerHTML = '<div class="lbl">Лишилось у ' + LOC[k] + tag + "</div>" +
+      '<div class="numrow"><div class="num">' + approx + zl(M.saved) + "</div>" +
+      '<a href="#journal" data-filter="inc" class="side inc">з доходу<b>' + nf0.format(M.income) + " зл</b>" + inc + "</a></div>" +
+      (P.ok ? "" : '<div class="sub">Потребує перевірки</div>') +
       '<div class="split2" role="img" aria-label="Витрати ' + nf0.format(ep) + " %, лишилось " + nf0.format(sp) + ' % доходу">' +
         '<b class="e" data-to="calc(' + ep.toFixed(2) + '% - 2px)"></b><b class="s"></b></div>' +
-      '<div class="lg2"><a href="#journal" data-filter="exp" class="le"><span class="lt"><i></i>Витрати' + (M.incomplete ? " за " + dn + " " + plural(dn, "день", "дні", "днів") : "") + ", " + nf0.format(ep) + " %</span>" +
+      '<div class="lg2"><a href="#journal" data-filter="exp" class="le"><span class="lt"><i></i>' + spent + ", " + nf0.format(ep) + " %</span>" +
         '<span class="lv"><b>' + zl(M.expenses) + "</b>" + exp + "</span></a>" +
       '<div class="ls"><span class="lt"><i></i>Лишилось, ' + nf0.format(sp) + " %</span><b>" + zl(M.saved) + "</b></div></div>";
   }
@@ -1651,7 +1674,7 @@ function delCash(P, line, day, title, back, undo, cancel) {
       var mk = D.people[person].months[month] && D.people[person].months[month].key;
       D = res.data;
       var ms = D.people[person].months.map(function (m) { return m.key; });
-      month = ms.indexOf(mk) >= 0 ? ms.indexOf(mk) : lastFull(D.people[person]);
+      month = ms.indexOf(mk) >= 0 ? ms.indexOf(mk) : curMonth(D.people[person]);
       saved = null; reportKey = null;
       justAdded = justAdded.filter(function (s) { return !(s.day === day && s.title === title); });
       if (back && location.hash !== back) location.hash = back; else render();
