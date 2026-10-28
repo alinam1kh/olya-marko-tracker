@@ -1351,10 +1351,8 @@ function renderReport(P) {
   var sd = ops.reduce(function (d, o) { return o.income && o.day > d ? o.day : d; }, "");
   var dm = function (iso) { return iso.slice(8) + "." + iso.slice(5, 7); }, z0 = function (v) { return (v < 0 ? "−" : "") + nf0.format(Math.abs(Math.round(v))) + " зл"; };
   if (month === P.months.length - 1 && M.incomplete && sd) {
-    var A = 0, out = 0, today = "";
-    ops.forEach(function (o) { if (o.day > today) today = o.day; if (o.day >= sd) { if (o.income) A += o.day === sd ? o.amount : 0; else out += o.amount; } });
-    var next = new Date(sd + "T12:00:00"); next.setMonth(next.getMonth() + 1);
-    var days = Math.round((next - new Date(today + "T12:00:00")) / 864e5), nextIso = next.toISOString().slice(0, 10);
+    var A = 0, out = 0;
+    ops.forEach(function (o) { if (o.day >= sd) { if (o.income) A += o.day === sd ? o.amount : 0; else out += o.amount; } });
     var ep = Math.min(100, Math.max(0, out / A * 100));
     hero.innerHTML = '<div class="lbl">Лишилось із зарплати ' + dm(sd) + tag + "</div>" +
       '<div class="numrow"><div class="num">' + approx + z0(A - out) + "</div>" +
@@ -1364,8 +1362,7 @@ function renderReport(P) {
         '<b class="e" data-to="calc(' + ep.toFixed(2) + '% - 2px)"></b><b class="s"></b></div>' +
       '<div class="lg2"><a href="#journal" data-filter="exp" class="le"><span class="lt"><i></i>Витрати з ' + dm(sd) + ", " + nf0.format(ep) + " %</span>" +
         '<span class="lv"><b>' + z0(out) + "</b></span></a>" +
-      '<div class="ls"><span class="lt">' + (days > 0 ? "До наступної зарплати" : "Зарплата очікувалась") + "</span><b>" +
-        (days > 0 ? "~" + days + " " + plural(days, "день", "дні", "днів") : dm(nextIso)) + "</b></div></div>";
+      '<div class="ls"><span class="lt"><i></i>Лишилось, ' + nf0.format(100 - ep) + " %</span><b>" + z0(A - out) + "</b></div></div>";
   } else if (noIncome) {
     // дохід ще жодного разу не надходив (або вибрано місяць без доходу): лише скільки витрачено
     hero.innerHTML = '<div class="lbl">Витрачено у ' + LOC[k] + tag + "</div>" +
