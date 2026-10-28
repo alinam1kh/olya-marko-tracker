@@ -758,7 +758,7 @@ a.ins { color: var(--ink4); }
 /* Аналітика: кнопка місяця з календарем — як колишня в шапці, лише без рамки */
 #an-chart { position: relative; z-index: 5; }
 #an-chart .ach { position: relative; z-index: 10; }  /* календар поверх стовпчиків */
-.ach .mpick > button { height: 40px; padding: 0 12px 0 10px; font-size: 14px; }  /* рамка й вигляд — як була кнопка місяця в шапці, лише нижча */
+.ach .mpick > button { height: 40px; gap: 6px; padding: 0 12px 0 16px; font-size: 14px; }  /* рамка й вигляд — як була кнопка місяця в шапці, лише нижча */
 .mmenu { position: fixed; right: auto; z-index: 45; }
 .mmenu:not([hidden]) { transform-origin: top left; }
 #a-sum { margin-top: 16px; }
@@ -891,7 +891,7 @@ a.ins { color: var(--ink4); }
 .filters button[aria-pressed="true"] { border-color: transparent; background: var(--blue-g); color: #fff; font-weight: 500; }
 .filters button.catf { display: inline-flex; align-items: center; gap: 6px; padding-right: 12px; }
 /* та сама кнопка місяця, що в Аналітиці: іконка календаря, місяць і рік, шеврон; 14px, вага 400 */
-.filters .mchip { display: inline-flex; align-items: center; gap: 8px; padding: 0 12px 0 10px; color: var(--ink); font-weight: 400; }
+.filters .mchip { display: inline-flex; align-items: center; gap: 6px; padding: 0 12px 0 16px; color: var(--ink); font-weight: 400; }
 .filters .mchip .chev { color: var(--ink2); }
 .filters .mchip[aria-expanded="true"] .chev { transform: rotate(180deg); }
 .filters .mchip:disabled { opacity: .5; cursor: default; }
@@ -1094,7 +1094,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
     <!-- один графік: місяці або тижні обраного місяця; лише щоденні витрати, повна сума — рядком під цифрою -->
     <section class="card" id="an-chart">
       <div class="ach"><div class="mpick" id="mpick">
-      <button type="button" id="mcal" aria-haspopup="dialog" aria-expanded="false" aria-controls="mmenu"><svg class="ico16" viewBox="0 0 24 24" fill="none" stroke="#6B7180" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span id="mcal-name"></span><svg class="ico16 chev" viewBox="0 0 24 24" fill="none" stroke="#6B7180" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+      <button type="button" id="mcal" aria-haspopup="dialog" aria-expanded="false" aria-controls="mmenu"><span id="mcal-name"></span><svg class="ico16 chev" viewBox="0 0 24 24" fill="none" stroke="#6B7180" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
       <div class="pop mmenu" id="mmenu" role="dialog" aria-label="Вибір дня" hidden>
         <div class="cal-head"><button type="button" id="cal-prev" aria-label="Попередній місяць"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg></button>
           <b id="cal-year"></b><button type="button" id="cal-next" aria-label="Наступний місяць"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m10 6 6 6-6 6"/></svg></button></div>
@@ -1722,7 +1722,7 @@ var FILTERS = [["all", "Усі"], ["exp", "Витрати"], ["inc", "Дохід
 function renderJournal(P) {
   var M = P.months[month], fb = $("j-filters"); fb.innerHTML = "";
   // місяць — першим чипом; відкриває той самий календар, що в Аналітиці (тап по дню — прокрутка до нього)
-  var ms = h("button", "mchip", CAL + esc(selDay && selDay.slice(0, 7) === M.key ? (+selDay.slice(8)) + " " + GEN[mi(M)] + " " + M.key.slice(0, 4) : M.name + " " + M.key.slice(0, 4)) +
+  var ms = h("button", "mchip", esc(selDay && selDay.slice(0, 7) === M.key ? (+selDay.slice(8)) + " " + GEN[mi(M)] + " " + M.key.slice(0, 4) : M.name + " " + M.key.slice(0, 4)) +
     '<svg class="ico16 chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>');
   ms.type = "button"; ms.id = "jm-btn"; ms.setAttribute("aria-haspopup", "dialog"); ms.setAttribute("aria-expanded", String(!$("mmenu").hidden));
   ms.disabled = !!jq.trim(); ms.title = ms.disabled ? "Пошук іде по всіх місяцях" : "";
