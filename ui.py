@@ -585,7 +585,7 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .hero .split2 .s { flex: 1; min-width: 0; background: #fff; }
 .hero .lg2 { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-top: 8px; }
 .hero .lt { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
-.hero .lt i { flex: none; width: 7px; height: 7px; border-radius: 50%; background: rgba(255, 255, 255, .45); }
+.hero .lt i { flex: 0 0 8px; width: 8px; height: 8px; aspect-ratio: 1; border-radius: 50%;  /* 8px — на екранах 1,25×/1,5× 7px округлювався в сплющений овал */ background: rgba(255, 255, 255, .45); }
 .hero .ls .lt i { background: #fff; }
 .hero .lv { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; margin-top: 6px; }  /* бейдж «зазвичай» — окремим рядком під сумою */
 .hero .lg2 b { font-size: 18px; font-weight: 500; }
@@ -716,7 +716,7 @@ a.ins { color: var(--ink4); }
 .goal .gbig { display: flex; align-items: baseline; gap: 8px; margin: 14px 0 0; }
 .goal .gbig b { font-size: 32px; font-weight: 500; line-height: 1; color: var(--blue); }
 .goal .gbig span { font-size: 16px; font-weight: 500; color: var(--ink); }
-.goal .gsub { display: flex; align-items: center; gap: 6px; margin: 6px 0 14px; font-size: 13px; color: var(--ink2); }
+.goal .gsub { display: flex; align-items: center; gap: 4px; margin: 6px 0 14px; font-size: 13px; color: var(--ink2); }
 .goal .gsub svg { flex: none; }
 .goal .gdue { flex: none; display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 12px; background: var(--blue-soft); color: var(--blue); font-size: 12px; font-weight: 500; white-space: nowrap; }
 .goal .gpace { margin-top: 16px; align-items: flex-start; }  /* бейдж — у верхньому правому куті */
