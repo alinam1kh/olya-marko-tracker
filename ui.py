@@ -772,7 +772,7 @@ a.ins { color: var(--ink4); }
 .wrow .nm { flex-direction: column; align-items: flex-start; gap: 2px; }
 .wrow .nm small { font-size: 13px; color: var(--ink2); }
 .wrow .ir { display: inline-flex; align-items: center; gap: 4px; color: var(--ink2); }
-#an-where .dh { margin: 14px 0 2px; }
+#an-where .dh { margin: 14px 0 4px; padding: 9px 12px; border-radius: 12px; background: var(--soft); }  /* заголовок розділу — мʼяка сіра смуга */
 .chart { display: flex; gap: 8px; margin-top: 24px; }
 .ticks { flex: none; display: flex; flex-direction: column; justify-content: space-between; height: 150px; width: 66px; font-size: 12px; color: var(--ink2); text-align: right; }
 .ticks span { line-height: 1; white-space: nowrap; }
@@ -1572,8 +1572,8 @@ function renderAnalytics(P) {
       monthBars(function (m) { return m.variable; }, avgV, false);
       $("t-avg").innerHTML = legRows([avgV ? ["Середні витрати за місяць", zr(avgV), true] : null, ["Разом з обовʼязковими", zr(M.expenses)]]);
       // неповний місяць порівнюємо зі звичним до того самого числа
-      line1 = M.incomplete ? vsUsual(M.variable, avgOf(base, function (m) { return m.ops.reduce(function (s, o) { return s + (!o.income && !o.fixed && dayOf(o) <= dn ? o.amount : 0); }, 0); }), n, false, " до " + dn + "-го")
-        : vsUsual(M.variable, avgOf(base, function (m) { return m.variable; }), n, false);
+      line1 = M.incomplete ? vsUsual(M.variable, avgOf(base, function (m) { return m.ops.reduce(function (s, o) { return s + (!o.income && !o.fixed && dayOf(o) <= dn ? o.amount : 0); }, 0); }), n, false, " за 1–" + dn + " " + GEN[k])
+        : vsUsual(M.variable, avgOf(base, function (m) { return m.variable; }), n, false, " за місяць");
     } else {
       var y = +M.key.slice(0, 4), mo = +M.key.slice(5), dim = new Date(y, mo, 0).getDate(), last = M.incomplete ? dn : dim;
       var bounds = [[1, 7], [8, 14], [15, 21], [22, 28], [29, dim]].filter(function (b) { return b[0] <= dim; });
