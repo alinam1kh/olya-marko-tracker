@@ -769,7 +769,7 @@ a.ins { color: var(--ink4); }
 #a-sum .aline { margin-top: 4px; font-size: 14px; color: var(--ink2); }
 /* графік без осі й доріжок: лише стовпчики, назви місяців і пунктир середнього з підписом */
 .caps.plain .trk { background: none; overflow: visible; }
-.avgl .avgt { position: absolute; right: 0; bottom: 5px; padding: 1px 7px; border-radius: 8px; background: var(--soft); font-size: 11px; line-height: 1.4; color: var(--ink2); white-space: nowrap; }  /* «сер. …» — мʼяка сіра плашка */
+.avgl .avgt { position: absolute; right: 0; bottom: 5px; padding: 1px 7px; border-radius: 8px; background: var(--card); box-shadow: inset 0 0 0 1px var(--mute); font-size: 11px; line-height: 1.4; color: var(--ink3); white-space: nowrap; }  /* «сер. …» — біла плашка з сірою обводкою, щоб не зливалась із доріжками */
 .bnote { display: flex; align-items: center; gap: 8px; margin: 14px 0 0; font-size: 12px; color: var(--ink2); }
 .bnote .mk { flex: none; width: 14px; height: 0; border-top: 2px solid var(--ink); border-radius: 1px; }
 .ach .mpick > button { height: 40px; gap: 6px; padding: 0 12px 0 16px; font-size: 14px; }  /* рамка й вигляд — як була кнопка місяця в шапці, лише нижча */
