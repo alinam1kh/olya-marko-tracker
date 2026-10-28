@@ -579,7 +579,7 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .hero .sub .inc { color: inherit; }
 .hero .sub .bd { display: inline-flex; margin-left: 6px; vertical-align: 1px; }
 /* смуга доходу: біла — залишок, напівпрозора — витрати; витрати ростуть зліва й стискають білу */
-.hero .split2 { display: flex; gap: 4px; height: 8px; margin-top: 26px; }
+.hero .split2 { display: flex; gap: 4px; height: 8px; margin-top: 20px; }
 .hero .split2 b { display: block; height: 100%; width: 0; border-radius: 4px; transition: width 2.1s var(--ease); }
 .hero .split2 .e { background: rgba(255, 255, 255, .34); }
 .hero .split2 .s { flex: 1; min-width: 0; background: #fff; }
@@ -599,7 +599,7 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .hero .num { margin-top: 12px; font-size: 40px; font-weight: 500; letter-spacing: -.02em; line-height: 1.05; }
 .hero .sub { margin-top: 6px; font-size: 14px; }
 /* велика цифра й «/ з доходу …» одразу за нею, по базовій лінії */
-.hero .numrow { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; margin-top: 12px; }  /* на вузькому екрані «з доходу» переходить під цифру */
+.hero .numrow { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; margin-top: 8px; }  /* на вузькому екрані «з доходу» переходить під цифру */
 .hero .numrow .num { margin-top: 0; min-width: 0; white-space: nowrap; }
 .hero .side { flex: none; display: inline-flex; align-items: baseline; gap: 4px; font-size: 13px; color: rgba(255,255,255,.72); white-space: nowrap; text-shadow: 0 1px 10px rgba(5, 10, 30, .28); }
 .hero .side b { font-weight: 500; color: #fff; }
