@@ -1828,7 +1828,7 @@ function renderWhere(P, M, W, LM) {
   var cats = function (q) { return q + " " + plural(q, "категорія", "категорії", "категорій"); };
   // з лімітами — угорі ті, де лишилось найменше (перевищені першими); без ліміту — у кінці; кнопка — назад до «за сумою»
   if (LL && wsort === "left") daily.sort(function (a, b) { var la = limOf(a), lb = limOf(b); return (la === null ? Infinity : la - a.amount) - (lb === null ? Infinity : lb - b.amount); });
-  var html = '<div class="ch"><h2>Куди пішли гроші ' + (W ? W.title : "у " + LOC[mi(M)]) + "</h2>" +
+  var html = '<div class="ch"><h2>Витрати за ' + (W ? W.title : M.name.toLowerCase()) + "</h2>" +
     (LL ? '<button type="button" class="wsort" id="w-sort">' + svgI("currentColor", '<path d="M7 4v16M3.5 16.5 7 20l3.5-3.5M17 20V4M13.5 7.5 17 4l3.5 3.5"/>', 14) + (wsort === "left" ? "За залишком" : "За сумою") + "</button>" : "") + "</div>";
   // обидва розділи однаково: кілька найбільших, решта під «Ще N категорій»; 3 і менше — усі одразу, без кнопки
   var section = function (title, list, show) {
