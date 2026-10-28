@@ -951,6 +951,20 @@ a.ins { color: var(--ink4); }
 .vh { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 .info { margin-top: 14px; padding: 12px 14px; border-radius: 14px; background: #FFF7E8; color: var(--cash); font-size: 12px; line-height: 1.5; }
 .sheet-foot { padding: 10px 16px calc(14px + env(safe-area-inset-bottom, 0px)); }
+/* картка операції */
+#v-op .sheet-head h2 { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.op[data-op] { cursor: pointer; }
+.opbig { margin: 10px 0 14px; font-size: 28px; font-weight: 500; letter-spacing: -.01em; }
+.opbig.inc { color: var(--good); }
+.oplist .oprow { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 52px; border-top: 1px solid var(--soft); font-size: 14px; }
+.oplist .oprow span { color: var(--ink2); }
+.oplist .oprow b { font-weight: 500; text-align: right; }
+.opcat { display: inline-flex; align-items: center; gap: 8px; color: var(--ink) !important; }
+.opcat .cic { width: 28px; height: 28px; }
+.opbtns { display: flex; gap: 10px; }
+.obtn { flex: 1; min-height: 52px; border: 1px solid var(--border); border-radius: 26px; background: var(--card); color: var(--ink); font: 500 15px var(--font); cursor: pointer; }
+.obtn.del { border-color: transparent; background: var(--bad-bg); color: var(--bad); }
+#op-foot:empty { display: none; }
 .msg { margin: 0 4px 8px; font-size: 14px; text-align: center; color: var(--bad); }
 .msg:empty { display: none; }
 .save { width: 100%; height: 52px; border: 0; border-radius: 26px; background: var(--blue-g); box-shadow: 0 8px 18px rgba(29,95,224,.3); color: #fff; font: 500 16px var(--font); cursor: pointer; }
@@ -1120,6 +1134,14 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
     </div>
     <div class="sheet-foot"><p class="msg" id="a-msg" role="status"></p><button class="save" id="a-save" type="submit" disabled>Зберегти</button></div>
   </form>
+  <!-- картка операції: тап по рядку в Журналі чи «Останніх операціях» -->
+  <div class="sheet-bg" id="op-bg" hidden></div>
+  <div class="sheet" id="v-op" hidden role="dialog" aria-modal="true" aria-labelledby="op-title">
+    <div class="sheet-head" id="op-head"><h2 id="op-title"></h2>
+      <button type="button" id="op-close" aria-label="Закрити"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+    <div class="sheet-scroll" id="op-body"></div>
+    <div class="sheet-foot" id="op-foot"></div>
+  </div>
 </div>
 <div class="fade" aria-hidden="true"></div>
 <nav class="nav" aria-label="Навігація">
@@ -1341,8 +1363,9 @@ function fixedCats(M) {
 }
 function nice(s) { return s === s.toUpperCase() ? s.toLowerCase().replace(/(^|[\s\/*.-])(\S)/g, function (_, a, b) { return a + b.toUpperCase(); }) : s; }
 var TRASH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>';
+var OPS = [];  // операції з рядків на екрані — для картки операції (data-op = індекс)
 function opRow(o, recent, fresh) {
-  return '<div class="op' + (fresh ? " fresh" : "") + '">' + cic(o.income ? "Дохід" : o.cat, true) + '<div class="t">' + (fresh ? '<div class="t1row"><div class="t1 one">' + esc(nice(o.title)) + '</div><span class="fx now">щойно</span></div>'
+  return '<div class="op' + (fresh ? " fresh" : "") + '" data-op="' + (OPS.push(o) - 1) + '" role="button" tabindex="0">' + cic(o.income ? "Дохід" : o.cat, true) + '<div class="t">' + (fresh ? '<div class="t1row"><div class="t1 one">' + esc(nice(o.title)) + '</div><span class="fx now">щойно</span></div>'
       : '<div class="t1' + (recent ? " one" : "") + '">' + esc(nice(o.title)) + "</div>") +
     '<div class="t2"><span>' + esc(o.income ? "Дохід" : o.cat) + (recent ? '<i class="sep" aria-hidden="true"></i>' + o.date : "") + "</span>" + (o.fixed ? '<span class="fx">обовʼязкова</span>' : "") + (o.cash ? '<span class="fx cash">готівка</span>' : "") +
     '</div></div><div class="r"><span class="am' + (o.income ? " inc" : "") + '">' + (o.income ? "+" : "−") + zl(o.amount) + "</span>" +
@@ -1751,7 +1774,7 @@ function swipeRow(sw, P, back) {
   };
 }
 // видалення одного готівкового запису; після — перезавантаження зі свіжими даними і тостом
-function delCash(P, line, day, title, back, undo, cancel) {
+function delCash(P, line, day, title, back, undo, cancel, doneMsg) {
   fetch("api/cash/delete", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "same-origin",
     body: JSON.stringify({ person: P.key, line: line, date: day, title: title }) })
     .then(function (r) { return r.json().catch(function () { return { ok: false, error: "Сервер не відповів" }; }); })
@@ -1766,7 +1789,7 @@ function delCash(P, line, day, title, back, undo, cancel) {
       justAdded = justAdded.filter(function (s) { return !(s.day === day && s.title === title); });
       if (back && location.hash !== back) location.hash = back; else render();
       // «Скасувати» записує той самий запис назад (та сама сума, категорія, опис і дата)
-      toast(okMsg(cancel ? "Скасовано" : "Запис видалено"), undo ? ["Скасувати", function () { restoreCash(P, undo); }] : null);
+      toast(okMsg(doneMsg || (cancel ? "Скасовано" : "Запис видалено")), undo ? ["Скасувати", function () { restoreCash(P, undo); }] : null);
     })
     .catch(function (err) { toast(err.message || "Немає звʼязку, спробуйте ще раз"); });
 }
@@ -1888,6 +1911,15 @@ $("v-add").addEventListener("submit", function (e) {
       if (ms.indexOf(res.month) >= 0) month = ms.indexOf(res.month);
       saved = { amount: amountValue(), day: res.date, line: res.line, title: res.title }; markFresh(saved);
       reportKey = null; btn.disabled = false;
+      // «Змінити»: новий запис уже додано — тепер прибираємо старий (він вище у файлі, його рядок не зсунувся)
+      if (editing) {
+        var ed = editing; editing = null;
+        $("a-title").value = ""; $("a-date").value = iso(new Date()); dpick = 1; $("a-cal").hidden = true; pick = null;
+        $("a-amount").value = ""; $("a-amount").dispatchEvent(new Event("input", { bubbles: true }));
+        location.replace("#" + sheetBase);
+        delCash(D.people[person], ed.line, ed.day, ed.title, null, null, false, "Запис змінено");
+        return;
+      }
       // форма для наступного запису — з чистого аркуша: без суми, категорії й опису, дата «Сьогодні»
       var cat = pick; pick = null; $("a-title").value = ""; $("a-date").value = iso(new Date()); dpick = 1; $("a-cal").hidden = true;
       $("a-amount").value = ""; $("a-amount").dispatchEvent(new Event("input", { bubbles: true })); renderAdd(P);
@@ -1904,7 +1936,15 @@ function sheet(open, P) {
     renderAdd(P);
     if (!was) {
       s.hidden = bg.hidden = false; document.body.style.overflow = "hidden";
-      $("a-amount").value = ""; $("a-cal").hidden = true; fitAmount(); check();
+      $("a-amount").value = ""; $("a-cal").hidden = true;
+      // «Змінити» з картки операції: поля вже заповнені цим записом
+      if (editing) {
+        var t0 = iso(new Date()), y0 = iso(new Date(Date.now() - 864e5));
+        $("a-amount").value = String(editing.amount).replace(".", ","); $("a-title").value = editing.title; $("a-date").value = editing.day;
+        dpick = editing.day === t0 ? 1 : editing.day === y0 ? 0 : -1; pick = editing.cat; renderAdd(P);
+      }
+      $("sheet-title").textContent = editing ? "Змінити запис" : "Витрата готівкою";
+      fitAmount(); check();
       requestAnimationFrame(function () { requestAnimationFrame(function () { s.classList.add("open"); bg.classList.add("open"); }); });
       $("a-amount").focus({ preventScroll: true });
     }
@@ -1928,6 +1968,52 @@ document.addEventListener("keydown", function (e) { if (e.key === "Escape" && vi
     if (dy > 80) closeSheet();
   });
 })();
+// ---------- картка операції: деталі; для готівки — «Змінити» і «Видалити» ----------
+var editing = null;  // готівковий запис, який змінюємо через шторку «Витрата готівкою»
+var opFmt = new Intl.DateTimeFormat("uk-UA", { day: "numeric", month: "long", weekday: "long" });
+function opCard(o) {
+  var P = D.people[person], acc = P.accounts.filter(function (a) { return a.key === o.cat.replace(/ /g, "-") || a.name === o.cat; })[0];
+  var d = opFmt.format(new Date(o.day + "T12:00:00")).split(", ");
+  var row = function (k, v) { return '<div class="oprow"><span>' + k + "</span><b>" + v + "</b></div>"; };
+  $("op-title").textContent = nice(o.title) || (o.income ? "Дохід" : o.cat);
+  $("op-body").innerHTML = '<div class="opbig' + (o.income ? " inc" : "") + '">' + (o.income ? "+" : "−") + zl(o.amount) + "</div>" +
+    '<div class="oplist">' + row("Категорія", '<span class="opcat">' + cic(o.income ? "Дохід" : o.cat, true) + esc(o.income ? "Дохід" : o.cat) + "</span>") +
+    row("Дата", esc((d[1] || d[0]) + (d[1] ? ", " + d[0] : ""))) +
+    row("Звідки", o.cash ? "готівка, додано вручну" : "банківська виписка") + (o.fixed ? row("Тип", "обовʼязкова витрата") : "") + "</div>" +
+    (o.cash && o.line ? "" : '<p class="note" style="margin:14px 2px 0">Операції з виписки змінити не можна: вони приходять з банку.</p>');
+  var foot = $("op-foot"); foot.innerHTML = "";
+  if (o.cash && o.line && acc) {
+    foot.innerHTML = '<div class="opbtns"><button type="button" class="obtn" id="op-edit">Змінити</button><button type="button" class="obtn del" id="op-del">Видалити</button></div>';
+    $("op-edit").onclick = function () {
+      editing = { line: o.line, day: o.day, title: o.title, amount: o.amount, cat: acc.key };
+      closeOp(); sheetFromApp = true; sheetBase = view() === "journal" ? "journal" : "report"; location.hash = "#add";
+    };
+    $("op-del").onclick = function () {
+      closeOp();
+      delCash(P, o.line, o.day, o.title, null, { amount: o.amount, category: acc.key, title: o.title, date: o.day });
+    };
+  }
+  var s = $("v-op"), bg = $("op-bg");
+  s.hidden = bg.hidden = false; document.body.style.overflow = "hidden";
+  requestAnimationFrame(function () { requestAnimationFrame(function () { s.classList.add("open"); bg.classList.add("open"); }); });
+}
+function closeOp() {
+  var s = $("v-op"), bg = $("op-bg"); if (s.hidden) return;
+  s.classList.remove("open"); bg.classList.remove("open"); document.body.style.overflow = "";
+  setTimeout(function () { if (!s.classList.contains("open")) s.hidden = bg.hidden = true; }, 300);
+}
+$("op-close").onclick = closeOp; $("op-bg").onclick = closeOp;
+document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeOp(); });
+window.addEventListener("hashchange", closeOp);
+// тап по рядку (не після свайпу «Видалити»)
+document.addEventListener("click", function (e) {
+  var r = e.target.closest(".op[data-op]");
+  if (!r || e.target.closest(".swdel")) return;
+  var sw = r.closest(".swipe");
+  if (sw && (sw.classList.contains("open") || sw.classList.contains("on"))) return;
+  opCard(OPS[+r.dataset.op]);
+});
+document.addEventListener("keydown", function (e) { var r = e.target.closest && e.target.closest(".op[data-op]"); if (r && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); opCard(OPS[+r.dataset.op]); } });
 $("cash").addEventListener("click", function () { sheetFromApp = true; sheetBase = "report"; });
 $("j-cash").addEventListener("click", function () { sheetFromApp = true; sheetBase = "journal"; });
 $("ops-all").addEventListener("click", function () { filter = "all"; toCur(D.people[person]); });
@@ -2017,7 +2103,11 @@ window.addEventListener("hashchange", function () {
   var v = view();
   if (v === "report" && lastView !== "report" && lastView !== "add") setTimeout(replaySheen, 250);
   if (v !== "add" && lastView !== "add") window.scrollTo(0, 0);
-  if (lastView === "add" && v !== "add") { sheetFromApp = false; sheetBase = "report"; }
+  if (lastView === "add" && v !== "add") {
+    sheetFromApp = false; sheetBase = "report";
+    // закрили «Змінити запис» без збереження — форма знову чиста
+    if (editing) { editing = null; pick = null; $("a-title").value = ""; $("a-date").value = iso(new Date()); dpick = 1; $("a-amount").value = ""; }
+  }
   if (lastView === "report" && v !== "report" && v !== "add") reportKey = null;
   if (lastView === "journal" && v !== "journal" && v !== "add") { filter = "all"; catF = null; jq = ""; $("j-q").value = ""; }
   prevView = lastView; lastView = v; render();
