@@ -927,7 +927,7 @@ a.ins { color: var(--ink4); }
   box-shadow: 0 1px 2px rgba(17,19,24,.12), 0 3px 8px rgba(17,19,24,.12); transition: transform .38s cubic-bezier(.34, 1.4, .64, 1), width .2s ease; }
 .limt .sw { transition: background .3s ease, box-shadow .3s ease; }
 /* увімкнений — як наша primary-кнопка «Додати готівку»: синій градієнт, синє світіння знизу і світла кромка зверху */
-.limt[aria-checked="true"] .sw { background: var(--blue-g); box-shadow: 0 4px 10px rgba(29,95,224,.32), inset 0 1px 0 rgba(255,255,255,.3); }
+.limt[aria-checked="true"] .sw { background: var(--blue-g); box-shadow: 0 0 10px rgba(29,95,224,.35), inset 0 1px 0 rgba(255,255,255,.3); }  /* світіння рівно довкола, без зсуву вниз */
 .limt[aria-checked="true"] .sw i { transform: translateX(16px); }
 .limt:active .sw i { width: 24px; }
 .limt[aria-checked="true"]:active .sw i { transform: translateX(12px); }
@@ -1423,7 +1423,11 @@ var growIO = "IntersectionObserver" in window ? new IntersectionObserver(functio
     e.style.transitionDelay = above ? "0ms" : (e.dataset.delay ? +e.dataset.delay + 150 : Math.min(k++, 8) * 80 + 150) + "ms"; e.style[e.dataset.attr] = e.dataset.to;
   });
 }, { rootMargin: "0px 0px -60px 0px" }) : null;
+// «тихе» перемальовування (тап по бару, ліміт, сортування): стовпчики й смужки одразу на місці, без повторного росту
+var still = false;
+function calm(fn) { still = true; try { fn(); } finally { still = false; } }
 function grow(sel, attr) {
+  if (still) { document.querySelectorAll(sel).forEach(function (e) { e.style.transition = "none"; e.style[attr] = e.dataset.to; }); return; }
   requestAnimationFrame(function () { requestAnimationFrame(function () {
     document.querySelectorAll(sel).forEach(function (e, i) {
       if (growIO) { e.dataset.attr = attr; growIO.observe(e); }
@@ -1855,12 +1859,14 @@ function capsules(boxId, tickId, items, max, sel, onPick, n, avg, opt) {
   // середнє за повні місяці — одна сіра пунктирна лінія через увесь графік (число одне на весь період)
   if (avg) {
     var al = box.appendChild(h("div", "avgl", opt.avgLabel ? '<span class="avgt">' + opt.avgLabel + "</span>" : "")); al.style.top = Math.round(H - avg / max * H) + "px";
-    requestAnimationFrame(function () { requestAnimationFrame(function () { al.classList.add("in"); }); });
+    if (still) { al.style.transition = "none"; al.classList.add("in"); }  // тихо — лінія одразу на місці
+    else requestAnimationFrame(function () { requestAnimationFrame(function () { al.classList.add("in"); }); });
   }
   // ліміт — друга, синя суцільна лінія; підпис ліворуч, щоб не налазити на «сер.» праворуч
   if (opt.lim) {
     var ll = box.appendChild(h("div", "avgl liml", '<span class="avgt">ліміт ' + nf0.format(Math.round(opt.lim)) + "</span>")); ll.style.top = Math.round(H - opt.lim / max * H) + "px";
-    requestAnimationFrame(function () { requestAnimationFrame(function () { ll.classList.add("in"); }); });
+    if (still) { ll.style.transition = "none"; ll.classList.add("in"); }
+    else requestAnimationFrame(function () { requestAnimationFrame(function () { ll.classList.add("in"); }); });
   }
   grow("#" + boxId + " .fill", "height");
 }
@@ -1985,7 +1991,7 @@ function renderAnalytics(P) {
       if (j === undefined) return { v: 0, label: short, aria: MONTHS_FULL[+kk.slice(5) - 1], empty: true, sub: "—", nopick: true };
       var m = P.months[j], v = vs[j], none = v === null || !m.ops.length;
       return { v: none ? 0 : Math.max(0, v), label: short, aria: m.name, part: m.incomplete, empty: none, sub: none ? "—" : (approx && m.incomplete ? "≈ " : "") + nf0.format(v) + " зл" };
-    }), ax.max, sel, function (i) { month = byKey[keys[i]]; render(); }, ax.n, avg || 0, { avgLabel: avgTag(avg), lim: limV || 0, paged: { per: per, page: mpage.p } });
+    }), ax.max, sel, function (i) { month = byKey[keys[i]]; calm(render); }, ax.n, avg || 0, { avgLabel: avgTag(avg), lim: limV || 0, paged: { per: per, page: mpage.p } });
   };
   var note = "";
   {
@@ -2015,7 +2021,7 @@ function renderAnalytics(P) {
       if (wsel.key !== M.key || wsel.i >= bounds.length || (wsel.i >= 0 && bounds[wsel.i][0] > last)) wsel = { key: M.key, i: -1 };
       var wi = wsel.i;
       // тап по тижню — його підсумок і категорії, як у місяцях; повторний тап — назад до місяця
-      var pickW = function (i) { if (bounds[i][0] > last) return; wsel = { key: M.key, i: wsel.i === i ? -1 : i, day: wsel.day }; render(); };
+      var pickW = function (i) { if (bounds[i][0] > last) return; wsel = { key: M.key, i: wsel.i === i ? -1 : i, day: wsel.day }; calm(render); };
       capsules("mbars", "mticks", bounds.map(function (b, i) { var future = b[0] > last; return { v: future ? 0 : w[i], label: b[0] + "–" + b[1], empty: future, sub: future ? "—" : nf0.format(w[i]) + " зл" }; }),
         (axW = niceAxis(Math.max.apply(null, w.concat([uw || 0, lw, 1])))).max, wi, pickW, axW.n, uw || 0, { avgLabel: avgTag(uw), lim: lw });
       if (wi >= 0) {
@@ -2039,7 +2045,7 @@ function renderAnalytics(P) {
     var tg = h("button", "limt", 'Ліміт<span class="sw" aria-hidden="true"><i></i></span>');  // тугл-перемикач: сірий → синій
     tg.type = "button"; tg.setAttribute("role", "switch"); tg.setAttribute("aria-checked", String(lim)); tg.setAttribute("aria-pressed", String(lim));
     // спершу їде кулька, а графік і списки перемальовуємо, коли вона доїхала
-    tg.onclick = function () { lim = !lim; try { localStorage.setItem("lim", lim ? "1" : "0"); } catch (e) {} tg.setAttribute("aria-checked", String(lim)); tg.setAttribute("aria-pressed", String(lim)); setTimeout(render, 280); };
+    tg.onclick = function () { lim = !lim; try { localStorage.setItem("lim", lim ? "1" : "0"); } catch (e) {} tg.setAttribute("aria-checked", String(lim)); tg.setAttribute("aria-pressed", String(lim)); setTimeout(function () { calm(render); }, 280); };
     if ($("a-day")) $("a-day").onclick = function () { selDay = null; render(); };
     var ach = $("a-scale").parentNode, old = ach.querySelector(".limt"); if (old) old.remove();
     ach.appendChild(tg);  // праворуч від «Місяці / Тижні»
@@ -2107,7 +2113,7 @@ function renderWhere(P, M, W, LM) {
       "</small></div><span>" + zl(M.saved) + "</span></div>";
   }
   box.innerHTML = html;
-  if (LL) $("w-sort").onclick = function () { wsort = wsort === "left" ? "sum" : "left"; render(); };
+  if (LL) $("w-sort").onclick = function () { wsort = wsort === "left" ? "sum" : "left"; calm(render); };
   box.querySelectorAll(".more").forEach(function (b) {
     b.onclick = function () {
       var open = b.getAttribute("aria-expanded") !== "true"; b.setAttribute("aria-expanded", open); b.previousElementSibling.classList.toggle("open", open);
