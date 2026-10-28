@@ -920,7 +920,9 @@ a.ins { color: var(--ink4); }
 .limt .sw { position: relative; flex: none; width: 42px; height: 26px; border-radius: 13px; background: #DDE1E7; box-shadow: inset 0 0 0 1px rgba(17,19,24,.04); transition: background .3s ease; }
 .limt .sw i { position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 10px; background: #fff;
   box-shadow: 0 1px 2px rgba(17,19,24,.12), 0 3px 8px rgba(17,19,24,.12); transition: transform .38s cubic-bezier(.34, 1.4, .64, 1), width .2s ease; }
-.limt[aria-checked="true"] .sw { background: var(--blue-g); }
+.limt .sw { transition: background .3s ease, box-shadow .3s ease; }
+/* увімкнений — як наша primary-кнопка «Додати готівку»: синій градієнт, синє світіння знизу і світла кромка зверху */
+.limt[aria-checked="true"] .sw { background: var(--blue-g); box-shadow: 0 4px 10px rgba(29,95,224,.32), inset 0 1px 0 rgba(255,255,255,.3); }
 .limt[aria-checked="true"] .sw i { transform: translateX(16px); }
 .limt:active .sw i { width: 24px; }
 .limt[aria-checked="true"]:active .sw i { transform: translateX(12px); }
@@ -1910,8 +1912,8 @@ function sumHTML(label, extra, big, c) {
 var ascale = "m";  // масштаб графіка витрат: m — місяці, w — тижні обраного місяця
 var mpage = { who: -1, p: 0 };  // сторінка графіка місяців (0 — найновіша) для людини who
 var wsel = { key: "", i: -1 };  // обраний тиждень (у межах місяця key); -1 — увесь місяць
-var lim = false, wsort = "left";  // ліміти увімкнено; сортування категорій з лімітом: left — за залишком, sum — за сумою
-try { lim = localStorage.getItem("lim") === "1"; } catch (e) {}
+var lim = true, wsort = "left";  // ліміти увімкнено (за замовчуванням так); сортування категорій з лімітом: left — за залишком, sum — за сумою
+try { lim = localStorage.getItem("lim") !== "0"; } catch (e) {}
 // «бажання» — те, що ріжемо першим, коли ціль відстає; потреби (Продукти, Транспорт…) не чіпаємо
 var WANTS = { "Кафе": 1, "Доставка Їжі": 1, "Розваги": 1, "Покупки": 1 };
 // план «Відкладати щомісяця», що діє в місяці key (останній з from ≤ key); минулі місяці — зі своїм планом або без
