@@ -346,6 +346,7 @@ body.p-olya .liquid { --sheen: .4; }
    повільно ковзають уздовж країв і перетікають (дві точки дзеркальні одна одній) */
 .liquid .after { -webkit-mask: linear-gradient(var(--a), #000 calc(var(--p) - 14%), transparent calc(var(--p) + 6%)), linear-gradient(rgba(0, 0, 0, .7) 0 0);
   mask: linear-gradient(var(--a), #000 calc(var(--p) - 14%), transparent calc(var(--p) + 6%)), linear-gradient(rgba(0, 0, 0, .7) 0 0); }
+.liquid.lit .after { -webkit-mask: none; mask: none; }  /* після першого проходу: те саме, що кінець бліку (--p 150%) */
 .liquid .after > .ehalo, .liquid .after > .erim { position: absolute; inset: 0; border-radius: inherit; }
 .liquid .after > .amb { position: absolute; }
 body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони яскравіші — трохи тихіше, щоб лишалась глибина */
@@ -1193,7 +1194,7 @@ function renderPeople() {
   D.people.forEach(function (p, i) {
     var b = h("button", "opt", '<span class="av ' + p.key + '"></span><span><b>' + esc(p.name) + '</b></span><span class="radio" aria-hidden="true"></span>');
     b.type = "button"; b.setAttribute("role", "menuitemradio"); b.setAttribute("aria-checked", i === person);
-    b.onclick = function () { popMenu("w", false); if (i === person) return; person = i; month = lastFull(D.people[i]); trendMonth = null; selDay = null; render(); };
+    b.onclick = function () { popMenu("w", false); if (i === person) return; person = i; month = lastFull(D.people[i]); trendMonth = null; selDay = null; render(); if (view() === "report") setTimeout(replaySheen, 250); };
     box.appendChild(b);
   });
 }
@@ -1856,7 +1857,11 @@ var lastView = view(), prevView = null, reportKey = null;
 function replaySheen() {
   var l = $("liquid");
   if (!l || !l.classList.contains("sheen") || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  l.getAnimations().forEach(function (a) { if (a.animationName === "sheen" && a.playState !== "running") { a.currentTime = 0; a.play(); } });
+  l.getAnimations().forEach(function (a) {
+    if (a.animationName !== "sheen" || a.playState === "running") return;
+    l.classList.add("lit");  // форми вже відкриті — повтор бліку їх не ховає, без обриву
+    a.currentTime = 0; a.play();
+  });
 }
 setInterval(function () { if (!document.hidden && view() === "report") replaySheen(); }, 30000);
 window.addEventListener("hashchange", function () {
