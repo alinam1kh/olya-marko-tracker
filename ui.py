@@ -759,8 +759,8 @@ a.ins { color: var(--ink4); }
 #an-chart { position: relative; z-index: 5; }
 #an-chart .ach { position: relative; z-index: 10; }  /* календар поверх стовпчиків */
 .ach .mpick > button { height: 40px; padding: 0 12px 0 10px; font-size: 14px; }  /* рамка й вигляд — як була кнопка місяця в шапці, лише нижча */
-.ach .mmenu { left: 0; right: auto; top: 46px; }
-.ach .mmenu:not([hidden]) { transform-origin: top left; }
+.mmenu { position: fixed; right: auto; z-index: 45; }
+.mmenu:not([hidden]) { transform-origin: top left; }
 #a-sum { margin-top: 16px; }
 .alab { display: flex; align-items: center; gap: 8px; min-height: 24px; font-size: 13px; color: var(--ink2); }  /* висота під тег «дані до …» — картка не стрибає між місяцями */
 .alab .tag { flex: none; padding: 3px 10px; border-radius: 12px; background: var(--soft); font-size: 12px; font-weight: 500; color: var(--ink2); }
@@ -890,12 +890,13 @@ a.ins { color: var(--ink4); }
 .filters button { flex: none; min-height: 44px; padding: 0 16px; border: 1px solid var(--border); border-radius: 22px; background: var(--card); font-size: 14px; cursor: pointer; }
 .filters button[aria-pressed="true"] { border-color: transparent; background: var(--blue-g); color: #fff; font-weight: 500; }
 .filters button.catf { display: inline-flex; align-items: center; gap: 6px; padding-right: 12px; }
-.filters .mchip { display: inline-flex; align-items: center; gap: 6px; padding: 0 12px 0 16px; color: var(--ink); }
+/* та сама кнопка місяця, що в Аналітиці: іконка календаря, місяць і рік, шеврон; 14px, вага 400 */
+.filters .mchip { display: inline-flex; align-items: center; gap: 8px; padding: 0 12px 0 10px; color: var(--ink); font-weight: 400; }
 .filters .mchip .chev { color: var(--ink2); }
 .filters .mchip[aria-expanded="true"] .chev { transform: rotate(180deg); }
 .filters .mchip:disabled { opacity: .5; cursor: default; }
-.jmenu { position: fixed; z-index: 30; width: 232px; }
-.jmenu:not([hidden]) { animation: popin .45s var(--ease) both; transform-origin: top left; }
+
+
 /* Журнал: пошук по всіх місяцях + «Готівка», під фільтрами — підсумок одним рядком */
 .jtop { display: flex; gap: 8px; margin-top: 12px; }
 .jsearch { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; height: 48px; padding: 0 14px; border: 1px solid var(--border); border-radius: 24px; background: var(--card); color: var(--ink2); }
@@ -1116,7 +1117,6 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
       <a class="jcash" id="j-cash" href="#add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Готівка</a>
     </div>
     <div class="filters" id="j-filters" role="group" aria-label="Фільтр"></div>
-    <div class="pop jmenu" id="jm" role="menu" aria-label="Місяць" hidden></div>
     <div class="jsum" id="j-sum" hidden></div>
     <div id="j-list"></div>
     <a class="fava" id="fava">Повний журнал у Fava<span id="arr-f"></span></a>
@@ -1309,7 +1309,7 @@ function renderCal(P) {
     b.type = "button"; b.disabled = !inMonth || d.getDate() > lastDay;
     b.setAttribute("aria-pressed", key === selDay);
     b.setAttribute("aria-label", d.getDate() + " " + GEN[d.getMonth()] + " " + d.getFullYear() + (b.disabled ? ", даних немає" : withOps[key] ? ", є операції" : ""));
-    if (!b.disabled) (function (key) { b.onclick = function () { selDay = key; month = ki; popMenu("m", false); render(); scrollToDay(key); }; })(key);
+    if (!b.disabled) (function (key) { b.onclick = function () { selDay = key; month = ki; calOpen(false); render(); scrollToDay(key); }; })(key);
     grid.appendChild(b);
   }
   var lastM = P.months[P.months.length - 1];
@@ -1321,15 +1321,31 @@ function scrollToDay(key) {
   var el = document.querySelector('[data-day="' + key + '"]');
   if (el) requestAnimationFrame(function () { window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 12); });
 }
-$("cal-prev").onclick = function () { var P = D.people[person], k = P.months.map(function (m) { return m.key; }).indexOf(calKey); if (k > 0) { month = k - 1; calKey = P.months[month].key; selDay = null; trendMonth = null; render(); } };
-$("cal-next").onclick = function () { var P = D.people[person], k = P.months.map(function (m) { return m.key; }).indexOf(calKey); if (k < P.months.length - 1) { month = k + 1; calKey = P.months[month].key; selDay = null; trendMonth = null; render(); } };
+$("cal-prev").onclick = function () { var P = D.people[person], k = P.months.map(function (m) { return m.key; }).indexOf(calKey); if (k > 0) { month = k - 1; calKey = P.months[month].key; selDay = null; trendMonth = null; render(); calOpen(true); } };
+$("cal-next").onclick = function () { var P = D.people[person], k = P.months.map(function (m) { return m.key; }).indexOf(calKey); if (k < P.months.length - 1) { month = k + 1; calKey = P.months[month].key; selDay = null; trendMonth = null; render(); calOpen(true); } };
 var MENUS = { w: ["who-menu", "who-btn"], m: ["mmenu", "mcal"] };
 function popMenu(k, open) {
+  if (!open) { $(MENUS[k][0]).hidden = true; $(MENUS[k][1]).setAttribute("aria-expanded", false); return; }  // закриваємо лише своє меню
   Object.keys(MENUS).forEach(function (x) { var on = x === k && open; $(MENUS[x][0]).hidden = !on; $(MENUS[x][1]).setAttribute("aria-expanded", on); });
   if (open) { var cur = $(MENUS[k][0]).querySelector('[aria-checked="true"], [aria-pressed="true"]'); if (cur) cur.focus(); }
 }
 $("who-btn").onclick = function () { popMenu("w", $("who-menu").hidden); };
-$("mcal").onclick = function () { popMenu("m", $("mmenu").hidden); };
+document.body.appendChild($("mmenu"));  // поза картками й рядком фільтрів — нічого його не обрізає
+function calAnchor() { return view() === "journal" ? $("jm-btn") : $("mcal"); }
+function calPlace() {
+  var m = $("mmenu"), b = calAnchor(); if (m.hidden || !b) return;
+  var r = b.getBoundingClientRect();
+  m.style.top = r.bottom + 8 + "px"; m.style.left = Math.max(12, Math.min(r.left, innerWidth - m.offsetWidth - 12)) + "px";
+}
+function calOpen(open) {
+  popMenu("m", open);
+  var j = $("jm-btn"); if (j) j.setAttribute("aria-expanded", String(open && view() === "journal"));
+  calPlace();
+}
+$("mcal").onclick = function () { calOpen($("mmenu").hidden); };
+document.addEventListener("click", function (e) { if (!e.target.closest("#mmenu, #mcal, #jm-btn")) calOpen(false); });
+window.addEventListener("scroll", calPlace, { passive: true });  // їде разом із кнопкою
+window.addEventListener("hashchange", function () { calOpen(false); });
 document.addEventListener("click", function (e) { if (!e.target.closest(".who, .mpick")) popMenu("w", false); });
 document.addEventListener("keydown", function (e) {
   if (e.key !== "Escape") return;
@@ -1705,17 +1721,13 @@ var dayFmt = new Intl.DateTimeFormat("uk-UA", { day: "numeric", month: "long", w
 var FILTERS = [["all", "Усі"], ["exp", "Витрати"], ["inc", "Дохід"], ["fixed", "Обовʼязкові"], ["cash", "Готівка"]];
 function renderJournal(P) {
   var M = P.months[month], fb = $("j-filters"); fb.innerHTML = "";
-  // місяць — першим чипом; відкриває наше меню (рядки з радіо, як меню профілю)
-  var ms = h("button", "mchip", esc(M.name) + '<svg class="ico16 chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>');
-  ms.type = "button"; ms.id = "jm-btn"; ms.setAttribute("aria-haspopup", "menu"); ms.setAttribute("aria-expanded", "false");
+  // місяць — першим чипом; відкриває той самий календар, що в Аналітиці (тап по дню — прокрутка до нього)
+  var ms = h("button", "mchip", CAL + esc(selDay && selDay.slice(0, 7) === M.key ? (+selDay.slice(8)) + " " + GEN[mi(M)] + " " + M.key.slice(0, 4) : M.name + " " + M.key.slice(0, 4)) +
+    '<svg class="ico16 chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>');
+  ms.type = "button"; ms.id = "jm-btn"; ms.setAttribute("aria-haspopup", "dialog"); ms.setAttribute("aria-expanded", String(!$("mmenu").hidden));
   ms.disabled = !!jq.trim(); ms.title = ms.disabled ? "Пошук іде по всіх місяцях" : "";
-  ms.onclick = function () { jmOpen($("jm").hidden); };
+  ms.onclick = function () { calOpen($("mmenu").hidden); };
   fb.appendChild(ms);
-  $("jm").innerHTML = P.months.slice().reverse().map(function (m) {
-    var on = m === M;
-    return '<button type="button" class="opt" role="menuitemradio" aria-checked="' + on + '" data-m="' + P.months.indexOf(m) + '"><span><b>' + esc(m.name) + "</b><small>" + m.key.slice(0, 4) + (m.incomplete ? ", дані до " + m.last_op : "") + '</small></span><i class="radio"></i></button>';
-  }).join("");
-  $("jm").querySelectorAll("[data-m]").forEach(function (b) { b.onclick = function () { jmOpen(false); month = +b.dataset.m; selDay = null; trendMonth = null; render(); }; });
   if (catF) {  // категорія, що прийшла з Головної, — першим чипом, ✕ знімає
     var cb = h("button", "catf", esc(catF) + svgI("currentColor", '<path d="M6 6l12 12M18 6 6 18"/>', 14)); cb.type = "button"; cb.setAttribute("aria-pressed", "true");
     cb.setAttribute("aria-label", "Категорія " + catF + ", прибрати фільтр"); cb.onclick = function () { catF = null; render(); };
@@ -2040,15 +2052,6 @@ document.addEventListener("keydown", function (e) { var r = e.target.closest && 
 $("cash").addEventListener("click", function () { sheetFromApp = true; sheetBase = "report"; });
 $("j-cash").addEventListener("click", function () { sheetFromApp = true; sheetBase = "journal"; });
 $("ops-all").addEventListener("click", function () { filter = "all"; toCur(D.people[person]); });
-// меню місяця в Журналі: під чипом, поверх списку; закривається тапом поза ним або Esc
-function jmOpen(open) {
-  var m = $("jm"), b = $("jm-btn"); if (!b) return;
-  m.hidden = !open; b.setAttribute("aria-expanded", open);
-  if (open) { var r = b.getBoundingClientRect(); m.style.top = r.bottom + 8 + "px"; m.style.left = Math.max(12, r.left) + "px"; var c = m.querySelector('[aria-checked="true"]'); if (c) c.focus(); }
-}
-document.addEventListener("click", function (e) { if (!e.target.closest("#jm, #jm-btn")) jmOpen(false); });
-document.addEventListener("keydown", function (e) { if (e.key === "Escape") jmOpen(false); });
-window.addEventListener("scroll", function () { jmOpen(false); }, { passive: true });
 // пошук у Журналі: перемальовуємо лише список, поле лишається у фокусі
 $("j-q").addEventListener("input", function () { jq = this.value; renderJournal(D.people[person]); });
 $("arr-j").outerHTML = CHR; $("arr-f").outerHTML = CHR;
