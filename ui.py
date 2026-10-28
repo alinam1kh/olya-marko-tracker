@@ -1627,7 +1627,7 @@ function vsUsual(now, u, goodIfMore, when) {
 // підсумок над графіком: підпис (уточнення — через нашу вертикальну риску), сума з бейджем, висновок
 function sumHTML(label, extra, big, c) {
   return '<div class="alab"><span>' + label + (extra ? '<i class="sep" aria-hidden="true"></i>' + extra : "") + "</span></div>" +
-    '<div class="abig"><span>' + big + "</span>" + (c.badge || "") + "</div>";
+    '<div class="abig"><span>' + big + "</span>" + (c.badge || "") + "</div>" + (c.text ? '<div class="aline">' + c.text + "</div>" : "");
 }
 var ascale = "m";  // масштаб графіка витрат: m — місяці, w — тижні обраного місяця
 function renderAnalytics(P) {
@@ -1695,9 +1695,8 @@ function renderAnalytics(P) {
       v === null ? "—" : (M.incomplete ? "≈ " : "") + zr(v), cs);
     $("an-where").hidden = true;
   }
-  // висновок «Більше, ніж зазвичай…» — сірим блоком під стовпчиками, як підсумок
-  var cc = metric === "exp" ? c : cs;
-  $("t-avg").innerHTML = note + (cc && cc.text ? '<div class="gpace apace"><div class="aline">' + cc.text + "</div></div>" : "");
+  // висновок «Більше, ніж зазвичай…» — рядком одразу під цифрою (у sumHTML), поруч із бейджем
+  $("t-avg").innerHTML = note;
 }
 // «Куди пішли гроші»: усі витрати місяця — спершу щоденні (вони змінюються) зі «зазвичай», внизу обовʼязкові, згорнуті
 function renderWhere(P, M) {
