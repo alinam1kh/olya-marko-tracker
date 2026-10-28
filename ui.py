@@ -856,6 +856,9 @@ a.ins { color: var(--ink4); }
 .filters button { flex: none; min-height: 44px; padding: 0 16px; border: 1px solid var(--border); border-radius: 22px; background: var(--card); font-size: 14px; cursor: pointer; }
 .filters button[aria-pressed="true"] { border-color: transparent; background: var(--blue-g); color: #fff; font-weight: 500; }
 .filters button.catf { display: inline-flex; align-items: center; gap: 6px; padding-right: 12px; }
+.filters .mchip { flex: none; min-height: 44px; padding: 0 34px 0 16px; border: 1px solid var(--border); border-radius: 22px; font: 500 14px var(--font); color: var(--ink); cursor: pointer;
+  -webkit-appearance: none; appearance: none; background: var(--card) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B7180' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center / 14px; }
+.filters .mchip:disabled { opacity: .5; cursor: default; }
 /* Журнал: пошук по всіх місяцях + «Готівка», під фільтрами — підсумок одним рядком */
 .jtop { display: flex; gap: 8px; margin-top: 12px; }
 .jsearch { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; height: 48px; padding: 0 14px; border: 1px solid var(--border); border-radius: 24px; background: var(--card); color: var(--ink2); }
@@ -1180,6 +1183,7 @@ function arr(d) { return d > 0 ? "↗" : "↘"; }
 
 function lastFull(P) { for (var i = P.months.length - 1; i >= 0; i--) if (P.months[i].income > 0) return i; return P.months.length - 1; }
 function curMonth(P) { return P.months.length - 1; }  // Головна завжди відкривається на поточному місяці, навіть до зарплати
+function toCur(P) { month = curMonth(P); selDay = null; }  // переходи з Головної в Журнал — у поточний місяць
 var person = 0, month = curMonth(D.people[0]), trendMonth = null, filter = "all", metric = "exp", amode = "month", catF = null, jq = "";  // catF — фільтр Журналу за категорією (з «Що змінилось»)
 var GOAL = { olya: { months: 6, deadline: [2027, 6], title: "Подушка безпеки" } };  // фіча 5 з роадмапу ДЗ
 var VIEWS = { report: 1, analytics: 1, journal: 1, add: 1 };
@@ -1356,6 +1360,7 @@ function payDays(P) {
 
 // ---------- головна ----------
 function renderReport(P) {
+  var month = curMonth(P);  // Головна завжди показує поточний місяць, незалежно від місяця в Аналітиці чи Журналі
   var M = P.months[month], k = mi(M), prevM = P.months[month - 1] || null, prevI = prevWithIncome(P, month);
   var noIncome = !(M.income > 0), hero = $("hero"), approx = P.ok ? "" : "≈ ";
   $("h-alert").innerHTML = P.ok ? "" : '<div class="alert" role="alert"><b>Журнал не сходиться</b>Перевірка обліку знайшла помилки, тож цифри нижче можуть бути неточні.<br><a href="' +
@@ -1398,7 +1403,7 @@ function renderReport(P) {
         '<span class="lv"><b>' + zl(M.expenses) + "</b>" + exp + "</span></a>" +
       '<div class="ls"><span class="lt"><i></i>Лишилось, ' + nf0.format(sp) + " %</span><b>" + zl(M.saved) + "</b></div></div>";
   }
-  hero.querySelectorAll("[data-filter]").forEach(function (a) { a.onclick = function () { filter = a.dataset.filter; }; });
+  hero.querySelectorAll("[data-filter]").forEach(function (a) { a.onclick = function () { filter = a.dataset.filter; toCur(P); }; });
   $("cash").hidden = !P.cash;
   renderGoal(P);
   renderInsights(P, M);
@@ -1415,6 +1420,7 @@ function renderReport(P) {
 // Категорія: витрачено помітно більше/менше, ніж зазвичай за місяць (у неповному місяці — лише «вже більше») → Журнал з цією категорією.
 // Минулий місяць: щойно закритий місяць і його залишок проти звичного — просто факт.
 function renderInsights(P, M) {
+  var month = P.months.indexOf(M);
   var box = $("insights"), k = mi(M), items = [];
   var fullBefore = function (j) { return P.months.slice(0, j).filter(function (m) { return m.income > 0 && !m.incomplete; }).slice(-6); };
   var z0 = function (v) { return nf0.format(Math.round(Math.abs(v))) + " зл"; };
@@ -1444,7 +1450,7 @@ function renderInsights(P, M) {
   if (mItem) items.push(mItem);
   box.hidden = !items.length;
   box.innerHTML = '<div class="ch"><h2>Що змінилось у ' + LOC[k] + "</h2></div>" + items.join("");
-  box.querySelectorAll("[data-cat]").forEach(function (a) { a.onclick = function () { filter = "all"; catF = a.dataset.cat; }; });
+  box.querySelectorAll("[data-cat]").forEach(function (a) { a.onclick = function () { filter = "all"; catF = a.dataset.cat; toCur(P); }; });
   box.classList.remove("fadein"); void box.offsetWidth; box.classList.add("fadein");
 }
 // подушка: ціль = 6 × середні витрати повних місяців; накопичене — що лишилось у повних місяцях
@@ -1622,6 +1628,12 @@ var dayFmt = new Intl.DateTimeFormat("uk-UA", { day: "numeric", month: "long", w
 var FILTERS = [["all", "Усі"], ["exp", "Витрати"], ["inc", "Дохід"], ["fixed", "Фіксовані"], ["cash", "Готівка"]];
 function renderJournal(P) {
   var M = P.months[month], fb = $("j-filters"); fb.innerHTML = "";
+  // місяць — першим чипом; на телефоні відкривається системний список
+  var ms = h("select", "mchip"); ms.setAttribute("aria-label", "Місяць");
+  P.months.slice().reverse().forEach(function (m) { var o = h("option", "", m.name + (m.key.slice(0, 4) === M.key.slice(0, 4) ? "" : " " + m.key.slice(0, 4))); o.value = P.months.indexOf(m); o.selected = m === M; ms.appendChild(o); });
+  ms.disabled = !!jq.trim(); ms.title = ms.disabled ? "Пошук іде по всіх місяцях" : "";
+  ms.onchange = function () { month = +ms.value; selDay = null; trendMonth = null; render(); };
+  fb.appendChild(ms);
   if (catF) {  // категорія, що прийшла з Головної, — першим чипом, ✕ знімає
     var cb = h("button", "catf", esc(catF) + svgI("currentColor", '<path d="M6 6l12 12M18 6 6 18"/>', 14)); cb.type = "button"; cb.setAttribute("aria-pressed", "true");
     cb.setAttribute("aria-label", "Категорія " + catF + ", прибрати фільтр"); cb.onclick = function () { catF = null; render(); };
@@ -1867,7 +1879,7 @@ document.addEventListener("keydown", function (e) { if (e.key === "Escape" && vi
 })();
 $("cash").addEventListener("click", function () { sheetFromApp = true; sheetBase = "report"; });
 $("j-cash").addEventListener("click", function () { sheetFromApp = true; sheetBase = "journal"; });
-$("ops-all").addEventListener("click", function () { filter = "all"; });
+$("ops-all").addEventListener("click", function () { filter = "all"; toCur(D.people[person]); });
 // пошук у Журналі: перемальовуємо лише список, поле лишається у фокусі
 $("j-q").addEventListener("input", function () { jq = this.value; renderJournal(D.people[person]); });
 $("arr-j").outerHTML = CHR; $("arr-f").outerHTML = CHR;
@@ -1878,8 +1890,9 @@ function render() {
   renderPeople();
   if (v === "add" && !P.cash) { location.replace("#report"); return; }
   var base = v === "add" ? sheetBase : v, M = P.months[month];
+  // вибір місяця в шапці — лише в Аналітиці; Головна завжди про поточний місяць, у Журналі місяць — перший чип фільтрів
   var range = base === "analytics" && amode === "trends";
-  $("mpick").hidden = range; $("mrange").hidden = !range;
+  $("mpick").hidden = base !== "analytics" || range; $("mrange").hidden = !range;
   if (range) $("mrange").innerHTML = CAL + P.months[0].name + " – " + P.months[P.months.length - 1].name.toLowerCase();
   $("mcal-name").textContent = selDay && base === "journal" ? (+selDay.slice(8)) + " " + GEN[mi(M)] + " " + M.key.slice(0, 4) : M.name + " " + M.key.slice(0, 4);
   $("mcal").setAttribute("aria-label", "Місяць: " + M.name + " " + M.key.slice(0, 4) + ". Змінити");
