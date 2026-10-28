@@ -794,6 +794,13 @@ a.ins { color: var(--ink4); }
 #an-where .dh b { font-weight: 500; color: var(--ink); }
 #an-where .dh > span { font-size: 14px; color: var(--ink2); }  /* сума — сіра, як підсумок дня в Журналі */
 .chart { display: flex; gap: 8px; margin-top: 24px; }
+#an-chart .chart { touch-action: pan-y; user-select: none; }
+#an-chart .chart.in-r { animation: chin-r .3s cubic-bezier(.32, .72, 0, 1); }
+#an-chart .chart.in-l { animation: chin-l .3s cubic-bezier(.32, .72, 0, 1); }
+#an-chart .chart.bump { animation: chbump .3s ease; }
+@keyframes chin-r { from { opacity: 0; transform: translateX(24px); } }
+@keyframes chin-l { from { opacity: 0; transform: translateX(-24px); } }
+@keyframes chbump { 30% { transform: translateX(-6px); } 60% { transform: translateX(6px); } }
 .ticks { flex: none; display: flex; flex-direction: column; justify-content: space-between; height: 150px; width: 66px; font-size: 12px; color: var(--ink2); text-align: right; }
 .ticks span { line-height: 1; white-space: nowrap; }
 /* «Динаміка»: числа осі притиснуті праворуч, з відступом до пунктиру середнього */
@@ -1373,6 +1380,24 @@ $("mcal").onclick = function () { calOpen($("mmenu").hidden); };
 $("a-prev").onclick = function () { if (month > 0) { month--; render(); } };
 $("a-next").onclick = function () { if (month < D.people[person].months.length - 1) { month++; render(); } };
 $("cal-all").onclick = function () { jqMonth = false; selDay = null; calOpen(false); render(); };
+// свайп по графіку Аналітики вліво/вправо — наступний/попередній місяць (і в «Місяцях», і в «Тижнях»)
+(function () {
+  var ch = document.querySelector("#an-chart .chart"), x0 = null, y0 = 0, swiped = false;
+  ch.addEventListener("pointerdown", function (e) { x0 = e.clientX; y0 = e.clientY; swiped = false; });
+  ch.addEventListener("pointerup", function (e) {
+    if (x0 === null) return;
+    var dx = e.clientX - x0, dy = e.clientY - y0; x0 = null;
+    if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    var n = D.people[person].months.length, to = month + (dx < 0 ? 1 : -1);
+    swiped = true;
+    if (to < 0 || to >= n) { ch.classList.remove("bump"); void ch.offsetWidth; ch.classList.add("bump"); return; }
+    month = to; render();
+    ch.classList.remove("in-l", "in-r"); void ch.offsetWidth; ch.classList.add(dx < 0 ? "in-r" : "in-l");
+  });
+  ch.addEventListener("pointercancel", function () { x0 = null; });
+  // після свайпу мишкою не спрацьовує тап по стовпчику
+  ch.addEventListener("click", function (e) { if (swiped) { e.stopPropagation(); e.preventDefault(); swiped = false; } }, true);
+})();
 document.addEventListener("click", function (e) { if (!e.target.closest("#mmenu, #mcal, #jm-btn")) calOpen(false); });
 window.addEventListener("scroll", calPlace, { passive: true });  // їде разом із кнопкою
 window.addEventListener("hashchange", function () { calOpen(false); });
