@@ -832,6 +832,9 @@ a.ins { color: var(--ink4); }
 .pldd-h b { font-weight: 500; color: var(--ink); }
 .pldd-h .chev { color: var(--ink2); transition: transform .2s; }
 .pldd.open .pldd-h .chev { transform: rotate(180deg); }
+.pldd-w { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows .38s cubic-bezier(.32, .72, 0, 1), opacity .25s ease; }
+.pldd-w > div { min-height: 0; overflow: hidden; }
+.pldd.open .pldd-w { grid-template-rows: 1fr; opacity: 1; }
 .pldd-b { padding: 0 14px 14px; }
 .pldd-b .pldate { margin-top: 10px; }
 .pldd-s { margin: 12px 0 0; font-size: 13px; color: var(--ink3); }
@@ -1078,6 +1081,9 @@ a.ins { color: var(--ink4); }
 .filters::-webkit-scrollbar { display: none; }
 .filters button { flex: none; min-height: 44px; padding: 0 16px; border: 1px solid var(--border); border-radius: 22px; background: var(--card); font-size: 14px; cursor: pointer; }
 .filters button[aria-pressed="true"] { border-color: transparent; background: var(--blue-g); color: #fff; font-weight: 500; }
+/* «на 7 жовтня ✕» — обраний у календарі день (Аналітика, Журнал); ✕ повертає до місяця */
+.daychip { display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 8px 0 10px; border: 0; border-radius: 12px; background: var(--blue-soft); color: var(--blue); font: 500 12px var(--font); white-space: nowrap; cursor: pointer; }
+.filters button.daychip { height: auto; min-height: 44px; padding: 0 12px 0 16px; gap: 6px; border-color: transparent; border-radius: 22px; font-size: 14px; }
 .filters button.catf { display: inline-flex; align-items: center; gap: 6px; padding-right: 12px; }
 /* та сама кнопка місяця, що в Аналітиці: іконка календаря, місяць і рік, шеврон; 14px, вага 400 */
 .filters .mchip { display: inline-flex; align-items: center; gap: 6px; padding: 0 12px 0 16px; color: var(--ink); font-weight: 400; }
@@ -1923,6 +1929,19 @@ var lim = true, wsort = "left";  // ліміти увімкнено (за зам
 try { lim = localStorage.getItem("lim") !== "0"; } catch (e) {}
 // «бажання» — те, що ріжемо першим, коли ціль відстає; потреби (Продукти, Транспорт…) не чіпаємо
 var WANTS = { "Кафе": 1, "Доставка Їжі": 1, "Розваги": 1, "Покупки": 1 };
+// місяць «на кінець дня cut»: лише операції до цього дня включно, суми перераховані, місяць — неповний
+// (так Аналітика й Журнал показують стан на обраний у календарі день тими самими правилами, що й для поточного місяця)
+function monthAt(M, cut) {
+  var ops = M.ops.filter(function (o) { return o.day <= cut; }), c = {}, inc = 0, fixed = 0, variable = 0;
+  ops.forEach(function (o) { if (o.income) inc += o.amount; else { if (o.fixed) fixed += o.amount; else variable += o.amount; c[o.cat] = (c[o.cat] || 0) + o.amount; } });
+  return Object.assign({}, M, { ops: ops, income: inc, fixed: fixed, variable: variable, expenses: fixed + variable, saved: inc - fixed - variable, incomplete: true,
+    last_op: cut.slice(8) + "." + cut.slice(5, 7), categories: Object.keys(c).map(function (n) { return { name: n, amount: c[n] }; }).sort(function (a, b) { return b.amount - a.amount; }) });
+}
+function dayCut(M) { return selDay && M && selDay.slice(0, 7) === M.key ? selDay : null; }
+// «на 7 жовтня ✕» — чип обраного дня; ✕ повертає до місяця
+function dayChip(cut, k, id) {
+  return '<button type="button" class="daychip" id="' + id + '" aria-label="Стан на ' + (+cut.slice(8)) + " " + GEN[k] + ', прибрати">на ' + (+cut.slice(8)) + " " + GEN[k] + svgI("currentColor", '<path d="M6 6l12 12M18 6 6 18"/>', 12) + "</button>";
+}
 // план «Відкладати щомісяця», що діє в місяці key (останній з from ≤ key); минулі місяці — зі своїм планом або без
 function planFor(P, key) {
   var h = ((D.plans || {})[P.key] || []).filter(function (x) { return x.from <= key; });
@@ -1969,8 +1988,13 @@ function renderAnalytics(P) {
     list.forEach(function (x) { var b = h("button", "", x[1]); b.type = "button"; b.setAttribute("aria-pressed", x[0] === cur); b.onclick = function () { set(x[0]); render(); }; box.appendChild(b); });
   };
   seg("a-scale", [["m", "Місяці"], ["w", "Тижні"]], ascale, function (v) { ascale = v; });
+  // обраний у календарі день: обраний місяць — «на кінець цього дня» (неповний), решта — як є;
+  // ліміти, середнє й ціль рахуємо з повних даних (P0), щоб день не змінював самих правил
+  var P0 = P, cutA = dayCut(P.months[month]);
+  if (cutA) { P = Object.assign({}, P, { months: P.months.slice() }); P.months[month] = monthAt(P0.months[month], cutA); }
   var M = P.months[month], k = mi(M), weeks = ascale === "w", base = usualMonths(P, month);
-  var allFull = usualMonths(P, P.months.length), dn = M.last_op ? +M.last_op.slice(0, 2) : 0;
+  var allFull = usualMonths(P0, P0.months.length), dn = M.last_op ? +M.last_op.slice(0, 2) : 0;
+  if (cutA && weeks && wsel.day !== cutA) wsel = { key: M.key, i: Math.min(4, Math.floor((+cutA.slice(8) - 1) / 7)), day: cutA };  // у «Тижнях» — одразу тиждень з цим днем
   // місяць обирають тапом по стовпчику; у тижнях — стрілками ‹ ›
   $("a-title").textContent = M.name + " " + M.key.slice(0, 4);
   $("a-prev").hidden = $("a-next").hidden = !weeks;
@@ -1999,7 +2023,7 @@ function renderAnalytics(P) {
   };
   var note = "";
   {
-    var c, extra = M.incomplete ? "дані до " + M.last_op : "", LM = lim ? limitsFor(P, month) : null;
+    var c, extra = cutA ? dayChip(cutA, k, "a-day") : M.incomplete ? "дані до " + M.last_op : "", LM = lim ? limitsFor(P0, month) : null;
     var dimM = new Date(+M.key.slice(0, 4), +M.key.slice(5), 0).getDate(), G = GOAL[P.key];
     // з лімітом: бейдж «лишилось …» / «+… понад ліміт»; рядком — ліміт (і скільки на день до кінця місяця), нижче — звідки він
     var vsLim = function (spent, l, open, per, perDay) {
@@ -2025,7 +2049,7 @@ function renderAnalytics(P) {
       if (wsel.key !== M.key || wsel.i >= bounds.length || (wsel.i >= 0 && bounds[wsel.i][0] > last)) wsel = { key: M.key, i: -1 };
       var wi = wsel.i;
       // тап по тижню — його підсумок і категорії, як у місяцях; повторний тап — назад до місяця
-      var pickW = function (i) { if (bounds[i][0] > last) return; wsel = { key: M.key, i: wsel.i === i ? -1 : i }; render(); };
+      var pickW = function (i) { if (bounds[i][0] > last) return; wsel = { key: M.key, i: wsel.i === i ? -1 : i, day: wsel.day }; render(); };
       capsules("mbars", "mticks", bounds.map(function (b, i) { var future = b[0] > last; return { v: future ? 0 : w[i], label: b[0] + "–" + b[1], empty: future, sub: future ? "—" : nf0.format(w[i]) + " зл" }; }),
         (axW = niceAxis(Math.max.apply(null, w.concat([uw || 0, lw, 1])))).max, wi, pickW, axW.n, uw || 0, { avgLabel: avgTag(uw), lim: lw });
       if (wi >= 0) {
@@ -2035,7 +2059,7 @@ function renderAnalytics(P) {
         var wc = {};
         M.ops.forEach(function (o) { var d = dayOf(o); if (!o.income && d >= B[0] && d <= B[1]) wc[o.cat] = (wc[o.cat] || 0) + o.amount; });
         var wcats = Object.keys(wc).map(function (n) { return { name: n, amount: wc[n] }; }).sort(function (a, b) { return b.amount - a.amount; });
-        $("a-sum").innerHTML = sumHTML("Щоденні витрати", wt, zr(w[wi]), c);
+        $("a-sum").innerHTML = sumHTML("Щоденні витрати", wt + (cutA ? " " + dayChip(cutA, k, "a-day") : ""), zr(w[wi]), c);
         renderWhere(P, M, { cats: wcats, k: (B[1] - B[0] + 1) / dim, title: wt, partial: wpart }, LM);
       } else if (lim) {
         c = vsLim(M.variable, LM && LM.total, M.incomplete, "на місяць", true);
@@ -2050,6 +2074,7 @@ function renderAnalytics(P) {
     tg.type = "button"; tg.setAttribute("role", "switch"); tg.setAttribute("aria-checked", String(lim)); tg.setAttribute("aria-pressed", String(lim));
     // спершу їде кулька, а графік і списки перемальовуємо, коли вона доїхала
     tg.onclick = function () { lim = !lim; try { localStorage.setItem("lim", lim ? "1" : "0"); } catch (e) {} tg.setAttribute("aria-checked", String(lim)); tg.setAttribute("aria-pressed", String(lim)); setTimeout(render, 280); };
+    if ($("a-day")) $("a-day").onclick = function () { selDay = null; render(); };
     var ach = $("a-scale").parentNode, old = ach.querySelector(".limt"); if (old) old.remove();
     ach.appendChild(tg);  // праворуч від «Місяці / Тижні»
   }
@@ -2096,7 +2121,7 @@ function renderWhere(P, M, W, LM) {
   var cats = function (q) { return q + " " + plural(q, "категорія", "категорії", "категорій"); };
   // з лімітами — угорі ті, де лишилось найменше (перевищені першими); без ліміту — у кінці; кнопка — назад до «за сумою»
   if (LL && wsort === "left") daily.sort(function (a, b) { var la = limOf(a), lb = limOf(b); return (la === null ? Infinity : la - a.amount) - (lb === null ? Infinity : lb - b.amount); });
-  var html = '<div class="ch"><h2>Витрати за ' + (W ? W.title : M.name.toLowerCase()) + "</h2>" +
+  var html = '<div class="ch"><h2>Витрати ' + (W ? "за " + W.title : dayCut(M) ? "на " + (+selDay.slice(8)) + " " + GEN[mi(M)] : "за " + M.name.toLowerCase()) + "</h2>" +
     (LL ? '<button type="button" class="wsort" id="w-sort">' + svgI("currentColor", '<path d="M7 4v16M3.5 16.5 7 20l3.5-3.5M17 20V4M13.5 7.5 17 4l3.5 3.5"/>', 14) + (wsort === "left" ? "За залишком" : "За сумою") + "</button>" : "") + "</div>";
   // обидва розділи однаково: кілька найбільших, решта під «Ще N категорій»; 3 і менше — усі одразу, без кнопки
   var section = function (title, list, show) {
@@ -2137,6 +2162,9 @@ function renderJournal(P) {
   cb.type = "button"; cb.id = "jc-btn"; cb.setAttribute("aria-haspopup", "listbox"); cb.setAttribute("aria-expanded", String(!$("cat-menu").hidden));
   if (catF) cb.setAttribute("aria-pressed", "true");
   cb.onclick = function () { catOpen($("cat-menu").hidden); };
+  // обраний у календарі день (без пошуку): список і плашки — на кінець цього дня; першим чипом «на 7 жовтня ✕»
+  var cutJ = jq.trim() ? null : dayCut(M);
+  if (cutJ) { var dc = h("span", "", dayChip(cutJ, mi(M), "j-day")).firstChild; dc.onclick = function () { selDay = null; render(); }; fb.appendChild(dc); }
   fb.appendChild(cb);
   FILTERS.forEach(function (f) {
     var b = h("button", "", f[1]); b.type = "button"; b.setAttribute("aria-pressed", f[0] === filter);
@@ -2147,6 +2175,7 @@ function renderJournal(P) {
   var q = jq.trim().toLowerCase(), qn = q.replace(",", ".");
   var src = q && !jqMonth ? [].concat.apply([], P.months.slice().reverse().map(function (m) { return m.ops; })) : M.ops;
   var ops = src.filter(function (o) {
+    if (cutJ && o.day > cutJ) return false;
     if (catF && o.cat !== catF) return false;
     if (q && o.title.toLowerCase().indexOf(q) < 0 && o.cat.toLowerCase().indexOf(q) < 0 && !(/\d/.test(qn) && o.amount.toFixed(2).indexOf(qn) >= 0)) return false;
     return filter === "all" || (filter === "exp" && !o.income) || (filter === "inc" && o.income) || (filter === "fixed" && o.fixed) || (filter === "cash" && o.cash);
@@ -2154,7 +2183,7 @@ function renderJournal(P) {
   var out = ops.reduce(function (s, o) { return s + (o.income ? 0 : o.amount); }, 0);
   // підсумок плашками — лише коли щось відібрано (пошук, категорія, фільтр); для «Усі» за місяць він дублює Головну й Аналітику
   var inc = ops.reduce(function (s, o) { return s + (o.income ? o.amount : 0); }, 0), isInc = filter === "inc";
-  $("j-sum").hidden = !(q || catF || filter !== "all");
+  $("j-sum").hidden = !(q || catF || cutJ || filter !== "all");
   $("j-sum").innerHTML = '<div class="card"><span class="ji" style="background:var(--blue-soft);color:var(--blue)" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 2.5h12a1 1 0 0 1 1 1v17.2a.6.6 0 0 1-.95.5L15.5 19.4l-2.9 1.9a1 1 0 0 1-1.1 0l-2.9-1.9-2.55 1.8A.6.6 0 0 1 5 20.7V3.5a1 1 0 0 1 1-1z"/><path fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" d="M9 8h6M9 12h6M9 15.5h3"/></svg></span>' +
     "<div><span>Операцій" + "</span><b>" + ops.length + "</b></div></div>" +
     '<div class="card"><span class="ji" style="background:var(' + (isInc ? "--good-bg" : "--bad-bg") + ");color:var(" + (isInc ? "--good" : "--bad") + ')" aria-hidden="true"><span class="glyph">' + (isInc ? "↙" : "↗") + "</span></span>" +
@@ -2507,9 +2536,9 @@ function plRender(keepFocus) {
     html += amt("pl-amount", m, "1000") + '<div class="chips plchips">' + [500, 1000, 2000, 5000].map(function (v) { return '<button type="button" data-v="' + v + '" aria-pressed="' + (m === v) + '">' + nf0.format(v) + "</button>"; }).join("") + "</div>" +
       '<div class="pldd' + (plS.dd ? " open" : "") + '"><button type="button" class="pldd-h" id="pl-dd" aria-expanded="' + !!plS.dd + '"><span>До коли</span><b>' + (until ? dmy(until) : "без терміну") + "</b>" +
         '<svg class="ico16 chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>' +
-      (plS.dd ? '<div class="pldd-b"><div class="chips">' + spans.map(function (x) { return '<button type="button" data-span="' + x[0] + '" aria-pressed="' + (plS.span === x[0]) + '">' + x[1] + "</button>"; }).join("") + "</div>" +
+      ('<div class="pldd-w"><div><div class="pldd-b"><div class="chips">' + spans.map(function (x) { return '<button type="button" data-span="' + x[0] + '" aria-pressed="' + (plS.span === x[0]) + '">' + x[1] + "</button>"; }).join("") + "</div>" +
         (plS.span === 0 ? '<input class="pldate" id="pl-until" type="date" min="' + iso(new Date(Date.now() + 864e5)) + '" value="' + (plS.until || "") + '">' : "") +
-        (until && m ? '<p class="pldd-s">До ' + dmy(until) + " збереться <b>" + zr(m * n2) + "</b></p>" : "") + "</div>" : "") + "</div>" +
+        (until && m ? '<p class="pldd-s">До ' + dmy(until) + " збереться <b>" + zr(m * n2) + "</b></p>" : "") + "</div></div></div>") + "</div>" +
       plResult(c2, m, false);
   }
   plS.m = m;
@@ -2525,7 +2554,8 @@ function plRender(keepFocus) {
   body.querySelectorAll("[data-v]").forEach(function (b) { b.onclick = function () { plS.monthly = +b.dataset.v; plRender(); }; });
   body.querySelectorAll("[data-span]").forEach(function (b) { b.onclick = function () { plS.span = b.dataset.span === "null" ? null : +b.dataset.span; plRender(); }; });
   if ($("pl-until")) $("pl-until").onchange = function () { plS.until = this.value; plRender(); };
-  if ($("pl-dd")) $("pl-dd").onclick = function () { plS.dd = !plS.dd; plRender(); };
+  // розгортання — без перемальовування: міняємо клас, висота плавно їде (grid 0fr → 1fr)
+  if ($("pl-dd")) $("pl-dd").onclick = function () { plS.dd = !plS.dd; this.parentNode.classList.toggle("open", plS.dd); this.setAttribute("aria-expanded", String(plS.dd)); };
 }
 function LMnow(P) { return limitsFor(P, P.months.length - 1) || {}; }
 function planOpen(P) {
@@ -2652,7 +2682,7 @@ $("arr-j").outerHTML = CHR; $("arr-f").outerHTML = CHR;
 // назва на кнопці місяця в шапці: у Журналі під час пошуку — «Усі місяці», з обраним днем — «15 жовтня 2026»
 function mcalName(base, M) {
   $("mcal-name").textContent = base === "journal" && jq.trim() && !jqMonth ? "Усі місяці"
-    : selDay && base !== "analytics" ? (+selDay.slice(8)) + " " + GEN[mi(M)] + " " + M.key.slice(0, 4) : M.name + " " + M.key.slice(0, 4);
+    : selDay ? (+selDay.slice(8)) + " " + GEN[mi(M)] + " " + M.key.slice(0, 4) : M.name + " " + M.key.slice(0, 4);
 }
 function render() {
   var v = view(), P = D.people[person];
