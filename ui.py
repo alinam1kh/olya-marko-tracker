@@ -883,7 +883,8 @@ a.ins { color: var(--ink4); }
 .gltx { flex: 1; min-width: 0; }
 .gltx b { display: block; font-size: 15px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .gltx small { display: block; margin-top: 2px; font-size: 12px; color: var(--ink2); }
-.glrow .lsegs { width: 72px; }
+.plprog { display: flex; align-items: center; gap: 10px; margin-top: 12px; font-size: 13px; color: var(--ink3); }
+.plprog span { flex: 1; } .plprog b { font-weight: 500; color: var(--ink); }
 .glrow > svg:last-child { flex: none; color: var(--ink2); }
 .pltot { margin: 10px 0 0; padding-top: 12px; border-top: 1px solid var(--soft); font-size: 14px; color: var(--ink3); }
 .pltot b { font-weight: 500; color: var(--ink); }
@@ -2601,7 +2602,7 @@ function plList() {
   act.forEach(function (g) {
     var mm = goalMonthly(g, k, P), pr = goalProgress(P, g); total += mm;
     html += '<button type="button" class="glrow" data-id="' + esc(g.id) + '"><span class="glic">' + goalIcon(g) + '</span><span class="gltx"><b>' + esc(goalName(g)) + "</b><small>" +
-      (g.cat ? esc(g.cat) + ", " : "") + zr(mm) + " на місяць" + (pr ? ", " + pr.txt : g.until ? "" : "") + "</small></span>" + (pr ? pr.segs : "") + CHR + "</button>";
+      (g.cat ? esc(g.cat) + ", " : "") + zr(mm) + " на місяць" + (pr ? ", " + pr.txt : g.until ? "" : "") + "</small></span>" + CHR + "</button>";  // сегменти — лише на Головній і в деталях цілі
   });
   html += "</div>" + (act.length > 1 ? '<p class="pltot">Разом відкладати <b>' + zr(total) + "</b> на місяць</p>" : "");
   $("pl-title").textContent = "Цілі";
@@ -2659,6 +2660,9 @@ function plRender(keepFocus) {
     if (until && m && c) html += calc(m + others, "Лишається на щоденні", c.cap);
     html += plResult(c, m + others);
   }
+  // прогрес збереженої цілі (подушка, ціль із датою) — у деталях, під плашкою з терміном
+  var sg = plS.isNew ? null : goalsOf(P).filter(function (x) { return x.id === plS.id; })[0], spr = sg ? goalProgress(P, sg) : null;
+  if (spr) html = html.replace('</div>', '</div><div class="plprog"><span>Відкладено <b>' + spr.txt + "</b></span>" + spr.segs + "</div>");
   if (!plS.isNew) html += '<button type="button" class="pldel" id="pl-del">' + TRASH + "Видалити ціль</button>";
   if (plS.back) html = '<button type="button" class="plback" id="pl-back">' + svgI("currentColor", '<path d="m15 6-6 6 6 6"/>', 18) + "Усі цілі</button>" + html;
   plS.m = m;
