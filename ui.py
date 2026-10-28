@@ -807,13 +807,13 @@ a.ins { color: var(--ink4); }
 .limc .lmain { display: block; color: inherit; }
 /* тихий рядок унизу картки: до шторки «Відкладати щомісяця» */
 .lfoot { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 48px; margin-top: 14px; padding: 12px 0 0; border: 0; border-top: 1px solid var(--soft); background: transparent; font: 400 14px var(--font); color: var(--ink3); text-align: left; cursor: pointer; }
-.lfoot .lft { flex: 1; min-width: 0; }
+.lfoot .lft { flex: 1; min-width: 0; white-space: nowrap; }
 .lfoot .lft b { font-weight: 500; color: var(--ink); }
 .lfoot .llink { color: var(--blue); font-weight: 500; }
 .lfoot > svg { flex: none; color: var(--ink2); }
-.lpig { flex: none; width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; background: var(--soft); color: var(--ink2); }
+.lpig { flex: none; display: grid; margin-right: -6px; color: var(--ink2); }  /* прапорець цілі без кола, «Відкладено» — впритул */
 .lsegs { flex: none; display: flex; gap: 3px; }
-.lsegs i { display: block; width: 12px; height: 6px; border-radius: 3px; background: var(--track); overflow: hidden; }
+.lsegs i { display: block; width: 18px; height: 6px; border-radius: 3px; background: var(--track); overflow: hidden; }
 .lsegs b { display: block; height: 100%; background: var(--blue); }
 /* шторка «Відкладати щомісяця» */
 .plintro { margin: 6px 0 0; font-size: 14px; line-height: 1.45; color: var(--ink3); }
@@ -1674,7 +1674,7 @@ function renderLimit(P) {
   if (g) {
     var segs = "";
     for (var i = 0; i < g.G.months; i++) segs += '<i><b style="width:' + (Math.max(0, Math.min(1, g.life - i)) * 100).toFixed(2) + '%"></b></i>';
-    foot = '<button type="button" class="lfoot" id="limc-plan"><span class="lpig">' + PIG + "</span><span class=\"lft\">Відкладено <b>" + nf1.format(g.life) + " з " + g.G.months + " міс.</b></span>" +
+    foot = '<button type="button" class="lfoot" id="limc-plan"><span class="lpig">' + svgI("currentColor", '<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>', 16) + "</span><span class=\"lft\">Відкладено <b>" + nf1.format(g.life) + " з " + g.G.months + " міс.</b></span>" +
       '<span class="lsegs" aria-hidden="true">' + segs + "</span>" + CHR + "</button>";
   } else if (pl) {
     foot = '<button type="button" class="lfoot" id="limc-plan"><span class="lft">' + "Відкладаєте <b>" + zr(pl.monthly) + "</b> на місяць" + (pl.until ? " до " + dmy(pl.until) : "") +
