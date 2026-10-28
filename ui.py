@@ -913,13 +913,13 @@ a.ins { color: var(--ink4); }
 .alab { display: flex; align-items: center; gap: 8px; min-height: 24px; font-size: 13px; color: var(--ink2); }
 /* перемикач «Ліміт» — квадратик-чекбокс праворуч у рядку підпису */
 .limt { margin: -6px -4px -6px auto; display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 4px; border: 0; background: transparent; font: 400 13px var(--font); color: var(--ink3); cursor: pointer; }
-.ach .limt { margin: 0; min-height: 42px; padding: 0 14px 0 12px; border-radius: 21px; background: var(--soft); font-size: 13px; color: var(--ink3); transition: background .2s, color .2s; }
-.ach .limt[aria-pressed="true"] { background: var(--blue-soft); color: var(--blue); }
+/* «Ліміт» — тугл, як у налаштуваннях телефона: підпис + повзунок; тап по всьому рядку */
+.ach .limt { margin: 0 0 0 -4px; min-height: 44px; gap: 10px; font-size: 14px; color: var(--ink); }
+.limt .sw { position: relative; flex: none; width: 36px; height: 22px; border-radius: 11px; background: var(--mute); transition: background .2s; }
+.limt .sw i { position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(17,19,24,.2); transition: transform .2s cubic-bezier(.32, .72, 0, 1); }
+.limt[aria-checked="true"] .sw { background: var(--blue); }
+.limt[aria-checked="true"] .sw i { transform: translateX(14px); }
 #a-scale button { min-width: 88px; }  /* «Місяці / Тижні» ширше — місце в шапці звільнилось */
-.limt i { width: 16px; height: 16px; border-radius: 5px; display: grid; place-items: center; box-shadow: inset 0 0 0 1.5px var(--mute); }
-.limt i svg { opacity: 0; }
-.limt[aria-pressed="true"] i { background: var(--blue); box-shadow: none; }
-.limt[aria-pressed="true"] i svg { opacity: 1; }
 .wsort { display: inline-flex; align-items: center; gap: 4px; min-height: 28px; margin-top: -8px; padding: 0; border: 0; background: transparent; font: 500 13px var(--font); color: var(--blue); cursor: pointer; }  /* висота під тег «дані до …» — картка не стрибає між місяцями */
 .hero .tagx { gap: 4px; height: 28px; padding: 0 8px 0 10px; border: 0; font-family: var(--font); cursor: pointer; }  /* «на 7 жовтня ✕» — стан на обраний день, ✕ повертає до сьогодні */
 .alab .tag { flex: none; padding: 3px 10px; border-radius: 12px; background: var(--soft); font-size: 12px; font-weight: 500; color: var(--ink2); }
@@ -2031,8 +2031,8 @@ function renderAnalytics(P) {
     }
     if (!weeks || wi < 0) { $("a-sum").innerHTML = sumHTML("Щоденні витрати", extra, zr(M.variable), c); renderWhere(P, M, null, LM); }
     // перемикач ліміту — у шапці картки ліворуч (праворуч «Місяці / Тижні»); вмикає ліміти і на графіку, і в «Витрати за …»
-    var tg = h("button", "limt", svgI("currentColor", '<path d="M4 12h16M4 8.5v7M20 8.5v7"/>', 16) + "Ліміт");  // пігулка-фільтр: сіра → мʼяко-голуба
-    tg.type = "button"; tg.setAttribute("aria-pressed", String(lim));
+    var tg = h("button", "limt", 'Ліміт<span class="sw" aria-hidden="true"><i></i></span>');  // тугл-перемикач: сірий → синій
+    tg.type = "button"; tg.setAttribute("role", "switch"); tg.setAttribute("aria-checked", String(lim)); tg.setAttribute("aria-pressed", String(lim));
     tg.onclick = function () { lim = !lim; try { localStorage.setItem("lim", lim ? "1" : "0"); } catch (e) {} render(); };
     var ach = $("a-scale").parentNode, old = ach.querySelector(".limt"); if (old) old.remove();
     ach.insertBefore(tg, $("a-scale"));
