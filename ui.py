@@ -735,9 +735,11 @@ a.ins { color: var(--ink4); }
 .gcols .bd { display: inline-flex; padding: 0 7px; font-size: 12px; letter-spacing: -.01em; word-spacing: normal; }
 .gpace { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 14px; background: #F8F9FB; font-size: 13px; line-height: 1.4; color: var(--ink4); }
 /* помилка обліку */
-.alert { margin-top: 12px; padding: 16px; border-radius: 20px; background: var(--bad-bg); color: #7A1D15; font-size: 14px; line-height: 1.45; }
-.alert b { display: block; margin-bottom: 4px; color: var(--bad); font-weight: 500; }
-.alert a { display: inline-flex; align-items: center; min-height: 44px; margin-top: 6px; padding: 0 16px; border-radius: 22px; background: var(--bad); color: #fff; font-weight: 500; }
+/* «цифри можуть бути неточні» — спокійна жовта плашка над карткою */
+.alert { display: flex; align-items: flex-start; gap: 8px; margin-top: 12px; padding: 12px 8px 12px 16px; border-radius: 18px; background: #FFF6DB; color: #6B4E00; font-size: 14px; line-height: 1.45; }
+.alert > span { flex: 1; padding-top: 2px; }
+.alert a { color: inherit; font-weight: 500; text-decoration: underline; text-underline-offset: 2px; }
+.alert button { flex: none; width: 32px; height: 32px; border: 0; border-radius: 16px; background: transparent; color: inherit; display: grid; place-items: center; cursor: pointer; }
 
 /* сегменти */
 .seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; margin-top: 12px; padding: 4px; border-radius: 24px; background: var(--seg); }
@@ -926,6 +928,11 @@ a.ins { color: var(--ink4); }
   padding: 8px 8px 8px 14px; min-height: 52px; border-radius: 18px; background: rgba(255, 255, 255, .72); -webkit-backdrop-filter: blur(18px) saturate(1.6); backdrop-filter: blur(18px) saturate(1.6);
   border: 1px solid #fff; box-shadow: 0 10px 30px rgba(17,19,24,.10); color: var(--ink); font-size: 14px; font-weight: 500; white-space: nowrap; }
 .toast:not(:has(button)) { padding-right: 18px; }
+.toast:has(.tbar) { overflow: hidden; }
+.toast .tbar { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; pointer-events: none; }
+.toast .tbar b { display: block; height: 100%; background: var(--bad); opacity: .45; transform-origin: left; animation: tbar 6s linear forwards; }
+.toast.hold .tbar b { animation-play-state: paused; }
+@keyframes tbar { from { transform: scaleX(1); } to { transform: scaleX(0); } }
 .toast i { flex: none; width: 19px; height: 19px; border-radius: 50%; display: grid; place-items: center; background: var(--good); font-style: normal; }
 .toast i svg { display: block; }
 .toast .tx { display: flex; flex-direction: column; line-height: 1.3; }
@@ -1363,8 +1370,13 @@ function renderReport(P) {
   var month = curMonth(P);  // Головна завжди показує поточний місяць, незалежно від місяця в Аналітиці чи Журналі
   var M = P.months[month], k = mi(M), prevM = P.months[month - 1] || null, prevI = prevWithIncome(P, month);
   var noIncome = !(M.income > 0), hero = $("hero"), approx = P.ok ? "" : "≈ ";
-  $("h-alert").innerHTML = P.ok ? "" : '<div class="alert" role="alert"><b>Журнал не сходиться</b>Перевірка обліку знайшла помилки, тож цифри нижче можуть бути неточні.<br><a href="' +
-    FAVA[P.key] + 'errors/">Переглянути у Fava</a></div>';
+  // облік з помилками: спокійна жовта плашка, нічого не блокує; ✕ ховає її, доки дані не оновляться
+  var akey = "alert-off:" + P.key + ":" + (M.last_op || ""), off = false;
+  try { off = localStorage.getItem(akey) === "1"; } catch (e) {}
+  $("h-alert").innerHTML = P.ok || off ? "" : '<div class="alert" role="status"><span>Цифри можуть бути неточні: облік прочитався з помилками. <a href="' +
+    FAVA[P.key] + 'errors/">Деталі</a></span><button type="button" aria-label="Сховати">' + svgI("currentColor", '<path d="M6 6l12 12M18 6 6 18"/>', 16) + "</button></div>";
+  var ab = $("h-alert").querySelector("button");
+  if (ab) ab.onclick = function () { try { localStorage.setItem(akey, "1"); } catch (e) {} $("h-alert").innerHTML = ""; };
   var tag = M.incomplete ? '<span class="tag">дані до ' + M.last_op + "</span>" : "";
   var dn = M.last_op ? +M.last_op.slice(0, 2) : 0, spent = "Витрати" + (M.incomplete ? " за " + dn + " " + plural(dn, "день", "дні", "днів") : "");
   // поточний місяць рахуємо від зарплати до зарплати: скільки лишилось з останньої зарплати — це факт, як Марко й думає про гроші
@@ -1746,12 +1758,21 @@ function restoreCash(P, u) {
     })
     .catch(function (err) { toast(err.message || "Немає звʼязку, спробуйте ще раз"); });
 }
+// тост зі «Скасувати» живе 6 с: смужка внизу показує, скільки лишилось; поки палець чи курсор на тості — час на паузі
 function toast(html, action) {
   document.querySelectorAll(".toast").forEach(function (x) { x.remove(); });
-  var t = h("div", "toast", html); t.setAttribute("role", "status");
-  if (action) { var b = h("button", "", action[0]); b.type = "button"; b.onclick = action[1]; t.appendChild(b); }
+  var t = h("div", "toast", html), left = action ? 6000 : 3200, t0 = 0, timer = null; t.setAttribute("role", "status");
+  var close = function () { t.classList.add("out"); setTimeout(function () { t.remove(); }, 500); };
+  var run = function () { t0 = Date.now(); t.classList.remove("hold"); timer = setTimeout(close, left); };
+  var hold = function () { if (t.classList.contains("hold") || t.classList.contains("out")) return; clearTimeout(timer); left -= Date.now() - t0; t.classList.add("hold"); };
+  if (action) {
+    var b = h("button", "", action[0]); b.type = "button"; b.onclick = action[1]; t.appendChild(b);
+    t.appendChild(h("span", "tbar", "<b></b>"));
+    t.addEventListener("pointerenter", hold); t.addEventListener("pointerdown", hold);
+    ["pointerleave", "pointercancel"].forEach(function (e) { t.addEventListener(e, function () { if (t.classList.contains("hold")) run(); }); });
+  }
   document.body.appendChild(t);
-  setTimeout(function () { t.classList.add("out"); setTimeout(function () { t.remove(); }, 500); }, action ? 7000 : 3200);
+  run();
 }
 
 // ---------- шторка «Витрата готівкою» ----------
