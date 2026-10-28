@@ -230,7 +230,7 @@ a { color: inherit; text-decoration: none; }
 .pop .opt b { display: block; font-size: 15px; font-weight: 500; }
 .pop .opt small { display: block; font-size: 12px; color: var(--ink2); }
 .pop .opt .radio { flex: none; width: 20px; height: 20px; margin-left: auto; border: 1.5px solid var(--mute); border-radius: 50%; }
-.pop .opt[aria-checked="true"] { background: var(--soft); }
+.pop .opt[aria-checked="true"], .pop .opt[aria-selected="true"] { background: var(--soft); }
 .pop .opt[aria-checked="true"] .radio { border: 6px solid var(--blue); }
 .pop .logout { margin: 6px 0 0; padding-top: 6px; border-top: 1px solid var(--soft); }
 .pop .logout button { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 48px; padding: 0 12px 0 16px; border: 0; border-radius: 18px; background: transparent; color: var(--ink2); font-size: 15px; text-align: left; cursor: pointer; }
@@ -941,6 +941,10 @@ a.ins { color: var(--ink4); }
 .jsug { position: fixed; z-index: 45; }
 .jsug .opt { min-height: 52px; gap: 10px; }
 .jsug .opt .cic { width: 32px; height: 32px; }
+.jcat { width: 300px; max-height: min(60vh, 440px); overflow-y: auto; overscroll-behavior: contain; }
+.jsug .opt .qi { flex: none; width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; background: var(--soft); color: var(--ink2); }
+.filters .catchip[aria-pressed="true"] { background: var(--blue); color: #fff; }
+.filters .catchip[aria-pressed="true"] .chev { color: #fff; }
 .jcash { flex: none; display: inline-flex; align-items: center; gap: 6px; height: 48px; padding: 0 16px; border-radius: 24px; background: var(--blue-g); color: #fff; font-size: 15px; font-weight: 500; box-shadow: 0 6px 14px rgba(29,95,224,.24); }
 .jcash svg { width: 16px; height: 16px; }
 .jsum { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
@@ -1158,7 +1162,8 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
         <button type="button" class="jclear" id="j-clear" aria-label="Очистити пошук" hidden><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"/></svg></button></label>
       <a class="jcash" id="j-cash" href="#add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Готівка</a>
     </div>
-    <div class="pop jsug" id="j-sug" role="listbox" aria-label="Категорії" hidden></div>
+    <div class="pop jsug" id="j-sug" role="listbox" aria-label="Підказки пошуку" hidden></div>
+    <div class="pop jsug jcat" id="cat-menu" role="listbox" aria-label="Категорії" hidden></div>
     <div class="filters" id="j-filters" role="group" aria-label="Фільтр"></div>
     <div class="jsum" id="j-sum" hidden></div>
     <div id="j-list"></div>
@@ -1881,11 +1886,12 @@ function renderJournal(P) {
   ms.type = "button"; ms.id = "jm-btn"; ms.setAttribute("aria-haspopup", "dialog"); ms.setAttribute("aria-expanded", String(!$("mmenu").hidden));
   ms.onclick = function () { calOpen($("mmenu").hidden); };
   fb.appendChild(ms);
-  if (catF) {  // категорія, що прийшла з Головної, — першим чипом, ✕ знімає
-    var cb = h("button", "catf", esc(catF) + svgI("currentColor", '<path d="M6 6l12 12M18 6 6 18"/>', 14)); cb.type = "button"; cb.setAttribute("aria-pressed", "true");
-    cb.setAttribute("aria-label", "Категорія " + catF + ", прибрати фільтр"); cb.onclick = function () { catF = null; render(); };
-    fb.appendChild(cb);
-  }
+  // категорія — другим чипом-дропдауном: «Категорія ⌄» або обрана (синя); «Усі категорії» в меню знімає фільтр
+  var cb = h("button", "mchip catchip", esc(catF || "Категорія") + '<svg class="ico16 chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>');
+  cb.type = "button"; cb.id = "jc-btn"; cb.setAttribute("aria-haspopup", "listbox"); cb.setAttribute("aria-expanded", String(!$("cat-menu").hidden));
+  if (catF) cb.setAttribute("aria-pressed", "true");
+  cb.onclick = function () { catOpen($("cat-menu").hidden); };
+  fb.appendChild(cb);
   FILTERS.forEach(function (f) {
     var b = h("button", "", f[1]); b.type = "button"; b.setAttribute("aria-pressed", f[0] === filter);
     b.onclick = function () { filter = f[0]; render(); };
@@ -2207,26 +2213,64 @@ $("j-cash").addEventListener("click", function () { sheetFromApp = true; sheetBa
 $("ops-all").addEventListener("click", function () { filter = "all"; toCur(D.people[person]); });
 // пошук у Журналі: перемальовуємо лише список, поле лишається у фокусі
 $("j-q").addEventListener("input", function () { jq = this.value; if (!jq.trim()) jqMonth = false; $("j-clear").hidden = !jq; renderJournal(D.people[person]); sugRender(); });
-// підказки категорій: з перших літер — категорії, у назві яких є таке слово; тап вмикає фільтр «Категорія ✕»
+// кількість операцій-витрат за категоріями й за назвами — у всіх місяцях людини
+function opCounts(P) {
+  var c = {}, t = {};
+  P.months.forEach(function (m) { m.ops.forEach(function (o) {
+    if (!o.income) c[o.cat] = (c[o.cat] || 0) + 1;
+    var nm = nice(o.title); if (nm) { var k = nm.toLowerCase(); (t[k] = t[k] || { name: nm, n: 0, cat: o.income ? "Дохід" : o.cat }).n++; }
+  }); });
+  return { cats: c, titles: t };
+}
+var nOps = function (k) { return k + " " + plural(k, "операція", "операції", "операцій"); };
+var catOpt = function (c, k) { return '<button type="button" class="opt" role="option" data-c="' + esc(c) + '"' + (c === catF ? ' aria-selected="true"' : "") + ">" + cic(c, true) + "<span><b>" + esc(c) + "</b><small>" + nOps(k) + "</small></span></button>"; };
+// підказки пошуку: з перших літер — категорії (тап вмикає фільтр) і назви операцій (тап шукає цю назву)
 function sugRender() {
   var box = $("j-sug"), q = jq.trim().toLowerCase(), P = D.people[person];
   if (!q || document.activeElement !== $("j-q")) { box.hidden = true; return; }
-  var n = {};
-  P.months.forEach(function (m) { m.ops.forEach(function (o) { if (!o.income) n[o.cat] = (n[o.cat] || 0) + 1; }); });
-  var cats = Object.keys(n).filter(function (c) { return c !== catF && c.toLowerCase().split(/[\s\/*.-]+/).some(function (w) { return w.indexOf(q) === 0; }); })
-    .sort(function (a, b) { return n[b] - n[a]; }).slice(0, 4);
-  box.hidden = !cats.length;
-  if (!cats.length) return;
-  box.innerHTML = '<p>Категорії</p>' + cats.map(function (c) {
-    return '<button type="button" class="opt" role="option" data-c="' + esc(c) + '">' + cic(c, true) + "<span><b>" + esc(c) + "</b><small>" + n[c] + " " + plural(n[c], "операція", "операції", "операцій") + "</small></span></button>";
-  }).join("");
+  var C = opCounts(P), starts = function (s) { return s.toLowerCase().split(/[\s\/*.,-]+/).some(function (w) { return w.indexOf(q) === 0; }); };
+  var cats = Object.keys(C.cats).filter(function (c) { return c !== catF && starts(c); }).sort(function (a, b) { return C.cats[b] - C.cats[a]; }).slice(0, 3);
+  var titles = Object.keys(C.titles).map(function (k) { return C.titles[k]; })
+    .filter(function (t) { return t.name.toLowerCase() !== q && !(t.name in C.cats) && starts(t.name); })  // назва = категорія (готівка «Кафе») — лише як категорія.sort(function (a, b) { return b.n - a.n; }).slice(0, 5);
+  box.hidden = !cats.length && !titles.length;
+  if (box.hidden) return;
+  box.innerHTML = (cats.length ? "<p>Категорії</p>" + cats.map(function (c) { return catOpt(c, C.cats[c]); }).join("") : "") +
+    (titles.length ? "<p>Операції</p>" + titles.map(function (t) {
+      return '<button type="button" class="opt" role="option" data-t="' + esc(t.name) + '"><span class="qi">' + svgI("currentColor", '<circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/>', 16) + "</span><span><b>" + esc(t.name) + "</b><small>" + esc(t.cat) + ", " + nOps(t.n) + "</small></span></button>";
+    }).join("") : "");
   var r = $("j-q").closest(".jsearch").getBoundingClientRect();
   box.style.top = r.bottom + 8 + "px"; box.style.left = r.left + "px"; box.style.width = r.width + "px";
+  box.querySelectorAll(".opt").forEach(function (b) { b.onpointerdown = function (e) { e.preventDefault(); }; });  // поле не втрачає фокус до вибору
   box.querySelectorAll("[data-c]").forEach(function (b) {
-    b.onpointerdown = function (e) { e.preventDefault(); };  // поле не втрачає фокус до вибору
     b.onclick = function () { catF = b.dataset.c; filter = "all"; var q = $("j-q"); q.value = ""; jq = ""; $("j-clear").hidden = true; box.hidden = true; q.blur(); render(); };
   });
+  box.querySelectorAll("[data-t]").forEach(function (b) {
+    b.onclick = function () { var q = $("j-q"); q.value = b.dataset.t; jq = q.value; $("j-clear").hidden = false; box.hidden = true; q.blur(); render(); };
+  });
 }
+// дропдаун категорій у фільтрах Журналу: усі категорії витрат людини, найчастіші зверху; «Усі категорії» знімає фільтр
+function catOpen(open) {
+  var m = $("cat-menu"), b = $("jc-btn");
+  m.hidden = !open; if (b) b.setAttribute("aria-expanded", String(open));
+  if (!open) return;
+  calOpen(false); popMenu("w", false);
+  var C = opCounts(D.people[person]).cats;
+  m.innerHTML = '<button type="button" class="opt" role="option" data-c=""' + (catF ? "" : ' aria-selected="true"') + '><span class="qi">' + svgI("currentColor", '<path d="M4 6h16M4 12h16M4 18h16"/>', 16) + "</span><span><b>Усі категорії</b></span></button>" +
+    Object.keys(C).sort(function (a, c) { return C[c] - C[a]; }).map(function (c) { return catOpt(c, C[c]); }).join("");
+  m.querySelectorAll("[data-c]").forEach(function (x) { x.onclick = function () { catF = x.dataset.c || null; filter = "all"; catOpen(false); render(); }; });
+  catPlace();
+  var cur = m.querySelector('[aria-selected="true"]'); if (cur) cur.focus();
+}
+function catPlace() {
+  var m = $("cat-menu"), b = $("jc-btn"); if (m.hidden || !b) return;
+  var r = b.getBoundingClientRect();
+  m.style.top = r.bottom + 8 + "px"; m.style.left = Math.max(12, Math.min(r.left, innerWidth - m.offsetWidth - 12)) + "px";
+}
+document.body.appendChild($("cat-menu"));
+document.addEventListener("click", function (e) { if (!e.target.closest("#cat-menu, #jc-btn")) catOpen(false); });
+document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !$("cat-menu").hidden) { catOpen(false); var b = $("jc-btn"); if (b) b.focus(); } });
+window.addEventListener("scroll", catPlace, { passive: true });
+window.addEventListener("hashchange", function () { catOpen(false); });
 document.body.appendChild($("j-sug"));  // поза екраном Журналу — поверх чипів і списку
 $("j-q").addEventListener("focus", sugRender);
 $("j-q").addEventListener("blur", function () { setTimeout(function () { $("j-sug").hidden = true; }, 120); });
