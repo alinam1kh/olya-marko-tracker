@@ -906,6 +906,7 @@ a.ins { color: var(--ink4); }
 .limt[aria-pressed="true"] i { background: var(--blue); box-shadow: none; }
 .limt[aria-pressed="true"] i svg { opacity: 1; }
 .wsort { display: inline-flex; align-items: center; gap: 4px; min-height: 28px; margin-top: -8px; padding: 0; border: 0; background: transparent; font: 500 13px var(--font); color: var(--blue); cursor: pointer; }  /* висота під тег «дані до …» — картка не стрибає між місяцями */
+.hero .tagx { gap: 4px; height: 28px; padding: 0 8px 0 10px; border: 0; font-family: var(--font); cursor: pointer; }  /* «на 7 жовтня ✕» — стан на обраний день, ✕ повертає до сьогодні */
 .alab .tag { flex: none; padding: 3px 10px; border-radius: 12px; background: var(--soft); font-size: 12px; font-weight: 500; color: var(--ink2); }
 .abig { margin-top: 2px; font-size: 28px; font-weight: 500; letter-spacing: -.01em; white-space: nowrap; }
 .aline { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; margin-top: 6px; font-size: 14px; color: var(--ink2); }
@@ -1649,8 +1650,11 @@ function payDays(P) {
 function renderLimit(P) {
   var box = $("limc"), j = P.months.length - 1, M = P.months[j], LM = month === j && M.incomplete ? limitsFor(P, j) : null;
   box.hidden = !LM; if (!LM) return;
-  var left = LM.total - M.variable, dn = M.last_op ? +M.last_op.slice(0, 2) : 0, dl = new Date(+M.key.slice(0, 4), +M.key.slice(5), 0).getDate() - dn, g = goalPlan(P);
-  var p = LM.total ? Math.min(100, M.variable / LM.total * 100) : 100;
+  // обраний у календарі день — витрачене до нього включно і скільки днів лишається після нього
+  var cut = selDay && selDay.slice(0, 7) === M.key ? selDay : null;
+  var spent = cut ? M.ops.reduce(function (s, o) { return s + (!o.income && !o.fixed && o.day <= cut ? o.amount : 0); }, 0) : M.variable;
+  var left = LM.total - spent, dn = cut ? +cut.slice(8) : M.last_op ? +M.last_op.slice(0, 2) : 0, dl = new Date(+M.key.slice(0, 4), +M.key.slice(5), 0).getDate() - dn, g = goalPlan(P);
+  var p = LM.total ? Math.min(100, spent / LM.total * 100) : 100;
   // Марко — скільки на день до кінця місяця; Оля — те саме, але видно, навіщо: щоб відкласти план
   var note = left < 0 ? "Щоденні вже понад ліміт, до кінця місяця ще " + dl + " " + plural(dl, "день", "дні", "днів")
     : "Це ≈ " + zr(left / Math.max(1, dl)) + " на день" + (LM.src !== "best" ? ", щоб відкласти " + zr(LM.save) : " до кінця місяця");
@@ -1664,7 +1668,7 @@ function renderLimit(P) {
     foot = '<button type="button" class="lfoot" id="limc-plan"><span class="lft">' + (pl.total ? "Збираєте <b>" + zr(pl.total) + "</b> до " + dmy(pl.until) : "Відкладаєте <b>" + zr(pl.monthly) + "</b> на місяць") +
       '</span><span class="llink">Змінити</span></button>';
   } else foot = '<button type="button" class="lfoot ladd" id="limc-plan"><span class="llink">+ Відкладати щомісяця</span></button>';
-  box.innerHTML = '<a class="lmain" href="#analytics"><div class="ch"><h2>Ліміт на щоденні у ' + LOC[mi(M)] + "</h2>" + CHR + "</div>" +
+  box.innerHTML = '<a class="lmain" href="#analytics"><div class="ch"><h2>Ліміт на щоденні ' + (cut ? "на " + (+cut.slice(8)) + " " + GEN[mi(M)] : "у " + LOC[mi(M)]) + "</h2>" + CHR + "</div>" +
     '<div class="lbig"><b>' + zr(Math.abs(left)) + "</b><span>" + (left < 0 ? "понад ліміт " : "лишилось з ") + nf0.format(Math.round(LM.total)) + "</span></div>" +
     '<div class="lbar" role="img" aria-label="Витрачено ' + nf0.format(Math.round(p)) + ' % ліміту"><b' + (left < 0 ? ' class="over"' : "") + ' data-to="' + p.toFixed(2) + '%"></b></div>' +
     '<p class="lnote">' + note + "</p></a>" + foot;
@@ -1685,10 +1689,13 @@ function renderReport(P) {
   var tag = M.incomplete ? '<span class="tag">дані до ' + M.last_op + "</span>" : "";
   var dn = M.last_op ? +M.last_op.slice(0, 2) : 0, spent = "Витрати" + (M.incomplete ? " за " + dn + " " + plural(dn, "день", "дні", "днів") : "");
   // поточний місяць рахуємо від зарплати до зарплати: скільки лишилось з останньої зарплати — це факт, як Марко й думає про гроші
-  var ops = [].concat.apply([], P.months.map(function (m) { return m.ops; }));
+  // день з календаря: Головна показує стан на кінець цього дня — від останньої зарплати до нього, за операціями виписки й готівки
+  var cut = selDay && selDay.slice(0, 7) === M.key ? selDay : null;
+  if (cut) tag = '<button type="button" class="tag tagx" id="h-day" aria-label="Стан на ' + (+cut.slice(8)) + " " + GEN[k] + ', прибрати">на ' + (+cut.slice(8)) + " " + GEN[k] + svgI("currentColor", '<path d="M6 6l12 12M18 6 6 18"/>', 12) + "</button>";
+  var ops = [].concat.apply([], P.months.map(function (m) { return m.ops; })).filter(function (o) { return !cut || o.day <= cut; });
   var sd = ops.reduce(function (d, o) { return o.income && o.day > d ? o.day : d; }, "");
   var dm = function (iso) { return iso.slice(8) + "." + iso.slice(5, 7); }, z0 = function (v) { return (v < 0 ? "−" : "") + nf0.format(Math.abs(Math.round(v))) + " зл"; };
-  if (month === P.months.length - 1 && M.incomplete && sd) {
+  if ((month === P.months.length - 1 && M.incomplete || cut) && sd) {
     var A = 0, out = 0;
     ops.forEach(function (o) { if (o.day >= sd) { if (o.income) A += o.day === sd ? o.amount : 0; else out += o.amount; } });
     var ep = Math.min(100, Math.max(0, out / A * 100));
@@ -1721,6 +1728,7 @@ function renderReport(P) {
       '<div class="ls"><span class="lt"><i></i>Лишилось, ' + nf0.format(sp) + " %</span><b>" + z0(M.saved) + "</b></div></div>";
   }
   hero.querySelectorAll("[data-filter]").forEach(function (a) { a.onclick = function () { filter = a.dataset.filter; toCur(P); }; });
+  if ($("h-day")) $("h-day").onclick = function () { selDay = null; reportKey = null; render(); };
   $("cash").hidden = !P.cash;
   renderLimit(P);
   renderGoal(P);
@@ -2615,7 +2623,7 @@ $("arr-j").outerHTML = CHR; $("arr-f").outerHTML = CHR;
 // назва на кнопці місяця в шапці: у Журналі під час пошуку — «Усі місяці», з обраним днем — «15 жовтня 2026»
 function mcalName(base, M) {
   $("mcal-name").textContent = base === "journal" && jq.trim() && !jqMonth ? "Усі місяці"
-    : selDay && base === "journal" ? (+selDay.slice(8)) + " " + GEN[mi(M)] + " " + M.key.slice(0, 4) : M.name + " " + M.key.slice(0, 4);
+    : selDay && base !== "analytics" ? (+selDay.slice(8)) + " " + GEN[mi(M)] + " " + M.key.slice(0, 4) : M.name + " " + M.key.slice(0, 4);
 }
 function render() {
   var v = view(), P = D.people[person];
