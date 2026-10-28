@@ -979,8 +979,10 @@ a.ins { color: var(--ink4); }
 .opcat { display: inline-flex; align-items: center; gap: 8px; color: var(--ink) !important; }
 .opcat .cic { width: 28px; height: 28px; }
 .opbtns { display: flex; gap: 10px; }
-.obtn { flex: 1; min-height: 52px; border: 1px solid var(--border); border-radius: 26px; background: var(--card); color: var(--ink); font: 500 15px var(--font); cursor: pointer; }
-.obtn.del { border-color: transparent; background: var(--bad-bg); color: var(--bad); }
+/* дві кнопки без рамки, як свайп «Видалити»: «Змінити» — голуба, «Видалити» — червона */
+.obtn { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; padding: 0 16px; border: 0; border-radius: 26px; background: var(--blue-soft); color: var(--blue); font: 500 15px var(--font); cursor: pointer; }
+.obtn svg { width: 18px; height: 18px; flex: none; }
+.obtn.del { background: var(--bad-bg); color: var(--bad); }
 #op-foot:empty { display: none; }
 .msg { margin: 0 4px 8px; font-size: 14px; text-align: center; color: var(--bad); }
 .msg:empty { display: none; }
@@ -992,7 +994,7 @@ a.ins { color: var(--ink4); }
 .toast:not(:has(button)) { padding-right: 18px; }
 .toast:has(.tbar) { overflow: hidden; }
 .toast .tbar { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; pointer-events: none; }
-.toast .tbar b { display: block; height: 100%; background: var(--bad); opacity: .45; transform-origin: left; animation: tbar 6s linear forwards; }
+.toast .tbar b { display: block; height: 100%; background: var(--blue); opacity: .45; transform-origin: left; animation: tbar 6s linear forwards; }
 .toast.hold .tbar b { animation-play-state: paused; }
 @keyframes tbar { from { transform: scaleX(1); } to { transform: scaleX(0); } }
 .toast i { flex: none; width: 19px; height: 19px; border-radius: 50%; display: grid; place-items: center; background: var(--good); font-style: normal; }
@@ -2026,7 +2028,7 @@ function opCard(o) {
     (o.cash && o.line ? "" : '<p class="note" style="margin:14px 2px 0">Операції з виписки змінити не можна: вони приходять з банку.</p>');
   var foot = $("op-foot"); foot.innerHTML = "";
   if (o.cash && o.line && acc) {
-    foot.innerHTML = '<div class="opbtns"><button type="button" class="obtn" id="op-edit">Змінити</button><button type="button" class="obtn del" id="op-del">Видалити</button></div>';
+    foot.innerHTML = '<div class="opbtns"><button type="button" class="obtn" id="op-edit">' + svgI("currentColor", '<path d="M14.5 5.5l4 4M4 20l1-4.5L15.5 5a1.4 1.4 0 0 1 2 0l1.5 1.5a1.4 1.4 0 0 1 0 2L8.5 19 4 20z"/>', 18) + 'Змінити</button><button type="button" class="obtn del" id="op-del">' + TRASH + 'Видалити</button></div>';
     $("op-edit").onclick = function () {
       editing = { line: o.line, day: o.day, title: o.title, amount: o.amount, cat: acc.key };
       closeOp(); sheetFromApp = true; sheetBase = view() === "journal" ? "journal" : "report"; location.hash = "#add";
