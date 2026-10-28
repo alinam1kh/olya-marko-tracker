@@ -716,7 +716,8 @@ a.ins { color: var(--ink4); }
 .goal .gbig { display: flex; align-items: baseline; gap: 8px; margin: 14px 0 0; }
 .goal .gbig b { font-size: 32px; font-weight: 500; line-height: 1; color: var(--blue); }
 .goal .gbig span { font-size: 16px; font-weight: 500; color: var(--ink); }
-.goal .gsub { margin: 6px 0 14px; font-size: 13px; color: var(--ink2); }
+.goal .gsub { display: flex; align-items: center; gap: 6px; margin: 6px 0 14px; font-size: 13px; color: var(--ink2); }
+.goal .gsub svg { flex: none; }
 .goal .gdue { flex: none; display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 12px; background: var(--blue-soft); color: var(--blue); font-size: 12px; font-weight: 500; white-space: nowrap; }
 .goal .gpace { margin-top: 16px; align-items: flex-start; }  /* бейдж — у верхньому правому куті */
 .goal .gpace > span:first-child { text-wrap: pretty; }  /* без одинокого слова в останньому рядку */
@@ -1471,7 +1472,9 @@ function renderGoal(P) {
   box.innerHTML = '<div class="ch" style="min-height:0"><h2>' + G.title + '</h2><span class="gdue" aria-label="Термін цілі: ' + due + '">' +
       svgI("currentColor", '<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>', 14) + "зібрати до " + due + "</span></div>" +
     '<div class="gbig"><b>' + nf1.format(life) + "</b><span>з " + G.months + " місяців витрат</span></div>" +
-    '<div class="gsub">' + nf0.format(have) + " з " + nf0.format(target) + " зл</div>" +
+    '<div class="gsub" aria-label="Накопичено ' + nf0.format(have) + " з " + nf0.format(target) + ' зл">' +
+      svgI("currentColor", '<path d="M4.5 11.5a6.5 5.5 0 0 1 6.5-5.5h3a6.5 5.5 0 0 1 6 3.4l1.5.4v3.4l-1.6.5a6.5 5.5 0 0 1-2.4 2.7V20h-2.6v-1.8h-3.8V20H8.5v-2.6a5.5 5.5 0 0 1-4-5.9z"/><path d="M11 6V4.2M10 9.5h3.5"/><circle cx="16.5" cy="10.5" r=".6" fill="currentColor"/>', 14) +
+      nf0.format(have) + " з " + nf0.format(target) + " зл</div>" +
     '<div class="segs" role="img" aria-label="' + nf1.format(life) + " з " + G.months + ' місяців">' + segs + "</div>" +
     '<div class="gpace"><span>Відкладено ≈ ' + nf0.format(pace) + " зл/міс. при плані " + nf0.format(need) + " зл. " +
       (ok ? (early ? "У такому темпі ціль буде досягнуто до " + GEN[etaM] + ", на " + (ahead === 1 ? "місяць" : ahead + " " + plural(ahead, "місяць", "місяці", "місяців")) + " раніше плану." : "У такому темпі ціль буде досягнуто вчасно.")
