@@ -579,7 +579,7 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .hero .sub .inc { color: inherit; }
 .hero .sub .bd { display: inline-flex; margin-left: 6px; vertical-align: 1px; }
 /* смуга доходу: біла — залишок, напівпрозора — витрати; витрати ростуть зліва й стискають білу */
-.hero .split2 { display: flex; gap: 4px; height: 8px; margin-top: 20px; }
+.hero .split2 { display: flex; gap: 4px; height: 8px; margin-top: 28px; }
 .hero .split2 b { display: block; height: 100%; width: 0; border-radius: 4px; transition: width 2.1s var(--ease); }
 .hero .split2 .e { background: rgba(255, 255, 255, .34); }
 .hero .split2 .s { flex: 1; min-width: 0; background: #fff; }
