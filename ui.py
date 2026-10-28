@@ -275,6 +275,7 @@ a { color: inherit; text-decoration: none; }
 .ins > span:first-child, .note, .sub, .lbl, .hero .lt, h2, .op .t1, .op .t2, .cal-note, .tag, .day-h, .info, .duo span, .duo small, .fv2 span { font-variant-numeric: proportional-nums; }
 :focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
 .ico16 { flex: none; width: 16px; height: 16px; }
+.ico16.chev, .more-r svg { width: 18px; height: 18px; }  /* шеврони ⌄ у кнопках-дропдаунах — трохи більші, щоб добре видно */
 
 /* шапка */
 .top { position: relative; z-index: 25; display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 4px 2px 0; }
@@ -806,10 +807,11 @@ a.ins { color: var(--ink4); }
 .lnote { margin: 10px 0 0; font-size: 13px; color: var(--ink2); }
 .limc .lmain { display: block; color: inherit; }
 /* тихий рядок унизу картки: до шторки «Відкладати щомісяця» */
-.lfoot { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 48px; margin-top: 14px; padding: 12px 0 0; border: 0; border-top: 1px solid var(--soft); background: transparent; font: 400 14px var(--font); color: var(--ink3); text-align: left; cursor: pointer; }
+.lfoot { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 40px; margin-top: 12px; padding: 8px 0 0; border: 0; border-top: 1px solid var(--soft); background: transparent; font: 400 14px var(--font); color: var(--ink3); text-align: left; cursor: pointer; }
 .lfoot .lft { flex: 1; min-width: 0; white-space: nowrap; }
 .lfoot .lft b { font-weight: 500; color: var(--ink); }
-.lfoot .llink { color: var(--blue); font-weight: 500; }
+.lfoot .llink { display: inline-flex; align-items: center; gap: 6px; color: var(--blue); font-weight: 500; }
+.lfoot .llink svg { flex: none; stroke-width: 2.2; }  /* плюс більший і чіткіший за текстовий «+» */
 .lfoot > svg { flex: none; color: var(--ink2); }
 .lpig { flex: none; display: grid; margin-right: -6px; color: var(--ink2); }  /* прапорець цілі без кола, «Відкладено» — впритул */
 .lsegs { flex: none; display: flex; gap: 3px; }
@@ -1313,7 +1315,6 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
     <a class="cashbtn" id="cash" href="#add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg>Додати готівку</a>
     <section class="card limc" id="limc" hidden></section>
     <section class="card list fadein" id="insights" hidden></section>
-    <section class="card goal" id="goal" hidden></section>
     <section class="card list"><div class="ch"><h2>Останні операції</h2><a href="#journal" id="ops-all">Журнал<span id="arr-j"></span></a></div><div id="recent"></div></section>
   </div>
 
@@ -1434,7 +1435,7 @@ function plural(n, one, few, many) { var a = n % 10, b = n % 100; return a === 1
 function svgI(color, body, size) {
   return '<svg viewBox="0 0 24 24" width="' + (size || 18) + '" height="' + (size || 18) + '" fill="none" stroke="' + color + '" stroke-width="' + (color === "#fff" || color === "currentColor" || color === "#6B7180" ? 1.8 : 2.1) + '" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + body + "</svg>";
 }
-var CHR = svgI("currentColor", '<path d="m9 6 6 6-6 6"/>', 16);
+var CHR = svgI("currentColor", '<path d="m9 6 6 6-6 6"/>', 20);  // шеврон «далі» — 20 px, щоб добре було видно
 var CAL = svgI("#6B7180", '<rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/>', 16);
 // кольорові іконки категорій (з макета v2): фон, колір лінії, малюнок
 var CATS = {
@@ -1703,8 +1704,8 @@ function renderLimit(P) {
   } else if (pl) {
     foot = '<button type="button" class="lfoot" id="limc-plan"><span class="lft">' + "Відкладаєте <b>" + zr(pl.monthly) + "</b> на місяць" + (pl.until ? " до " + dmy(pl.until) : "") +
       '</span><span class="llink">Змінити</span></button>';
-  } else foot = '<button type="button" class="lfoot ladd" id="limc-plan"><span class="llink">+ Відкладати щомісяця</span></button>';
-  box.innerHTML = '<a class="lmain" href="#analytics"><div class="ch"><h2>Ліміт на щоденні ' + (cut ? "на " + (+cut.slice(8)) + " " + GEN[mi(M)] : "у " + LOC[mi(M)]) + "</h2>" + CHR + "</div>" +
+  } else foot = '<button type="button" class="lfoot ladd" id="limc-plan"><span class="llink">' + svgI("currentColor", '<path d="M12 5v14M5 12h14"/>', 18) + "Відкладати щомісяця</span></button>";
+  box.innerHTML = '<a class="lmain" href="#analytics"><div class="ch"><h2>Ліміт на щоденні витрати</h2>' + CHR + "</div>" +
     '<div class="lbig"><b>' + zr(Math.abs(left)) + "</b><span>" + (left < 0 ? "понад ліміт " : "лишилось з ") + nf0.format(Math.round(LM.total)) + "</span></div>" +
     '<div class="lbar" role="img" aria-label="Витрачено ' + nf0.format(Math.round(p)) + ' % ліміту"><b' + (left < 0 ? ' class="over"' : "") + ' data-to="' + p.toFixed(2) + '%"></b></div>' +
     '<p class="lnote">' + note + "</p></a>" + foot;
@@ -1767,7 +1768,6 @@ function renderReport(P) {
   if ($("h-day")) $("h-day").onclick = function () { selDay = null; reportKey = null; render(); };
   $("cash").hidden = !P.cash;
   renderLimit(P);
-  renderGoal(P);
   renderInsights(P, M);
   var last = P.months[P.months.length - 1], ops = last ? last.ops.slice(0, 5) : [], left = justAdded.slice();
   $("recent").innerHTML = ops.length ? ops.map(function (o) {
@@ -1815,40 +1815,6 @@ function renderInsights(P, M) {
   box.querySelectorAll("[data-cat]").forEach(function (a) { a.onclick = function () { filter = "all"; catF = a.dataset.cat; toCur(P); }; });
   box.classList.remove("fadein"); void box.offsetWidth; box.classList.add("fadein");
 }
-// подушка: ціль = 6 × середні витрати повних місяців; накопичене — що лишилось у повних місяцях
-function renderGoal(P) {
-  var G = GOAL[P.key], box = $("goal");
-  var full = P.months.filter(function (m) { return !m.incomplete && m.income > 0; });
-  box.hidden = !G || !full.length;
-  if (box.hidden) return;
-  var avgExp = full.reduce(function (s, m) { return s + m.expenses; }, 0) / full.length;
-  var target = G.months * avgExp, have = full.reduce(function (s, m) { return s + m.saved; }, 0), life = have / avgExp;
-  var pace = have / full.length, last = full[full.length - 1], y = +last.key.slice(0, 4), m = +last.key.slice(5);
-  var left = Math.max(0, target - have), monthsLeft = (G.deadline[0] * 12 + G.deadline[1] - 1) - (y * 12 + m);
-  var need = monthsLeft > 0 ? left / monthsLeft : left;
-  var eta = pace > 0 ? Math.ceil(left / pace) : 0, etaIdx = y * 12 + m - 1 + eta, etaY = Math.floor(etaIdx / 12), etaM = etaIdx % 12;
-  var early = etaY * 12 + etaM < G.deadline[0] * 12 + G.deadline[1] - 1, ahead = (G.deadline[0] * 12 + G.deadline[1] - 1) - (etaY * 12 + etaM);
-  var segs = "";
-  // смужки подушки статичні: одразу показують, скільки місяців покрито
-  for (var i = 0; i < G.months; i++) {
-    var f = Math.max(0, Math.min(1, life - i));
-    segs += '<i><b style="width:' + (f * 100).toFixed(2) + '%;transition:none"></b></i>';
-  }
-  // термін — окремою плашкою з прапорцем: видно, що це дата цілі, а не блоку
-  var due = "1 " + GEN[G.deadline[1] - 1] + " " + G.deadline[0];
-  var ok = pace >= need;
-  box.innerHTML = '<div class="ch" style="min-height:0"><h2>' + G.title + '</h2><span class="gdue" aria-label="Термін цілі: ' + due + '">' +
-      svgI("currentColor", '<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>', 14) + "до " + due + "</span></div>" +
-    '<div class="gbig"><b>' + nf1.format(life) + "</b><span>з " + G.months + " місяців витрат</span></div>" +
-    '<div class="gsub" aria-label="Накопичено ' + nf0.format(have) + " з " + nf0.format(target) + ' зл">' +
-      svgI("currentColor", '<path d="M4.5 11.5a6.5 5.5 0 0 1 6.5-5.5h3a6.5 5.5 0 0 1 6 3.4l1.5.4v3.4l-1.6.5a6.5 5.5 0 0 1-2.4 2.7V20h-2.6v-1.8h-3.8V20H8.5v-2.6a5.5 5.5 0 0 1-4-5.9z"/><path d="M11 6V4.2M10 9.5h3.5"/><circle cx="16.5" cy="10.5" r=".6" fill="currentColor"/>', 14) +
-      nf0.format(have) + " з " + nf0.format(target) + " зл</div>" +
-    '<div class="segs" role="img" aria-label="' + nf1.format(life) + " з " + G.months + ' місяців">' + segs + "</div>" +
-    '<div class="gpace"><span>Відкладено <b>≈ ' + nf0.format(pace) + " зл/міс.</b> при плані <b>" + nf0.format((planFor(P, P.months[P.months.length - 1].key) || { monthly: need }).monthly) + " зл</b>. " +
-      (ok ? (early ? "У такому темпі ціль буде досягнуто до " + GEN[etaM] + ", на " + (ahead === 1 ? "місяць" : ahead + " " + plural(ahead, "місяць", "місяці", "місяців")) + " раніше плану." : "У такому темпі ціль буде досягнуто вчасно.")
-        : "У такому темпі ціль не буде досягнуто до " + GEN[G.deadline[1] - 1] + ": бракує ≈ " + nf0.format(need - pace) + " зл на місяць.") + "</span></div>";
-}
-
 // ---------- аналітика ----------
 // шкала осі: «гарний» максимум і 4 позначки
 function niceMax(v) { var s = [400, 800, 1200, 1500, 2000, 3000, 4500, 6000, 8000, 10000, 15000]; for (var i = 0; i < s.length; i++) if (v <= s[i]) return s[i]; return Math.ceil(v / 5000) * 5000; }
