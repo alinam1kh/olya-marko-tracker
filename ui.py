@@ -998,6 +998,7 @@ a.ins { color: var(--ink4); }
 .obtn svg { width: 18px; height: 18px; flex: none; }
 .obtn.del { background: var(--bad-bg); color: var(--bad); }
 #op-foot:empty { display: none; }
+#op-foot { padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px)); }
 .msg { margin: 0 4px 8px; font-size: 14px; text-align: center; color: var(--bad); }
 .msg:empty { display: none; }
 .save { width: 100%; height: 52px; border: 0; border-radius: 26px; background: var(--blue-g); box-shadow: 0 8px 18px rgba(29,95,224,.3); color: #fff; font: 500 16px var(--font); cursor: pointer; }
