@@ -765,7 +765,7 @@ a.ins { color: var(--ink4); }
 .anav .aarr { width: 28px; height: 28px; background: transparent; color: var(--ink2); font-size: 18px; }
 .alab .sep { margin: 0 8px; }
 .abig { display: flex; align-items: center; gap: 10px; }
-.abig .bd { font-size: 12px; letter-spacing: 0; }
+.abig .bd { font-size: 12px; line-height: 1; letter-spacing: 0; }  /* без успадкованої висоти рядка — текст рівно посередині плашки */
 #a-sum .aline { margin-top: 4px; font-size: 14px; color: var(--ink2); }
 /* графік без осі й доріжок: лише стовпчики, назви місяців і пунктир середнього з підписом */
 .caps.plain .trk { background: none; overflow: visible; }
@@ -1695,7 +1695,9 @@ function renderAnalytics(P) {
       v === null ? "—" : (M.incomplete ? "≈ " : "") + zr(v), cs);
     $("an-where").hidden = true;
   }
-  $("t-avg").innerHTML = note;
+  // висновок «Більше, ніж зазвичай…» — сірим блоком під стовпчиками, як підсумок
+  var cc = metric === "exp" ? c : cs;
+  $("t-avg").innerHTML = note + (cc && cc.text ? '<div class="gpace apace"><div class="aline">' + cc.text + "</div></div>" : "");
 }
 // «Куди пішли гроші»: усі витрати місяця — спершу щоденні (вони змінюються) зі «зазвичай», внизу обовʼязкові, згорнуті
 function renderWhere(P, M) {
