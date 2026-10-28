@@ -902,8 +902,14 @@ a.ins { color: var(--ink4); }
 .jsearch input::placeholder { color: var(--ink2); }
 .jcash { flex: none; display: inline-flex; align-items: center; gap: 6px; height: 48px; padding: 0 16px; border-radius: 24px; background: var(--blue-g); color: #fff; font-size: 15px; font-weight: 500; box-shadow: 0 6px 14px rgba(29,95,224,.24); }
 .jcash svg { width: 16px; height: 16px; }
-.jline { margin: 12px 4px 0; font-size: 14px; color: var(--ink2); }
-.jline b { font-weight: 500; color: var(--ink); }
+.jsum { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+.jsum .card { margin: 0; padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
+.jsum .ji { flex: none; width: 36px; height: 36px; border-radius: 18px; display: grid; place-items: center; }
+.jsum .ji svg { width: 18px; height: 18px; }
+.jsum .ji .glyph { display: inline; font-size: 20px; color: inherit; }
+.jsum span { display: block; font-size: 12px; color: var(--ink2); }
+.jsum b { display: block; margin-top: 2px; font-size: 17px; font-weight: 500; white-space: nowrap; }
+.jsum .card > div { min-width: 0; }
 .dh { display: flex; justify-content: space-between; gap: 10px; margin: 16px 4px 6px; font-size: 14px; }
 .dh b { font-weight: 500; }
 .dh b span { font-weight: 400; color: var(--ink2); }
@@ -1107,7 +1113,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
       <a class="jcash" id="j-cash" href="#add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Готівка</a>
     </div>
     <div class="filters" id="j-filters" role="group" aria-label="Фільтр"></div>
-    <p class="jline" id="j-line"></p>
+    <div class="jsum" id="j-sum" hidden></div>
     <div id="j-list"></div>
     <a class="fava" id="fava">Повний журнал у Fava<span id="arr-f"></span></a>
   </div>
@@ -1720,7 +1726,13 @@ function renderJournal(P) {
     return filter === "all" || (filter === "exp" && !o.income) || (filter === "inc" && o.income) || (filter === "fixed" && o.fixed) || (filter === "cash" && o.cash);
   });
   var out = ops.reduce(function (s, o) { return s + (o.income ? 0 : o.amount); }, 0);
-  $("j-line").innerHTML = "<b>" + ops.length + " " + plural(ops.length, "операція", "операції", "операцій") + "</b>" + (out ? " · витрачено " + zl(out) : "") + (q ? " · у всіх місяцях" : "");
+  // підсумок плашками — лише коли щось відібрано (пошук, категорія, фільтр); для «Усі» за місяць він дублює Головну й Аналітику
+  var inc = ops.reduce(function (s, o) { return s + (o.income ? o.amount : 0); }, 0), isInc = filter === "inc";
+  $("j-sum").hidden = !(q || catF || filter !== "all");
+  $("j-sum").innerHTML = '<div class="card"><span class="ji" style="background:var(--blue-soft);color:var(--blue)" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 2.5h12a1 1 0 0 1 1 1v17.2a.6.6 0 0 1-.95.5L15.5 19.4l-2.9 1.9a1 1 0 0 1-1.1 0l-2.9-1.9-2.55 1.8A.6.6 0 0 1 5 20.7V3.5a1 1 0 0 1 1-1z"/><path fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" d="M9 8h6M9 12h6M9 15.5h3"/></svg></span>' +
+    "<div><span>" + (q ? "Знайдено" : "Операцій") + "</span><b>" + ops.length + "</b></div></div>" +
+    '<div class="card"><span class="ji" style="background:var(' + (isInc ? "--good-bg" : "--bad-bg") + ");color:var(" + (isInc ? "--good" : "--bad") + ')" aria-hidden="true"><span class="glyph">' + (isInc ? "↙" : "↗") + "</span></span>" +
+    "<div><span>" + (isInc ? "Дохід" : "Витрати") + "</span><b>" + zl(isInc ? inc : out) + "</b></div></div>";
   $("j-cash").hidden = !P.cash;
   var html = "", day = null, buf = "";
   var flush = function () { if (day) html += buf + "</div></section>"; };
