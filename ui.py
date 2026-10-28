@@ -635,8 +635,12 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .fx { display: inline-block; padding: 0 8px; border-radius: 10px; line-height: 20px; background: var(--soft); color: var(--ink3); font-size: 12px; }
 .fx.cash { background: var(--cash-bg); color: var(--cash); }
 .fx.now { background: var(--blue); color: #fff; }
-/* «Головне за вересень» */
+/* «Що змінилось у жовтні» */
 .ins { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 56px; padding: 14px 0; border-top: 1px solid var(--soft); font-size: 14px; line-height: 1.45; color: var(--ink4); }
+.ins .it { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.ins .it small { font-size: 13px; color: var(--ink2); }
+.ins .ir { flex: none; display: inline-flex; align-items: center; gap: 4px; color: var(--ink2); }
+a.ins { color: var(--ink4); }
 .fadein { animation: rise .8s var(--ease) both; }
 @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 /* категорії: кольорова іконка, назва, сума, частка, шкала */
@@ -846,6 +850,7 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .filters::-webkit-scrollbar { display: none; }
 .filters button { flex: none; min-height: 44px; padding: 0 16px; border: 1px solid var(--border); border-radius: 22px; background: var(--card); font-size: 14px; cursor: pointer; }
 .filters button[aria-pressed="true"] { border-color: transparent; background: var(--blue-g); color: #fff; font-weight: 500; }
+.filters button.catf { display: inline-flex; align-items: center; gap: 6px; padding-right: 12px; }
 .jsum { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
 .jsum .card { margin: 0; padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
 .jsum .ji { flex: none; width: 36px; height: 36px; border-radius: 18px; display: grid; place-items: center; }
@@ -1165,7 +1170,7 @@ function arr(d) { return d > 0 ? "↗" : "↘"; }
 
 function lastFull(P) { for (var i = P.months.length - 1; i >= 0; i--) if (P.months[i].income > 0) return i; return P.months.length - 1; }
 function curMonth(P) { return P.months.length - 1; }  // Головна завжди відкривається на поточному місяці, навіть до зарплати
-var person = 0, month = curMonth(D.people[0]), trendMonth = null, filter = "all", metric = "exp", amode = "month";
+var person = 0, month = curMonth(D.people[0]), trendMonth = null, filter = "all", metric = "exp", amode = "month", catF = null;  // catF — фільтр Журналу за категорією (з «Що змінилось»)
 var GOAL = { olya: { months: 6, deadline: [2027, 6], title: "Подушка безпеки" } };  // фіча 5 з роадмапу ДЗ
 var VIEWS = { report: 1, analytics: 1, journal: 1, add: 1 };
 var saved = null;  // після збереження готівки: сума й дата, щоб підсвітити новий запис
@@ -1403,33 +1408,40 @@ function renderReport(P) {
   $("recent").querySelectorAll(".swipe").forEach(function (sw) { swipeRow(sw, P, "#report"); });
   grow("#hero .meter b, #hero .split2 .e, #v-report .bar6 b", "width");
 }
-// «Головне за вересень»: факт і бейдж праворуч; у неповному місяці — що вже відомо
+// «Що змінилось у жовтні»: лише відхилення від звичного, 0–2 пункти; якщо все звично — блоку немає.
+// Категорія: витрачено помітно більше/менше, ніж зазвичай за місяць (у неповному місяці — лише «вже більше») → Журнал з цією категорією.
+// Минулий місяць: щойно закритий місяць і його залишок проти звичного — просто факт.
 function renderInsights(P, M) {
-  var box = $("insights"), rows = [], k = mi(M);
-  var add = function (text, bd) { rows.push('<div class="ins"><span>' + text + "</span>" + (bd || "") + "</div>"); };
-  if (!(M.income > 0)) { box.hidden = true; return; }
-  var title = "Головне за " + MONTHS_FULL[k].toLowerCase();
-  if (M.incomplete) {
-    add("Фіксовані платежі вже сплачено", '<span class="bd">' + zl(M.fixed) + "</span>");
-    add("Змінні витрати за " + (+M.last_op.slice(0, 2)) + " " + plural(+M.last_op.slice(0, 2), "день", "дні", "днів"), '<span class="bd">' + zl(M.variable) + "</span>");
-  } else {
-    var pi = prevWithIncome(P, month);
-    if (pi) {
-      var pp = M.rate - pi.rate;
-      add("Норма заощаджень проти " + GEN[mi(pi)],
-        Math.abs(pp) < 0.05 ? '<span class="bd">як у ' + LOC[mi(pi)] + "</span>" :
-        '<span class="bd ' + (pp > 0 ? "good" : "bad") + '" aria-label="' + (pp > 0 ? "більше" : "менше") + ", ніж у " + LOC[mi(pi)] + ": " + nf1.format(pi.rate) + ' %">' + arr(pp) + " з " + nf1.format(pi.rate) + " %</span>");
-    }
-    var top = M.categories[0];
-    if (top && M.expenses) {
-      var share = top.amount / M.expenses * 100;
-      add(share > 50 && top.name === "Житло" ? "Оренда — понад половину витрат" : "Найбільша категорія — " + top.name.toLowerCase(), '<span class="bd blue">' + nf0.format(share) + " % витрат</span>");
-    }
-    var pm = P.months[month - 1];
-    if (pm && pm.variable) add("Змінні витрати порівняно з " + INS[mi(pm)], badge(M.variable, pm.variable, true, "", true));
+  var box = $("insights"), k = mi(M), items = [];
+  var fullBefore = function (j) { return P.months.slice(0, j).filter(function (m) { return m.income > 0 && !m.incomplete; }).slice(-6); };
+  var z0 = function (v) { return nf0.format(Math.round(Math.abs(v))) + " зл"; };
+  var row = function (title, sub, bd, cat) {
+    return (cat ? '<a class="ins go" href="#journal" data-cat="' + esc(cat) + '">' : '<div class="ins">') + '<span class="it"><span>' + title + "</span>" + (sub ? "<small>" + sub + "</small>" : "") + "</span>" +
+      '<span class="ir">' + bd + (cat ? CHR : "") + "</span>" + (cat ? "</a>" : "</div>");
+  };
+  var base = fullBefore(month);
+  if (base.length) {
+    var usual = {};
+    base.forEach(function (m) { m.categories.forEach(function (c) { usual[c.name] = (usual[c.name] || 0) + c.amount / base.length; }); });
+    var cats = M.categories.map(function (c) { return { name: c.name, now: c.amount, was: usual[c.name] || 0, d: c.amount - (usual[c.name] || 0) }; })
+      .filter(function (c) { return M.incomplete ? c.d >= Math.max(30, c.was * .15) : Math.abs(c.d) >= Math.max(50, c.was * .2); })
+      .sort(function (a, b) { return Math.abs(b.d) - Math.abs(a.d); });
   }
-  box.hidden = !rows.length;
-  box.innerHTML = '<div class="ch"><h2>' + title + "</h2></div>" + rows.join("");
+  var pm = M.incomplete ? P.months[month - 1] : null, mItem = "";
+  if (pm && pm.income > 0 && !pm.incomplete) {
+    var pb = fullBefore(month - 1), us = pb.length ? pb.reduce(function (s, m) { return s + m.saved; }, 0) / pb.length : null, ds = us === null ? 0 : pm.saved - us;
+    mItem = row("У " + LOC[mi(pm)] + " лишилось " + z0(pm.saved),
+      us === null ? "" : Math.abs(ds) < Math.max(50, us * .05) ? "як зазвичай" : (ds > 0 ? "більше" : "менше") + ", ніж зазвичай",
+      us === null || Math.abs(ds) < Math.max(50, us * .05) ? "" : '<span class="bd ' + (ds > 0 ? "good" : "bad") + '">' + (ds > 0 ? "+" : "−") + z0(ds) + "</span>");
+  }
+  (cats || []).slice(0, mItem ? 1 : 2).forEach(function (c) {
+    items.push(row(esc(c.name) + " — " + z0(c.now), c.was ? "зазвичай за місяць ≈ " + z0(c.was) : "минулими місяцями не було",
+      '<span class="bd ' + (c.d > 0 ? "bad" : "good") + '">' + (c.d > 0 ? "+" : "−") + z0(c.d) + "</span>", c.name));
+  });
+  if (mItem) items.push(mItem);
+  box.hidden = !items.length;
+  box.innerHTML = '<div class="ch"><h2>Що змінилось у ' + LOC[k] + "</h2></div>" + items.join("");
+  box.querySelectorAll("[data-cat]").forEach(function (a) { a.onclick = function () { filter = "all"; catF = a.dataset.cat; }; });
   box.classList.remove("fadein"); void box.offsetWidth; box.classList.add("fadein");
 }
 // подушка: ціль = 6 × середні витрати повних місяців; накопичене — що лишилось у повних місяцях
@@ -1601,12 +1613,18 @@ var dayFmt = new Intl.DateTimeFormat("uk-UA", { day: "numeric", month: "long", w
 var FILTERS = [["all", "Усі"], ["exp", "Витрати"], ["inc", "Дохід"], ["fixed", "Фіксовані"], ["cash", "Готівка"]];
 function renderJournal(P) {
   var M = P.months[month], fb = $("j-filters"); fb.innerHTML = "";
+  if (catF) {  // категорія, що прийшла з Головної, — першим чипом, ✕ знімає
+    var cb = h("button", "catf", esc(catF) + svgI("currentColor", '<path d="M6 6l12 12M18 6 6 18"/>', 14)); cb.type = "button"; cb.setAttribute("aria-pressed", "true");
+    cb.setAttribute("aria-label", "Категорія " + catF + ", прибрати фільтр"); cb.onclick = function () { catF = null; render(); };
+    fb.appendChild(cb);
+  }
   FILTERS.forEach(function (f) {
     var b = h("button", "", f[1]); b.type = "button"; b.setAttribute("aria-pressed", f[0] === filter);
     b.onclick = function () { filter = f[0]; render(); };
     fb.appendChild(b);
   });
   var ops = M.ops.filter(function (o) {
+    if (catF && o.cat !== catF) return false;
     return filter === "all" || (filter === "exp" && !o.income) || (filter === "inc" && o.income) || (filter === "fixed" && o.fixed) || (filter === "cash" && o.cash);
   });
   var out = ops.reduce(function (s, o) { return s + (o.income ? 0 : o.amount); }, 0);
@@ -1923,7 +1941,7 @@ window.addEventListener("hashchange", function () {
   if (v !== "add" && lastView !== "add") window.scrollTo(0, 0);
   if (lastView === "add" && v !== "add") sheetFromApp = false;
   if (lastView === "report" && v !== "report" && v !== "add") reportKey = null;
-  if (lastView === "journal" && v !== "journal" && v !== "add") filter = "all";
+  if (lastView === "journal" && v !== "journal" && v !== "add") { filter = "all"; catF = null; }
   prevView = lastView; lastView = v; render();
 });
 render();
