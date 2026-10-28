@@ -776,7 +776,7 @@ a.ins { color: var(--ink4); }
 .cap .r2 { font-size: 12px; color: var(--ink2); }
 .cap.on .r1 { color: var(--ink); font-weight: 500; }
 .cap.on .r2 { color: var(--ink3); font-weight: 500; }
-/* фіксовані й змінні */
+/* обовʼязкові (фіксовані) й щоденні (змінні) */
 .split { display: flex; gap: 3px; height: 10px; margin: 4px 0 14px; }
 .split i { display: block; height: 100%; border-radius: 5px; }
 .fv2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
@@ -1039,7 +1039,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
   <div id="v-analytics" hidden>
     <div class="seg" id="a-mode" role="group" aria-label="Розділ аналітики"></div>
     <div id="an-month">
-      <section class="card"><div class="ch" style="min-height:0;margin-bottom:12px"><h2>Фіксовані й змінні</h2></div><div class="split" id="fvsplit" aria-hidden="true"></div><div class="fv2" id="fv"></div><p class="note" id="fvnote" style="margin:14px 0 0"></p></section>
+      <section class="card"><div class="ch" style="min-height:0;margin-bottom:12px"><h2>Обовʼязкові й щоденні</h2></div><div class="split" id="fvsplit" aria-hidden="true"></div><div class="fv2" id="fv"></div><p class="note" id="fvnote" style="margin:14px 0 0"></p></section>
       <section class="card list"><div class="ch"><h2 id="t-dmon"></h2></div><div id="cats"></div></section>
       <section class="card">
         <div class="ch" style="min-height:0;flex-direction:column;align-items:flex-start;gap:2px"><h2 id="w-title">Витрати по тижнях</h2><span class="sub wsub" id="w-sub"></span></div>
@@ -1316,7 +1316,7 @@ var TRASH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-w
 function opRow(o, recent, fresh) {
   return '<div class="op' + (fresh ? " fresh" : "") + '">' + cic(o.income ? "Дохід" : o.cat, true) + '<div class="t">' + (fresh ? '<div class="t1row"><div class="t1 one">' + esc(nice(o.title)) + '</div><span class="fx now">щойно</span></div>'
       : '<div class="t1' + (recent ? " one" : "") + '">' + esc(nice(o.title)) + "</div>") +
-    '<div class="t2"><span>' + esc(o.income ? "Дохід" : o.cat) + (recent ? '<i class="sep" aria-hidden="true"></i>' + o.date : "") + "</span>" + (o.fixed ? '<span class="fx">фіксована</span>' : "") + (o.cash ? '<span class="fx cash">готівка</span>' : "") +
+    '<div class="t2"><span>' + esc(o.income ? "Дохід" : o.cat) + (recent ? '<i class="sep" aria-hidden="true"></i>' + o.date : "") + "</span>" + (o.fixed ? '<span class="fx">обовʼязкова</span>' : "") + (o.cash ? '<span class="fx cash">готівка</span>' : "") +
     '</div></div><div class="r"><span class="am' + (o.income ? " inc" : "") + '">' + (o.income ? "+" : "−") + zl(o.amount) + "</span>" +
     "</div>" +
     "</div>";
@@ -1327,7 +1327,7 @@ function catRows(M, limit) {
   // static — для рядків у згорнутому блоці: шкала одразу потрібної ширини (вони зʼявляються вже на місці)
   var row = function (c, static_) {
     var p = Math.max(M.expenses ? c.amount / M.expenses * 100 : 0, 1);
-    return '<div class="crow">' + cic(c.name) + '<span class="nm">' + esc(c.name) + (fx[c.name] ? '<span class="fx">фіксована</span>' : "") + '</span><span class="am">' + zl(c.amount) +
+    return '<div class="crow">' + cic(c.name) + '<span class="nm">' + esc(c.name) + (fx[c.name] ? '<span class="fx">обовʼязкова</span>' : "") + '</span><span class="am">' + zl(c.amount) +
       '</span><span class="bd blue">' + pct(c.amount) + '</span><div class="bar6"><b style="background:' + bright(c.name) + (static_ ? ";width:" + p + '%"' : '" data-to="' + p + '%"') + "></b></div></div>";
   };
   shown.forEach(function (c) { out += row(c); });
@@ -1545,9 +1545,9 @@ function renderAnalytics(P) {
   var total = M.fixed + M.variable, pm = P.months[month - 1], cmp = pm && !M.incomplete, fp = total ? M.fixed / total * 100 : 0;
   var FIXED = { marko: "звʼязок, світло, спортзал, YouTube", olya: "оренда, проїзний ZTM, Netflix, Spotify, Claude.ai, Play" };
   $("fvsplit").innerHTML = '<i style="width:' + fp + '%;background:#A9C6F8"></i><i style="flex:1;background:linear-gradient(90deg,#3B82F6,#1D5FE0)"></i>';
-  $("fv").innerHTML = '<div><span><i style="background:#A9C6F8"></i>Фіксовані, ' + nf1.format(fp) + " %</span><b>" + zl(M.fixed) + "</b>" + (cmp ? badge(M.fixed, pm.fixed, true, "", false) : "") + "</div>" +
-    '<div><span><i style="background:#1F63E6"></i>Змінні, ' + nf1.format(100 - fp) + " %</span><b>" + zl(M.variable) + "</b>" + (cmp ? badge(M.variable, pm.variable, true, "", false) : "") + "</div>";
-  $("fvnote").textContent = "Фіксовані: " + FIXED[P.key] + ". Змінні — решта витрат, саме їх можна зменшити.";
+  $("fv").innerHTML = '<div><span><i style="background:#A9C6F8"></i>Обовʼязкові, ' + nf1.format(fp) + " %</span><b>" + zl(M.fixed) + "</b>" + (cmp ? badge(M.fixed, pm.fixed, true, "", false) : "") + "</div>" +
+    '<div><span><i style="background:#1F63E6"></i>Щоденні, ' + nf1.format(100 - fp) + " %</span><b>" + zl(M.variable) + "</b>" + (cmp ? badge(M.variable, pm.variable, true, "", false) : "") + "</div>";
+  $("fvnote").textContent = "Обовʼязкові: " + FIXED[P.key] + ". Щоденні — решта витрат, саме їх можна зменшити.";
   $("t-dmon").textContent = "Категорії у " + LOC[mi(M)];
   // наші рядки категорій (іконка, сума, частка, шкала); решта — під «Ще N категорій»
   $("cats").innerHTML = catRows(M, 5);
@@ -1625,7 +1625,7 @@ function renderTrends(P) {
 
 // ---------- журнал ----------
 var dayFmt = new Intl.DateTimeFormat("uk-UA", { day: "numeric", month: "long", weekday: "long" });
-var FILTERS = [["all", "Усі"], ["exp", "Витрати"], ["inc", "Дохід"], ["fixed", "Фіксовані"], ["cash", "Готівка"]];
+var FILTERS = [["all", "Усі"], ["exp", "Витрати"], ["inc", "Дохід"], ["fixed", "Обовʼязкові"], ["cash", "Готівка"]];
 function renderJournal(P) {
   var M = P.months[month], fb = $("j-filters"); fb.innerHTML = "";
   // місяць — першим чипом; на телефоні відкривається системний список
