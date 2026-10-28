@@ -254,6 +254,7 @@ a { color: inherit; text-decoration: none; }
 .cal-grid button[aria-pressed="true"] { background: var(--blue-g); color: #fff; }
 .cal-grid button[aria-pressed="true"].has::after { background: #fff; opacity: .8; }
 .cal-note { margin: 10px 4px 0; font-size: 12px; color: var(--ink2); }
+.cal-all { display: block; width: 100%; min-height: 44px; margin-top: 10px; border: 0; border-top: 1px solid var(--soft); background: transparent; color: var(--blue); font: 500 14px var(--font); cursor: pointer; }
 .acal { margin-top: 10px; padding: 12px; border: 1px solid var(--border); border-radius: 20px; background: var(--card); animation: popin .45s var(--ease) both; transform-origin: top right; }
 
 /* головна картка: градієнт у кольорі людини, а над ним «рідкі» плями світла */
@@ -1109,6 +1110,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
         <div class="cal-wd" aria-hidden="true"><span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Нд</span></div>
         <div class="cal-grid" id="cal-grid"></div>
         <p class="cal-note" id="cal-note"></p>
+        <button type="button" class="cal-all" id="cal-all" hidden>Шукати в усіх місяцях</button>
       </div>
     </div>
         <div class="seg sm" id="a-scale" role="group" aria-label="Масштаб"></div></div>
@@ -1255,7 +1257,7 @@ function arr(d) { return d > 0 ? "↗" : "↘"; }
 function lastFull(P) { for (var i = P.months.length - 1; i >= 0; i--) if (P.months[i].income > 0) return i; return P.months.length - 1; }
 function curMonth(P) { return P.months.length - 1; }  // Головна завжди відкривається на поточному місяці, навіть до зарплати
 function toCur(P) { month = curMonth(P); selDay = null; }  // переходи з Головної в Журнал — у поточний місяць
-var person = 0, month = curMonth(D.people[0]), trendMonth = null, filter = "all", metric = "exp", amode = "month", catF = null, jq = "";  // catF — фільтр Журналу за категорією (з «Що змінилось»)
+var person = 0, month = curMonth(D.people[0]), trendMonth = null, filter = "all", metric = "exp", amode = "month", catF = null, jq = "", jqMonth = false;  // jqMonth — пошук лише в обраному місяці  // catF — фільтр Журналу за категорією (з «Що змінилось»)
 var GOAL = { olya: { months: 6, deadline: [2027, 6], title: "Подушка безпеки" } };  // фіча 5 з роадмапу ДЗ
 var VIEWS = { report: 1, analytics: 1, journal: 1, add: 1 };
 var saved = null;  // після збереження готівки: сума й дата, щоб підсвітити новий запис
@@ -1319,7 +1321,7 @@ function renderCal(P) {
     b.type = "button"; b.disabled = !inMonth || d.getDate() > lastDay;
     b.setAttribute("aria-pressed", key === selDay);
     b.setAttribute("aria-label", d.getDate() + " " + GEN[d.getMonth()] + " " + d.getFullYear() + (b.disabled ? ", даних немає" : withOps[key] ? ", є операції" : ""));
-    if (!b.disabled) (function (key) { b.onclick = function () { selDay = key; month = ki; calOpen(false); render(); scrollToDay(key); }; })(key);
+    if (!b.disabled) (function (key) { b.onclick = function () { selDay = key; month = ki; if (view() === "journal" && jq.trim()) jqMonth = true; calOpen(false); render(); scrollToDay(key); }; })(key);
     grid.appendChild(b);
   }
   var lastM = P.months[P.months.length - 1];
@@ -1331,8 +1333,8 @@ function scrollToDay(key) {
   var el = document.querySelector('[data-day="' + key + '"]');
   if (el) requestAnimationFrame(function () { window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 12); });
 }
-$("cal-prev").onclick = function () { var P = D.people[person], k = P.months.map(function (m) { return m.key; }).indexOf(calKey); if (k > 0) { month = k - 1; calKey = P.months[month].key; selDay = null; trendMonth = null; render(); calOpen(true); } };
-$("cal-next").onclick = function () { var P = D.people[person], k = P.months.map(function (m) { return m.key; }).indexOf(calKey); if (k < P.months.length - 1) { month = k + 1; calKey = P.months[month].key; selDay = null; trendMonth = null; render(); calOpen(true); } };
+$("cal-prev").onclick = function () { var P = D.people[person], k = P.months.map(function (m) { return m.key; }).indexOf(calKey); if (k > 0) { month = k - 1; calKey = P.months[month].key; selDay = null; trendMonth = null; if (view() === "journal" && jq.trim()) jqMonth = true; render(); calOpen(true); } };
+$("cal-next").onclick = function () { var P = D.people[person], k = P.months.map(function (m) { return m.key; }).indexOf(calKey); if (k < P.months.length - 1) { month = k + 1; calKey = P.months[month].key; selDay = null; trendMonth = null; if (view() === "journal" && jq.trim()) jqMonth = true; render(); calOpen(true); } };
 var MENUS = { w: ["who-menu", "who-btn"], m: ["mmenu", "mcal"] };
 function popMenu(k, open) {
   if (!open) { $(MENUS[k][0]).hidden = true; $(MENUS[k][1]).setAttribute("aria-expanded", false); return; }  // закриваємо лише своє меню
@@ -1348,11 +1350,13 @@ function calPlace() {
   m.style.top = r.bottom + 8 + "px"; m.style.left = Math.max(12, Math.min(r.left, innerWidth - m.offsetWidth - 12)) + "px";
 }
 function calOpen(open) {
+  $("cal-all").hidden = !(view() === "journal" && jq.trim());  // під час пошуку — повернення до всіх місяців
   popMenu("m", open);
   var j = $("jm-btn"); if (j) j.setAttribute("aria-expanded", String(open && view() === "journal"));
   calPlace();
 }
 $("mcal").onclick = function () { calOpen($("mmenu").hidden); };
+$("cal-all").onclick = function () { jqMonth = false; selDay = null; calOpen(false); render(); };
 document.addEventListener("click", function (e) { if (!e.target.closest("#mmenu, #mcal, #jm-btn")) calOpen(false); });
 window.addEventListener("scroll", calPlace, { passive: true });  // їде разом із кнопкою
 window.addEventListener("hashchange", function () { calOpen(false); });
@@ -1732,10 +1736,10 @@ var FILTERS = [["all", "Усі"], ["exp", "Витрати"], ["inc", "Дохід
 function renderJournal(P) {
   var M = P.months[month], fb = $("j-filters"); fb.innerHTML = "";
   // місяць — першим чипом; відкриває той самий календар, що в Аналітиці (тап по дню — прокрутка до нього)
-  var ms = h("button", "mchip", esc(selDay && selDay.slice(0, 7) === M.key ? (+selDay.slice(8)) + " " + GEN[mi(M)] + " " + M.key.slice(0, 4) : M.name + " " + M.key.slice(0, 4)) +
+  var allM = !!jq.trim() && !jqMonth;  // пошук по всіх місяцях
+  var ms = h("button", "mchip", esc(allM ? "Усі місяці" : selDay && selDay.slice(0, 7) === M.key ? (+selDay.slice(8)) + " " + GEN[mi(M)] + " " + M.key.slice(0, 4) : M.name + " " + M.key.slice(0, 4)) +
     '<svg class="ico16 chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>');
   ms.type = "button"; ms.id = "jm-btn"; ms.setAttribute("aria-haspopup", "dialog"); ms.setAttribute("aria-expanded", String(!$("mmenu").hidden));
-  ms.disabled = !!jq.trim(); ms.title = ms.disabled ? "Пошук іде по всіх місяцях" : "";
   ms.onclick = function () { calOpen($("mmenu").hidden); };
   fb.appendChild(ms);
   if (catF) {  // категорія, що прийшла з Головної, — першим чипом, ✕ знімає
@@ -1750,7 +1754,7 @@ function renderJournal(P) {
   });
   // пошук шукає в усіх місяцях: за назвою, категорією або сумою («72,29»); без запиту — лише обраний місяць
   var q = jq.trim().toLowerCase(), qn = q.replace(",", ".");
-  var src = q ? [].concat.apply([], P.months.slice().reverse().map(function (m) { return m.ops; })) : M.ops;
+  var src = q && !jqMonth ? [].concat.apply([], P.months.slice().reverse().map(function (m) { return m.ops; })) : M.ops;
   var ops = src.filter(function (o) {
     if (catF && o.cat !== catF) return false;
     if (q && o.title.toLowerCase().indexOf(q) < 0 && o.cat.toLowerCase().indexOf(q) < 0 && !(/\d/.test(qn) && o.amount.toFixed(2).indexOf(qn) >= 0)) return false;
@@ -1761,7 +1765,7 @@ function renderJournal(P) {
   var inc = ops.reduce(function (s, o) { return s + (o.income ? o.amount : 0); }, 0), isInc = filter === "inc";
   $("j-sum").hidden = !(q || catF || filter !== "all");
   $("j-sum").innerHTML = '<div class="card"><span class="ji" style="background:var(--blue-soft);color:var(--blue)" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 2.5h12a1 1 0 0 1 1 1v17.2a.6.6 0 0 1-.95.5L15.5 19.4l-2.9 1.9a1 1 0 0 1-1.1 0l-2.9-1.9-2.55 1.8A.6.6 0 0 1 5 20.7V3.5a1 1 0 0 1 1-1z"/><path fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" d="M9 8h6M9 12h6M9 15.5h3"/></svg></span>' +
-    "<div><span>" + (q ? "Знайдено" : "Операцій") + "</span><b>" + ops.length + "</b></div></div>" +
+    "<div><span>Операцій" + "</span><b>" + ops.length + "</b></div></div>" +
     '<div class="card"><span class="ji" style="background:var(' + (isInc ? "--good-bg" : "--bad-bg") + ");color:var(" + (isInc ? "--good" : "--bad") + ')" aria-hidden="true"><span class="glyph">' + (isInc ? "↙" : "↗") + "</span></span>" +
     "<div><span>" + (isInc ? "Дохід" : "Витрати") + "</span><b>" + zl(isInc ? inc : out) + "</b></div></div>";
   $("j-cash").hidden = !P.cash;
@@ -2063,7 +2067,7 @@ $("cash").addEventListener("click", function () { sheetFromApp = true; sheetBase
 $("j-cash").addEventListener("click", function () { sheetFromApp = true; sheetBase = "journal"; });
 $("ops-all").addEventListener("click", function () { filter = "all"; toCur(D.people[person]); });
 // пошук у Журналі: перемальовуємо лише список, поле лишається у фокусі
-$("j-q").addEventListener("input", function () { jq = this.value; $("j-clear").hidden = !jq; renderJournal(D.people[person]); sugRender(); });
+$("j-q").addEventListener("input", function () { jq = this.value; if (!jq.trim()) jqMonth = false; $("j-clear").hidden = !jq; renderJournal(D.people[person]); sugRender(); });
 // підказки категорій: з перших літер — категорії, у назві яких є таке слово; тап вмикає фільтр «Категорія ✕»
 function sugRender() {
   var box = $("j-sug"), q = jq.trim().toLowerCase(), P = D.people[person];
@@ -2180,7 +2184,7 @@ window.addEventListener("hashchange", function () {
     if (editing) { editing = null; pick = null; $("a-title").value = ""; $("a-date").value = iso(new Date()); dpick = 1; $("a-amount").value = ""; }
   }
   if (lastView === "report" && v !== "report" && v !== "add") reportKey = null;
-  if (lastView === "journal" && v !== "journal" && v !== "add") { filter = "all"; catF = null; jq = ""; $("j-q").value = ""; $("j-clear").hidden = true; }
+  if (lastView === "journal" && v !== "journal" && v !== "add") { filter = "all"; catF = null; jq = ""; jqMonth = false; $("j-q").value = ""; $("j-clear").hidden = true; }
   prevView = lastView; lastView = v; render();
 });
 render();
