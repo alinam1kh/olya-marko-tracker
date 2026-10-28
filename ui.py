@@ -1619,7 +1619,7 @@ function capsules(boxId, tickId, items, max, sel, onPick, n, avg, opt) {
   if (n) $(tickId).innerHTML = Array.apply(null, Array(n + 1)).map(function (_, k) { return "<span>" + nf0.format(Math.round(max * (n - k) / n)) + "</span>"; }).join("");
   else $(tickId).innerHTML = [1, 2 / 3, 1 / 3, 0].map(function (f) { return "<span>" + nf0.format(Math.round(max * f)) + " зл</span>"; }).join("");
   items.forEach(function (x, i) {
-    var c = h("div", "cap" + (onPick ? " pick" : "") + (i === sel ? " on" : "") + (x.part ? " part" : "") + (onPick && i !== sel ? " dim" : ""));
+    var c = h("div", "cap" + (onPick ? " pick" : "") + (i === sel ? " on" : "") + (x.part ? " part" : "") + (onPick && sel >= 0 && i !== sel ? " dim" : ""));
     var hh = Math.max(8, Math.round(x.v / max * H)), rent = x.rent ? Math.round(x.rent / max * H) : 0;
     // немає даних: порожня капсула — наш пунктир (круглі кінці, #C3C9D3) і риска всередині
     if (x.empty) c.innerHTML = '<div class="trk emp"><svg viewBox="0 0 40 28" aria-hidden="true"><rect x=".75" y=".75" width="38.5" height="26.5" rx="9.25" fill="none" stroke="#C3C9D3" stroke-width="1.5" stroke-dasharray="4 4" stroke-linecap="round"/><path d="M15 14h10" stroke="#C3C9D3" stroke-width="1.5" stroke-linecap="round"/></svg></div>';
@@ -1648,7 +1648,7 @@ function vsUsual(now, u, goodIfMore, when) {
   if (u === null || u === undefined) return { badge: "", text: "" };
   var d = now - u;
   if (Math.abs(d) < Math.max(30, u * .05)) return { badge: "", text: "Як зазвичай" + when };
-  return { badge: '<span class="bd ' + ((d > 0) === goodIfMore ? "good" : "bad") + '">' + (d > 0 ? "+" : "−") + zr(d) + "</span>", text: (d > 0 ? "Більше" : "Менше") + ", ніж зазвичай" + when };
+  return { badge: '<span class="bd ' + ((d > 0) === goodIfMore ? "good" : "bad") + '">' + (d > 0 ? "+" : "−") + zr(Math.abs(d)) + "</span>", text: (d > 0 ? "Більше" : "Менше") + ", ніж зазвичай" + when };
 }
 // підсумок над графіком: підпис (уточнення — через нашу вертикальну риску), сума з бейджем, висновок
 function sumHTML(label, extra, big, c) {
@@ -1656,6 +1656,7 @@ function sumHTML(label, extra, big, c) {
     '<div class="abig"><span>' + big + "</span>" + (c.badge || "") + "</div>" + (c.text ? '<div class="aline">' + c.text + "</div>" : "");
 }
 var ascale = "m";  // масштаб графіка витрат: m — місяці, w — тижні обраного місяця
+var wsel = { key: "", i: -1 };  // обраний тиждень (у межах місяця key); -1 — увесь місяць
 function renderAnalytics(P) {
   if (metric !== "saved") metric = "exp";
   if (month >= P.months.length) month = curMonth(P);
@@ -1697,13 +1698,26 @@ function renderAnalytics(P) {
       var w = bounds.map(function (b) { return M.ops.reduce(function (s, o) { var d = dayOf(o); return s + (!o.income && !o.fixed && d >= b[0] && d <= b[1] ? o.amount : 0); }, 0); });
       var uw = avgOf(base.length ? base : allFull, function (m) { var yy = +m.key.slice(0, 4), mm = +m.key.slice(5); return m.variable * 7 / new Date(yy, mm, 0).getDate(); });
       var top = -1, axW; w.forEach(function (v, i) { if (bounds[i][0] <= last && (top < 0 || v > w[top])) top = i; });
+      if (wsel.key !== M.key || wsel.i >= bounds.length || (wsel.i >= 0 && bounds[wsel.i][0] > last)) wsel = { key: M.key, i: -1 };
+      var wi = wsel.i;
+      // тап по тижню — його підсумок і категорії, як у місяцях; повторний тап — назад до місяця
+      var pickW = function (i) { if (bounds[i][0] > last) return; wsel = { key: M.key, i: wsel.i === i ? -1 : i }; render(); };
       capsules("mbars", "mticks", bounds.map(function (b, i) { var future = b[0] > last; return { v: future ? 0 : w[i], label: b[0] + "–" + b[1], empty: future, sub: future ? "—" : nf0.format(w[i]) + " зл" }; }),
-        (axW = niceAxis(Math.max.apply(null, w.concat([uw || 0, 1])))).max, -1, null, axW.n, uw || 0, { avgLabel: avgTag(uw) });
-      c = top >= 0 ? vsUsual(w[top], uw, false, "") : { badge: "", text: "" };
-      if (top >= 0) c.text = "Найдорожчий тиждень — " + bounds[top][0] + "–" + bounds[top][1];
+        (axW = niceAxis(Math.max.apply(null, w.concat([uw || 0, 1])))).max, wi, pickW, axW.n, uw || 0, { avgLabel: avgTag(uw) });
+      if (wi >= 0) {
+        var B = bounds[wi], upTo = Math.min(B[1], last), days = upTo - B[0] + 1, wpart = upTo < B[1], wt = B[0] + "–" + B[1] + " " + GEN[k];
+        c = vsUsual(w[wi], uw === null ? null : uw * days / 7, false, wpart ? " на " + upTo + "-те" : " за тиждень");
+        var wc = {};
+        M.ops.forEach(function (o) { var d = dayOf(o); if (!o.income && d >= B[0] && d <= B[1]) wc[o.cat] = (wc[o.cat] || 0) + o.amount; });
+        var wcats = Object.keys(wc).map(function (n) { return { name: n, amount: wc[n] }; }).sort(function (a, b) { return b.amount - a.amount; });
+        $("a-sum").innerHTML = sumHTML("Щоденні витрати", wt, zr(w[wi]), c);
+        renderWhere(P, M, { cats: wcats, k: days / dim, title: wt, partial: wpart });
+      } else {
+        c = top >= 0 ? vsUsual(w[top], uw, false, "") : { badge: "", text: "" };
+        if (top >= 0) c.text = "Найдорожчий тиждень — " + bounds[top][0] + "–" + bounds[top][1];
+      }
     }
-    $("a-sum").innerHTML = sumHTML("Щоденні витрати", extra, zr(M.variable), c);
-    renderWhere(P, M);
+    if (!weeks || wi < 0) { $("a-sum").innerHTML = sumHTML("Щоденні витрати", extra, zr(M.variable), c); renderWhere(P, M); }
   } else {
     // «Лишилось»: факт для закритих місяців; для неповного — оцінка «≈» (дохід мінус витрати мінус звичне до кінця місяця)
     var est = function (m, j) {
@@ -1725,17 +1739,19 @@ function renderAnalytics(P) {
   $("t-avg").innerHTML = note;
 }
 // «Куди пішли гроші»: усі витрати місяця — спершу щоденні (вони змінюються) зі «зазвичай», внизу обовʼязкові, згорнуті
-function renderWhere(P, M) {
+// W — обраний тиждень: { cats, k — частка звичного місяця, title, partial }; без W — увесь місяць
+function renderWhere(P, M, W) {
   var box = $("an-where"), j = P.months.indexOf(M), base = usualMonths(P, j), u = {}, fx = fixedCats(M);
+  var all = W ? W.cats : M.categories, f = W ? W.k : 1, part = W ? W.partial : M.incomplete;
   box.hidden = false;
-  base.forEach(function (m) { m.categories.forEach(function (c) { u[c.name] = (u[c.name] || 0) + c.amount / base.length; }); });
-  var daily = M.categories.filter(function (c) { return !fx[c.name]; }), oblig = M.categories.filter(function (c) { return fx[c.name]; });
-  var sum = function (a) { return a.reduce(function (s, c) { return s + c.amount; }, 0); };
+  base.forEach(function (m) { m.categories.forEach(function (c) { u[c.name] = (u[c.name] || 0) + c.amount / base.length * f; }); });
+  var daily = all.filter(function (c) { return !fx[c.name]; }), oblig = all.filter(function (c) { return fx[c.name]; });
+  var sum = function (a) { return a.reduce(function (s, c) { return s + c.amount; }, 0); }, tot = W ? sum(all) : M.expenses;
   var row = function (c, i, st) {
     var was = u[c.name], d = was === undefined ? null : c.amount - was;
-    var show = d !== null && (M.incomplete ? d >= Math.max(30, was * .15) : Math.abs(d) >= Math.max(30, was * .15));
-    var sub = !base.length ? "" : was === undefined ? "минулими місяцями не було" : show || M.incomplete ? "зазвичай ≈ " + zr(was) : "як зазвичай";
-    var p = Math.max(M.expenses ? c.amount / M.expenses * 100 : 0, 1);
+    var show = d !== null && (part ? d >= Math.max(30, was * .15) : Math.abs(d) >= Math.max(30, was * .15));
+    var sub = !base.length ? "" : was === undefined ? "минулими місяцями не було" : show || part ? "зазвичай ≈ " + zr(was) : "як зазвичай";
+    var p = Math.max(tot ? c.amount / tot * 100 : 0, 1);
     return '<a class="crow wrow" href="#journal" data-cat="' + esc(c.name) + '"' + (i >= 0 ? ' style="--i:' + i + '"' : "") + ">" + cic(c.name) +
       // бейдж різниці — у підрядку одразу після «зазвичай …»: суми праворуч стоять рівним стовпчиком
       '<span class="nm"><span>' + esc(c.name) + "</span>" + (sub ? "<small>" + sub + (show ? '<span class="bd ' + (d > 0 ? "bad" : "good") + '">' + (d > 0 ? "+" : "−") + nf0.format(Math.abs(Math.round(d))) + " зл</span>" : "") + "</small>" : "") +
@@ -1747,7 +1763,7 @@ function renderWhere(P, M) {
     return '<button type="button" class="more" aria-expanded="false" data-label="' + label + '"><span class="more-l">' + label + '</span><span class="more-r">' + (right ? '<span class="more-sum">' + right + "</span>" : "") + chev + "</span></button>";
   };
   var cats = function (q) { return q + " " + plural(q, "категорія", "категорії", "категорій"); };
-  var html = '<div class="ch"><h2>Куди пішли гроші у ' + LOC[mi(M)] + "</h2></div>";
+  var html = '<div class="ch"><h2>Куди пішли гроші ' + (W ? W.title : "у " + LOC[mi(M)]) + "</h2></div>";
   // обидва розділи однаково: кілька найбільших, решта під «Ще N категорій»; 3 і менше — усі одразу, без кнопки
   var section = function (title, list, show) {
     if (!list.length) return;
