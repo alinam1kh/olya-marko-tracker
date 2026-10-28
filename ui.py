@@ -773,7 +773,8 @@ a.ins { color: var(--ink4); }
 /* «Куди пішли гроші»: під назвою категорії — дрібно «зазвичай …», як у «Що змінилось» */
 .wrow { color: inherit; }
 .wrow .nm { flex-direction: column; align-items: flex-start; gap: 2px; }
-.wrow .nm small { font-size: 13px; color: var(--ink2); }
+.wrow .nm small { display: flex; align-items: center; flex-wrap: wrap; gap: 2px 6px; font-size: 13px; color: var(--ink2); }
+.wrow .nm small .bd { padding: 0 6px; min-height: 20px; font-size: 11px; }
 .wrow .ir { display: inline-flex; align-items: center; gap: 4px; color: var(--ink2); }
 #an-where .dh { align-items: baseline; margin: 18px 0 2px; padding: 0 0 10px; border-bottom: 1px solid var(--soft); font-size: 15px; }  /* заголовок розділу: наш шрифт списків, 500, роздільник під ним */
 #an-where .dh b { font-weight: 500; color: var(--ink); }
@@ -1616,7 +1617,7 @@ function renderAnalytics(P) {
         var dd = uw ? w[top] - uw : 0;
         line1 = '<div class="aline"><span>Найдорожчий тиждень — ' + bounds[top][0] + "–" + bounds[top][1] + "</span>" + (uw && Math.abs(dd) >= 30 ? '<span class="bd ' + (dd > 0 ? "bad" : "good") + '">' + (dd > 0 ? "+" : "−") + zr(dd) + "</span>" : "") + "</div>";
       }
-      $("t-avg").innerHTML = legRows([uw ? ["Середній тиждень", zr(uw), true] : null]);
+      $("t-avg").innerHTML = legRows([uw ? ["У середньому за тиждень", zr(uw), true] : null]);
     }
     $("a-sum").innerHTML = '<div class="alab">Щоденні витрати' + (M.incomplete ? '<span class="tag">дані до ' + M.last_op + "</span>" : "") + '</div><div class="abig">' + zr(M.variable) + "</div>";
     $("t-avg").innerHTML += aNote(line1);
@@ -1657,8 +1658,9 @@ function renderWhere(P, M) {
     var sub = !base.length ? "" : was === undefined ? "минулими місяцями не було" : show || M.incomplete ? "зазвичай ≈ " + zr(was) : "як зазвичай";
     var p = Math.max(M.expenses ? c.amount / M.expenses * 100 : 0, 1);
     return '<a class="crow wrow" href="#journal" data-cat="' + esc(c.name) + '"' + (i >= 0 ? ' style="--i:' + i + '"' : "") + ">" + cic(c.name) +
-      '<span class="nm"><span>' + esc(c.name) + "</span>" + (sub ? "<small>" + sub + "</small>" : "") + '</span><span class="am">' + zl(c.amount) + "</span>" +
-      '<span class="ir">' + (show ? '<span class="bd ' + (d > 0 ? "bad" : "good") + '">' + (d > 0 ? "+" : "−") + nf0.format(Math.abs(Math.round(d))) + " зл</span>" : "") + CHR + "</span>" +
+      // бейдж різниці — у підрядку одразу після «зазвичай …»: суми праворуч стоять рівним стовпчиком
+      '<span class="nm"><span>' + esc(c.name) + "</span>" + (sub ? "<small>" + sub + (show ? '<span class="bd ' + (d > 0 ? "bad" : "good") + '">' + (d > 0 ? "+" : "−") + nf0.format(Math.abs(Math.round(d))) + " зл</span>" : "") + "</small>" : "") +
+      '</span><span class="am">' + zl(c.amount) + '</span><span class="ir">' + CHR + "</span>" +
       '<div class="bar6"><b style="background:' + bright(c.name) + (st ? ";width:" + p + '%"' : '" data-to="' + p + '%"') + "></b></div></a>";
   };
   var chev = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
@@ -1671,7 +1673,7 @@ function renderWhere(P, M) {
   var section = function (title, list, show) {
     if (!list.length) return;
     html += '<div class="dh"><b>' + title + "</b><span>" + zl(sum(list)) + "</span></div>";
-    var top = list.length <= 3 ? list.length : show, rest = list.slice(top);
+    var top = list.length <= 3 || list.length === show + 1 ? list.length : show, rest = list.slice(top);  // одну категорію під «Ще» не ховаємо
     list.slice(0, top).forEach(function (c) { html += row(c, -1, false); });
     if (rest.length) html += '<div class="more-rows"><div>' + rest.map(function (c, i) { return row(c, i, true); }).join("") + "</div></div>" + more("Ще " + cats(rest.length), zl(sum(rest)));
   };
