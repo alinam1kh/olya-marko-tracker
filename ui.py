@@ -904,6 +904,9 @@ a.ins { color: var(--ink4); }
 .jsearch svg { flex: none; width: 18px; height: 18px; }
 .jsearch input { flex: 1; min-width: 0; height: 100%; border: 0; outline: 0; background: none; font: 16px var(--font); color: var(--ink); }
 .jsearch input::placeholder { color: var(--ink2); }
+.jsearch input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }  /* системний хрестик ховаємо — є наш */
+.jclear { flex: none; width: 32px; height: 32px; margin-right: -8px; border: 0; border-radius: 16px; background: transparent; color: var(--ink2); display: grid; place-items: center; cursor: pointer; }
+.jclear:hover { background: var(--soft); }
 .jcash { flex: none; display: inline-flex; align-items: center; gap: 6px; height: 48px; padding: 0 16px; border-radius: 24px; background: var(--blue-g); color: #fff; font-size: 15px; font-weight: 500; box-shadow: 0 6px 14px rgba(29,95,224,.24); }
 .jcash svg { width: 16px; height: 16px; }
 .jsum { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
@@ -1113,7 +1116,8 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
   <div id="v-journal" hidden>
     <div class="jtop">
       <label class="jsearch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
-        <input id="j-q" type="search" placeholder="Назва, сума або категорія" autocomplete="off" enterkeyhint="search" aria-label="Пошук операцій у всіх місяцях"></label>
+        <input id="j-q" type="search" placeholder="Назва, сума або категорія" autocomplete="off" enterkeyhint="search" aria-label="Пошук операцій у всіх місяцях">
+        <button type="button" class="jclear" id="j-clear" aria-label="Очистити пошук" hidden><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"/></svg></button></label>
       <a class="jcash" id="j-cash" href="#add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Готівка</a>
     </div>
     <div class="filters" id="j-filters" role="group" aria-label="Фільтр"></div>
@@ -2053,7 +2057,9 @@ $("cash").addEventListener("click", function () { sheetFromApp = true; sheetBase
 $("j-cash").addEventListener("click", function () { sheetFromApp = true; sheetBase = "journal"; });
 $("ops-all").addEventListener("click", function () { filter = "all"; toCur(D.people[person]); });
 // пошук у Журналі: перемальовуємо лише список, поле лишається у фокусі
-$("j-q").addEventListener("input", function () { jq = this.value; renderJournal(D.people[person]); });
+$("j-q").addEventListener("input", function () { jq = this.value; $("j-clear").hidden = !jq; renderJournal(D.people[person]); });
+// наш хрестик замість системного: очищає пошук і лишає курсор у полі
+$("j-clear").onclick = function () { var q = $("j-q"); q.value = ""; q.dispatchEvent(new Event("input")); q.focus(); };
 $("arr-j").outerHTML = CHR; $("arr-f").outerHTML = CHR;
 
 // ---------- рендер ----------
@@ -2144,7 +2150,7 @@ window.addEventListener("hashchange", function () {
     if (editing) { editing = null; pick = null; $("a-title").value = ""; $("a-date").value = iso(new Date()); dpick = 1; $("a-amount").value = ""; }
   }
   if (lastView === "report" && v !== "report" && v !== "add") reportKey = null;
-  if (lastView === "journal" && v !== "journal" && v !== "add") { filter = "all"; catF = null; jq = ""; $("j-q").value = ""; }
+  if (lastView === "journal" && v !== "journal" && v !== "add") { filter = "all"; catF = null; jq = ""; $("j-q").value = ""; $("j-clear").hidden = true; }
   prevView = lastView; lastView = v; render();
 });
 render();
