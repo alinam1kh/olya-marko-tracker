@@ -1299,7 +1299,7 @@ function arr(d) { return d > 0 ? "↗" : "↘"; }
 
 function lastFull(P) { for (var i = P.months.length - 1; i >= 0; i--) if (P.months[i].income > 0) return i; return P.months.length - 1; }
 function curMonth(P) { return P.months.length - 1; }  // Головна завжди відкривається на поточному місяці, навіть до зарплати
-function toCur(P) { month = curMonth(P); selDay = null; }  // переходи з Головної в Журнал — у поточний місяць
+function toCur(P) { selDay = null; }  // переходи з Головної в Журнал — той самий місяць, що в шапці, без обраного дня
 var person = 0, month = curMonth(D.people[0]), trendMonth = null, filter = "all", metric = "exp", amode = "month", catF = null, jq = "", jqMonth = false;  // jqMonth — пошук лише в обраному місяці  // catF — фільтр Журналу за категорією (з «Що змінилось»)
 var GOAL = { olya: { months: 6, deadline: [2027, 6], title: "Подушка безпеки" } };  // фіча 5 з роадмапу ДЗ
 var VIEWS = { report: 1, analytics: 1, journal: 1, add: 1 };
@@ -1472,7 +1472,7 @@ function usualBadge(now, u) {
   if (!u) return "";
   var d = now - u.v, t = "середнє за " + u.n + " міс.: " + nf0.format(Math.round(u.v)) + " зл";
   if (Math.abs(d) < u.v * .03) return '<span class="bd" title="' + t + '">як зазвичай</span>';
-  return '<span class="bd ' + (d > 0 ? "bad" : "good") + '" title="' + t + '">' + (d > 0 ? "більше" : "менше") + ", ніж зазвичай · " + (d > 0 ? "+" : "−") + nf0.format(Math.abs(Math.round(d))) + " зл</span>";
+  return '<span class="bd ' + (d > 0 ? "bad" : "good") + '" title="' + t + '" aria-label="' + (d > 0 ? "більше" : "менше") + ', ніж зазвичай">' + (d > 0 ? "+" : "−") + nf0.format(Math.abs(Math.round(d))) + " зл</span>";
 }
 function prevWithIncome(P, k) { for (var j = k - 1; j >= 0; j--) if (P.months[j].income > 0) return P.months[j]; return null; }
 function fixedCats(M) {
@@ -1509,7 +1509,6 @@ function payDays(P) {
 
 // ---------- головна ----------
 function renderReport(P) {
-  var month = curMonth(P);  // Головна завжди показує поточний місяць, незалежно від місяця в Аналітиці чи Журналі
   var M = P.months[month], k = mi(M), prevM = P.months[month - 1] || null, prevI = prevWithIncome(P, month);
   var noIncome = !(M.income > 0), hero = $("hero"), approx = P.ok ? "" : "≈ ";
   // облік з помилками: спокійна жовта плашка, нічого не блокує; ✕ ховає її, доки дані не оновляться
@@ -1548,14 +1547,14 @@ function renderReport(P) {
     // увесь дохід — це смуга; витрати й залишок — її частини
     var ep = M.income > 0 ? Math.min(100, M.expenses / M.income * 100) : 100, sp = 100 - ep;
     hero.innerHTML = '<div class="lbl">Лишилось у ' + LOC[k] + tag + "</div>" +
-      '<div class="numrow"><div class="num">' + approx + zl(M.saved) + "</div>" +
+      '<div class="numrow"><div class="num">' + approx + z0(M.saved) + "</div>" +
       '<a href="#journal" data-filter="inc" class="side inc">/ з доходу <b>' + nf0.format(M.income) + " зл</b>" + inc + "</a></div>" +
       (P.ok ? "" : '<div class="sub">Потребує перевірки</div>') +
       '<div class="split2" role="img" aria-label="Витрати ' + nf0.format(ep) + " %, лишилось " + nf0.format(sp) + ' % доходу">' +
         '<b class="e" data-to="calc(' + ep.toFixed(2) + '% - 2px)"></b><b class="s"></b></div>' +
       '<div class="lg2"><a href="#journal" data-filter="exp" class="le"><span class="lt"><i></i>' + spent + ", " + nf0.format(ep) + " %</span>" +
-        '<span class="lv"><b>' + zl(M.expenses) + "</b>" + exp + "</span></a>" +
-      '<div class="ls"><span class="lt"><i></i>Лишилось, ' + nf0.format(sp) + " %</span><b>" + zl(M.saved) + "</b></div></div>";
+        '<span class="lv"><b>' + z0(M.expenses) + "</b>" + exp + "</span></a>" +
+      '<div class="ls"><span class="lt"><i></i>Лишилось, ' + nf0.format(sp) + " %</span><b>" + z0(M.saved) + "</b></div></div>";
   }
   hero.querySelectorAll("[data-filter]").forEach(function (a) { a.onclick = function () { filter = a.dataset.filter; toCur(P); }; });
   $("cash").hidden = !P.cash;
@@ -2335,8 +2334,8 @@ function render() {
   renderPeople();
   if (v === "add" && !P.cash) { location.replace("#report"); return; }
   var base = v === "add" ? sheetBase : v, M = P.months[month];
-  // місяць — у шапці для Аналітики й Журналу; Головна завжди про поточний місяць, тож там кнопки немає
-  $("mrange").hidden = true; $("mpick").hidden = base === "report";
+  // місяць — у шапці на всіх екранах; один для Головної, Аналітики й Журналу
+  $("mrange").hidden = true; $("mpick").hidden = false;
   mcalName(base, M);
   $("mcal").setAttribute("aria-label", "Місяць: " + M.name + " " + M.key.slice(0, 4) + ". Змінити");
   calKey = M.key; if (selDay && selDay.slice(0, 7) !== M.key) selDay = null; renderCal(P);
