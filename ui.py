@@ -718,7 +718,9 @@ a.ins { color: var(--ink4); }
 .goal .gbig span { font-size: 16px; font-weight: 500; color: var(--ink); }
 .goal .gsub { margin: 6px 0 14px; font-size: 13px; color: var(--ink2); }
 .goal .gdue { flex: none; display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 12px; background: var(--blue-soft); color: var(--blue); font-size: 12px; font-weight: 500; white-space: nowrap; }
-.goal .gpace { margin-top: 16px; }
+.goal .gpace { margin-top: 16px; align-items: flex-start; }  /* бейдж — у верхньому правому куті */
+.goal .gpace > span:first-child { text-wrap: pretty; }  /* без одинокого слова в останньому рядку */
+.goal .gpace .bd { flex: none; white-space: nowrap; }
 .segs { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
 .segs i { position: relative; height: 8px; border-radius: 4px; background: var(--track); overflow: hidden; }
 .segs i b { position: absolute; inset: 0; width: 0; border-radius: 4px; background: var(--blue-g); transition: width 2.1s var(--ease); }
@@ -1472,7 +1474,7 @@ function renderGoal(P) {
     '<div class="gsub">' + nf0.format(have) + " з " + nf0.format(target) + " зл</div>" +
     '<div class="segs" role="img" aria-label="' + nf1.format(life) + " з " + G.months + ' місяців">' + segs + "</div>" +
     '<div class="gpace"><span>Щомісяця відкладаєте ≈ ' + nf0.format(pace) + " зл, план — " + nf0.format(need) + " зл. " +
-      (ok ? (early ? "Встигнете до " + GEN[etaM] + "." : "Встигаєте вчасно.") : "Щоб встигнути, треба ще ≈ " + nf0.format(need - pace) + " зл на місяць.") + "</span>" +
+      (ok ? (early ? "Встигнете до " + GEN[etaM] + "." : "Встигаєте вчасно.") : "Щоб встигнути, треба ще ≈ " + nf0.format(need - pace) + " зл на місяць.") + "</span>" +
       '<span class="bd ' + (ok ? "good" : "bad") + '">' + (ok ? (early ? "на " + (ahead === 1 ? "місяць" : ahead + " " + plural(ahead, "місяць", "місяці", "місяців")) + " раніше" : "вчасно") : "−" + nf0.format(need - pace) + " зл/міс.") + "</span></div>";
 }
 
