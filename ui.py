@@ -264,6 +264,10 @@ PAGE = r"""<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#F5F6F8">
+<script>(function () { var s = null; try { s = localStorage.getItem("theme"); } catch (e) {}
+  var d = s ? s === "dark" : window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.setAttribute("data-theme", d ? "dark" : "light");
+  var m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = d ? "#0D0F13" : "#F5F6F8"; })();</script>
 <link rel="manifest" href="manifest.webmanifest" crossorigin="use-credentials">
 <link rel="icon" type="image/png" sizes="192x192" href="static/icon-192.png">
 <link rel="apple-touch-icon" href="static/apple-touch-icon.png">
@@ -1322,6 +1326,45 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
 @media (prefers-reduced-motion: reduce) { .cap .fill, .crow .bar6 b, .segs i b, .hero .meter b, .hero .split2 b { transition: none !important; } .fadein, .liquid, .liquid span { animation: none !important; }
   .avgl { clip-path: none !important; transition: none !important; }
   .liquid .after { -webkit-mask: none; mask: none; } }
+
+/* ---------- темна тема ----------
+   Вмикається атрибутом data-theme="dark" на <html>: за замовчуванням — як у системі телефона, перемикач — у меню профілю.
+   Головна картка вже темна (свій градієнт) — лишається як є; решта — темні поверхні, світлий текст, ті самі акценти. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0D0F13; --card: #171A20; --border: #252932; --soft: #1F232A; --track: #232730; --seg: #1F232A;
+  --ink: #F1F3F6; --ink2: #959CAA; --ink3: #C2C7D1; --ink4: #DADEE5; --mute: #464C57;
+  --blue: #5B95FF; --blue-soft: rgba(91, 149, 255, .16); --blue-txt: #8FB5FF; --blue-l: #34507F;
+  --good: #4ADE80; --good-bg: rgba(74, 222, 128, .14); --bad: #FF7468; --bad-bg: rgba(255, 116, 104, .15); --cash: #F2C46D; --cash-bg: rgba(242, 196, 109, .14);
+}
+[data-theme="dark"] .gpace, [data-theme="dark"] .plcalc { background: #1C1F26; }
+[data-theme="dark"] .alert, [data-theme="dark"] .info { background: var(--cash-bg); color: var(--cash); }
+[data-theme="dark"] .fade { background: linear-gradient(rgba(13,15,19,0), var(--bg) 70%); }
+[data-theme="dark"] .nav, [data-theme="dark"] .pop { box-shadow: 0 12px 34px rgba(0,0,0,.5); }
+[data-theme="dark"] .toast { background: rgba(32, 36, 44, .82); border-color: rgba(255,255,255,.06); box-shadow: 0 12px 34px rgba(0,0,0,.45); }
+[data-theme="dark"] .sheet-bg { background: rgba(0,0,0,.6); }
+[data-theme="dark"] .sheet-head::before, [data-theme="dark"] .jcat::-webkit-scrollbar-thumb { background-color: #3A3F49; }
+[data-theme="dark"] .save:disabled { background: #2A2E36; color: var(--ink2); }
+/* стовпчики: сірі — темніші, штрихування — у темних тонах; порожні капсули й пунктир середнього — темно-сірі */
+[data-theme="dark"] .cap.dim .fill .main { background: #3A404B; }
+[data-theme="dark"] .cap.part .fill .main, [data-theme="dark"] .vs-part.on i { background: repeating-linear-gradient(135deg, #4C86F0 0 5px, #263C66 5px 10px); }
+[data-theme="dark"] .cap.part.dim .fill .main, [data-theme="dark"] .vs-part i { background: repeating-linear-gradient(135deg, #3E444F 0 5px, #282C34 5px 10px); }
+[data-theme="dark"] .cap .fill .rent { background: repeating-linear-gradient(135deg, #34507F 0 5px, #22314F 5px 10px); }
+[data-theme="dark"] .trk.emp svg rect, [data-theme="dark"] .trk.emp svg path { stroke: #474D58; }
+[data-theme="dark"] .avgl:not(.liml) { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='3'%3E%3Cline x1='1.5' y1='1.5' x2='7.5' y2='1.5' stroke='%23474D58' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"); }
+[data-theme="dark"] .caps > .avgt { background: var(--card); }
+/* тугл: вимкнений — темна доріжка, кулька трохи приглушена */
+[data-theme="dark"] .limt .sw { background: #343943; box-shadow: none; }
+[data-theme="dark"] .limt[aria-checked="true"] .sw { background: var(--blue-g); box-shadow: 0 0 12px rgba(59,130,246,.45), inset 0 1px 0 rgba(255,255,255,.2); }
+[data-theme="dark"] .limt .sw i { background: #F1F3F6; }
+/* поля й кнопки, що мали білий фон за замовчуванням браузера */
+[data-theme="dark"] input, [data-theme="dark"] textarea { color: var(--ink); }
+[data-theme="dark"] .cashbtn, [data-theme="dark"] .save:not(:disabled) { box-shadow: 0 8px 22px rgba(29,95,224,.4), inset 0 1px 0 rgba(255,255,255,.2); }
+/* перемикач теми в меню профілю */
+/* тема — сегмент на всю ширину меню, як «Місяці / Тижні»: сонце й місяць */
+.pop .thseg { margin: 8px 6px 2px; }
+.pop .thseg button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 40px; font-size: 13px; }
+html.thm-anim, html.thm-anim * { transition: background-color .35s ease, color .35s ease, border-color .35s ease, fill .35s ease !important; }
 </style>
 </head>
 <body class="p-marko">
@@ -1336,6 +1379,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
     <div class="who">
       <button type="button" id="who-btn" aria-haspopup="menu" aria-expanded="false" aria-controls="who-menu"><span class="av" id="who-av"></span><span id="who-name"></span><svg class="ico16 sw" style="width:14px;height:14px" viewBox="0 0 24 24" fill="none" stroke="#6B7180" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="sw-a" d="M3 6.5h18M16.5 2 21 6.5 16.5 11"/><path class="sw-b" d="M21 17.5H3M7.5 13 3 17.5 7.5 22"/></svg></button>
       <div class="pop" id="who-menu" role="menu" aria-label="Чиї дані показати" hidden><p>Профіль</p><div id="who-opts"></div>
+        <div class="seg sm thseg" id="theme-seg" role="group" aria-label="Тема"><button type="button" data-th="light" aria-pressed="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></svg>Світла</button><button type="button" data-th="dark" aria-pressed="false"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>Темна</button></div>
         <form class="logout" method="post" action="logout"><button type="submit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 16l-4-4 4-4M6 12h10"/></svg>Вийти</button></form>
 </div>
     </div>
@@ -1607,6 +1651,21 @@ function popMenu(k, open) {
   if (open) { var cur = $(MENUS[k][0]).querySelector('[aria-checked="true"], [aria-pressed="true"]'); if (cur) cur.focus(); }
 }
 $("who-btn").onclick = function () { popMenu("w", $("who-menu").hidden); };
+// темна тема: перемикач у меню профілю; вибір запамʼятовуємо, без вибору — як у системі телефона
+function themeSet(dark, save) {
+  var r = document.documentElement;
+  if (save) { r.classList.add("thm-anim"); setTimeout(function () { r.classList.remove("thm-anim"); }, 450); }  // плавний перехід кольорів
+  r.setAttribute("data-theme", dark ? "dark" : "light");
+  var m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = dark ? "#0D0F13" : "#F5F6F8";
+  document.querySelectorAll("#theme-seg [data-th]").forEach(function (b) { b.setAttribute("aria-pressed", String((b.dataset.th === "dark") === dark)); });
+  if (save) try { localStorage.setItem("theme", dark ? "dark" : "light"); } catch (e) {}
+}
+themeSet(document.documentElement.getAttribute("data-theme") === "dark", false);
+document.querySelectorAll("#theme-seg [data-th]").forEach(function (b) { b.onclick = function () { themeSet(b.dataset.th === "dark", true); }; });
+if (window.matchMedia) matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function (e) {
+  var s = null; try { s = localStorage.getItem("theme"); } catch (er) {}
+  if (!s) themeSet(e.matches, false);
+});
 document.body.appendChild($("mmenu"));  // поза картками й рядком фільтрів — нічого його не обрізає
 function calAnchor() { return $("mcal"); }
 function calPlace() {
