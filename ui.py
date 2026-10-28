@@ -909,7 +909,7 @@ a.ins { color: var(--ink4); }
 #a-sum .anote { margin-top: 2px; font-size: 12px; color: var(--ink2); }  /* звідки ліміт */
 /* графік без осі й доріжок: лише стовпчики, назви місяців і пунктир середнього з підписом */
 .caps.plain .trk { background: none; overflow: visible; }
-.avgl .avgt { position: absolute; right: 0; bottom: 5px; padding: 1px 7px; border-radius: 999px; background: var(--card); box-shadow: inset 0 0 0 1px var(--mute); font-size: 11px; line-height: 1.4; color: var(--ink3); white-space: nowrap; }  /* «сер. …» — біла плашка з сірою обводкою, щоб не зливалась із доріжками */
+.caps > .avgt { position: absolute; z-index: 6; right: 0; transform: translateY(calc(-100% - 4px)); opacity: 0; transition: opacity .6s ease .5s; padding: 1px 7px; border-radius: 999px; background: var(--card); box-shadow: inset 0 0 0 1px var(--mute); font-size: 11px; line-height: 1.4; color: var(--ink3); white-space: nowrap; }  /* «сер. …» — біла плашка з сірою обводкою, щоб не зливалась із доріжками */
 .bnote { display: flex; align-items: center; gap: 8px; margin: 14px 0 0; font-size: 12px; color: var(--ink2); }
 .bnote .mk { flex: none; width: 14px; height: 0; border-top: 2px solid var(--ink); border-radius: 1px; }
 .mmenu { position: fixed; right: auto; z-index: 45; }
@@ -984,7 +984,8 @@ a.ins { color: var(--ink4); }
 /* поява разом зі стовпчиками: лінія «прокреслюється» зліва направо */
 .avgl.in { clip-path: inset(-24px -4px -4px -4px); opacity: 1; }  /* запас угору — для підпису «сер. …» */
 .avgl.liml { height: 2px; margin-top: -1px; background: var(--blue); border-radius: 1px; }  /* ліміт — суцільна синя */
-.liml .avgt { left: 0; right: auto; color: var(--blue-txt); box-shadow: inset 0 0 0 1px var(--blue-l); }
+.caps > .avgt.in { opacity: 1; }
+.caps > .avgt.l { left: 0; right: auto; color: var(--blue-txt); box-shadow: inset 0 0 0 1px var(--blue-l); }
 .avg-leg { display: flex; align-items: center; gap: 10px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--soft); font-size: 14px; color: var(--ink2); }
 .avg-leg i { flex: none; width: 20px; height: 3px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='3'%3E%3Cline x1='1.5' y1='1.5' x2='7.5' y2='1.5' stroke='%23C3C9D3' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") repeat-x left center / 12px 3px; }
 .avg-leg b { margin-left: auto; font-size: 15px; font-weight: 500; color: var(--ink); }
@@ -1578,18 +1579,19 @@ $("mcal").onclick = function () { calOpen($("mmenu").hidden); };
 $("a-prev").onclick = function () { if (month > 0) { month--; render(); } };
 $("a-next").onclick = function () { if (month < D.people[person].months.length - 1) { month++; render(); } };
 $("cal-all").onclick = function () { jqMonth = false; selDay = null; calOpen(false); render(); };
-// свайп по графіку Аналітики. «Місяці»: стрічка їде за пальцем; відпустили далі за 50 px — сусідня сторінка
-// (праворуч від найновішої — порожнеча, тягнеться пружно й повертається). «Тижні»: свайп — сусідній місяць
+// свайп по графіку Аналітики: стрічка їде за пальцем; відпустили далі за 50 px — сусідня сторінка
+// (праворуч від найновішої — порожнеча, тягнеться пружно й повертається). «Місяці» — по 5 місяців на сторінку,
+// «Тижні» — сторінка = місяць (4 тижні): доклацнули до іншого місяця — дані міняються без перемальовування графіка
 (function () {
   var ch = document.querySelector("#an-chart .chart"), x0 = null, y0 = 0, swiped = false, drag = false;
   var pgMax = function (g) { return Math.ceil(g.n / g.per) - 1; };
-  var shift = function (g, dx) { return (dx > 0 && mpage.p >= pgMax(g)) || (dx < 0 && mpage.p <= 0) ? dx * .35 : dx; };  // за краєм — пружина
+  var shift = function (g, dx) { return (dx > 0 && g.page >= pgMax(g)) || (dx < 0 && g.page <= 0) ? dx * .35 : dx; };  // за краєм — пружина
   ch.addEventListener("pointerdown", function (e) { x0 = e.clientX; y0 = e.clientY; swiped = false; drag = false; });
   ch.addEventListener("pointermove", function (e) {
     var box = $("mbars"), g = box._pg; if (x0 === null || !g) return;
     var dx = e.clientX - x0, dy = e.clientY - y0;
     if (!drag) { if (Math.abs(dx) < 8 || Math.abs(dx) < Math.abs(dy)) return; drag = true; try { ch.setPointerCapture(e.pointerId); } catch (er) {} }
-    pageTo(box, mpage.p, false, shift(g, dx));
+    pageTo(box, g.page, false, shift(g, dx));
   });
   ch.addEventListener("pointerup", function (e) {
     if (x0 === null) return;
@@ -1597,9 +1599,11 @@ $("cal-all").onclick = function () { jqMonth = false; selDay = null; calOpen(fal
     if (g) {
       if (!drag) return;
       swiped = true; drag = false;
-      if (dx > 50 && mpage.p < pgMax(g)) mpage.p++;
-      else if (dx < -50 && mpage.p > 0) mpage.p--;
-      pageTo(box, mpage.p, true);
+      var was = g.page;
+      if (dx > 50 && g.page < pgMax(g)) g.page++;
+      else if (dx < -50 && g.page > 0) g.page--;
+      pageTo(box, g.page, true);
+      if (g.page !== was && g.onPage) g.onPage(g.page);
       return;
     }
     if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
@@ -1609,7 +1613,7 @@ $("cal-all").onclick = function () { jqMonth = false; selDay = null; calOpen(fal
     month = to; render();
     ch.classList.remove("in-l", "in-r"); void ch.offsetWidth; ch.classList.add(dx < 0 ? "in-r" : "in-l");
   });
-  ch.addEventListener("pointercancel", function () { x0 = null; if (drag) { drag = false; pageTo($("mbars"), mpage.p, true); } });
+  ch.addEventListener("pointercancel", function () { x0 = null; if (drag) { drag = false; var g = $("mbars")._pg; if (g) pageTo($("mbars"), g.page, true); } });
   // після свайпу мишкою не спрацьовує тап по стовпчику
   ch.addEventListener("click", function (e) { if (swiped) { e.stopPropagation(); e.preventDefault(); swiped = false; } }, true);
 })();
@@ -1870,18 +1874,16 @@ function capsules(boxId, tickId, items, max, sel, onPick, n, avg, opt) {
       c.onclick = c.onkeydown = function (e) { if (e.type === "keydown" && e.key !== "Enter" && e.key !== " ") return; onPick(i); }; }
     dest.appendChild(c);
   });
-  // середнє за повні місяці — одна сіра пунктирна лінія через увесь графік (число одне на весь період)
-  if (avg) {
-    var al = box.appendChild(h("div", "avgl", opt.avgLabel ? '<span class="avgt">' + opt.avgLabel + "</span>" : "")); al.style.top = Math.round(H - avg / max * H) + "px";
-    if (still) { al.style.transition = "none"; al.classList.add("in"); }  // тихо — лінія одразу на місці
-    else requestAnimationFrame(function () { requestAnimationFrame(function () { al.classList.add("in"); }); });
-  }
-  // ліміт — друга, синя суцільна лінія; підпис ліворуч, щоб не налазити на «сер.» праворуч
-  if (opt.lim) {
-    var ll = box.appendChild(h("div", "avgl liml", '<span class="avgt">ліміт ' + nf0.format(Math.round(opt.lim)) + "</span>")); ll.style.top = Math.round(H - opt.lim / max * H) + "px";
-    if (still) { ll.style.transition = "none"; ll.classList.add("in"); }
-    else requestAnimationFrame(function () { requestAnimationFrame(function () { ll.classList.add("in"); }); });
-  }
+  // лінії (середнє — сірий пунктир, ліміт — синя) лежать позаду; підписи до них — окремим шаром попереду всіх ліній,
+  // щоб лінія ліміту не перекривала «сер.» і навпаки
+  var line = function (cls, v, label, side) {
+    var y = Math.round(H - v / max * H), l = box.appendChild(h("div", cls, "")); l.style.top = y + "px";
+    var t = label ? box.appendChild(h("span", "avgt " + side, label)) : null; if (t) t.style.top = y + "px";
+    if (still) { l.style.transition = "none"; l.classList.add("in"); if (t) { t.style.transition = "none"; t.classList.add("in"); } }  // тихо — одразу на місці
+    else requestAnimationFrame(function () { requestAnimationFrame(function () { l.classList.add("in"); if (t) t.classList.add("in"); }); });
+  };
+  if (avg) line("avgl", avg, opt.avgLabel, "r");  // середнє за повні місяці — підпис праворуч
+  if (opt.lim) line("avgl liml", opt.lim, "ліміт " + nf0.format(Math.round(opt.lim)), "l");  // ліміт — підпис ліворуч
   grow("#" + boxId + " .fill", "height");
 }
 // сторінка p (0 — найновіша, праворуч): перші стовпчики сторінки — від кінця стрічки; dx — зсув пальцем, px
@@ -1911,7 +1913,7 @@ function sumHTML(label, extra, big, c) {
 var ascale = "m";  // масштаб графіка витрат: m — місяці, w — тижні обраного місяця
 var mpage = { who: -1, p: 0 };  // сторінка графіка місяців (0 — найновіша) для людини who
 var wsel = { key: "", i: -1 };  // обраний тиждень (у межах місяця key); -1 — увесь місяць
-var lim = true, wsort = "left";  // ліміти увімкнено (за замовчуванням так); сортування категорій з лімітом: left — за залишком, sum — за сумою
+var lim = true, wdir = null;  // ліміти увімкнено (за замовчуванням так); напрям сортування категорій: "asc" / "desc", null — звичний
 try { lim = localStorage.getItem("lim") !== "0"; } catch (e) {}
 // «бажання» — те, що ріжемо першим, коли ціль відстає; потреби (Продукти, Транспорт…) не чіпаємо
 var WANTS = { "Кафе": 1, "Доставка Їжі": 1, "Розваги": 1, "Покупки": 1 };
@@ -2005,7 +2007,7 @@ function renderAnalytics(P) {
       if (j === undefined) return { v: 0, label: short, aria: MONTHS_FULL[+kk.slice(5) - 1], empty: true, sub: "—", nopick: true };
       var m = P.months[j], v = vs[j], none = v === null || !m.ops.length;
       return { v: none ? 0 : Math.max(0, v), label: short, aria: m.name, part: m.incomplete, empty: none, sub: none ? "—" : (approx && m.incomplete ? "≈ " : "") + nf0.format(v) + " зл" };
-    }), ax.max, sel, function (i) { month = byKey[keys[i]]; calm(render); }, ax.n, avg || 0, { avgLabel: avgTag(avg), lim: limV || 0, paged: { per: per, page: mpage.p } });
+    }), ax.max, sel, function (i) { month = byKey[keys[i]]; calm(render); }, ax.n, avg || 0, { avgLabel: avgTag(avg), lim: limV || 0, paged: { per: per, page: mpage.p, onPage: function (pg) { mpage.p = pg; } } });
   };
   var note = "";
   {
@@ -2026,18 +2028,36 @@ function renderAnalytics(P) {
       c = lim ? vsLim(M.variable, LM && LM.total, M.incomplete, "на місяць", true)
         : M.incomplete ? vsUsual(M.variable, uDay, false, " на " + dn + "-те") : vsUsual(M.variable, avgOf(base, function (m) { return m.variable; }), false, " за місяць");
     } else {
-      var y = +M.key.slice(0, 4), mo = +M.key.slice(5), dim = new Date(y, mo, 0).getDate(), last = M.incomplete ? dn : dim;
-      var bounds = [[1, 7], [8, 14], [15, 21], [22, 28], [29, dim]].filter(function (b) { return b[0] <= dim; });
-      var w = bounds.map(function (b) { return M.ops.reduce(function (s, o) { var d = dayOf(o); return s + (!o.income && !o.fixed && d >= b[0] && d <= b[1] ? o.amount : 0); }, 0); });
+      // 4 тижні в місяці: 1–7, 8–14, 15–21 і 22–кінець; усі місяці — однією стрічкою, сторінка = місяць
+      var wk = function (m) {
+        var dd = new Date(+m.key.slice(0, 4), +m.key.slice(5), 0).getDate(), ls = m.incomplete ? (m.last_op ? +m.last_op.slice(0, 2) : 0) : dd;
+        var bb = [[1, 7], [8, 14], [15, 21], [22, dd]];
+        return { dim: dd, last: ls, bounds: bb, sums: bb.map(function (b) { return m.ops.reduce(function (s, o) { var d = dayOf(o); return s + (!o.income && !o.fixed && d >= b[0] && d <= b[1] ? o.amount : 0); }, 0); }) };
+      };
+      var WK = P.months.map(wk), cur = WK[month], dim = cur.dim, last = cur.last, bounds = cur.bounds, w = cur.sums;
       var uw = avgOf(base.length ? base : allFull, function (m) { var yy = +m.key.slice(0, 4), mm = +m.key.slice(5); return m.variable * 7 / new Date(yy, mm, 0).getDate(); });
       var lw = LM ? LM.total * 7 / dim : 0;  // ліміт тижня — частка місячного
       var top = -1, axW; w.forEach(function (v, i) { if (bounds[i][0] <= last && (top < 0 || v > w[top])) top = i; });
       if (wsel.key !== M.key || wsel.i >= bounds.length || (wsel.i >= 0 && bounds[wsel.i][0] > last)) wsel = { key: M.key, i: -1 };
       var wi = wsel.i;
       // тап по тижню — його підсумок і категорії, як у місяцях; повторний тап — назад до місяця
-      var pickW = function (i) { if (bounds[i][0] > last) return; wsel = { key: M.key, i: wsel.i === i ? -1 : i, day: wsel.day }; calm(render); };
-      capsules("mbars", "mticks", bounds.map(function (b, i) { var future = b[0] > last; return { v: future ? 0 : w[i], label: b[0] + "–" + b[1], empty: future, sub: future ? "—" : nf0.format(w[i]) + " зл" }; }),
-        (axW = niceAxis(Math.max.apply(null, w.concat([uw || 0, lw, 1])))).max, wi, pickW, axW.n, uw || 0, { avgLabel: avgTag(uw), lim: lw });
+      // тап по тижню іншого місяця — переходимо в той місяць і одразу на цей тиждень
+      var pickW = function (i) {
+        var jj = Math.floor(i / 4), ii = i % 4, X = WK[jj]; if (X.bounds[ii][0] > X.last) return;
+        if (jj === month) wsel = { key: M.key, i: wsel.i === ii ? -1 : ii, day: wsel.day };
+        else { month = jj; wsel = { key: P.months[jj].key, i: ii }; }
+        calm(render);
+      };
+      var allW = [].concat.apply([], WK.map(function (X) { return X.sums.filter(function (v, i) { return X.bounds[i][0] <= X.last; }); }));
+      axW = niceAxis(Math.max.apply(null, allW.concat([uw || 0, lw, 1])));  // одна шкала на всю стрічку — стовпчики не стрибають між місяцями
+      capsules("mbars", "mticks", [].concat.apply([], WK.map(function (X, j) {
+        return X.bounds.map(function (b, i) { var future = b[0] > X.last; return { v: future ? 0 : X.sums[i], label: b[0] + "–" + b[1], aria: b[0] + "–" + b[1] + " " + GEN[mi(P.months[j])], empty: future, nopick: future, sub: future ? "—" : nf0.format(X.sums[i]) + " зл" }; });
+      })), axW.max, wi >= 0 ? month * 4 + wi : -1, pickW, axW.n, uw || 0,
+        { avgLabel: avgTag(uw), lim: lw, paged: { per: 4, page: P.months.length - 1 - month, onPage: function (pg) {
+          // доклацнули до сусіднього місяця — міняємо дані (підсумок, категорії, шапку) тихо, графік уже на місці
+          var nm = P.months.length - 1 - pg; if (nm === month) return;
+          month = nm; setTimeout(function () { calm(render); }, 400);
+        } } });
       if (wi >= 0) {
         var B = bounds[wi], upTo = Math.min(B[1], last), days = upTo - B[0] + 1, wpart = upTo < B[1], wt = B[0] + "–" + B[1] + " " + GEN[k];
         c = lim ? vsLim(w[wi], LM && LM.total * (B[1] - B[0] + 1) / dim, wpart, "на тиждень")
@@ -2106,9 +2126,18 @@ function renderWhere(P, M, W, LM) {
   };
   var cats = function (q) { return q + " " + plural(q, "категорія", "категорії", "категорій"); };
   // з лімітами — угорі ті, де лишилось найменше (перевищені першими); без ліміту — у кінці; кнопка — назад до «за сумою»
-  if (LL && wsort === "left") daily.sort(function (a, b) { var la = limOf(a), lb = limOf(b); return (la === null ? Infinity : la - a.amount) - (lb === null ? Infinity : lb - b.amount); });
+  // сортування — одна кнопка: за спаданням / за зростанням. З лімітом рахуємо залишок (за замовчуванням спершу найменший),
+  // без ліміту — суму (за замовчуванням спершу найбільша); категорії без ліміту — завжди в кінці
+  var dir = wdir || (LL ? "asc" : "desc"), sgn = dir === "asc" ? 1 : -1;
+  daily.sort(function (a, b) {
+    if (!LL) return sgn * (a.amount - b.amount);
+    var la = limOf(a), lb = limOf(b);
+    if (la === null || lb === null) return (la === null) - (lb === null);
+    return sgn * ((la - a.amount) - (lb - b.amount));
+  });
   var html = '<div class="ch"><h2>Витрати ' + (W ? "за " + W.title : dayCut(M) ? "на " + (+selDay.slice(8)) + " " + GEN[mi(M)] : "за " + M.name.toLowerCase()) + "</h2>" +
-    (LL ? '<button type="button" class="wsort" id="w-sort">' + svgI("currentColor", '<path d="M7 4v16M3.5 16.5 7 20l3.5-3.5M17 20V4M13.5 7.5 17 4l3.5 3.5"/>', 14) + (wsort === "left" ? "За залишком" : "За сумою") + "</button>" : "") + "</div>";
+    '<button type="button" class="wsort" id="w-sort" aria-label="Сортування: ' + (dir === "asc" ? "за зростанням" : "за спаданням") + (LL ? " залишку" : " суми") + '">' +
+      svgI("currentColor", dir === "asc" ? '<path d="M12 19V5M6 11l6-6 6 6"/>' : '<path d="M12 5v14M6 13l6 6 6-6"/>', 16) + (dir === "asc" ? "За зростанням" : "За спаданням") + "</button></div>";
   // обидва розділи однаково: кілька найбільших, решта під «Ще N категорій»; 3 і менше — усі одразу, без кнопки
   var section = function (title, list, show) {
     if (!list.length) return;
@@ -2127,7 +2156,7 @@ function renderWhere(P, M, W, LM) {
       "</small></div><span>" + zl(M.saved) + "</span></div>";
   }
   box.innerHTML = html;
-  if (LL) $("w-sort").onclick = function () { wsort = wsort === "left" ? "sum" : "left"; calm(render); };
+  $("w-sort").onclick = function () { wdir = dir === "asc" ? "desc" : "asc"; calm(render); };
   box.querySelectorAll(".more").forEach(function (b) {
     b.onclick = function () {
       var open = b.getAttribute("aria-expanded") !== "true"; b.setAttribute("aria-expanded", open); b.previousElementSibling.classList.toggle("open", open);
