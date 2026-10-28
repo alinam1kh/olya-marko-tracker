@@ -600,7 +600,7 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .hero .num { margin-top: 12px; font-size: 40px; font-weight: 500; letter-spacing: -.02em; line-height: 1.05; }
 .hero .sub { margin-top: 6px; font-size: 14px; }
 /* велика цифра й «/ з доходу …» одразу за нею, по базовій лінії */
-.hero .numrow { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; margin-top: 8px; }  /* на вузькому екрані «з доходу» переходить під цифру */
+.hero .numrow { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; margin-top: 12px; }  /* на вузькому екрані «з доходу» переходить під цифру */
 .hero .numrow .num { margin-top: 0; min-width: 0; white-space: nowrap; }
 .hero .side { flex: none; display: inline-flex; align-items: baseline; gap: 4px; font-size: 13px; color: rgba(255,255,255,.72); white-space: nowrap; text-shadow: 0 1px 10px rgba(5, 10, 30, .28); }
 .hero .side b { font-weight: 500; color: #fff; }
@@ -719,8 +719,10 @@ a.ins { color: var(--ink4); }
 .goal .gbig span { font-size: 16px; font-weight: 500; color: var(--ink); }
 .goal .gsub { display: flex; align-items: center; gap: 4px; margin: 6px 0 14px; font-size: 13px; color: var(--ink2); }
 .goal .gsub svg { flex: none; }
+.goal .ch { flex-wrap: nowrap; gap: 8px; }
 .goal .gdue { flex: none; display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 12px; background: var(--blue-soft); color: var(--blue); font-size: 12px; font-weight: 500; white-space: nowrap; }
-.goal .gpace { margin-top: 16px; align-items: flex-start; }  /* бейдж — у верхньому правому куті */
+.goal .gpace { margin-top: 16px; align-items: flex-start; }
+.goal .gpace b { font-weight: 500; color: var(--ink); }  /* бейдж — у верхньому правому куті */
 .goal .gpace > span:first-child { text-wrap: pretty; }  /* без одинокого слова в останньому рядку */
 .goal .gpace .bd { flex: none; white-space: nowrap; }
 .segs { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
@@ -1552,13 +1554,13 @@ function renderGoal(P) {
   var due = "1 " + GEN[G.deadline[1] - 1] + " " + G.deadline[0];
   var ok = pace >= need;
   box.innerHTML = '<div class="ch" style="min-height:0"><h2>' + G.title + '</h2><span class="gdue" aria-label="Термін цілі: ' + due + '">' +
-      svgI("currentColor", '<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>', 14) + "зібрати до " + due + "</span></div>" +
+      svgI("currentColor", '<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>', 14) + "до " + due + "</span></div>" +
     '<div class="gbig"><b>' + nf1.format(life) + "</b><span>з " + G.months + " місяців витрат</span></div>" +
     '<div class="gsub" aria-label="Накопичено ' + nf0.format(have) + " з " + nf0.format(target) + ' зл">' +
       svgI("currentColor", '<path d="M4.5 11.5a6.5 5.5 0 0 1 6.5-5.5h3a6.5 5.5 0 0 1 6 3.4l1.5.4v3.4l-1.6.5a6.5 5.5 0 0 1-2.4 2.7V20h-2.6v-1.8h-3.8V20H8.5v-2.6a5.5 5.5 0 0 1-4-5.9z"/><path d="M11 6V4.2M10 9.5h3.5"/><circle cx="16.5" cy="10.5" r=".6" fill="currentColor"/>', 14) +
       nf0.format(have) + " з " + nf0.format(target) + " зл</div>" +
     '<div class="segs" role="img" aria-label="' + nf1.format(life) + " з " + G.months + ' місяців">' + segs + "</div>" +
-    '<div class="gpace"><span>Відкладено ≈ ' + nf0.format(pace) + " зл/міс. при плані " + nf0.format(need) + " зл. " +
+    '<div class="gpace"><span>Відкладено <b>≈ ' + nf0.format(pace) + " зл/міс.</b> при плані <b>" + nf0.format(need) + " зл</b>. " +
       (ok ? (early ? "У такому темпі ціль буде досягнуто до " + GEN[etaM] + ", на " + (ahead === 1 ? "місяць" : ahead + " " + plural(ahead, "місяць", "місяці", "місяців")) + " раніше плану." : "У такому темпі ціль буде досягнуто вчасно.")
         : "У такому темпі ціль не буде досягнуто до " + GEN[G.deadline[1] - 1] + ": бракує ≈ " + nf0.format(need - pace) + " зл на місяць.") + "</span></div>";
 }
