@@ -587,9 +587,10 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .hero .lt { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
 .hero .lt i { flex: none; width: 7px; height: 7px; border-radius: 50%; background: rgba(255, 255, 255, .45); }
 .hero .ls .lt i { background: #fff; }
-.hero .lv { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+.hero .lv { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; margin-top: 6px; }  /* бейдж «зазвичай» — окремим рядком під сумою */
 .hero .lg2 b { font-size: 18px; font-weight: 500; }
-.hero .ls { display: flex; flex-direction: column; align-items: flex-end; text-align: right; }
+.hero .ls { flex: none; display: flex; flex-direction: column; align-items: flex-end; text-align: right; white-space: nowrap; }
+.hero .le { min-width: 0; } .hero .lg2 b { white-space: nowrap; }
 .hero .ls b { margin-top: 6px; }
 .hero .lbl { font-size: 14px; }
 .hero .num.cu { animation: numin .7s var(--ease) both .1s; }
@@ -1266,6 +1267,17 @@ function heroBadge(now, was, isExp, gen) {
   return '<span class="bd ' + (good ? "good" : "bad") + '" title="' + (ch > 0 ? "більше" : "менше") + ", ніж у " + gen + '" aria-label="' +
     (ch > 0 ? "більше" : "менше") + " на " + nf1.format(Math.abs(ch)) + " %, ніж у " + gen + ", " + (good ? "краще" : "гірше") + '">' + arr(ch) + " " + nf1.format(Math.abs(ch)) + " %</span>";
 }
+// «зазвичай»: середні витрати за повні місяці до k (є зарплата, місяць закрито), не більше 6 останніх
+function usualExp(P, k) {
+  var ms = P.months.slice(0, k).filter(function (m) { return m.income > 0 && !m.incomplete; }).slice(-6);
+  return ms.length ? { v: ms.reduce(function (s, m) { return s + m.expenses; }, 0) / ms.length, n: ms.length } : null;
+}
+function usualBadge(now, u) {
+  if (!u) return "";
+  var d = now - u.v, t = "середнє за " + u.n + " міс.: " + nf0.format(Math.round(u.v)) + " зл";
+  if (Math.abs(d) < u.v * .03) return '<span class="bd" title="' + t + '">як зазвичай</span>';
+  return '<span class="bd ' + (d > 0 ? "bad" : "good") + '" title="' + t + '">' + (d > 0 ? "більше" : "менше") + ", ніж зазвичай · " + (d > 0 ? "+" : "−") + nf0.format(Math.abs(Math.round(d))) + " зл</span>";
+}
 function prevWithIncome(P, k) { for (var j = k - 1; j >= 0; j--) if (P.months[j].income > 0) return P.months[j]; return null; }
 function fixedCats(M) {
   var fx = {};
@@ -1334,12 +1346,12 @@ function renderReport(P) {
       "<span>Залишок зʼявиться після зарплати " + (days ? days + " числа" : "наприкінці місяця") + ".</span></div>";
   } else {
     var inc = M.incomplete ? "" : (prevI ? heroBadge(M.income, prevI.income, false, LOC[mi(prevI)]) : "");
-    var exp = M.incomplete ? "" : (prevM ? heroBadge(M.expenses, prevM.expenses, true, LOC[mi(prevM)]) : "");
+    var exp = M.incomplete ? "" : usualBadge(M.expenses, usualExp(P, month));
     var dn = +M.last_op.slice(0, 2);
     // увесь дохід — це смуга; витрати й залишок — її частини
     var ep = M.income > 0 ? Math.min(100, M.expenses / M.income * 100) : 100, sp = 100 - ep;
     hero.innerHTML = '<div class="lbl">Лишилось у ' + LOC[k] + tag + '</div><div class="num">' + approx + zl(M.saved) + "</div>" +
-      '<div class="sub">Норма заощаджень ' + nf1.format(M.rate) + " % з доходу " + '<a href="#journal" data-filter="inc" class="inc">' + nf0.format(M.income) + " зл" + "</a>" + inc + (P.ok ? "" : ", потребує перевірки") + "</div>" +
+      '<div class="sub">З доходу <a href="#journal" data-filter="inc" class="inc">' + nf0.format(M.income) + " зл" + "</a>" + inc + (P.ok ? "" : ", потребує перевірки") + "</div>" +
       '<div class="split2" role="img" aria-label="Витрати ' + nf0.format(ep) + " %, лишилось " + nf0.format(sp) + ' % доходу">' +
         '<b class="e" data-to="calc(' + ep.toFixed(2) + '% - 2px)"></b><b class="s"></b></div>' +
       '<div class="lg2"><a href="#journal" data-filter="exp" class="le"><span class="lt"><i></i>Витрати' + (M.incomplete ? " за " + dn + " " + plural(dn, "день", "дні", "днів") : "") + ", " + nf0.format(ep) + " %</span>" +
