@@ -1100,6 +1100,13 @@ a.ins { color: var(--ink4); }
 .jsug .opt { min-height: 52px; gap: 10px; }
 .jsug .opt .cic { width: 32px; height: 32px; }
 .jcat { width: 300px; max-height: min(60vh, 440px); overflow-y: auto; overscroll-behavior: contain; }
+/* повзунок прокрутки в меню: тонка сіра «пігулка» з відступом від країв, без стрілок */
+.jcat::-webkit-scrollbar { width: 12px; }
+.jcat::-webkit-scrollbar-track { margin: 18px 0; background: transparent; }
+.jcat::-webkit-scrollbar-thumb { border: 4px solid transparent; border-radius: 6px; background: #D9DDE3 padding-box; }
+.jcat::-webkit-scrollbar-thumb:hover { background-color: #C4C8D0; }
+.jcat::-webkit-scrollbar-button { display: none; height: 0; }
+@supports not selector(::-webkit-scrollbar) { .jcat { scrollbar-width: thin; scrollbar-color: #D9DDE3 transparent; } }
 .jsug .opt .qi { flex: none; width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; background: var(--soft); color: var(--ink2); }
 .filters .catchip[aria-pressed="true"] { background: var(--blue); color: #fff; }
 .filters .catchip[aria-pressed="true"] .chev { color: #fff; }
