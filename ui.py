@@ -811,7 +811,7 @@ a.ins { color: var(--ink4); }
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='3'%3E%3Cline x1='1.5' y1='1.5' x2='7.5' y2='1.5' stroke='%23C3C9D3' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") repeat-x left center / 12px 3px;
   clip-path: inset(-24px 100% -4px 0); opacity: 0; transition: clip-path 2.2s cubic-bezier(.45, 0, .2, 1) .3s, opacity 1.4s ease .3s; }
 /* поява разом зі стовпчиками: лінія «прокреслюється» зліва направо */
-.avgl.in { clip-path: inset(-24px 0 -4px 0); opacity: 1; }  /* запас угору — для підпису «сер. …» */
+.avgl.in { clip-path: inset(-24px -4px -4px 0); opacity: 1; }  /* запас угору — для підпису «сер. …» */
 .avg-leg { display: flex; align-items: center; gap: 10px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--soft); font-size: 14px; color: var(--ink2); }
 .avg-leg i { flex: none; width: 20px; height: 3px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='3'%3E%3Cline x1='1.5' y1='1.5' x2='7.5' y2='1.5' stroke='%23C3C9D3' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") repeat-x left center / 12px 3px; }
 .avg-leg b { margin-left: auto; font-size: 15px; font-weight: 500; color: var(--ink); }
