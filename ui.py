@@ -773,7 +773,6 @@ a.ins { color: var(--ink4); }
 .avgl .avgt { position: absolute; right: 0; bottom: 5px; padding: 1px 7px; border-radius: 999px; background: var(--card); box-shadow: inset 0 0 0 1px var(--mute); font-size: 11px; line-height: 1.4; color: var(--ink3); white-space: nowrap; }  /* «сер. …» — біла плашка з сірою обводкою, щоб не зливалась із доріжками */
 .bnote { display: flex; align-items: center; gap: 8px; margin: 14px 0 0; font-size: 12px; color: var(--ink2); }
 .bnote .mk { flex: none; width: 14px; height: 0; border-top: 2px solid var(--ink); border-radius: 1px; }
-.ach .mpick > button { height: 40px; gap: 6px; padding: 0 12px 0 16px; font-size: 14px; }  /* рамка й вигляд — як була кнопка місяця в шапці, лише нижча */
 .mmenu { position: fixed; right: auto; z-index: 45; }
 .mmenu:not([hidden]) { transform-origin: top left; }
 #a-sum { margin-top: 16px; }
@@ -1121,6 +1120,17 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
         <form class="logout" method="post" action="logout"><button type="submit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 16l-4-4 4-4M6 12h10"/></svg>Вийти</button></form>
 </div>
     </div>
+    <div class="mpick" id="mpick">
+      <button type="button" id="mcal" aria-haspopup="dialog" aria-expanded="false" aria-controls="mmenu"><span id="mcal-name"></span><svg class="ico16 chev" viewBox="0 0 24 24" fill="none" stroke="#6B7180" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+      <div class="pop mmenu" id="mmenu" role="dialog" aria-label="Вибір дня" hidden>
+        <div class="cal-head"><button type="button" id="cal-prev" aria-label="Попередній місяць"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg></button>
+          <b id="cal-year"></b><button type="button" id="cal-next" aria-label="Наступний місяць"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m10 6 6 6-6 6"/></svg></button></div>
+        <div class="cal-wd" aria-hidden="true"><span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Нд</span></div>
+        <div class="cal-grid" id="cal-grid"></div>
+        <p class="cal-note" id="cal-note"></p>
+        <button type="button" class="cal-all" id="cal-all" hidden>Шукати в усіх місяцях</button>
+      </div>
+    </div>
     <span class="mstatic" id="mrange" hidden></span>
   </div>
 
@@ -1137,18 +1147,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
     <div class="seg" id="a-mode" role="group" aria-label="Показник"></div>
     <!-- один графік: місяці або тижні обраного місяця; лише щоденні витрати, повна сума — рядком під цифрою -->
     <section class="card" id="an-chart">
-      <div class="ach"><div class="anav" hidden><button type="button" class="aarr" id="a-prev" aria-label="Попередній місяць">‹</button><h2 id="a-title"></h2><button type="button" class="aarr" id="a-next" aria-label="Наступний місяць">›</button></div><div class="mpick" id="mpick">
-      <button type="button" id="mcal" aria-haspopup="dialog" aria-expanded="false" aria-controls="mmenu"><span id="mcal-name"></span><svg class="ico16 chev" viewBox="0 0 24 24" fill="none" stroke="#6B7180" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-      <div class="pop mmenu" id="mmenu" role="dialog" aria-label="Вибір дня" hidden>
-        <div class="cal-head"><button type="button" id="cal-prev" aria-label="Попередній місяць"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg></button>
-          <b id="cal-year"></b><button type="button" id="cal-next" aria-label="Наступний місяць"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m10 6 6 6-6 6"/></svg></button></div>
-        <div class="cal-wd" aria-hidden="true"><span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Нд</span></div>
-        <div class="cal-grid" id="cal-grid"></div>
-        <p class="cal-note" id="cal-note"></p>
-        <button type="button" class="cal-all" id="cal-all" hidden>Шукати в усіх місяцях</button>
-      </div>
-    </div>
-        <div class="seg sm" id="a-scale" role="group" aria-label="Масштаб"></div></div>
+      <div class="ach"><div class="anav" hidden><button type="button" class="aarr" id="a-prev" aria-label="Попередній місяць">‹</button><h2 id="a-title"></h2><button type="button" class="aarr" id="a-next" aria-label="Наступний місяць">›</button></div>        <div class="seg sm" id="a-scale" role="group" aria-label="Масштаб"></div></div>
       <div class="asum" id="a-sum"></div>
       <div class="chart"><div class="ticks" id="mticks" aria-hidden="true"></div><div class="caps" id="mbars"></div></div><div class="legs" id="t-avg"></div>
     </section>
@@ -1379,7 +1378,7 @@ function popMenu(k, open) {
 }
 $("who-btn").onclick = function () { popMenu("w", $("who-menu").hidden); };
 document.body.appendChild($("mmenu"));  // поза картками й рядком фільтрів — нічого його не обрізає
-function calAnchor() { return view() === "journal" ? $("jm-btn") : $("mcal"); }
+function calAnchor() { return $("mcal"); }
 function calPlace() {
   var m = $("mmenu"), b = calAnchor(); if (m.hidden || !b) return;
   var r = b.getBoundingClientRect();
@@ -1387,9 +1386,7 @@ function calPlace() {
 }
 function calOpen(open) {
   $("cal-all").hidden = !(view() === "journal" && jq.trim());  // під час пошуку — повернення до всіх місяців
-  popMenu("m", open);
-  var j = $("jm-btn"); if (j) j.setAttribute("aria-expanded", String(open && view() === "journal"));
-  calPlace();
+  popMenu("m", open);  calPlace();
 }
 $("mcal").onclick = function () { calOpen($("mmenu").hidden); };
 $("a-prev").onclick = function () { if (month > 0) { month--; render(); } };
@@ -1413,7 +1410,7 @@ $("cal-all").onclick = function () { jqMonth = false; selDay = null; calOpen(fal
   // після свайпу мишкою не спрацьовує тап по стовпчику
   ch.addEventListener("click", function (e) { if (swiped) { e.stopPropagation(); e.preventDefault(); swiped = false; } }, true);
 })();
-document.addEventListener("click", function (e) { if (!e.target.closest("#mmenu, #mcal, #jm-btn")) calOpen(false); });
+document.addEventListener("click", function (e) { if (!e.target.closest("#mmenu, #mcal")) calOpen(false); });
 window.addEventListener("scroll", calPlace, { passive: true });  // їде разом із кнопкою
 window.addEventListener("hashchange", function () { calOpen(false); });
 document.addEventListener("click", function (e) { if (!e.target.closest(".who, .mpick")) popMenu("w", false); });
@@ -1879,14 +1876,7 @@ var dayFmt = new Intl.DateTimeFormat("uk-UA", { day: "numeric", month: "long", w
 var FILTERS = [["all", "Усі"], ["exp", "Витрати"], ["inc", "Дохід"], ["fixed", "Обовʼязкові"], ["cash", "Готівка"]];
 function renderJournal(P) {
   var M = P.months[month], fb = $("j-filters"); fb.innerHTML = "";
-  // місяць — першим чипом; відкриває той самий календар, що в Аналітиці (тап по дню — прокрутка до нього)
-  var allM = !!jq.trim() && !jqMonth;  // пошук по всіх місяцях
-  var ms = h("button", "mchip", esc(allM ? "Усі місяці" : selDay && selDay.slice(0, 7) === M.key ? (+selDay.slice(8)) + " " + GEN[mi(M)] + " " + M.key.slice(0, 4) : M.name + " " + M.key.slice(0, 4)) +
-    '<svg class="ico16 chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>');
-  ms.type = "button"; ms.id = "jm-btn"; ms.setAttribute("aria-haspopup", "dialog"); ms.setAttribute("aria-expanded", String(!$("mmenu").hidden));
-  ms.onclick = function () { calOpen($("mmenu").hidden); };
-  fb.appendChild(ms);
-  // категорія — другим чипом-дропдауном: «Категорія ⌄» або обрана (синя); «Усі категорії» в меню знімає фільтр
+  // місяць обирають у шапці (той самий календар, тап по дню — прокрутка до нього); категорія — першим чипом-дропдауном: «Категорія ⌄» або обрана (синя); «Усі категорії» в меню знімає фільтр
   var cb = h("button", "mchip catchip", esc(catF || "Категорія") + '<svg class="ico16 chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>');
   cb.type = "button"; cb.id = "jc-btn"; cb.setAttribute("aria-haspopup", "listbox"); cb.setAttribute("aria-expanded", String(!$("cat-menu").hidden));
   if (catF) cb.setAttribute("aria-pressed", "true");
@@ -2212,7 +2202,7 @@ $("cash").addEventListener("click", function () { sheetFromApp = true; sheetBase
 $("j-cash").addEventListener("click", function () { sheetFromApp = true; sheetBase = "journal"; });
 $("ops-all").addEventListener("click", function () { filter = "all"; toCur(D.people[person]); });
 // пошук у Журналі: перемальовуємо лише список, поле лишається у фокусі
-$("j-q").addEventListener("input", function () { jq = this.value; if (!jq.trim()) jqMonth = false; $("j-clear").hidden = !jq; renderJournal(D.people[person]); sugRender(); });
+$("j-q").addEventListener("input", function () { jq = this.value; if (!jq.trim()) jqMonth = false; $("j-clear").hidden = !jq; renderJournal(D.people[person]); mcalName("journal", D.people[person].months[month]); sugRender(); });
 // кількість операцій-витрат за категоріями й за назвами — у всіх місяцях людини
 function opCounts(P) {
   var c = {}, t = {};
@@ -2280,14 +2270,19 @@ $("j-clear").onclick = function () { var q = $("j-q"); q.value = ""; q.dispatchE
 $("arr-j").outerHTML = CHR; $("arr-f").outerHTML = CHR;
 
 // ---------- рендер ----------
+// назва на кнопці місяця в шапці: у Журналі під час пошуку — «Усі місяці», з обраним днем — «15 жовтня 2026»
+function mcalName(base, M) {
+  $("mcal-name").textContent = base === "journal" && jq.trim() && !jqMonth ? "Усі місяці"
+    : selDay && base === "journal" ? (+selDay.slice(8)) + " " + GEN[mi(M)] + " " + M.key.slice(0, 4) : M.name + " " + M.key.slice(0, 4);
+}
 function render() {
   var v = view(), P = D.people[person];
   renderPeople();
   if (v === "add" && !P.cash) { location.replace("#report"); return; }
   var base = v === "add" ? sheetBase : v, M = P.months[month];
-  // вибору місяця в шапці більше немає: Головна — поточний місяць, Аналітика — тап по стовпчику або ‹ ›, Журнал — чип у фільтрах
-  $("mrange").hidden = true;
-  $("mcal-name").textContent = selDay && base === "journal" ? (+selDay.slice(8)) + " " + GEN[mi(M)] + " " + M.key.slice(0, 4) : M.name + " " + M.key.slice(0, 4);
+  // місяць — у шапці для Аналітики й Журналу; Головна завжди про поточний місяць, тож там кнопки немає
+  $("mrange").hidden = true; $("mpick").hidden = base === "report";
+  mcalName(base, M);
   $("mcal").setAttribute("aria-label", "Місяць: " + M.name + " " + M.key.slice(0, 4) + ". Змінити");
   calKey = M.key; if (selDay && selDay.slice(0, 7) !== M.key) selDay = null; renderCal(P);
   ["report", "analytics", "journal"].forEach(function (k) { $("v-" + k).hidden = k !== base; });
