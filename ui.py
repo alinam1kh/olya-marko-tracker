@@ -1473,8 +1473,8 @@ function renderGoal(P) {
     '<div class="gbig"><b>' + nf1.format(life) + "</b><span>з " + G.months + " місяців витрат</span></div>" +
     '<div class="gsub">' + nf0.format(have) + " з " + nf0.format(target) + " зл</div>" +
     '<div class="segs" role="img" aria-label="' + nf1.format(life) + " з " + G.months + ' місяців">' + segs + "</div>" +
-    '<div class="gpace"><span>Щомісяця відкладаєте ≈ ' + nf0.format(pace) + " зл, план — " + nf0.format(need) + " зл. " +
-      (ok ? (early ? "Встигнете до " + GEN[etaM] + "." : "Встигаєте вчасно.") : "Щоб встигнути, треба ще ≈ " + nf0.format(need - pace) + " зл на місяць.") + "</span>" +
+    '<div class="gpace"><span>Відкладено ≈ ' + nf0.format(pace) + " зл/міс. при плані " + nf0.format(need) + " зл. " +
+      (ok ? "У такому темпі — " + (early ? "до " + GEN[etaM] + "." : "вчасно.") : "У такому темпі — пізніше за " + MONTHS_FULL[G.deadline[1] - 1].toLowerCase() + ".") + "</span>" +
       '<span class="bd ' + (ok ? "good" : "bad") + '">' + (ok ? (early ? "на " + (ahead === 1 ? "місяць" : ahead + " " + plural(ahead, "місяць", "місяці", "місяців")) + " раніше" : "вчасно") : "−" + nf0.format(need - pace) + " зл/міс.") + "</span></div>";
 }
 
