@@ -760,7 +760,18 @@ a.ins { color: var(--ink4); }
 .aarr:disabled { opacity: .35; cursor: default; }
 /* Аналітика: кнопка місяця з календарем — як колишня в шапці, лише без рамки */
 #an-chart { position: relative; z-index: 5; }
-#an-chart .ach { position: relative; z-index: 10; }  /* календар поверх стовпчиків */
+#an-chart .ach { position: relative; z-index: 10; }
+#a-title { margin: 0; font-size: 16px; font-weight: 500; white-space: nowrap; }
+.anav .aarr { width: 28px; height: 28px; background: transparent; color: var(--ink2); font-size: 18px; }
+.alab .sep { margin: 0 8px; }
+.abig { display: flex; align-items: center; gap: 10px; }
+.abig .bd { font-size: 12px; letter-spacing: 0; }
+#a-sum .aline { margin-top: 4px; font-size: 14px; color: var(--ink2); }
+/* графік без осі й доріжок: лише стовпчики, назви місяців і пунктир середнього з підписом */
+.caps.plain .trk { background: none; overflow: visible; }
+.avgl .avgt { position: absolute; right: 0; bottom: 5px; padding: 0 4px; border-radius: 6px; background: var(--card); font-size: 11px; line-height: 1.4; color: var(--ink2); white-space: nowrap; }
+.bnote { display: flex; align-items: center; gap: 8px; margin: 14px 0 0; font-size: 12px; color: var(--ink2); }
+.bnote .mk { flex: none; width: 14px; height: 0; border-top: 2px solid var(--ink); border-radius: 1px; }
 .ach .mpick > button { height: 40px; gap: 6px; padding: 0 12px 0 16px; font-size: 14px; }  /* рамка й вигляд — як була кнопка місяця в шапці, лише нижча */
 .mmenu { position: fixed; right: auto; z-index: 45; }
 .mmenu:not([hidden]) { transform-origin: top left; }
@@ -791,9 +802,9 @@ a.ins { color: var(--ink4); }
 /* середнє: більші заокруглені штрихи (SVG-візерунок), окремим шаром поверх стовпчиків */
 .avgl { position: absolute; left: 0; right: 0; height: 3px; margin-top: -1.5px; pointer-events: none; z-index: 3; transform: translateZ(0);
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='3'%3E%3Cline x1='1.5' y1='1.5' x2='7.5' y2='1.5' stroke='%23C3C9D3' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") repeat-x left center / 12px 3px;
-  clip-path: inset(0 100% 0 0); opacity: 0; transition: clip-path 2.2s cubic-bezier(.45, 0, .2, 1) .3s, opacity 1.4s ease .3s; }
+  clip-path: inset(-24px 100% -4px 0); opacity: 0; transition: clip-path 2.2s cubic-bezier(.45, 0, .2, 1) .3s, opacity 1.4s ease .3s; }
 /* поява разом зі стовпчиками: лінія «прокреслюється» зліва направо */
-.avgl.in { clip-path: inset(0 0 0 0); opacity: 1; }
+.avgl.in { clip-path: inset(-24px 0 -4px 0); opacity: 1; }  /* запас угору — для підпису «сер. …» */
 .avg-leg { display: flex; align-items: center; gap: 10px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--soft); font-size: 14px; color: var(--ink2); }
 .avg-leg i { flex: none; width: 20px; height: 3px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='3'%3E%3Cline x1='1.5' y1='1.5' x2='7.5' y2='1.5' stroke='%23C3C9D3' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") repeat-x left center / 12px 3px; }
 .avg-leg b { margin-left: auto; font-size: 15px; font-weight: 500; color: var(--ink); }
@@ -1104,7 +1115,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
     <div class="seg" id="a-mode" role="group" aria-label="Показник"></div>
     <!-- один графік: місяці або тижні обраного місяця; лише щоденні витрати, повна сума — рядком під цифрою -->
     <section class="card" id="an-chart">
-      <div class="ach"><div class="mpick" id="mpick">
+      <div class="ach"><div class="anav" hidden><button type="button" class="aarr" id="a-prev" aria-label="Попередній місяць">‹</button><h2 id="a-title"></h2><button type="button" class="aarr" id="a-next" aria-label="Наступний місяць">›</button></div><div class="mpick" id="mpick">
       <button type="button" id="mcal" aria-haspopup="dialog" aria-expanded="false" aria-controls="mmenu"><span id="mcal-name"></span><svg class="ico16 chev" viewBox="0 0 24 24" fill="none" stroke="#6B7180" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
       <div class="pop mmenu" id="mmenu" role="dialog" aria-label="Вибір дня" hidden>
         <div class="cal-head"><button type="button" id="cal-prev" aria-label="Попередній місяць"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg></button>
@@ -1358,6 +1369,8 @@ function calOpen(open) {
   calPlace();
 }
 $("mcal").onclick = function () { calOpen($("mmenu").hidden); };
+$("a-prev").onclick = function () { if (month > 0) { month--; render(); } };
+$("a-next").onclick = function () { if (month < D.people[person].months.length - 1) { month++; render(); } };
 $("cal-all").onclick = function () { jqMonth = false; selDay = null; calOpen(false); render(); };
 document.addEventListener("click", function (e) { if (!e.target.closest("#mmenu, #mcal, #jm-btn")) calOpen(false); });
 window.addEventListener("scroll", calPlace, { passive: true });  // їде разом із кнопкою
@@ -1574,8 +1587,9 @@ function niceAxis(v) {
   for (var i = 0; i < steps.length; i++) { var n = Math.max(2, Math.ceil(v / steps[i])); if (n <= 4) return { max: n * steps[i], n: n }; }
   return { max: Math.ceil(v / 10000) * 10000, n: 4 };
 }
-function capsules(boxId, tickId, items, max, sel, onPick, n, avg) {
-  var H = 150, box = $(boxId); box.innerHTML = "";
+function capsules(boxId, tickId, items, max, sel, onPick, n, avg, opt) {
+  var H = 150, box = $(boxId); box.innerHTML = ""; opt = opt || {};
+  box.classList.toggle("plain", !!opt.plain); $(tickId).hidden = !!opt.plain;
   if (n) $(tickId).innerHTML = Array.apply(null, Array(n + 1)).map(function (_, k) { return "<span>" + nf0.format(Math.round(max * (n - k) / n)) + "</span>"; }).join("");
   else $(tickId).innerHTML = [1, 2 / 3, 1 / 3, 0].map(function (f) { return "<span>" + nf0.format(Math.round(max * f)) + " зл</span>"; }).join("");
   items.forEach(function (x, i) {
@@ -1593,7 +1607,7 @@ function capsules(boxId, tickId, items, max, sel, onPick, n, avg) {
   });
   // середнє за повні місяці — одна сіра пунктирна лінія через увесь графік (число одне на весь період)
   if (avg) {
-    var al = box.appendChild(h("div", "avgl", "")); al.style.top = Math.round(H - avg / max * H) + "px";
+    var al = box.appendChild(h("div", "avgl", opt.avgLabel ? '<span class="avgt">' + opt.avgLabel + "</span>" : "")); al.style.top = Math.round(H - avg / max * H) + "px";
     requestAnimationFrame(function () { requestAnimationFrame(function () { al.classList.add("in"); }); });
   }
   grow("#" + boxId + " .fill", "height");
@@ -1603,19 +1617,18 @@ function usualMonths(P, k) { return P.months.slice(0, k).filter(function (m) { r
 function avgOf(ms, f) { return ms.length ? ms.reduce(function (s, m) { return s + f(m); }, 0) / ms.length : null; }
 function zr(v) { return (v < 0 ? "−" : "") + nf0.format(Math.abs(Math.round(v))) + " зл"; }
 function dayOf(o) { return +o.day.slice(8); }
-// рядок під великою цифрою: «Як зазвичай — середнє за N міс. …» або «Більше, ніж зазвичай» + бейдж у злотих
-function vsUsual(now, u, n, goodIfMore, when) {
-  if (u === null || u === undefined) return "";
+// порівняння зі «зазвичай»: бейдж біля великої цифри + висновок рядком під нею
+function vsUsual(now, u, goodIfMore, when) {
+  if (u === null || u === undefined) return { badge: "", text: "" };
   var d = now - u;
-  if (Math.abs(d) < Math.max(30, u * .05)) return '<div class="aline"><span>Як зазвичай' + (when || "") + " — середнє за " + n + " міс. " + zr(u) + "</span></div>";
-  return '<div class="aline"><span>' + (d > 0 ? "Більше" : "Менше") + ", ніж зазвичай" + (when || "") + '</span><span class="bd ' + ((d > 0) === goodIfMore ? "good" : "bad") + '">' + (d > 0 ? "+" : "−") + zr(d) + "</span></div>";
+  if (Math.abs(d) < Math.max(30, u * .05)) return { badge: "", text: "Як зазвичай" + when };
+  return { badge: '<span class="bd ' + ((d > 0) === goodIfMore ? "good" : "bad") + '">' + (d > 0 ? "+" : "−") + zr(d) + "</span>", text: (d > 0 ? "Більше" : "Менше") + ", ніж зазвичай" + when };
 }
-// рядки під графіком, як «Середні витрати за місяць»: перший — з нашим пунктиром середнього
-function legRows(rows) {
-  return rows.filter(Boolean).map(function (r) { return '<div class="avg-leg">' + (r[2] ? '<i aria-hidden="true"></i>' : "") + "<span>" + r[0] + "</span><b>" + r[1] + "</b></div>"; }).join("");
+// підсумок над графіком: підпис (уточнення — через нашу вертикальну риску), сума з бейджем, висновок
+function sumHTML(label, extra, big, c) {
+  return '<div class="alab"><span>' + label + (extra ? '<i class="sep" aria-hidden="true"></i>' + extra : "") + "</span></div>" +
+    '<div class="abig"><span>' + big + "</span>" + (c.badge || "") + "</div>";
 }
-// порівняння «зазвичай» — сірим блоком під рядком середнього, як примітка темпу в «Подушці безпеки»
-function aNote(html) { return html ? '<div class="gpace apace">' + html + "</div>" : ""; }
 var ascale = "m";  // масштаб графіка витрат: m — місяці, w — тижні обраного місяця
 function renderAnalytics(P) {
   if (metric !== "saved") metric = "exp";
@@ -1626,43 +1639,44 @@ function renderAnalytics(P) {
   };
   seg("a-mode", [["exp", "Витрати"], ["saved", "Лишилось"]], metric, function (v) { metric = v; });
   seg("a-scale", [["m", "Місяці"], ["w", "Тижні"]], ascale, function (v) { ascale = v; });
-  var M = P.months[month], k = mi(M), weeks = metric === "exp" && ascale === "w", base = usualMonths(P, month), n = base.length;
+  var M = P.months[month], k = mi(M), weeks = metric === "exp" && ascale === "w", base = usualMonths(P, month);
   var allFull = usualMonths(P, P.months.length), dn = M.last_op ? +M.last_op.slice(0, 2) : 0;
   $("a-scale").hidden = metric !== "exp";
+  // місяць обирають тапом по стовпчику; у тижнях — стрілками ‹ ›
+  $("a-title").textContent = M.name + " " + M.key.slice(0, 4);
+  $("a-prev").hidden = $("a-next").hidden = !weeks;
+  $("a-prev").disabled = month <= 0; $("a-next").disabled = month >= P.months.length - 1;
   var pick = function (i) { month = i; render(); };
-  // місяці: повна назва і сума під стовпчиком, шкала зліва
+  var avgTag = function (v) { return v ? "сер. " + nf0.format(Math.round(v)) : ""; };
+  // місяці: без осі, доріжок і сум — лише назви; пунктир середнього з підписом «сер. …»
   var monthBars = function (val, avg, approx) {
     var vs = P.months.map(val), ax = niceAxis(Math.max.apply(null, vs.map(function (v) { return v || 0; }).concat([avg || 0, 1])));
     capsules("mbars", "mticks", P.months.map(function (m, j) {
       var v = vs[j], none = v === null || !m.ops.length;
       return { v: none ? 0 : Math.max(0, v), label: m.name, part: m.incomplete, empty: none, sub: none ? "немає даних" : (approx && m.incomplete ? "≈ " : "") + nf0.format(v) + " зл" };
-    }), ax.max, month, pick, ax.n, avg || 0);
+    }), ax.max, month, pick, ax.n, avg || 0, { avgLabel: avgTag(avg) });
   };
+  var note = "";
   if (metric === "exp") {
-    var line1 = "";
+    var c, extra = M.incomplete ? "дані до " + M.last_op : "";
     if (!weeks) {
       var avgV = avgOf(allFull, function (m) { return m.variable; });
+      // неповний місяць порівнюємо зі звичним на те саме число — і на графіку це риска, а не середнє за місяць
+      var uDay = M.incomplete ? avgOf(base, function (m) { return m.ops.reduce(function (s, o) { return s + (!o.income && !o.fixed && dayOf(o) <= dn ? o.amount : 0); }, 0); }) : null;
       monthBars(function (m) { return m.variable; }, avgV, false);
-      $("t-avg").innerHTML = legRows([avgV ? ["Середні витрати за місяць", zr(avgV), true] : null]);
-      // неповний місяць порівнюємо зі звичним до того самого числа
-      line1 = M.incomplete ? vsUsual(M.variable, avgOf(base, function (m) { return m.ops.reduce(function (s, o) { return s + (!o.income && !o.fixed && dayOf(o) <= dn ? o.amount : 0); }, 0); }), n, false, " за 1–" + dn + " " + GEN[k])
-        : vsUsual(M.variable, avgOf(base, function (m) { return m.variable; }), n, false, " за місяць");
+      c = M.incomplete ? vsUsual(M.variable, uDay, false, " на " + dn + "-те") : vsUsual(M.variable, avgOf(base, function (m) { return m.variable; }), false, " за місяць");
     } else {
       var y = +M.key.slice(0, 4), mo = +M.key.slice(5), dim = new Date(y, mo, 0).getDate(), last = M.incomplete ? dn : dim;
       var bounds = [[1, 7], [8, 14], [15, 21], [22, 28], [29, dim]].filter(function (b) { return b[0] <= dim; });
       var w = bounds.map(function (b) { return M.ops.reduce(function (s, o) { var d = dayOf(o); return s + (!o.income && !o.fixed && d >= b[0] && d <= b[1] ? o.amount : 0); }, 0); });
       var uw = avgOf(base.length ? base : allFull, function (m) { var yy = +m.key.slice(0, 4), mm = +m.key.slice(5); return m.variable * 7 / new Date(yy, mm, 0).getDate(); });
-      var top = -1; w.forEach(function (v, i) { if (bounds[i][0] <= last && (top < 0 || v > w[top])) top = i; });
-      var axW = niceAxis(Math.max.apply(null, w.concat([uw || 0, 1])));
-      capsules("mbars", "mticks", bounds.map(function (b, i) { var future = b[0] > last; return { v: future ? 0 : w[i], label: b[0] + "–" + b[1], empty: future, sub: future ? "—" : nf0.format(w[i]) + " зл" }; }), axW.max, -1, null, axW.n, uw || 0);
-      if (top >= 0) {
-        var dd = uw ? w[top] - uw : 0;
-        line1 = '<div class="aline"><span>Найдорожчий тиждень — ' + bounds[top][0] + "–" + bounds[top][1] + "</span>" + (uw && Math.abs(dd) >= 30 ? '<span class="bd ' + (dd > 0 ? "bad" : "good") + '">' + (dd > 0 ? "+" : "−") + zr(dd) + "</span>" : "") + "</div>";
-      }
-      $("t-avg").innerHTML = legRows([uw ? ["У середньому за тиждень", zr(uw), true] : null]);
+      var top = -1, axW; w.forEach(function (v, i) { if (bounds[i][0] <= last && (top < 0 || v > w[top])) top = i; });
+      capsules("mbars", "mticks", bounds.map(function (b, i) { var future = b[0] > last; return { v: future ? 0 : w[i], label: b[0] + "–" + b[1], empty: future, sub: future ? "—" : nf0.format(w[i]) + " зл" }; }),
+        (axW = niceAxis(Math.max.apply(null, w.concat([uw || 0, 1])))).max, -1, null, axW.n, uw || 0, { avgLabel: avgTag(uw) });
+      c = top >= 0 ? vsUsual(w[top], uw, false, "") : { badge: "", text: "" };
+      if (top >= 0) c.text = "Найдорожчий тиждень — " + bounds[top][0] + "–" + bounds[top][1];
     }
-    $("a-sum").innerHTML = '<div class="alab">Щоденні витрати' + (M.incomplete ? '<span class="tag">дані до ' + M.last_op + "</span>" : "") + '</div><div class="abig">' + zr(M.variable) + "</div>";
-    $("t-avg").innerHTML += aNote(line1);
+    $("a-sum").innerHTML = sumHTML("Щоденні витрати", extra, zr(M.variable), c);
     renderWhere(P, M);
   } else {
     // «Лишилось»: факт для закритих місяців; для неповного — оцінка «≈» (дохід мінус витрати мінус звичне до кінця місяця)
@@ -1672,20 +1686,16 @@ function renderAnalytics(P) {
       if (!inc) return null;
       return inc - m.expenses - (avgOf(usualMonths(P, j), function (mm) { return mm.ops.reduce(function (s, o) { return s + (!o.income && dayOf(o) > d0 ? o.amount : 0); }, 0); }) || 0);
     };
-    var sv = P.months.map(est);
-    var avgS = avgOf(allFull, function (m) { return m.saved; });
+    var sv = P.months.map(est), avgS = avgOf(allFull, function (m) { return m.saved; });
     monthBars(function (m, j) { return sv[j]; }, avgS, true);
-    $("t-avg").innerHTML = legRows([avgS ? ["У середньому лишається за місяць", zr(avgS), true] : null]);
     var v = sv[month], inc = M.income > 0 ? M.income : (prevWithIncome(P, month) || {}).income;
-    var l1 = M.incomplete ? '<div class="aline"><span>' + (M.income > 0 ? "Оцінка до кінця місяця, якщо витрати як зазвичай" : "Точно — після зарплати") + "</span></div>"
-      : vsUsual(M.saved, avgOf(base, function (m) { return m.saved; }), n, true);
-    var l2 = M.income > 0 ? "З доходу " + zr(M.income) + (M.incomplete ? "" : " — " + nf0.format(Math.round(M.rate)) + " зл з кожних 100")
-      : inc ? "Оцінка, якщо дохід як зазвичай (" + zr(inc) + ")" : "Дохід ще не надходив";
-    $("a-sum").innerHTML = '<div class="alab">' + (M.incomplete ? "Лишиться" : "Лишилось") + (M.incomplete ? '<span class="tag">попередні дані</span>' : "") + '</div><div class="abig">' +
-      (v === null ? "—" : (M.incomplete ? "≈ " : "") + zr(v)) + "</div>";
-    $("t-avg").innerHTML += aNote(l1 + '<div class="aline sub">' + l2 + "</div>");
+    var cs = M.incomplete ? { badge: "", text: M.income > 0 ? "Оцінка до кінця місяця, якщо витрати як зазвичай" : "Оцінка — точно після зарплати" }
+      : vsUsual(M.saved, avgOf(base, function (m) { return m.saved; }), true, " за місяць");
+    $("a-sum").innerHTML = sumHTML(M.incomplete ? "Лишиться" : "Лишилось", inc ? (M.income > 0 ? "з доходу " : "з доходу ≈ ") + zr(inc) : "",
+      v === null ? "—" : (M.incomplete ? "≈ " : "") + zr(v), cs);
     $("an-where").hidden = true;
   }
+  $("t-avg").innerHTML = note;
 }
 // «Куди пішли гроші»: усі витрати місяця — спершу щоденні (вони змінюються) зі «зазвичай», внизу обовʼязкові, згорнуті
 function renderWhere(P, M) {
