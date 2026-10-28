@@ -885,14 +885,17 @@ a.ins { color: var(--ink4); }
 .fava { display: inline-flex; align-items: center; gap: 2px; min-height: 44px; margin: 10px 4px 0; font-size: 14px; font-weight: 500; color: var(--blue); }
 
 /* журнал */
-.filters { display: flex; gap: 8px; margin-top: 12px; overflow-x: auto; scrollbar-width: none; }
+.filters { display: flex; gap: 8px; margin: 9px -4px 0; padding: 3px 4px; overflow-x: auto; scrollbar-width: none; }  /* запас 3–4px — рамка фокуса не обрізається */
 .filters::-webkit-scrollbar { display: none; }
 .filters button { flex: none; min-height: 44px; padding: 0 16px; border: 1px solid var(--border); border-radius: 22px; background: var(--card); font-size: 14px; cursor: pointer; }
 .filters button[aria-pressed="true"] { border-color: transparent; background: var(--blue-g); color: #fff; font-weight: 500; }
 .filters button.catf { display: inline-flex; align-items: center; gap: 6px; padding-right: 12px; }
-.filters .mchip { flex: none; min-height: 44px; padding: 0 34px 0 16px; border: 1px solid var(--border); border-radius: 22px; font: 500 14px var(--font); color: var(--ink); cursor: pointer;
-  -webkit-appearance: none; appearance: none; background: var(--card) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B7180' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center / 14px; }
+.filters .mchip { display: inline-flex; align-items: center; gap: 6px; padding: 0 12px 0 16px; color: var(--ink); }
+.filters .mchip .chev { color: var(--ink2); }
+.filters .mchip[aria-expanded="true"] .chev { transform: rotate(180deg); }
 .filters .mchip:disabled { opacity: .5; cursor: default; }
+.jmenu { position: fixed; z-index: 30; width: 232px; }
+.jmenu:not([hidden]) { animation: popin .45s var(--ease) both; transform-origin: top left; }
 /* Журнал: пошук по всіх місяцях + «Готівка», під фільтрами — підсумок одним рядком */
 .jtop { display: flex; gap: 8px; margin-top: 12px; }
 .jsearch { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; height: 48px; padding: 0 14px; border: 1px solid var(--border); border-radius: 24px; background: var(--card); color: var(--ink2); }
@@ -1113,6 +1116,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
       <a class="jcash" id="j-cash" href="#add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Готівка</a>
     </div>
     <div class="filters" id="j-filters" role="group" aria-label="Фільтр"></div>
+    <div class="pop jmenu" id="jm" role="menu" aria-label="Місяць" hidden></div>
     <div class="jsum" id="j-sum" hidden></div>
     <div id="j-list"></div>
     <a class="fava" id="fava">Повний журнал у Fava<span id="arr-f"></span></a>
@@ -1701,12 +1705,17 @@ var dayFmt = new Intl.DateTimeFormat("uk-UA", { day: "numeric", month: "long", w
 var FILTERS = [["all", "Усі"], ["exp", "Витрати"], ["inc", "Дохід"], ["fixed", "Обовʼязкові"], ["cash", "Готівка"]];
 function renderJournal(P) {
   var M = P.months[month], fb = $("j-filters"); fb.innerHTML = "";
-  // місяць — першим чипом; на телефоні відкривається системний список
-  var ms = h("select", "mchip"); ms.setAttribute("aria-label", "Місяць");
-  P.months.slice().reverse().forEach(function (m) { var o = h("option", "", m.name + (m.key.slice(0, 4) === M.key.slice(0, 4) ? "" : " " + m.key.slice(0, 4))); o.value = P.months.indexOf(m); o.selected = m === M; ms.appendChild(o); });
+  // місяць — першим чипом; відкриває наше меню (рядки з радіо, як меню профілю)
+  var ms = h("button", "mchip", esc(M.name) + '<svg class="ico16 chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>');
+  ms.type = "button"; ms.id = "jm-btn"; ms.setAttribute("aria-haspopup", "menu"); ms.setAttribute("aria-expanded", "false");
   ms.disabled = !!jq.trim(); ms.title = ms.disabled ? "Пошук іде по всіх місяцях" : "";
-  ms.onchange = function () { month = +ms.value; selDay = null; trendMonth = null; render(); };
+  ms.onclick = function () { jmOpen($("jm").hidden); };
   fb.appendChild(ms);
+  $("jm").innerHTML = P.months.slice().reverse().map(function (m) {
+    var on = m === M;
+    return '<button type="button" class="opt" role="menuitemradio" aria-checked="' + on + '" data-m="' + P.months.indexOf(m) + '"><span><b>' + esc(m.name) + "</b><small>" + m.key.slice(0, 4) + (m.incomplete ? ", дані до " + m.last_op : "") + '</small></span><i class="radio"></i></button>';
+  }).join("");
+  $("jm").querySelectorAll("[data-m]").forEach(function (b) { b.onclick = function () { jmOpen(false); month = +b.dataset.m; selDay = null; trendMonth = null; render(); }; });
   if (catF) {  // категорія, що прийшла з Головної, — першим чипом, ✕ знімає
     var cb = h("button", "catf", esc(catF) + svgI("currentColor", '<path d="M6 6l12 12M18 6 6 18"/>', 14)); cb.type = "button"; cb.setAttribute("aria-pressed", "true");
     cb.setAttribute("aria-label", "Категорія " + catF + ", прибрати фільтр"); cb.onclick = function () { catF = null; render(); };
@@ -2031,6 +2040,15 @@ document.addEventListener("keydown", function (e) { var r = e.target.closest && 
 $("cash").addEventListener("click", function () { sheetFromApp = true; sheetBase = "report"; });
 $("j-cash").addEventListener("click", function () { sheetFromApp = true; sheetBase = "journal"; });
 $("ops-all").addEventListener("click", function () { filter = "all"; toCur(D.people[person]); });
+// меню місяця в Журналі: під чипом, поверх списку; закривається тапом поза ним або Esc
+function jmOpen(open) {
+  var m = $("jm"), b = $("jm-btn"); if (!b) return;
+  m.hidden = !open; b.setAttribute("aria-expanded", open);
+  if (open) { var r = b.getBoundingClientRect(); m.style.top = r.bottom + 8 + "px"; m.style.left = Math.max(12, r.left) + "px"; var c = m.querySelector('[aria-checked="true"]'); if (c) c.focus(); }
+}
+document.addEventListener("click", function (e) { if (!e.target.closest("#jm, #jm-btn")) jmOpen(false); });
+document.addEventListener("keydown", function (e) { if (e.key === "Escape") jmOpen(false); });
+window.addEventListener("scroll", function () { jmOpen(false); }, { passive: true });
 // пошук у Журналі: перемальовуємо лише список, поле лишається у фокусі
 $("j-q").addEventListener("input", function () { jq = this.value; renderJournal(D.people[person]); });
 $("arr-j").outerHTML = CHR; $("arr-f").outerHTML = CHR;
