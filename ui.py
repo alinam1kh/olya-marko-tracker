@@ -755,35 +755,18 @@ a.ins { color: var(--ink4); }
 .anav h2 { margin: 0; white-space: nowrap; }
 .aarr { flex: none; width: 32px; height: 32px; border: 0; border-radius: 16px; background: var(--soft); color: var(--ink); font: 500 18px/1 var(--font); cursor: pointer; }
 .aarr:disabled { opacity: .35; cursor: default; }
-/* графік Аналітики — як у Claude Design: синій заголовок місяця, велика цифра, стовпчики без осі */
-#a-title { font-size: 16px; font-weight: 600; color: var(--blue); }
-.aarr { background: transparent; color: var(--blue); width: 24px; }
-#a-sum { margin-top: 18px; }
+/* Аналітика: кнопка місяця з календарем — як колишня в шапці, лише без рамки */
+#an-chart { position: relative; z-index: 5; }
+#an-chart .ach { position: relative; z-index: 10; }  /* календар поверх стовпчиків */
+.ach .mpick > button { height: 40px; padding: 0 6px 0 0; border: 0; background: transparent; font-size: 16px; font-weight: 500; }
+.ach .mmenu { left: 0; right: auto; top: 46px; }
+.ach .mmenu:not([hidden]) { transform-origin: top left; }
+#a-sum { margin-top: 16px; }
 .alab { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink2); }
-.alab .tag { flex: none; padding: 2px 8px; border-radius: 10px; background: var(--soft); font-size: 12px; font-weight: 500; }
-.abig { margin-top: 4px; font-size: 30px; font-weight: 600; letter-spacing: -.01em; white-space: nowrap; }
-.aline { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; margin-top: 6px; font-size: 14px; }
-.aline.sub { margin-top: 4px; font-size: 13px; color: var(--ink2); }
-.bch { margin-top: 26px; }
-.bwrap { position: relative; display: flex; align-items: flex-end; gap: 12px; height: 160px; }
-.bc { flex: 1; min-width: 0; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 6px; }
-.bc[role="button"] { cursor: pointer; }
-.bc .bb { display: block; width: 100%; max-width: 48px; height: 0; border-radius: 10px; background: #C3D5F9; transition: height 2.1s var(--ease); }
-.bc.on .bb { background: var(--blue-g); }
-.bc.part .bb { background: repeating-linear-gradient(135deg, #A9C3F5 0 5px, #D6E3FB 5px 10px); }
-.bc.part.on .bb { background: repeating-linear-gradient(135deg, #3B82F6 0 5px, #9DBFF8 5px 10px); }
-.bc.empty .bb { width: 64%; height: 28px; border: 1.5px dashed #C3C9D3; background: none; display: grid; place-items: center; font-size: 13px; color: var(--ink2); }
-.bc .bv { font-size: 12px; color: var(--ink2); }
-.bc.on .bv { padding: 2px 7px; border-radius: 7px; background: var(--ink); color: #fff; font-weight: 600; }
-.bavg { position: absolute; left: 0; right: 0; height: 0; border-top: 1.5px dashed #9AA3B2; pointer-events: none; }
-.blabs { display: flex; gap: 12px; margin-top: 10px; }
-.bl { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 13px; color: var(--ink2); text-align: center; }
-.bl small { font-size: 11px; line-height: 1.25; color: var(--ink2); }
-.bl.on > span { padding: 2px 10px; border-radius: 12px; background: var(--blue); color: #fff; font-weight: 600; }
-.bl > span { white-space: nowrap; }
-.blabs.wk .bl.on > span { padding: 0; background: none; color: var(--blue); }  /* у тижнях обраний — просто синій текст */
-.bnote { display: flex; align-items: center; gap: 6px; margin: 14px 0 0; font-size: 12px; color: var(--ink2); }
-.bnote i { flex: none; width: 18px; height: 0; border-top: 1.5px dashed #9AA3B2; }
+.alab .tag { flex: none; padding: 3px 10px; border-radius: 12px; background: var(--soft); font-size: 12px; font-weight: 500; color: var(--ink2); }
+.abig { margin-top: 6px; font-size: 28px; font-weight: 500; letter-spacing: -.01em; white-space: nowrap; }
+.aline { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; margin-top: 6px; font-size: 14px; color: var(--ink2); }
+.legs .avg-leg + .avg-leg { margin-top: 0; }
 /* «Куди пішли гроші»: під назвою категорії — дрібно «зазвичай …», як у «Що змінилось» */
 .wrow { color: inherit; }
 .wrow .nm { flex-direction: column; align-items: flex-start; gap: 2px; }
@@ -809,6 +792,8 @@ a.ins { color: var(--ink4); }
 .cap { display: flex; flex-direction: column; align-items: center; gap: 6px; }
 .cap.pick { cursor: pointer; }
 .cap .trk { width: 40px; height: 150px; border-radius: 10px; background: var(--track); display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; }
+.cap .trk.emp { background: none; justify-content: flex-end; align-items: center; }
+.cap .trk.emp svg { width: 40px; height: 28px; display: block; }
 .cap .fill { display: flex; flex-direction: column; height: 0; border-radius: 10px; overflow: hidden; transition: height 2.1s var(--ease); }
 .cap .fill .rent { background: repeating-linear-gradient(135deg, #A9C6F8 0 5px, #D7E4FC 5px 10px); }
 .cap .fill .main { flex: 1; background: var(--blue-g); }
@@ -1031,7 +1016,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
 .cashbtn:hover { box-shadow: 0 10px 22px rgba(29,95,224,.4), inset 0 1px 0 rgba(255,255,255,.3); }
 /* спливаючі меню розкриваються від кнопки */
 .pop:not([hidden]) { animation: popin .45s var(--ease) both; transform-origin: top left; }
-.mmenu:not([hidden]) { transform-origin: top right; }
+
 @keyframes popin { from { opacity: 0; transform: translateY(-6px) scale(.96); } to { opacity: 1; transform: none; } }
 /* тост виринає знизу */
 .toast { animation: toastin .7s var(--spring) both; }
@@ -1062,16 +1047,6 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
         <form class="logout" method="post" action="logout"><button type="submit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 16l-4-4 4-4M6 12h10"/></svg>Вийти</button></form>
 </div>
     </div>
-    <div class="mpick" id="mpick">
-      <button type="button" id="mcal" aria-haspopup="dialog" aria-expanded="false" aria-controls="mmenu"><svg class="ico16" viewBox="0 0 24 24" fill="none" stroke="#6B7180" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span id="mcal-name"></span><svg class="ico16 chev" viewBox="0 0 24 24" fill="none" stroke="#6B7180" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-      <div class="pop mmenu" id="mmenu" role="dialog" aria-label="Вибір дня" hidden>
-        <div class="cal-head"><button type="button" id="cal-prev" aria-label="Попередній місяць"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg></button>
-          <b id="cal-year"></b><button type="button" id="cal-next" aria-label="Наступний місяць"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m10 6 6 6-6 6"/></svg></button></div>
-        <div class="cal-wd" aria-hidden="true"><span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Нд</span></div>
-        <div class="cal-grid" id="cal-grid"></div>
-        <p class="cal-note" id="cal-note"></p>
-      </div>
-    </div>
     <span class="mstatic" id="mrange" hidden></span>
   </div>
 
@@ -1088,10 +1063,19 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
     <div class="seg" id="a-mode" role="group" aria-label="Показник"></div>
     <!-- один графік: місяці або тижні обраного місяця; лише щоденні витрати, повна сума — рядком під цифрою -->
     <section class="card" id="an-chart">
-      <div class="ach"><div class="anav"><button type="button" class="aarr" id="a-prev" aria-label="Попередній місяць">‹</button><h2 id="a-title"></h2><button type="button" class="aarr" id="a-next" aria-label="Наступний місяць">›</button></div>
+      <div class="ach"><div class="mpick" id="mpick">
+      <button type="button" id="mcal" aria-haspopup="dialog" aria-expanded="false" aria-controls="mmenu"><svg class="ico16" viewBox="0 0 24 24" fill="none" stroke="#6B7180" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span id="mcal-name"></span><svg class="ico16 chev" viewBox="0 0 24 24" fill="none" stroke="#6B7180" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+      <div class="pop mmenu" id="mmenu" role="dialog" aria-label="Вибір дня" hidden>
+        <div class="cal-head"><button type="button" id="cal-prev" aria-label="Попередній місяць"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg></button>
+          <b id="cal-year"></b><button type="button" id="cal-next" aria-label="Наступний місяць"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m10 6 6 6-6 6"/></svg></button></div>
+        <div class="cal-wd" aria-hidden="true"><span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Нд</span></div>
+        <div class="cal-grid" id="cal-grid"></div>
+        <p class="cal-note" id="cal-note"></p>
+      </div>
+    </div>
         <div class="seg sm" id="a-scale" role="group" aria-label="Масштаб"></div></div>
       <div class="asum" id="a-sum"></div>
-      <div class="bch" id="mbars"></div><div id="t-avg"></div>
+      <div class="chart"><div class="ticks" id="mticks" aria-hidden="true"></div><div class="caps" id="mbars"></div></div><div class="legs" id="t-avg"></div>
     </section>
     <section class="card list" id="an-where"></section>
   </div>
@@ -1526,10 +1510,12 @@ function capsules(boxId, tickId, items, max, sel, onPick, n, avg) {
   items.forEach(function (x, i) {
     var c = h("div", "cap" + (onPick ? " pick" : "") + (i === sel ? " on" : "") + (x.part ? " part" : "") + (onPick && i !== sel ? " dim" : ""));
     var hh = Math.max(8, Math.round(x.v / max * H)), rent = x.rent ? Math.round(x.rent / max * H) : 0;
-    c.innerHTML = '<div class="trk"><div class="fill" data-to="' + hh + 'px">' + (rent ? '<div class="rent" style="height:' + rent + 'px"></div>' : "") + '<div class="main"></div></div>' +
-      (x.mark ? '<i class="mark" style="bottom:' + Math.round(x.mark / max * H) + 'px" aria-hidden="true"></i>' : "") + "</div>" +
-      '<span class="r1">' + esc(x.label) + '</span><span class="r2">' + esc(x.sub) + "</span>" + (x.sub2 ? '<span class="r3">' + esc(x.sub2) + "</span>" : "");
-    c.setAttribute("aria-label", x.label + ": " + zl(x.v));
+    // немає даних: порожня капсула — наш пунктир (круглі кінці, #C3C9D3) і риска всередині
+    if (x.empty) c.innerHTML = '<div class="trk emp"><svg viewBox="0 0 40 28" aria-hidden="true"><rect x=".75" y=".75" width="38.5" height="26.5" rx="9.25" fill="none" stroke="#C3C9D3" stroke-width="1.5" stroke-dasharray="4 4" stroke-linecap="round"/><path d="M15 14h10" stroke="#C3C9D3" stroke-width="1.5" stroke-linecap="round"/></svg></div>';
+    else c.innerHTML = '<div class="trk"><div class="fill" data-to="' + hh + 'px">' + (rent ? '<div class="rent" style="height:' + rent + 'px"></div>' : "") + '<div class="main"></div></div>' +
+      (x.mark ? '<i class="mark" style="bottom:' + Math.round(x.mark / max * H) + 'px" aria-hidden="true"></i>' : "") + "</div>";
+    c.innerHTML += '<span class="r1">' + esc(x.label) + '</span><span class="r2">' + esc(x.sub) + "</span>" + (x.sub2 ? '<span class="r3">' + esc(x.sub2) + "</span>" : "");
+    c.setAttribute("aria-label", x.label + ": " + (x.empty ? "немає даних" : zl(x.v)));
     if (onPick) { c.setAttribute("role", "button"); c.tabIndex = 0;
       c.onclick = c.onkeydown = function (e) { if (e.type === "keydown" && e.key !== "Enter" && e.key !== " ") return; onPick(i); }; }
     box.appendChild(c);
@@ -1553,22 +1539,9 @@ function vsUsual(now, u, n, goodIfMore, when) {
   if (Math.abs(d) < Math.max(30, u * .05)) return '<div class="aline"><span>Як зазвичай' + (when || "") + " — середнє за " + n + " міс. " + zr(u) + "</span></div>";
   return '<div class="aline"><span>' + (d > 0 ? "Більше" : "Менше") + ", ніж зазвичай" + (when || "") + '</span><span class="bd ' + ((d > 0) === goodIfMore ? "good" : "bad") + '">' + (d > 0 ? "+" : "−") + zr(d) + "</span></div>";
 }
-// стовпчики як у Claude Design: без осі, блакитні, обраний — синій; неповний заштрихований, порожній — пунктирна пігулка
-function bars2(items, sel, onPick, avg, vals) {
-  var H = 130, max = Math.max.apply(null, items.map(function (x) { return x.v; }).concat([avg || 0, 1])) * 1.08, box = $("mbars");
-  var cols = items.map(function (x, i) {
-    var hh = x.empty ? 0 : Math.max(10, Math.round(x.v / max * H));
-    return '<div class="bc' + (i === sel ? " on" : "") + (x.part ? " part" : "") + (x.empty ? " empty" : "") + '"' + (onPick ? ' role="button" tabindex="0" data-i="' + i + '"' : "") +
-      ' aria-label="' + esc(x.full || x.label) + ": " + (x.empty ? "немає даних" : zl(x.v)) + '">' +
-      (vals && !x.empty ? '<span class="bv">' + (x.hideV ? "" : nf0.format(Math.round(x.v))) + "</span>" : "") +
-      (x.empty ? '<span class="bb">—</span>' : '<span class="bb" data-to="' + hh + 'px"></span>') + "</div>";
-  }).join("");
-  var labs = items.map(function (x, i) { return '<div class="bl' + (i === sel ? " on" : "") + '"><span>' + esc(x.label) + "</span>" + (x.sub ? "<small>" + x.sub + "</small>" : "") + "</div>"; }).join("");
-  box.innerHTML = '<div class="bwrap">' + cols + (avg ? '<i class="bavg" style="bottom:' + Math.round(avg / max * H) + 'px" aria-hidden="true"></i>' : "") + '</div><div class="blabs' + (vals ? " wk" : "") + '">' + labs + "</div>";
-  if (onPick) box.querySelectorAll(".bc[data-i]").forEach(function (c) {
-    c.onclick = c.onkeydown = function (e) { if (e.type === "keydown" && e.key !== "Enter" && e.key !== " ") return; onPick(+c.dataset.i); };
-  });
-  grow("#mbars .bb[data-to]", "height");
+// рядки під графіком, як «Середні витрати за місяць»: перший — з нашим пунктиром середнього
+function legRows(rows) {
+  return rows.filter(Boolean).map(function (r) { return '<div class="avg-leg">' + (r[2] ? '<i aria-hidden="true"></i>' : "") + "<span>" + r[0] + "</span><b>" + r[1] + "</b></div>"; }).join("");
 }
 var ascale = "m";  // масштаб графіка витрат: m — місяці, w — тижні обраного місяця
 function renderAnalytics(P) {
@@ -1582,20 +1555,22 @@ function renderAnalytics(P) {
   seg("a-scale", [["m", "Місяці"], ["w", "Тижні"]], ascale, function (v) { ascale = v; });
   var M = P.months[month], k = mi(M), weeks = metric === "exp" && ascale === "w", base = usualMonths(P, month), n = base.length;
   var allFull = usualMonths(P, P.months.length), dn = M.last_op ? +M.last_op.slice(0, 2) : 0;
-  var short = function (m) { return MONTHS_FULL[mi(m)].slice(0, 3).toLowerCase(); };
   $("a-scale").hidden = metric !== "exp";
-  $("a-title").textContent = M.name + " " + M.key.slice(0, 4);
-  // у тижнях місяць гортають стрілками; у місяцях — тапом по стовпчику
-  $("a-prev").hidden = $("a-next").hidden = !weeks;
-  $("a-prev").disabled = month <= 0; $("a-next").disabled = month >= P.months.length - 1;
   var pick = function (i) { month = i; render(); };
-  var monthItems = function (val, sub) { return P.months.map(function (m, j) { var v = val(m, j); return { v: v === null ? 0 : Math.max(0, v), label: short(m), full: m.name, part: m.incomplete, empty: !m.ops.length || v === null, sub: sub(m, v) }; }); };
-  var monthSub = function (m, v) { return !m.ops.length || v === null ? "немає даних" : m.incomplete ? "неповний" : ""; };
-  $("t-avg").innerHTML = "";
+  // місяці: повна назва і сума під стовпчиком, шкала зліва
+  var monthBars = function (val, avg, approx) {
+    var vs = P.months.map(val), ax = niceAxis(Math.max.apply(null, vs.map(function (v) { return v || 0; }).concat([avg || 0, 1])));
+    capsules("mbars", "mticks", P.months.map(function (m, j) {
+      var v = vs[j], none = v === null || !m.ops.length;
+      return { v: none ? 0 : Math.max(0, v), label: m.name, part: m.incomplete, empty: none, sub: none ? "немає даних" : (approx && m.incomplete ? "≈ " : "") + nf0.format(v) + " зл" };
+    }), ax.max, month, pick, ax.n, avg || 0);
+  };
   if (metric === "exp") {
     var line1 = "";
     if (!weeks) {
-      bars2(monthItems(function (m) { return m.variable; }, monthSub), month, pick, avgOf(allFull, function (m) { return m.variable; }), false);
+      var avgV = avgOf(allFull, function (m) { return m.variable; });
+      monthBars(function (m) { return m.variable; }, avgV, false);
+      $("t-avg").innerHTML = legRows([avgV ? ["Середні витрати за місяць", zr(avgV), true] : null, ["Разом з обовʼязковими", zr(M.expenses)]]);
       // неповний місяць порівнюємо зі звичним до того самого числа
       line1 = M.incomplete ? vsUsual(M.variable, avgOf(base, function (m) { return m.ops.reduce(function (s, o) { return s + (!o.income && !o.fixed && dayOf(o) <= dn ? o.amount : 0); }, 0); }), n, false, " до " + dn + "-го")
         : vsUsual(M.variable, avgOf(base, function (m) { return m.variable; }), n, false);
@@ -1605,15 +1580,15 @@ function renderAnalytics(P) {
       var w = bounds.map(function (b) { return M.ops.reduce(function (s, o) { var d = dayOf(o); return s + (!o.income && !o.fixed && d >= b[0] && d <= b[1] ? o.amount : 0); }, 0); });
       var uw = avgOf(base.length ? base : allFull, function (m) { var yy = +m.key.slice(0, 4), mm = +m.key.slice(5); return m.variable * 7 / new Date(yy, mm, 0).getDate(); });
       var top = -1; w.forEach(function (v, i) { if (bounds[i][0] <= last && (top < 0 || v > w[top])) top = i; });
-      bars2(bounds.map(function (b, i) { var future = b[0] > last; return { v: future ? 0 : w[i], label: b[0] + "–" + b[1], empty: future }; }), top, null, uw, true);
+      var axW = niceAxis(Math.max.apply(null, w.concat([uw || 0, 1])));
+      capsules("mbars", "mticks", bounds.map(function (b, i) { var future = b[0] > last; return { v: future ? 0 : w[i], label: b[0] + "–" + b[1], empty: future, sub: future ? "—" : nf0.format(w[i]) + " зл" }; }), axW.max, -1, null, axW.n, uw || 0);
       if (top >= 0) {
         var dd = uw ? w[top] - uw : 0;
         line1 = '<div class="aline"><span>Найдорожчий тиждень — ' + bounds[top][0] + "–" + bounds[top][1] + "</span>" + (uw && Math.abs(dd) >= 30 ? '<span class="bd ' + (dd > 0 ? "bad" : "good") + '">' + (dd > 0 ? "+" : "−") + zr(dd) + "</span>" : "") + "</div>";
       }
-      $("t-avg").innerHTML = uw ? '<p class="bnote"><i aria-hidden="true"></i>звичайний тиждень ≈ ' + zr(uw) + "</p>" : "";
+      $("t-avg").innerHTML = legRows([uw ? ["Середній тиждень", zr(uw), true] : null, ["Разом з обовʼязковими", zr(M.expenses)]]);
     }
-    $("a-sum").innerHTML = '<div class="alab">Щоденні витрати' + (M.incomplete ? '<span class="tag">дані до ' + M.last_op + "</span>" : "") + '</div><div class="abig">' + zr(M.variable) + "</div>" + line1 +
-      '<div class="aline sub">Разом з обовʼязковими (оренда тощо) — ' + zr(M.expenses) + "</div>";
+    $("a-sum").innerHTML = '<div class="alab">Щоденні витрати' + (M.incomplete ? '<span class="tag">дані до ' + M.last_op + "</span>" : "") + '</div><div class="abig">' + zr(M.variable) + "</div>" + line1;
     renderWhere(P, M);
   } else {
     // «Лишилось»: факт для закритих місяців; для неповного — оцінка «≈» (дохід мінус витрати мінус звичне до кінця місяця)
@@ -1624,7 +1599,9 @@ function renderAnalytics(P) {
       return inc - m.expenses - (avgOf(usualMonths(P, j), function (mm) { return mm.ops.reduce(function (s, o) { return s + (!o.income && dayOf(o) > d0 ? o.amount : 0); }, 0); }) || 0);
     };
     var sv = P.months.map(est);
-    bars2(monthItems(function (m, j) { return sv[j]; }, function (m, v) { return !m.ops.length || v === null ? "немає даних" : m.incomplete ? "≈ оцінка" : ""; }), month, pick, avgOf(allFull, function (m) { return m.saved; }), false);
+    var avgS = avgOf(allFull, function (m) { return m.saved; });
+    monthBars(function (m, j) { return sv[j]; }, avgS, true);
+    $("t-avg").innerHTML = legRows([avgS ? ["У середньому лишається за місяць", zr(avgS), true] : null]);
     var v = sv[month], inc = M.income > 0 ? M.income : (prevWithIncome(P, month) || {}).income;
     var l1 = M.incomplete ? '<div class="aline"><span>' + (M.income > 0 ? "Оцінка до кінця місяця, якщо витрати як зазвичай" : "Точно — після зарплати") + "</span></div>"
       : vsUsual(M.saved, avgOf(base, function (m) { return m.saved; }), n, true);
@@ -1948,9 +1925,6 @@ document.addEventListener("keydown", function (e) { if (e.key === "Escape" && vi
 $("cash").addEventListener("click", function () { sheetFromApp = true; sheetBase = "report"; });
 $("j-cash").addEventListener("click", function () { sheetFromApp = true; sheetBase = "journal"; });
 $("ops-all").addEventListener("click", function () { filter = "all"; toCur(D.people[person]); });
-// Аналітика, тижні: ‹ › гортають місяці
-$("a-prev").onclick = function () { if (month > 0) { month--; render(); } };
-$("a-next").onclick = function () { if (month < D.people[person].months.length - 1) { month++; render(); } };
 // пошук у Журналі: перемальовуємо лише список, поле лишається у фокусі
 $("j-q").addEventListener("input", function () { jq = this.value; renderJournal(D.people[person]); });
 $("arr-j").outerHTML = CHR; $("arr-f").outerHTML = CHR;
@@ -1962,7 +1936,7 @@ function render() {
   if (v === "add" && !P.cash) { location.replace("#report"); return; }
   var base = v === "add" ? sheetBase : v, M = P.months[month];
   // вибору місяця в шапці більше немає: Головна — поточний місяць, Аналітика — тап по стовпчику або ‹ ›, Журнал — чип у фільтрах
-  $("mpick").hidden = true; $("mrange").hidden = true;
+  $("mrange").hidden = true;
   $("mcal-name").textContent = selDay && base === "journal" ? (+selDay.slice(8)) + " " + GEN[mi(M)] + " " + M.key.slice(0, 4) : M.name + " " + M.key.slice(0, 4);
   $("mcal").setAttribute("aria-label", "Місяць: " + M.name + " " + M.key.slice(0, 4) + ". Змінити");
   calKey = M.key; if (selDay && selDay.slice(0, 7) !== M.key) selDay = null; renderCal(P);
