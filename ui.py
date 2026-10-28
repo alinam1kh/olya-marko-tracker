@@ -603,12 +603,7 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .hero .numrow .num { margin-top: 0; min-width: 0; white-space: nowrap; }
 .hero .side { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; padding-bottom: 3px; font-size: 13px; line-height: 1.25; color: rgba(255,255,255,.75); text-align: right; text-shadow: 0 1px 10px rgba(5, 10, 30, .28); }
 .hero .side b { font-size: 15px; font-weight: 500; color: #fff; white-space: nowrap; }
-.hero .side .bd { margin-top: 4px; }
-/* прогноз до зарплати: що зазвичай ще піде — ледь видно, що лишиться — штрихування */
-.hero .split2 .f { background: rgba(255, 255, 255, .14); }
-.hero .split2 .x { background: repeating-linear-gradient(-45deg, rgba(255,255,255,.8) 0 3px, rgba(255,255,255,.22) 3px 6px); }
-.hero .ls.x .lt i { background: repeating-linear-gradient(-45deg, #fff 0 2px, rgba(255,255,255,.3) 2px 4px); }
-.hero .lbl { display: flex; align-items: center; gap: 8px; }
+.hero .side .bd { margin-top: 4px; }.hero .lbl { display: flex; align-items: center; gap: 8px; }
 .hero .tag { flex: none; height: 22px; padding: 0 8px; border-radius: 11px; background: rgba(255,255,255,.16); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); color: #fff; font-size: 12px; font-weight: 500; display: flex; align-items: center; }
 .hero .meter { height: 8px; margin: 14px 0 8px; border-radius: 4px; background: rgba(255,255,255,.25); overflow: hidden; }
 .hero .meter b { display: block; height: 100%; width: 0; border-radius: 4px; background: #fff; transition: width 2.1s var(--ease); }
@@ -1351,21 +1346,30 @@ function renderReport(P) {
     FAVA[P.key] + 'errors/">Переглянути у Fava</a></div>';
   var tag = M.incomplete ? '<span class="tag">дані до ' + M.last_op + "</span>" : "";
   var dn = M.last_op ? +M.last_op.slice(0, 2) : 0, spent = "Витрати" + (M.incomplete ? " за " + dn + " " + plural(dn, "день", "дні", "днів") : "");
-  if (noIncome) {
-    // до зарплати: прогноз «лишиться» = звичний дохід − (вже витрачено + скільки зазвичай іде після цього числа); прогноз заштрихований
-    var base = prevI ? prevI.income : 0;
-    var fullM = P.months.slice(0, month).filter(function (m) { return m.income > 0 && !m.incomplete; }).slice(-6);
-    var rest = fullM.length ? fullM.reduce(function (s, m) { return s + m.ops.reduce(function (t, o) { return t + (!o.income && +o.day.slice(8) > dn ? o.amount : 0); }, 0); }, 0) / fullM.length : 0;
-    var est = base ? Math.max(0, base - M.expenses - rest) : null, estS = est === null ? "—" : "≈ " + nf0.format(Math.round(est)) + " зл";  // оцінка — без копійок
-    var pe = base ? Math.min(100, M.expenses / base * 100) : 0, pf = base ? Math.min(100 - pe, rest / base * 100) : 0, ps = 100 - pe - pf;
-    hero.innerHTML = '<div class="lbl">Лишиться у ' + LOC[k] + tag + "</div>" +
-      '<div class="numrow"><div class="num">' + estS + "</div>" +
-      '<div class="side">' + (base ? "з доходу<b>≈ " + nf0.format(base) + " зл</b>" : "дохід ще<b>не надходив</b>") + "</div></div>" +
-      '<div class="split2" role="img" aria-label="' + (base ? "Витрати " + nf0.format(pe) + " % звичного доходу, прогноз залишку " + nf0.format(ps) + " %" : "Дохід ще не надходив") + '">' +
-        (base ? '<b class="e" data-to="calc(' + pe.toFixed(2) + '% - 2px)"></b>' + (pf > .5 ? '<b class="f" data-to="calc(' + pf.toFixed(2) + '% - 4px)"></b>' : "") : "") + '<b class="s x"></b></div>' +
-      '<div class="lg2"><a href="#journal" data-filter="exp" class="le"><span class="lt"><i></i>' + spent + (base ? ", " + nf0.format(pe) + " %" : "") + "</span>" +
-        '<span class="lv"><b>' + zl(M.expenses) + "</b></span></a>" +
-      '<div class="ls x"><span class="lt"><i></i>Лишиться після зарплати</span><b>' + estS + "</b></div></div>";
+  // поточний місяць рахуємо від зарплати до зарплати: скільки лишилось з останньої зарплати — це факт, як Марко й думає про гроші
+  var ops = [].concat.apply([], P.months.map(function (m) { return m.ops; }));
+  var sd = ops.reduce(function (d, o) { return o.income && o.day > d ? o.day : d; }, "");
+  var dm = function (iso) { return iso.slice(8) + "." + iso.slice(5, 7); }, z0 = function (v) { return (v < 0 ? "−" : "") + nf0.format(Math.abs(Math.round(v))) + " зл"; };
+  if (month === P.months.length - 1 && M.incomplete && sd) {
+    var A = 0, out = 0, today = "";
+    ops.forEach(function (o) { if (o.day > today) today = o.day; if (o.day >= sd) { if (o.income) A += o.day === sd ? o.amount : 0; else out += o.amount; } });
+    var next = new Date(sd + "T12:00:00"); next.setMonth(next.getMonth() + 1);
+    var days = Math.round((next - new Date(today + "T12:00:00")) / 864e5), nextIso = next.toISOString().slice(0, 10);
+    var ep = Math.min(100, Math.max(0, out / A * 100));
+    hero.innerHTML = '<div class="lbl">Лишилось із зарплати ' + dm(sd) + tag + "</div>" +
+      '<div class="numrow"><div class="num">' + approx + z0(A - out) + "</div>" +
+      '<a href="#journal" data-filter="inc" class="side inc">з доходу<b>' + z0(A) + "</b></a></div>" +
+      (P.ok ? "" : '<div class="sub">Потребує перевірки</div>') +
+      '<div class="split2" role="img" aria-label="Витрачено ' + nf0.format(ep) + " % зарплати, лишилось " + nf0.format(100 - ep) + ' %">' +
+        '<b class="e" data-to="calc(' + ep.toFixed(2) + '% - 2px)"></b><b class="s"></b></div>' +
+      '<div class="lg2"><a href="#journal" data-filter="exp" class="le"><span class="lt"><i></i>Витрати з ' + dm(sd) + ", " + nf0.format(ep) + " %</span>" +
+        '<span class="lv"><b>' + z0(out) + "</b></span></a>" +
+      '<div class="ls"><span class="lt">' + (days > 0 ? "До наступної зарплати" : "Зарплата очікувалась") + "</span><b>" +
+        (days > 0 ? "~" + days + " " + plural(days, "день", "дні", "днів") : dm(nextIso)) + "</b></div></div>";
+  } else if (noIncome) {
+    // дохід ще жодного разу не надходив (або вибрано місяць без доходу): лише скільки витрачено
+    hero.innerHTML = '<div class="lbl">Витрачено у ' + LOC[k] + tag + "</div>" +
+      '<div class="numrow"><div class="num">' + approx + z0(M.expenses) + '</div><div class="side">дохід<b>не надходив</b></div></div>';
   } else {
     var inc = M.incomplete ? "" : (prevI ? heroBadge(M.income, prevI.income, false, LOC[mi(prevI)]) : "");
     var exp = M.incomplete ? "" : usualBadge(M.expenses, usualExp(P, month));
