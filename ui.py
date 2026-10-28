@@ -773,7 +773,7 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .duo .duo-cmp { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 6px; }
 .duo .duo-cmp small { margin-top: 0; }
 .duo .duo-cmp .bd { display: inline-flex; font-size: 12px; }
-#t-duo { display: block; }
+#t-duo { display: block; margin-top: 16px; }  /* підсумок місяця — заголовок над стовпчиками всередині картки графіка */
 .vs > span { display: block; font-size: 13px; color: var(--ink2); }
 .vs .vs-big { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; margin: 6px 0 2px; }
 .vs .vs-big b { margin: 0; font-size: 28px; font-weight: 500; letter-spacing: -.01em; }
@@ -1022,9 +1022,9 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
     <div id="an-trends" hidden>
       <section class="card">
         <div class="seg sm" id="t-metric" role="group" aria-label="Показник"></div>
+        <div class="duo" id="t-duo"></div>
         <div class="chart"><div class="ticks" id="mticks" aria-hidden="true"></div><div class="caps" id="mbars"></div></div><div class="avg-leg" id="t-avg"></div>
       </section>
-      <div class="duo" id="t-duo"></div>
       <p class="note" id="t-note" style="margin:8px 4px 0"></p>
       <section class="card list"><div class="ch" style="flex-direction:column;align-items:flex-start;gap:2px;padding:10px 0 8px"><h2 id="t-cmp"></h2><span class="sub" id="t-cmpsub" style="font-size:13px"></span></div><div id="t-cats"></div><p class="note" id="t-cmpnote" style="margin:6px 0 8px"></p></section>
     </div>
@@ -1538,7 +1538,7 @@ function renderTrends(P) {
   else right = cmpBadge(val(S), val(prev)) + "<small>проти " + GEN[mi(prev)] + "</small>";
   var sub = metric === "saved" && paid ? "норма заощаджень " + nf1.format(S.rate) + " %" : "";
   var tag = S.incomplete ? '<em class="vs-tag">1–' + upTo(S) + " " + GEN[mi(S)] + "</em>" : "";
-  $("t-duo").innerHTML = '<div class="card vs vs2"><div class="vs-l"><div class="vs-head"><span>' + NAME + " у " + LOC[mi(S)] + "</span>" + tag + "</div>" +
+  $("t-duo").innerHTML = '<div class="vs vs2"><div class="vs-l"><div class="vs-head"><span>' + NAME + " у " + LOC[mi(S)] + "</span>" + tag + "</div>" +
     '<div class="vs-big"><b>' + (known ? z0(val(S)) : "—") + "</b></div>" + (sub ? '<small class="vs-sub">' + sub + "</small>" : "") + "</div>" +
     '<div class="vs-r">' + right + "</div></div>";
   $("t-note").hidden = true;
