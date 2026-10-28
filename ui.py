@@ -1020,7 +1020,6 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
     <div class="hero-wrap"><div class="liquid" id="liquid" aria-hidden="true"><span class="after"><span class="amb a1"></span><span class="amb a2"></span><span class="amb a3"></span><span class="ehalo"><i></i></span><span class="erim"></span></span><span class="glow"></span><span class="halo"><i></i></span><span class="rim"></span></div><section class="hero" id="hero" aria-live="polite"></section></div>
     <a class="cashbtn" id="cash" href="#add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg>Додати готівку</a>
     <section class="card list fadein" id="insights" hidden></section>
-    <section class="card list"><div class="ch"><h2>Категорії</h2></div><div id="cats"></div></section>
     <section class="card goal" id="goal" hidden></section>
     <section class="card list"><div class="ch"><h2>Останні операції</h2><a href="#journal" id="ops-all">Журнал<span id="arr-j"></span></a></div><div id="recent"></div></section>
   </div>
@@ -1392,13 +1391,6 @@ function renderReport(P) {
   $("cash").hidden = !P.cash;
   renderGoal(P);
   renderInsights(P, M);
-  $("cats").innerHTML = catRows(M, 3);
-  var mb = $("more-btn");
-  if (mb) mb.onclick = function () {
-    var open = mb.getAttribute("aria-expanded") !== "true", n = $("more-rows").querySelectorAll(".crow").length;
-    mb.setAttribute("aria-expanded", open); $("more-rows").classList.toggle("open", open);
-    mb.querySelector(".more-l").textContent = open ? "Згорнути" : "Ще " + n + " " + plural(n, "категорія", "категорії", "категорій");
-  };
   var last = P.months[P.months.length - 1], ops = last ? last.ops.slice(0, 5) : [], left = justAdded.slice();
   $("recent").innerHTML = ops.length ? ops.map(function (o) {
     var k = !o.cash ? -1 : left.findIndex(function (s) { return Math.abs(o.amount - s.amount) < 0.005 && (!s.day || o.day === s.day) && (!s.title || o.title === s.title); });
