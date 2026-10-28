@@ -263,7 +263,7 @@ a { color: inherit; text-decoration: none; }
 .hero-wrap::after { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; border-radius: inherit; opacity: .26; mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
 /* SVG-шум браузер раструє зі своєю роздільністю й розмиває — тому JS малює зерно попіксельно під екран (одна крапка = один фізичний піксель); SVG лишається запасним */
-.hero-wrap.grain::after { opacity: .22; background-image: var(--grain); background-size: 160px 160px; image-rendering: pixelated; }
+.hero-wrap.grain::after { opacity: .14; mix-blend-mode: soft-light; background-image: var(--grain); background-size: 160px 160px; image-rendering: pixelated; }
 /* Під час відкриття — один живий прохід бліку: світло збирається в лівому верхньому куті, смугою на всю картку
    хвилясто (кут смуги «гуляє») проходить до правого нижнього кута й зникає. Кант і розмита рамка по краях
    горять разом зі смугою. Далі лишаються тільки мʼякі абстрактні форми, що повільно перетікають усередині */
@@ -1854,13 +1854,13 @@ function countUp(el) {
 // абстрактні форми щоразу стартують з іншого положення
 // старт форм зміщений випадково, але спільно — щоб протифаза яскравості зберігалась
 var ambD = -(Math.random() * 60).toFixed(1) + "s"; $("liquid").querySelectorAll(".amb").forEach(function (s) { s.style.animationDelay = ambD; });
-// зерно головної картки: випадкова сіра крапка на кожен фізичний піксель плитки 160×160
+// зерно головної картки: випадкова сіра крапка на кожен фізичний піксель плитки 160×160 (м'яке світло — не бруднить темні тони)
 (function () {
   var dpr = Math.min(3, window.devicePixelRatio || 1), s = Math.round(160 * dpr), c = document.createElement("canvas");
   c.width = c.height = s;
   var x = c.getContext("2d"); if (!x || !c.toBlob) return;
   var im = x.createImageData(s, s), p = im.data;
-  for (var i = 0; i < p.length; i += 4) { var v = Math.random() * 255 | 0; p[i] = p[i + 1] = p[i + 2] = v; p[i + 3] = 255; }
+  for (var i = 0; i < p.length; i += 4) { var v = 128 + (Math.random() - .5) * 150 | 0; /* навколо нейтрального сірого — без глибоких чорних крапок */ p[i] = p[i + 1] = p[i + 2] = v; p[i + 3] = 255; }
   x.putImageData(im, 0, 0);
   c.toBlob(function (b) {
     if (!b) return;
