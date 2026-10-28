@@ -975,7 +975,7 @@ a.ins { color: var(--ink4); }
 .opbig.inc { color: var(--good); }
 .oplist .oprow { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 52px; border-top: 1px solid var(--soft); font-size: 14px; }
 .oplist .oprow span { color: var(--ink2); }
-.oplist .oprow b { font-weight: 500; text-align: right; }
+.oplist .oprow b { font-weight: 400; text-align: right; }  /* значення — звичайною вагою, як у наших списках */
 .opcat { display: inline-flex; align-items: center; gap: 8px; color: var(--ink) !important; }
 .opcat .cic { width: 28px; height: 28px; }
 .opbtns { display: flex; gap: 10px; }
