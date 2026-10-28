@@ -758,7 +758,7 @@ a.ins { color: var(--ink4); }
 /* Аналітика: кнопка місяця з календарем — як колишня в шапці, лише без рамки */
 #an-chart { position: relative; z-index: 5; }
 #an-chart .ach { position: relative; z-index: 10; }  /* календар поверх стовпчиків */
-.ach .mpick > button { height: 40px; padding: 0 6px 0 0; border: 0; background: transparent; font-size: 16px; font-weight: 500; }
+.ach .mpick > button { height: 40px; padding: 0 12px 0 10px; font-size: 14px; }  /* рамка й вигляд — як була кнопка місяця в шапці, лише нижча */
 .ach .mmenu { left: 0; right: auto; top: 46px; }
 .ach .mmenu:not([hidden]) { transform-origin: top left; }
 #a-sum { margin-top: 16px; }
@@ -1635,19 +1635,16 @@ function renderWhere(P, M) {
   };
   var cats = function (q) { return q + " " + plural(q, "категорія", "категорії", "категорій"); };
   var html = '<div class="ch"><h2>Куди пішли гроші у ' + LOC[mi(M)] + "</h2></div>";
-  if (daily.length) {
-    html += '<div class="dh"><b>Щоденні</b><span>' + zl(sum(daily)) + "</span></div>";
-    var top = daily.length === 6 ? 6 : 5;  // одну категорію під «Ще» не ховаємо
-    daily.slice(0, top).forEach(function (c) { html += row(c, -1, false); });
-    var rest = daily.slice(top);
+  // обидва розділи однаково: кілька найбільших, решта під «Ще N категорій»; 3 і менше — усі одразу, без кнопки
+  var section = function (title, list, show) {
+    if (!list.length) return;
+    html += '<div class="dh"><b>' + title + "</b><span>" + zl(sum(list)) + "</span></div>";
+    var top = list.length <= 3 ? list.length : show, rest = list.slice(top);
+    list.slice(0, top).forEach(function (c) { html += row(c, -1, false); });
     if (rest.length) html += '<div class="more-rows"><div>' + rest.map(function (c, i) { return row(c, i, true); }).join("") + "</div></div>" + more("Ще " + cats(rest.length), zl(sum(rest)));
-  }
-  if (oblig.length) {
-    var names = oblig.map(function (c) { return c.name === "Житло" ? "оренда" : c.name.toLowerCase(); });
-    names = names.slice(0, 3).join(", ") + (names.length > 3 ? " і ще " + (names.length - 3) : "");
-    html += '<div class="dh"><b>Обовʼязкові</b><span>' + zl(sum(oblig)) + "</span></div>" +
-      '<div class="more-rows"><div>' + oblig.map(function (c, i) { return row(c, i, true); }).join("") + "</div></div>" + more(names.charAt(0).toUpperCase() + names.slice(1), "");
-  }
+  };
+  section("Щоденні", daily, 4);
+  section("Обовʼязкові", oblig, 2);
   box.innerHTML = html;
   box.querySelectorAll(".more").forEach(function (b) {
     b.onclick = function () {
