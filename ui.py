@@ -816,10 +816,10 @@ a.ins { color: var(--ink4); }
 .lsegs i { display: block; width: 12px; height: 6px; border-radius: 3px; background: var(--track); overflow: hidden; }
 .lsegs b { display: block; height: 100%; background: var(--blue); }
 /* шторка «Відкладати щомісяця» */
-.plintro { margin: 6px 2px 0; font-size: 14px; line-height: 1.45; color: var(--ink3); }
-.pla { padding-top: 14px; }
-.plchips { justify-content: center; margin-top: 14px; }
-.pllink { display: block; min-height: 44px; margin: 8px auto 0; padding: 0 8px; border: 0; background: none; color: var(--blue); font: 500 14px var(--font); cursor: pointer; }
+.plintro { margin: 6px 0 0; font-size: 14px; line-height: 1.45; color: var(--ink3); }
+.amount.pla { justify-content: flex-start; padding-top: 14px; }  /* у шторці плану все — від лівого краю */
+.plchips { justify-content: flex-start; margin-top: 14px; }
+.pllink { display: block; min-height: 44px; margin: 8px 0 0; padding: 0; border: 0; background: none; color: var(--blue); font: 500 14px var(--font); cursor: pointer; }
 .plres { margin-top: 14px; padding: 12px 14px; border-radius: 14px; background: var(--blue-soft); font-size: 13px; line-height: 1.4; color: var(--ink3); }
 .plres b { display: block; margin-bottom: 2px; font-size: 14px; font-weight: 500; color: var(--blue-txt); }
 .plres.ok { background: var(--good-bg); } .plres.ok b { color: var(--good); }
