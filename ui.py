@@ -914,7 +914,7 @@ a.ins { color: var(--ink4); }
 /* перемикач «Ліміт» — квадратик-чекбокс праворуч у рядку підпису */
 .limt { margin: -6px -4px -6px auto; display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 4px; border: 0; background: transparent; font: 400 13px var(--font); color: var(--ink3); cursor: pointer; }
 /* «Ліміт» — тугл, як у налаштуваннях телефона: підпис + повзунок; тап по всьому рядку */
-.ach .limt { margin: 0 0 0 -4px; min-height: 44px; gap: 10px; font-size: 14px; color: var(--ink3); transition: color .25s; }
+.ach .limt { margin: 0 -4px 0 0; min-height: 44px; gap: 10px; font-size: 14px; color: var(--ink3); transition: color .25s; }
 .ach .limt[aria-checked="true"] { color: var(--ink); }
 /* доріжка: сіра → синій градієнт; кулька пружно їде й трохи витягується, поки палець на перемикачі */
 .limt .sw { position: relative; flex: none; width: 42px; height: 26px; border-radius: 13px; background: #DDE1E7; box-shadow: inset 0 0 0 1px rgba(17,19,24,.04); transition: background .3s ease; }
@@ -2036,13 +2036,13 @@ function renderAnalytics(P) {
       }
     }
     if (!weeks || wi < 0) { $("a-sum").innerHTML = sumHTML("Щоденні витрати", extra, zr(M.variable), c); renderWhere(P, M, null, LM); }
-    // перемикач ліміту — у шапці картки ліворуч (праворуч «Місяці / Тижні»); вмикає ліміти і на графіку, і в «Витрати за …»
+    // перемикач ліміту — у шапці картки праворуч (ліворуч «Місяці / Тижні»); вмикає ліміти і на графіку, і в «Витрати за …»
     var tg = h("button", "limt", 'Ліміт<span class="sw" aria-hidden="true"><i></i></span>');  // тугл-перемикач: сірий → синій
     tg.type = "button"; tg.setAttribute("role", "switch"); tg.setAttribute("aria-checked", String(lim)); tg.setAttribute("aria-pressed", String(lim));
     // спершу їде кулька, а графік і списки перемальовуємо, коли вона доїхала
     tg.onclick = function () { lim = !lim; try { localStorage.setItem("lim", lim ? "1" : "0"); } catch (e) {} tg.setAttribute("aria-checked", String(lim)); tg.setAttribute("aria-pressed", String(lim)); setTimeout(render, 280); };
     var ach = $("a-scale").parentNode, old = ach.querySelector(".limt"); if (old) old.remove();
-    ach.insertBefore(tg, $("a-scale"));
+    ach.appendChild(tg);  // праворуч від «Місяці / Тижні»
   }
   // висновок «Більше, ніж зазвичай…» — рядком одразу під цифрою (у sumHTML), поруч із бейджем
   $("t-avg").innerHTML = note;
