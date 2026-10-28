@@ -583,7 +583,7 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .hero .split2 b { display: block; height: 100%; width: 0; border-radius: 4px; transition: width 2.1s var(--ease); }
 .hero .split2 .e { background: rgba(255, 255, 255, .34); }
 .hero .split2 .s { flex: 1; min-width: 0; background: #fff; }
-.hero .lg2 { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-top: 12px; }
+.hero .lg2 { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-top: 8px; }
 .hero .lt { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
 .hero .lt i { flex: none; width: 7px; height: 7px; border-radius: 50%; background: rgba(255, 255, 255, .45); }
 .hero .ls .lt i { background: #fff; }
