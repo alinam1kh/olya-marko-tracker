@@ -714,6 +714,17 @@ a.ins { color: var(--ink4); }
 .toast button { min-height: 36px; margin-left: 7px; padding: 0 12px; border: 0; border-radius: 12px; background: var(--bad-bg); color: var(--bad); font: 500 13px var(--font); cursor: pointer; }  /* «Скасувати» в плашках — червона */
 
 /* подушка безпеки (Оля) */
+/* картка ліміту на Головній */
+.limc { display: block; color: inherit; text-decoration: none; }
+.limc .ch { min-height: 0; flex-wrap: nowrap; }
+.limc .ch svg { flex: none; color: var(--ink2); }
+.lbig { display: flex; align-items: baseline; gap: 8px; margin-top: 12px; }
+.lbig b { font-size: 32px; font-weight: 500; line-height: 1; }
+.lbig span { font-size: 14px; color: var(--ink2); }
+.lbar { height: 8px; margin-top: 14px; border-radius: 999px; background: var(--track); overflow: hidden; }
+.lbar b { display: block; height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, #3B82F6, #1D5FE0); transition: width 2.1s var(--ease); }
+.lbar b.over { background: var(--bad); }
+.lnote { margin: 10px 0 0; font-size: 13px; color: var(--ink2); }
 .goal .gbig { display: flex; align-items: baseline; gap: 8px; margin: 14px 0 0; }
 .goal .gbig b { font-size: 32px; font-weight: 500; line-height: 1; color: var(--blue); }
 .goal .gbig span { font-size: 16px; font-weight: 500; color: var(--ink); }
@@ -1151,6 +1162,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
     <div id="h-alert"></div>
     <div class="hero-wrap"><div class="liquid" id="liquid" aria-hidden="true"><span class="after"><span class="amb a1"></span><span class="amb a2"></span><span class="amb a3"></span><span class="ehalo"><i></i></span><span class="erim"></span></span><span class="glow"></span><span class="halo"><i></i></span><span class="rim"></span></div><section class="hero" id="hero" aria-live="polite"></section></div>
     <a class="cashbtn" id="cash" href="#add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg>Додати готівку</a>
+    <a class="card limc" id="limc" href="#analytics" hidden></a>
     <section class="card list fadein" id="insights" hidden></section>
     <section class="card goal" id="goal" hidden></section>
     <section class="card list"><div class="ch"><h2>Останні операції</h2><a href="#journal" id="ops-all">Журнал<span id="arr-j"></span></a></div><div id="recent"></div></section>
@@ -1512,6 +1524,22 @@ function payDays(P) {
 }
 
 // ---------- головна ----------
+// картка ліміту: лише для поточного (неповного) місяця і коли ліміт уже є; тап — Аналітика з увімкненим лімітом
+function renderLimit(P) {
+  var box = $("limc"), j = P.months.length - 1, M = P.months[j], LM = month === j && M.incomplete ? limitsFor(P, j) : null;
+  box.hidden = !LM; if (!LM) return;
+  var left = LM.total - M.variable, dn = M.last_op ? +M.last_op.slice(0, 2) : 0, dl = new Date(+M.key.slice(0, 4), +M.key.slice(5), 0).getDate() - dn, g = goalPlan(P);
+  var p = LM.total ? Math.min(100, M.variable / LM.total * 100) : 100;
+  // Марко — скільки на день до кінця місяця; Оля — те саме, але видно, навіщо: щоб відкласти план
+  var note = left < 0 ? "Щоденні вже понад ліміт, до кінця місяця ще " + dl + " " + plural(dl, "день", "дні", "днів")
+    : "Це ≈ " + zr(left / Math.max(1, dl)) + " на день" + (LM.src === "goal" && g ? ", щоб відкласти " + zr(g.need) : " до кінця місяця");
+  box.innerHTML = '<div class="ch"><h2>Ліміт на щоденні у ' + LOC[mi(M)] + "</h2>" + CHR + "</div>" +
+    '<div class="lbig"><b>' + zr(Math.abs(left)) + "</b><span>" + (left < 0 ? "понад ліміт " : "лишилось з ") + nf0.format(Math.round(LM.total)) + "</span></div>" +
+    '<div class="lbar" role="img" aria-label="Витрачено ' + nf0.format(Math.round(p)) + ' % ліміту"><b' + (left < 0 ? ' class="over"' : "") + ' data-to="' + p.toFixed(2) + '%"></b></div>' +
+    '<p class="lnote">' + note + "</p>";
+  box.onclick = function () { lim = true; ascale = "m"; try { localStorage.setItem("lim", "1"); } catch (e) {} };
+  grow("#limc .lbar b", "width");
+}
 function renderReport(P) {
   var M = P.months[month], k = mi(M), prevM = P.months[month - 1] || null, prevI = prevWithIncome(P, month);
   var noIncome = !(M.income > 0), hero = $("hero"), approx = P.ok ? "" : "≈ ";
@@ -1562,6 +1590,7 @@ function renderReport(P) {
   }
   hero.querySelectorAll("[data-filter]").forEach(function (a) { a.onclick = function () { filter = a.dataset.filter; toCur(P); }; });
   $("cash").hidden = !P.cash;
+  renderLimit(P);
   renderGoal(P);
   renderInsights(P, M);
   var last = P.months[P.months.length - 1], ops = last ? last.ops.slice(0, 5) : [], left = justAdded.slice();
