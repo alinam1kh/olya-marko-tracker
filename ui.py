@@ -262,6 +262,10 @@ a { color: inherit; text-decoration: none; }
 .hero { position: relative; z-index: 1; padding: 22px 20px 20px; border-radius: 24px; color: #fff; }
 .hero-wrap::after { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; border-radius: inherit; opacity: .26; mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+/* на телефонах (2–3 фізичні пікселі на точку) шум 1:1 розтягувався й мутнів — тут він намальований утричі щільніше й стиснутий до 160px, зерно чітке */
+@media (min-resolution: 2dppx) {
+  .hero-wrap::after { opacity: .3; background-size: 160px 160px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='480' height='480'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.55' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); } }
 /* Під час відкриття — один живий прохід бліку: світло збирається в лівому верхньому куті, смугою на всю картку
    хвилясто (кут смуги «гуляє») проходить до правого нижнього кута й зникає. Кант і розмита рамка по краях
    горять разом зі смугою. Далі лишаються тільки мʼякі абстрактні форми, що повільно перетікають усередині */
