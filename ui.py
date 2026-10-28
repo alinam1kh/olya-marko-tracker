@@ -654,7 +654,6 @@ a.ins { color: var(--ink4); }
 .cic svg { width: 18px; height: 18px; }
 .cic.inc { background: var(--good-bg); }
 .cic .glyph, .ji .glyph { font-weight: 400; line-height: 1; }
-.jsum .ji .glyph { display: inline; font-size: 20px; color: inherit; }
 .more { display: flex; justify-content: space-between; align-items: center; width: 100%; min-height: 52px; margin-top: 4px; padding: 0; border: 0; border-top: 1px solid var(--soft);
   background: none; font: inherit; font-size: 15px; color: var(--ink2); cursor: pointer; text-align: left; }
 .more-r { display: inline-flex; align-items: center; gap: 6px; }
@@ -851,13 +850,17 @@ a.ins { color: var(--ink4); }
 .filters button { flex: none; min-height: 44px; padding: 0 16px; border: 1px solid var(--border); border-radius: 22px; background: var(--card); font-size: 14px; cursor: pointer; }
 .filters button[aria-pressed="true"] { border-color: transparent; background: var(--blue-g); color: #fff; font-weight: 500; }
 .filters button.catf { display: inline-flex; align-items: center; gap: 6px; padding-right: 12px; }
-.jsum { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
-.jsum .card { margin: 0; padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
-.jsum .ji { flex: none; width: 36px; height: 36px; border-radius: 18px; display: grid; place-items: center; }
-.jsum .ji svg { width: 18px; height: 18px; }
-.jsum span { display: block; font-size: 12px; color: var(--ink2); }
-.jsum b { display: block; margin-top: 2px; font-size: 17px; font-weight: 500; white-space: nowrap; }
-.jsum .card > div { min-width: 0; }
+/* Журнал: пошук по всіх місяцях + «Готівка», під фільтрами — підсумок одним рядком */
+.jtop { display: flex; gap: 8px; margin-top: 12px; }
+.jsearch { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; height: 48px; padding: 0 14px; border: 1px solid var(--border); border-radius: 24px; background: var(--card); color: var(--ink2); }
+.jsearch:focus-within { border-color: var(--blue); box-shadow: 0 0 0 4px var(--blue-soft); }
+.jsearch svg { flex: none; width: 18px; height: 18px; }
+.jsearch input { flex: 1; min-width: 0; height: 100%; border: 0; outline: 0; background: none; font: 16px var(--font); color: var(--ink); }
+.jsearch input::placeholder { color: var(--ink2); }
+.jcash { flex: none; display: inline-flex; align-items: center; gap: 6px; height: 48px; padding: 0 16px; border-radius: 24px; background: var(--blue-g); color: #fff; font-size: 15px; font-weight: 500; box-shadow: 0 6px 14px rgba(29,95,224,.24); }
+.jcash svg { width: 16px; height: 16px; }
+.jline { margin: 12px 4px 0; font-size: 14px; color: var(--ink2); }
+.jline b { font-weight: 500; color: var(--ink); }
 .dh { display: flex; justify-content: space-between; gap: 10px; margin: 16px 4px 6px; font-size: 14px; }
 .dh b { font-weight: 500; }
 .dh b span { font-weight: 400; color: var(--ink2); }
@@ -1046,11 +1049,13 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
   </div>
 
   <div id="v-journal" hidden>
-    <div class="filters" id="j-filters" role="group" aria-label="Фільтр"></div>
-    <div class="jsum">
-      <div class="card"><span class="ji" style="background:var(--blue-soft);color:var(--blue)" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 2.5h12a1 1 0 0 1 1 1v17.2a.6.6 0 0 1-.95.5L15.5 19.4l-2.9 1.9a1 1 0 0 1-1.1 0l-2.9-1.9-2.55 1.8A.6.6 0 0 1 5 20.7V3.5a1 1 0 0 1 1-1z"/><path fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" d="M9 8h6M9 12h6M9 15.5h3"/></svg></span><div><span>Операцій</span><b id="j-count"></b></div></div>
-      <div class="card"><span class="ji" style="background:var(--bad-bg);color:var(--bad)" aria-hidden="true"><span class="glyph">↗</span></span><div><span>Витрати</span><b id="j-sum"></b></div></div>
+    <div class="jtop">
+      <label class="jsearch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
+        <input id="j-q" type="search" placeholder="Назва, сума або категорія" autocomplete="off" enterkeyhint="search" aria-label="Пошук операцій у всіх місяцях"></label>
+      <a class="jcash" id="j-cash" href="#add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Готівка</a>
     </div>
+    <div class="filters" id="j-filters" role="group" aria-label="Фільтр"></div>
+    <p class="jline" id="j-line"></p>
     <div id="j-list"></div>
     <a class="fava" id="fava">Повний журнал у Fava<span id="arr-f"></span></a>
   </div>
@@ -1169,7 +1174,7 @@ function arr(d) { return d > 0 ? "↗" : "↘"; }
 
 function lastFull(P) { for (var i = P.months.length - 1; i >= 0; i--) if (P.months[i].income > 0) return i; return P.months.length - 1; }
 function curMonth(P) { return P.months.length - 1; }  // Головна завжди відкривається на поточному місяці, навіть до зарплати
-var person = 0, month = curMonth(D.people[0]), trendMonth = null, filter = "all", metric = "exp", amode = "month", catF = null;  // catF — фільтр Журналу за категорією (з «Що змінилось»)
+var person = 0, month = curMonth(D.people[0]), trendMonth = null, filter = "all", metric = "exp", amode = "month", catF = null, jq = "";  // catF — фільтр Журналу за категорією (з «Що змінилось»)
 var GOAL = { olya: { months: 6, deadline: [2027, 6], title: "Подушка безпеки" } };  // фіча 5 з роадмапу ДЗ
 var VIEWS = { report: 1, analytics: 1, journal: 1, add: 1 };
 var saved = null;  // після збереження готівки: сума й дата, щоб підсвітити новий запис
@@ -1621,13 +1626,17 @@ function renderJournal(P) {
     b.onclick = function () { filter = f[0]; render(); };
     fb.appendChild(b);
   });
-  var ops = M.ops.filter(function (o) {
+  // пошук шукає в усіх місяцях: за назвою, категорією або сумою («72,29»); без запиту — лише обраний місяць
+  var q = jq.trim().toLowerCase(), qn = q.replace(",", ".");
+  var src = q ? [].concat.apply([], P.months.slice().reverse().map(function (m) { return m.ops; })) : M.ops;
+  var ops = src.filter(function (o) {
     if (catF && o.cat !== catF) return false;
+    if (q && o.title.toLowerCase().indexOf(q) < 0 && o.cat.toLowerCase().indexOf(q) < 0 && !(/\d/.test(qn) && o.amount.toFixed(2).indexOf(qn) >= 0)) return false;
     return filter === "all" || (filter === "exp" && !o.income) || (filter === "inc" && o.income) || (filter === "fixed" && o.fixed) || (filter === "cash" && o.cash);
   });
   var out = ops.reduce(function (s, o) { return s + (o.income ? 0 : o.amount); }, 0);
-  $("j-count").textContent = ops.length;
-  $("j-sum").textContent = zl(out);
+  $("j-line").innerHTML = "<b>" + ops.length + " " + plural(ops.length, "операція", "операції", "операцій") + "</b>" + (out ? " · витрачено " + zl(out) : "") + (q ? " · у всіх місяцях" : "");
+  $("j-cash").hidden = !P.cash;
   var html = "", day = null, buf = "";
   var flush = function () { if (day) html += buf + "</div></section>"; };
   ops.forEach(function (o) {
@@ -1813,7 +1822,7 @@ $("v-add").addEventListener("submit", function (e) {
       // форма для наступного запису — з чистого аркуша: без суми, категорії й опису, дата «Сьогодні»
       var cat = pick; pick = null; $("a-title").value = ""; $("a-date").value = iso(new Date()); dpick = 1; $("a-cal").hidden = true;
       $("a-amount").value = ""; $("a-amount").dispatchEvent(new Event("input", { bubbles: true })); renderAdd(P);
-      location.replace("#report");
+      location.replace("#" + sheetBase);
       toast(okMsg("Готівку додано", D.people[person], saved.amount, cat), ["Скасувати", function () {
         delCash(D.people[person], saved.line, saved.day, saved.title, "#report", null, true);
       }]);
@@ -1835,8 +1844,8 @@ function sheet(open, P) {
     setTimeout(function () { if (!s.classList.contains("open")) s.hidden = bg.hidden = true; }, 300);
   }
 }
-var sheetFromApp = false;
-function closeSheet() { if (history.length > 1 && sheetFromApp) history.back(); else location.replace("#report"); }
+var sheetFromApp = false, sheetBase = "report";  // sheetBase — екран під шторкою: Головна або Журнал (кнопка «Готівка» там)
+function closeSheet() { if (history.length > 1 && sheetFromApp) history.back(); else location.replace("#" + sheetBase); }
 $("sheet-close").onclick = closeSheet;
 $("sheet-bg").onclick = closeSheet;
 document.addEventListener("keydown", function (e) { if (e.key === "Escape" && view() === "add") closeSheet(); });
@@ -1850,8 +1859,11 @@ document.addEventListener("keydown", function (e) { if (e.key === "Escape" && vi
     if (dy > 80) closeSheet();
   });
 })();
-$("cash").addEventListener("click", function () { sheetFromApp = true; });
+$("cash").addEventListener("click", function () { sheetFromApp = true; sheetBase = "report"; });
+$("j-cash").addEventListener("click", function () { sheetFromApp = true; sheetBase = "journal"; });
 $("ops-all").addEventListener("click", function () { filter = "all"; });
+// пошук у Журналі: перемальовуємо лише список, поле лишається у фокусі
+$("j-q").addEventListener("input", function () { jq = this.value; renderJournal(D.people[person]); });
 $("arr-j").outerHTML = CHR; $("arr-f").outerHTML = CHR;
 
 // ---------- рендер ----------
@@ -1859,7 +1871,7 @@ function render() {
   var v = view(), P = D.people[person];
   renderPeople();
   if (v === "add" && !P.cash) { location.replace("#report"); return; }
-  var base = v === "add" ? "report" : v, M = P.months[month];
+  var base = v === "add" ? sheetBase : v, M = P.months[month];
   var range = base === "analytics" && amode === "trends";
   $("mpick").hidden = range; $("mrange").hidden = !range;
   if (range) $("mrange").innerHTML = CAL + P.months[0].name + " – " + P.months[P.months.length - 1].name.toLowerCase();
@@ -1937,9 +1949,9 @@ window.addEventListener("hashchange", function () {
   var v = view();
   if (v === "report" && lastView !== "report" && lastView !== "add") setTimeout(replaySheen, 250);
   if (v !== "add" && lastView !== "add") window.scrollTo(0, 0);
-  if (lastView === "add" && v !== "add") sheetFromApp = false;
+  if (lastView === "add" && v !== "add") { sheetFromApp = false; sheetBase = "report"; }
   if (lastView === "report" && v !== "report" && v !== "add") reportKey = null;
-  if (lastView === "journal" && v !== "journal" && v !== "add") { filter = "all"; catF = null; }
+  if (lastView === "journal" && v !== "journal" && v !== "add") { filter = "all"; catF = null; jq = ""; $("j-q").value = ""; }
   prevView = lastView; lastView = v; render();
 });
 render();
