@@ -1570,7 +1570,7 @@ function renderAnalytics(P) {
     if (!weeks) {
       var avgV = avgOf(allFull, function (m) { return m.variable; });
       monthBars(function (m) { return m.variable; }, avgV, false);
-      $("t-avg").innerHTML = legRows([avgV ? ["Середні витрати за місяць", zr(avgV), true] : null, ["Разом з обовʼязковими", zr(M.expenses)]]);
+      $("t-avg").innerHTML = legRows([avgV ? ["Середні витрати за місяць", zr(avgV), true] : null]);
       // неповний місяць порівнюємо зі звичним до того самого числа
       line1 = M.incomplete ? vsUsual(M.variable, avgOf(base, function (m) { return m.ops.reduce(function (s, o) { return s + (!o.income && !o.fixed && dayOf(o) <= dn ? o.amount : 0); }, 0); }), n, false, " за 1–" + dn + " " + GEN[k])
         : vsUsual(M.variable, avgOf(base, function (m) { return m.variable; }), n, false, " за місяць");
@@ -1586,7 +1586,7 @@ function renderAnalytics(P) {
         var dd = uw ? w[top] - uw : 0;
         line1 = '<div class="aline"><span>Найдорожчий тиждень — ' + bounds[top][0] + "–" + bounds[top][1] + "</span>" + (uw && Math.abs(dd) >= 30 ? '<span class="bd ' + (dd > 0 ? "bad" : "good") + '">' + (dd > 0 ? "+" : "−") + zr(dd) + "</span>" : "") + "</div>";
       }
-      $("t-avg").innerHTML = legRows([uw ? ["Середній тиждень", zr(uw), true] : null, ["Разом з обовʼязковими", zr(M.expenses)]]);
+      $("t-avg").innerHTML = legRows([uw ? ["Середній тиждень", zr(uw), true] : null]);
     }
     $("a-sum").innerHTML = '<div class="alab">Щоденні витрати' + (M.incomplete ? '<span class="tag">дані до ' + M.last_op + "</span>" : "") + '</div><div class="abig">' + zr(M.variable) + "</div>" + line1;
     renderWhere(P, M);
