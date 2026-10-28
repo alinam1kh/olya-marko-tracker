@@ -598,12 +598,13 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 @keyframes numin { from { opacity: 0; transform: translateY(8px); filter: blur(4px); } to { opacity: 1; transform: none; filter: none; } }
 .hero .num { margin-top: 12px; font-size: 40px; font-weight: 500; letter-spacing: -.02em; line-height: 1.05; }
 .hero .sub { margin-top: 6px; font-size: 14px; }
-/* велика цифра й «з доходу» поруч, по нижньому краю */
-.hero .numrow { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 6px 12px; margin-top: 12px; }  /* на вузькому екрані «з доходу» переходить під цифру */
+/* велика цифра й «/ з доходу …» одразу за нею, по базовій лінії */
+.hero .numrow { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; margin-top: 12px; }  /* на вузькому екрані «з доходу» переходить під цифру */
 .hero .numrow .num { margin-top: 0; min-width: 0; white-space: nowrap; }
-.hero .side { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; padding-bottom: 3px; font-size: 13px; line-height: 1.25; color: rgba(255,255,255,.75); text-align: right; text-shadow: 0 1px 10px rgba(5, 10, 30, .28); }
-.hero .side b { font-size: 15px; font-weight: 500; color: #fff; white-space: nowrap; }
-.hero .side .bd { margin-top: 4px; }.hero .lbl { display: flex; align-items: center; gap: 8px; }
+.hero .side { flex: none; display: inline-flex; align-items: baseline; gap: 4px; font-size: 13px; color: rgba(255,255,255,.72); white-space: nowrap; text-shadow: 0 1px 10px rgba(5, 10, 30, .28); }
+.hero .side b { font-weight: 500; color: #fff; }
+.hero .side .bd { align-self: center; margin-left: 4px; }
+.hero .lbl .tag { margin-left: auto; }  /* «дані до …» — до правого краю */.hero .lbl { display: flex; align-items: center; gap: 8px; }
 .hero .tag { flex: none; height: 22px; padding: 0 8px; border-radius: 11px; background: rgba(255,255,255,.16); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); color: #fff; font-size: 12px; font-weight: 500; display: flex; align-items: center; }
 .hero .meter { height: 8px; margin: 14px 0 8px; border-radius: 4px; background: rgba(255,255,255,.25); overflow: hidden; }
 .hero .meter b { display: block; height: 100%; width: 0; border-radius: 4px; background: #fff; transition: width 2.1s var(--ease); }
@@ -1356,7 +1357,7 @@ function renderReport(P) {
     var ep = Math.min(100, Math.max(0, out / A * 100));
     hero.innerHTML = '<div class="lbl">Лишилось із зарплати ' + dm(sd) + tag + "</div>" +
       '<div class="numrow"><div class="num">' + approx + z0(A - out) + "</div>" +
-      '<a href="#journal" data-filter="inc" class="side inc">з доходу<b>' + z0(A) + "</b></a></div>" +
+      '<a href="#journal" data-filter="inc" class="side inc">/ з доходу <b>' + z0(A) + "</b></a></div>" +
       (P.ok ? "" : '<div class="sub">Потребує перевірки</div>') +
       '<div class="split2" role="img" aria-label="Витрачено ' + nf0.format(ep) + " % зарплати, лишилось " + nf0.format(100 - ep) + ' %">' +
         '<b class="e" data-to="calc(' + ep.toFixed(2) + '% - 2px)"></b><b class="s"></b></div>' +
@@ -1366,7 +1367,7 @@ function renderReport(P) {
   } else if (noIncome) {
     // дохід ще жодного разу не надходив (або вибрано місяць без доходу): лише скільки витрачено
     hero.innerHTML = '<div class="lbl">Витрачено у ' + LOC[k] + tag + "</div>" +
-      '<div class="numrow"><div class="num">' + approx + z0(M.expenses) + '</div><div class="side">дохід<b>не надходив</b></div></div>';
+      '<div class="numrow"><div class="num">' + approx + z0(M.expenses) + '</div><div class="side">/ дохід <b>не надходив</b></div></div>';
   } else {
     var inc = M.incomplete ? "" : (prevI ? heroBadge(M.income, prevI.income, false, LOC[mi(prevI)]) : "");
     var exp = M.incomplete ? "" : usualBadge(M.expenses, usualExp(P, month));
@@ -1374,7 +1375,7 @@ function renderReport(P) {
     var ep = M.income > 0 ? Math.min(100, M.expenses / M.income * 100) : 100, sp = 100 - ep;
     hero.innerHTML = '<div class="lbl">Лишилось у ' + LOC[k] + tag + "</div>" +
       '<div class="numrow"><div class="num">' + approx + zl(M.saved) + "</div>" +
-      '<a href="#journal" data-filter="inc" class="side inc">з доходу<b>' + nf0.format(M.income) + " зл</b>" + inc + "</a></div>" +
+      '<a href="#journal" data-filter="inc" class="side inc">/ з доходу <b>' + nf0.format(M.income) + " зл</b>" + inc + "</a></div>" +
       (P.ok ? "" : '<div class="sub">Потребує перевірки</div>') +
       '<div class="split2" role="img" aria-label="Витрати ' + nf0.format(ep) + " %, лишилось " + nf0.format(sp) + ' % доходу">' +
         '<b class="e" data-to="calc(' + ep.toFixed(2) + '% - 2px)"></b><b class="s"></b></div>' +
