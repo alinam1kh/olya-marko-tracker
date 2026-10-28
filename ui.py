@@ -2140,7 +2140,7 @@ function renderJournal(P) {
   fb.appendChild(cb);
   FILTERS.forEach(function (f) {
     var b = h("button", "", f[1]); b.type = "button"; b.setAttribute("aria-pressed", f[0] === filter);
-    b.onclick = function () { filter = f[0]; render(); };
+    b.onclick = function () { filter = f[0]; if (f[0] === "all") catF = null; render(); };  // «Усі» скидає й категорію
     fb.appendChild(b);
   });
   // пошук шукає в усіх місяцях: за назвою, категорією або сумою («72,29»); без запиту — лише обраний місяць
