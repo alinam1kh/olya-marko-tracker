@@ -913,7 +913,8 @@ a.ins { color: var(--ink4); }
 .alab { display: flex; align-items: center; gap: 8px; min-height: 24px; font-size: 13px; color: var(--ink2); }
 /* перемикач «Ліміт» — квадратик-чекбокс праворуч у рядку підпису */
 .limt { margin: -6px -4px -6px auto; display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 4px; border: 0; background: transparent; font: 400 13px var(--font); color: var(--ink3); cursor: pointer; }
-.ach .limt { margin: 0 0 0 -4px; font-size: 14px; }
+.ach .limt { margin: 0; min-height: 42px; padding: 0 14px 0 12px; border-radius: 21px; background: var(--soft); font-size: 13px; color: var(--ink3); transition: background .2s, color .2s; }
+.ach .limt[aria-pressed="true"] { background: var(--blue-soft); color: var(--blue); }
 #a-scale button { min-width: 88px; }  /* «Місяці / Тижні» ширше — місце в шапці звільнилось */
 .limt i { width: 16px; height: 16px; border-radius: 5px; display: grid; place-items: center; box-shadow: inset 0 0 0 1.5px var(--mute); }
 .limt i svg { opacity: 0; }
@@ -2030,7 +2031,7 @@ function renderAnalytics(P) {
     }
     if (!weeks || wi < 0) { $("a-sum").innerHTML = sumHTML("Щоденні витрати", extra, zr(M.variable), c); renderWhere(P, M, null, LM); }
     // перемикач ліміту — у шапці картки ліворуч (праворуч «Місяці / Тижні»); вмикає ліміти і на графіку, і в «Витрати за …»
-    var tg = h("button", "limt", '<i aria-hidden="true">' + svgI("#fff", '<path d="m5 12.5 4.5 4.5L19 7.5"/>', 12) + "</i>Ліміт");
+    var tg = h("button", "limt", svgI("currentColor", '<path d="M4 12h16M4 8.5v7M20 8.5v7"/>', 16) + "Ліміт");  // пігулка-фільтр: сіра → мʼяко-голуба
     tg.type = "button"; tg.setAttribute("aria-pressed", String(lim));
     tg.onclick = function () { lim = !lim; try { localStorage.setItem("lim", lim ? "1" : "0"); } catch (e) {} render(); };
     var ach = $("a-scale").parentNode, old = ach.querySelector(".limt"); if (old) old.remove();
