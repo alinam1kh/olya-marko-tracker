@@ -767,6 +767,7 @@ a.ins { color: var(--ink4); }
 .abig { display: flex; align-items: center; gap: 10px; }
 .abig .bd { font-size: 12px; line-height: 1; letter-spacing: 0; }  /* без успадкованої висоти рядка — текст рівно посередині плашки */
 #a-sum .aline { margin-top: 4px; font-size: 14px; color: var(--ink2); }
+#a-sum .anote { margin-top: 2px; font-size: 12px; color: var(--ink2); }  /* звідки ліміт */
 /* графік без осі й доріжок: лише стовпчики, назви місяців і пунктир середнього з підписом */
 .caps.plain .trk { background: none; overflow: visible; }
 .avgl .avgt { position: absolute; right: 0; bottom: 5px; padding: 1px 7px; border-radius: 999px; background: var(--card); box-shadow: inset 0 0 0 1px var(--mute); font-size: 11px; line-height: 1.4; color: var(--ink3); white-space: nowrap; }  /* «сер. …» — біла плашка з сірою обводкою, щоб не зливалась із доріжками */
@@ -818,7 +819,9 @@ a.ins { color: var(--ink4); }
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='3'%3E%3Cline x1='1.5' y1='1.5' x2='7.5' y2='1.5' stroke='%23C3C9D3' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") repeat-x left center / 12px 3px;
   clip-path: inset(-24px 100% -4px 0); opacity: 0; transition: clip-path 2.2s cubic-bezier(.45, 0, .2, 1) .3s, opacity 1.4s ease .3s; }
 /* поява разом зі стовпчиками: лінія «прокреслюється» зліва направо */
-.avgl.in { clip-path: inset(-24px -4px -4px 0); opacity: 1; }  /* запас угору — для підпису «сер. …» */
+.avgl.in { clip-path: inset(-24px -4px -4px -4px); opacity: 1; }  /* запас угору — для підпису «сер. …» */
+.avgl.liml { height: 2px; margin-top: -1px; background: var(--blue); border-radius: 1px; }  /* ліміт — суцільна синя */
+.liml .avgt { left: 0; right: auto; color: var(--blue-txt); box-shadow: inset 0 0 0 1px var(--blue-l); }
 .avg-leg { display: flex; align-items: center; gap: 10px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--soft); font-size: 14px; color: var(--ink2); }
 .avg-leg i { flex: none; width: 20px; height: 3px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='3'%3E%3Cline x1='1.5' y1='1.5' x2='7.5' y2='1.5' stroke='%23C3C9D3' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") repeat-x left center / 12px 3px; }
 .avg-leg b { margin-left: auto; font-size: 15px; font-weight: 500; color: var(--ink); }
@@ -1643,6 +1646,11 @@ function capsules(boxId, tickId, items, max, sel, onPick, n, avg, opt) {
     var al = box.appendChild(h("div", "avgl", opt.avgLabel ? '<span class="avgt">' + opt.avgLabel + "</span>" : "")); al.style.top = Math.round(H - avg / max * H) + "px";
     requestAnimationFrame(function () { requestAnimationFrame(function () { al.classList.add("in"); }); });
   }
+  // ліміт — друга, синя суцільна лінія; підпис ліворуч, щоб не налазити на «сер.» праворуч
+  if (opt.lim) {
+    var ll = box.appendChild(h("div", "avgl liml", '<span class="avgt">ліміт ' + nf0.format(Math.round(opt.lim)) + "</span>")); ll.style.top = Math.round(H - opt.lim / max * H) + "px";
+    requestAnimationFrame(function () { requestAnimationFrame(function () { ll.classList.add("in"); }); });
+  }
   grow("#" + boxId + " .fill", "height");
 }
 // «зазвичай» для Аналітики: повні місяці перед k (є зарплата, місяць закрито), не більше 6 останніх
@@ -1660,7 +1668,7 @@ function vsUsual(now, u, goodIfMore, when) {
 // підсумок над графіком: підпис (уточнення — через нашу вертикальну риску), сума з бейджем, висновок
 function sumHTML(label, extra, big, c) {
   return '<div class="alab"><span>' + label + (extra ? '<i class="sep" aria-hidden="true"></i>' + extra : "") + "</span></div>" +
-    '<div class="abig"><span>' + big + "</span>" + (c.badge || "") + "</div>" + (c.text ? '<div class="aline">' + c.text + "</div>" : "");
+    '<div class="abig"><span>' + big + "</span>" + (c.badge || "") + "</div>" + (c.text ? '<div class="aline">' + c.text + "</div>" : "") + (c.note ? '<div class="anote">' + c.note + "</div>" : "");
 }
 var ascale = "m";  // масштаб графіка витрат: m — місяці, w — тижні обраного місяця
 var wsel = { key: "", i: -1 };  // обраний тиждень (у межах місяця key); -1 — увесь місяць
@@ -1676,18 +1684,26 @@ function goalPlan(P) {
   var last = full[full.length - 1], ml = (G.deadline[0] * 12 + G.deadline[1] - 1) - (+last.key.slice(0, 4) * 12 + +last.key.slice(5)), left = Math.max(0, G.months * avgExp - have);
   return { pace: have / full.length, need: ml > 0 ? left / ml : left };
 }
-// ліміти щоденних категорій на місяць j: звичне за повні місяці (потрібно ≥ 2); якщо ціль відстає
-// або дохід мінус обовʼязкові мінус план відкладень не покриває звичне — різницю знімаємо лише з «бажань»
+// ліміти щоденних витрат на місяць j (з повних місяців перед ним):
+// • категорії: потреби — звичне (середнє), «бажання» — як у найекономніший місяць; потрібно ≥ 2 місяці з категорією
+// • загальний: є ціль — дохід мінус обовʼязкові мінус план відкладень («скільки можна, щоб устигнути»);
+//   цілі немає — сума лімітів категорій (категорії з малою кількістю даних — за звичним)
+// якщо ліміт від цілі менший за суму категорій — різницю знімаємо лише з «бажань»
 function limitsFor(P, j) {
-  var base = usualMonths(P, j), M = P.months[j], u = {}, cnt = {};
-  if (base.length < 2) return null;
-  base.forEach(function (m) { var f = fixedCats(m); m.categories.forEach(function (c) { if (f[c.name]) return; u[c.name] = (u[c.name] || 0) + c.amount / base.length; cnt[c.name] = (cnt[c.name] || 0) + 1; }); });
-  var L = {}, wants = 0, all = 0;
-  Object.keys(u).forEach(function (n) { all += u[n]; if (cnt[n] >= 2) { L[n] = u[n]; if (WANTS[n]) wants += u[n]; } });
-  var g = goalPlan(P), cut = g ? Math.max(0, g.need - g.pace) : 0, pm = M.income > 0 ? M : prevWithIncome(P, j);
-  if (pm) cut = Math.max(cut, all - (pm.income - avgOf(base, function (m) { return m.expenses - m.variable; }) - (g ? g.need : 0)));
-  if (cut > 0 && wants > 0) { var f = Math.max(0, 1 - cut / wants); Object.keys(L).forEach(function (n) { if (WANTS[n]) L[n] *= f; }); }
-  return { cat: L, total: Object.keys(u).reduce(function (s, n) { return s + (n in L ? L[n] : u[n]); }, 0) };
+  var base = usualMonths(P, j), M = P.months[j], u = {}, mn = {}, cnt = {}, g = goalPlan(P);
+  if (base.length < (g ? 1 : 2)) return null;
+  base.forEach(function (m) { var f = fixedCats(m); m.categories.forEach(function (c) { if (f[c.name]) return;
+    u[c.name] = (u[c.name] || 0) + c.amount / base.length; mn[c.name] = Math.min(mn[c.name] === undefined ? Infinity : mn[c.name], c.amount); cnt[c.name] = (cnt[c.name] || 0) + 1; }); });
+  var L = {}, wants = 0;
+  Object.keys(u).forEach(function (n) { if (cnt[n] >= 2) { L[n] = WANTS[n] ? mn[n] : u[n]; if (WANTS[n]) wants += L[n]; } });
+  var catSum = Object.keys(u).reduce(function (s, n) { return s + (n in L ? L[n] : u[n]); }, 0), total = catSum, src = "best";
+  var pm = M.income > 0 ? M : prevWithIncome(P, j);
+  if (g && pm) {
+    total = Math.max(0, pm.income - avgOf(base, function (m) { return m.expenses - m.variable; }) - g.need); src = "goal";
+    var cut = catSum - total;
+    if (cut > 0 && wants > 0) { var f = Math.max(0, 1 - cut / wants); Object.keys(L).forEach(function (n) { if (WANTS[n]) L[n] *= f; }); }
+  }
+  return { cat: L, total: total, src: src };
 }
 function renderAnalytics(P) {
   if (metric !== "saved") metric = "exp";
@@ -1708,30 +1724,31 @@ function renderAnalytics(P) {
   var pick = function (i) { month = i; render(); };
   var avgTag = function (v) { return v ? "сер. " + nf0.format(Math.round(v)) : ""; };
   // місяці: без осі, доріжок і сум — лише назви; пунктир середнього з підписом «сер. …»
-  var monthBars = function (val, avg, approx, tag) {
-    var vs = P.months.map(val), ax = niceAxis(Math.max.apply(null, vs.map(function (v) { return v || 0; }).concat([avg || 0, 1])));
+  var monthBars = function (val, avg, approx, limV) {
+    var vs = P.months.map(val), ax = niceAxis(Math.max.apply(null, vs.map(function (v) { return v || 0; }).concat([avg || 0, limV || 0, 1])));
     capsules("mbars", "mticks", P.months.map(function (m, j) {
       var v = vs[j], none = v === null || !m.ops.length;
       return { v: none ? 0 : Math.max(0, v), label: m.name, part: m.incomplete, empty: none, sub: none ? "немає даних" : (approx && m.incomplete ? "≈ " : "") + nf0.format(v) + " зл" };
-    }), ax.max, month, pick, ax.n, avg || 0, { avgLabel: (tag || avgTag)(avg) });
+    }), ax.max, month, pick, ax.n, avg || 0, { avgLabel: avgTag(avg), lim: limV || 0 });
   };
   var note = "";
   if (metric === "exp") {
     var c, extra = M.incomplete ? "дані до " + M.last_op : "", LM = lim ? limitsFor(P, month) : null;
-    var limTag = function (v) { return v ? "ліміт " + nf0.format(Math.round(v)) : ""; };
-    // з лімітом: бейдж «лишилось …» / «+… понад ліміт», рядком — сам ліміт
-    var vsLim = function (spent, l, open, per) {
+    var dimM = new Date(+M.key.slice(0, 4), +M.key.slice(5), 0).getDate(), G = GOAL[P.key];
+    // з лімітом: бейдж «лишилось …» / «+… понад ліміт»; рядком — ліміт (і скільки на день до кінця місяця), нижче — звідки він
+    var vsLim = function (spent, l, open, per, perDay) {
       if (!LM) return { badge: "", text: "Ліміт зʼявиться, коли буде два повні місяці" };
-      var d = l - spent;
+      var d = l - spent, dl = dimM - dn;
       return { badge: '<span class="bd ' + (d >= 0 ? "good" : "bad") + '">' + (d < 0 ? "+" + zr(-d) + " понад ліміт" : open ? "лишилось " + zr(d) : "вклались") + "</span>",
-        text: open ? "Ліміт " + per + " — " + zr(l) : "Ліміт був " + zr(l) + (d >= 0 ? ", лишилось " + zr(d) : "") };
+        text: (open ? "Ліміт " + per + " — " + zr(l) : "Ліміт був " + zr(l)) + (perDay && open && d > 0 && dl > 0 ? ", до кінця місяця ≈ " + zr(d / dl) + " на день" : ""),
+        note: LM.src === "goal" ? "Рахуємо від цілі «" + G.title + "»: дохід мінус обовʼязкові й план відкладень" : "Як у найекономніший місяць: бажання — за мінімумом, решта — як зазвичай" };
     };
     if (!weeks) {
       var avgV = avgOf(allFull, function (m) { return m.variable; });
       // неповний місяць порівнюємо зі звичним на те саме число — і на графіку це риска, а не середнє за місяць
       var uDay = M.incomplete ? avgOf(base, function (m) { return m.ops.reduce(function (s, o) { return s + (!o.income && !o.fixed && dayOf(o) <= dn ? o.amount : 0); }, 0); }) : null;
-      monthBars(function (m) { return m.variable; }, lim ? (LM ? LM.total : 0) : avgV, false, lim ? limTag : null);
-      c = lim ? vsLim(M.variable, LM && LM.total, M.incomplete, "на місяць")
+      monthBars(function (m) { return m.variable; }, avgV, false, LM ? LM.total : 0);
+      c = lim ? vsLim(M.variable, LM && LM.total, M.incomplete, "на місяць", true)
         : M.incomplete ? vsUsual(M.variable, uDay, false, " на " + dn + "-те") : vsUsual(M.variable, avgOf(base, function (m) { return m.variable; }), false, " за місяць");
     } else {
       var y = +M.key.slice(0, 4), mo = +M.key.slice(5), dim = new Date(y, mo, 0).getDate(), last = M.incomplete ? dn : dim;
@@ -1745,7 +1762,7 @@ function renderAnalytics(P) {
       // тап по тижню — його підсумок і категорії, як у місяцях; повторний тап — назад до місяця
       var pickW = function (i) { if (bounds[i][0] > last) return; wsel = { key: M.key, i: wsel.i === i ? -1 : i }; render(); };
       capsules("mbars", "mticks", bounds.map(function (b, i) { var future = b[0] > last; return { v: future ? 0 : w[i], label: b[0] + "–" + b[1], empty: future, sub: future ? "—" : nf0.format(w[i]) + " зл" }; }),
-        (axW = niceAxis(Math.max.apply(null, w.concat([(lim ? lw : uw) || 0, 1])))).max, wi, pickW, axW.n, (lim ? lw : uw) || 0, { avgLabel: lim ? limTag(lw) : avgTag(uw) });
+        (axW = niceAxis(Math.max.apply(null, w.concat([uw || 0, lw, 1])))).max, wi, pickW, axW.n, uw || 0, { avgLabel: avgTag(uw), lim: lw });
       if (wi >= 0) {
         var B = bounds[wi], upTo = Math.min(B[1], last), days = upTo - B[0] + 1, wpart = upTo < B[1], wt = B[0] + "–" + B[1] + " " + GEN[k];
         c = lim ? vsLim(w[wi], LM && LM.total * (B[1] - B[0] + 1) / dim, wpart, "на тиждень")
@@ -1756,7 +1773,7 @@ function renderAnalytics(P) {
         $("a-sum").innerHTML = sumHTML("Щоденні витрати", wt, zr(w[wi]), c);
         renderWhere(P, M, { cats: wcats, k: (B[1] - B[0] + 1) / dim, title: wt, partial: wpart }, LM);
       } else if (lim) {
-        c = vsLim(M.variable, LM && LM.total, M.incomplete, "на місяць");
+        c = vsLim(M.variable, LM && LM.total, M.incomplete, "на місяць", true);
       } else {
         c = top >= 0 ? vsUsual(w[top], uw, false, "") : { badge: "", text: "" };
         if (top >= 0) c.text = "Найдорожчий тиждень — " + bounds[top][0] + "–" + bounds[top][1];
