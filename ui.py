@@ -799,7 +799,12 @@ a.ins { color: var(--ink4); }
 .wrow .ir { display: inline-flex; align-items: center; gap: 4px; color: var(--ink2); }
 #an-where .dh { align-items: baseline; margin: 18px 0 2px; padding: 0 0 10px; border-bottom: 1px solid var(--soft); font-size: 15px; }  /* заголовок розділу: наш шрифт списків, 500, роздільник під ним */
 #an-where .dh b { font-weight: 500; color: var(--ink); }
-#an-where .dh > span { font-size: 14px; color: var(--ink2); }  /* сума — сіра, як підсумок дня в Журналі */
+#an-where .dh > span { font-size: 14px; color: var(--ink2); }
+/* підсумок місяця під категоріями: «Лишилось з доходу» — як заголовок розділу, але з роздільником зверху */
+#an-where .lrow { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin: 14px 0 6px; padding-top: 14px; border-top: 1px solid var(--soft); }
+#an-where .lrow b { display: block; font-size: 15px; font-weight: 500; }
+#an-where .lrow small { display: block; margin-top: 2px; font-size: 12px; color: var(--ink2); }
+#an-where .lrow > span { font-size: 15px; font-weight: 500; white-space: nowrap; }  /* сума — сіра, як підсумок дня в Журналі */
 .chart { display: flex; gap: 8px; margin-top: 24px; }
 #an-chart .chart { touch-action: pan-y; user-select: none; }
 #an-chart .chart.in-r { animation: chin-r .3s cubic-bezier(.32, .72, 0, 1); }
@@ -1152,7 +1157,6 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
   </div>
 
   <div id="v-analytics" hidden>
-    <div class="seg" id="a-mode" role="group" aria-label="Показник"></div>
     <!-- один графік: місяці або тижні обраного місяця; лише щоденні витрати, повна сума — рядком під цифрою -->
     <section class="card" id="an-chart">
       <div class="ach"><div class="anav" hidden><button type="button" class="aarr" id="a-prev" aria-label="Попередній місяць">‹</button><h2 id="a-title"></h2><button type="button" class="aarr" id="a-next" aria-label="Наступний місяць">›</button></div>        <div class="seg sm" id="a-scale" role="group" aria-label="Масштаб"></div></div>
@@ -1300,7 +1304,7 @@ function arr(d) { return d > 0 ? "↗" : "↘"; }
 function lastFull(P) { for (var i = P.months.length - 1; i >= 0; i--) if (P.months[i].income > 0) return i; return P.months.length - 1; }
 function curMonth(P) { return P.months.length - 1; }  // Головна завжди відкривається на поточному місяці, навіть до зарплати
 function toCur(P) { selDay = null; }  // переходи з Головної в Журнал — той самий місяць, що в шапці, без обраного дня
-var person = 0, month = curMonth(D.people[0]), trendMonth = null, filter = "all", metric = "exp", amode = "month", catF = null, jq = "", jqMonth = false;  // jqMonth — пошук лише в обраному місяці  // catF — фільтр Журналу за категорією (з «Що змінилось»)
+var person = 0, month = curMonth(D.people[0]), trendMonth = null, filter = "all", amode = "month", catF = null, jq = "", jqMonth = false;  // jqMonth — пошук лише в обраному місяці  // catF — фільтр Журналу за категорією (з «Що змінилось»)
 var GOAL = { olya: { months: 6, deadline: [2027, 6], title: "Подушка безпеки" } };  // фіча 5 з роадмапу ДЗ
 var VIEWS = { report: 1, analytics: 1, journal: 1, add: 1 };
 var saved = null;  // після збереження готівки: сума й дата, щоб підсвітити новий запис
@@ -1750,17 +1754,14 @@ function limitsFor(P, j) {
   return { cat: L, total: total, src: src };
 }
 function renderAnalytics(P) {
-  if (metric !== "saved") metric = "exp";
   if (month >= P.months.length) month = curMonth(P);
   var seg = function (id, list, cur, set) {
     var box = $(id); box.innerHTML = "";
     list.forEach(function (x) { var b = h("button", "", x[1]); b.type = "button"; b.setAttribute("aria-pressed", x[0] === cur); b.onclick = function () { set(x[0]); render(); }; box.appendChild(b); });
   };
-  seg("a-mode", [["exp", "Витрати"], ["saved", "Лишилось"]], metric, function (v) { metric = v; });
   seg("a-scale", [["m", "Місяці"], ["w", "Тижні"]], ascale, function (v) { ascale = v; });
-  var M = P.months[month], k = mi(M), weeks = metric === "exp" && ascale === "w", base = usualMonths(P, month);
+  var M = P.months[month], k = mi(M), weeks = ascale === "w", base = usualMonths(P, month);
   var allFull = usualMonths(P, P.months.length), dn = M.last_op ? +M.last_op.slice(0, 2) : 0;
-  $("a-scale").hidden = metric !== "exp";
   // місяць обирають тапом по стовпчику; у тижнях — стрілками ‹ ›
   $("a-title").textContent = M.name + " " + M.key.slice(0, 4);
   $("a-prev").hidden = $("a-next").hidden = !weeks;
@@ -1788,7 +1789,7 @@ function renderAnalytics(P) {
     }), ax.max, sel, function (i) { month = byKey[keys[i]]; render(); }, ax.n, avg || 0, { avgLabel: avgTag(avg), lim: limV || 0, paged: { per: per, page: mpage.p } });
   };
   var note = "";
-  if (metric === "exp") {
+  {
     var c, extra = M.incomplete ? "дані до " + M.last_op : "", LM = lim ? limitsFor(P, month) : null;
     var dimM = new Date(+M.key.slice(0, 4), +M.key.slice(5), 0).getDate(), G = GOAL[P.key];
     // з лімітом: бейдж «лишилось …» / «+… понад ліміт»; рядком — ліміт (і скільки на день до кінця місяця), нижче — звідки він
@@ -1841,22 +1842,6 @@ function renderAnalytics(P) {
     tg.type = "button"; tg.setAttribute("aria-pressed", String(lim));
     tg.onclick = function () { lim = !lim; try { localStorage.setItem("lim", lim ? "1" : "0"); } catch (e) {} render(); };
     $("a-sum").querySelector(".alab").appendChild(tg);
-  } else {
-    // «Лишилось»: факт для закритих місяців; для неповного — оцінка «≈» (дохід мінус витрати мінус звичне до кінця місяця)
-    var est = function (m, j) {
-      if (!m.incomplete) return m.income > 0 ? m.saved : null;
-      var pi = prevWithIncome(P, j), inc = m.income > 0 ? m.income : pi ? pi.income : 0, d0 = m.last_op ? +m.last_op.slice(0, 2) : 0;
-      if (!inc) return null;
-      return inc - m.expenses - (avgOf(usualMonths(P, j), function (mm) { return mm.ops.reduce(function (s, o) { return s + (!o.income && dayOf(o) > d0 ? o.amount : 0); }, 0); }) || 0);
-    };
-    var sv = P.months.map(est), avgS = avgOf(allFull, function (m) { return m.saved; });
-    monthBars(function (m, j) { return sv[j]; }, avgS, true);
-    var v = sv[month], inc = M.income > 0 ? M.income : (prevWithIncome(P, month) || {}).income;
-    var cs = M.incomplete ? { badge: "", text: M.income > 0 ? "Оцінка до кінця місяця, якщо витрати як зазвичай" : "Оцінка — точно після зарплати" }
-      : vsUsual(M.saved, avgOf(base, function (m) { return m.saved; }), true, " за місяць");
-    $("a-sum").innerHTML = sumHTML(M.incomplete ? "Лишиться" : "Лишилось", inc ? (M.income > 0 ? "з доходу " : "з доходу ≈ ") + zr(inc) : "",
-      v === null ? "—" : (M.incomplete ? "≈ " : "") + zr(v), cs);
-    $("an-where").hidden = true;
   }
   // висновок «Більше, ніж зазвичай…» — рядком одразу під цифрою (у sumHTML), поруч із бейджем
   $("t-avg").innerHTML = note;
@@ -1913,6 +1898,13 @@ function renderWhere(P, M, W, LM) {
   };
   section("Щоденні", daily, 4);
   section("Обовʼязкові", oblig, 2);
+  // замість окремої вкладки «Лишилось» — підсумковий рядок місяця: скільки лишилось з доходу і як це до звичного
+  if (!W && M.income > 0) {
+    var us = avgOf(base, function (m) { return m.saved; }), ds = us === null ? 0 : M.saved - us;
+    html += '<div class="lrow"><div><b>Лишилось з доходу</b><small>' + nf0.format(Math.round(M.saved / M.income * 100)) + " % з " + zr(M.income) +
+      (M.incomplete ? ", поки що" : us !== null && Math.abs(ds) >= Math.max(30, us * .05) ? ", на " + zr(Math.abs(ds)) + (ds > 0 ? " більше" : " менше") + ", ніж зазвичай" : us !== null ? ", як зазвичай" : "") +
+      "</small></div><span>" + zl(M.saved) + "</span></div>";
+  }
   box.innerHTML = html;
   if (LL) $("w-sort").onclick = function () { wsort = wsort === "left" ? "sum" : "left"; render(); };
   box.querySelectorAll(".more").forEach(function (b) {
