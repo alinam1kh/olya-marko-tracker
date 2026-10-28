@@ -772,7 +772,8 @@ a.ins { color: var(--ink4); }
 .wrow .nm { flex-direction: column; align-items: flex-start; gap: 2px; }
 .wrow .nm small { font-size: 13px; color: var(--ink2); }
 .wrow .ir { display: inline-flex; align-items: center; gap: 4px; color: var(--ink2); }
-#an-where .dh { margin: 14px 0 4px; padding: 9px 12px; border-radius: 12px; background: var(--soft); }  /* заголовок розділу — мʼяка сіра смуга */
+#an-where .dh { align-items: center; margin: 14px 0 4px; padding: 9px 12px; border-radius: 12px; background: var(--soft); }  /* заголовок розділу — мʼяка сіра смуга */
+#an-where .dh b { font-size: 12px; letter-spacing: .05em; text-transform: uppercase; }
 .chart { display: flex; gap: 8px; margin-top: 24px; }
 .ticks { flex: none; display: flex; flex-direction: column; justify-content: space-between; height: 150px; width: 66px; font-size: 12px; color: var(--ink2); text-align: right; }
 .ticks span { line-height: 1; white-space: nowrap; }
