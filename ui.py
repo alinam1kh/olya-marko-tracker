@@ -1467,9 +1467,9 @@ function renderReport(P) {
     var A = 0, out = 0;
     ops.forEach(function (o) { if (o.day >= sd) { if (o.income) A += o.day === sd ? o.amount : 0; else out += o.amount; } });
     var ep = Math.min(100, Math.max(0, out / A * 100));
-    hero.innerHTML = '<div class="lbl">Лишилось із зарплати ' + dm(sd) + tag + "</div>" +
+    hero.innerHTML = '<div class="lbl">Лишилось коштів' + tag + "</div>" +
       '<div class="numrow"><div class="num">' + approx + z0(A - out) + "</div>" +
-      '<a href="#journal" data-filter="inc" class="side inc">/ з доходу <b>' + z0(A) + "</b></a></div>" +
+      '<a href="#journal" data-filter="inc" class="side inc">/ із зарплати ' + dm(sd) + " — <b>" + z0(A) + "</b></a></div>" +
       (P.ok ? "" : '<div class="sub">Потребує перевірки</div>') +
       '<div class="split2" role="img" aria-label="Витрачено ' + nf0.format(ep) + " % зарплати, лишилось " + nf0.format(100 - ep) + ' %">' +
         '<b class="e" data-to="calc(' + ep.toFixed(2) + '% - 2px)"></b><b class="s"></b></div>' +
