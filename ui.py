@@ -1361,7 +1361,7 @@ function renderReport(P) {
       (P.ok ? "" : '<div class="sub">Потребує перевірки</div>') +
       '<div class="split2" role="img" aria-label="Витрачено ' + nf0.format(ep) + " % зарплати, лишилось " + nf0.format(100 - ep) + ' %">' +
         '<b class="e" data-to="calc(' + ep.toFixed(2) + '% - 2px)"></b><b class="s"></b></div>' +
-      '<div class="lg2"><a href="#journal" data-filter="exp" class="le"><span class="lt"><i></i>Витрати з ' + dm(sd) + ", " + nf0.format(ep) + " %</span>" +
+      '<div class="lg2"><a href="#journal" data-filter="exp" class="le"><span class="lt"><i></i>Витрати, ' + nf0.format(ep) + " %</span>" +
         '<span class="lv"><b>' + z0(out) + "</b></span></a>" +
       '<div class="ls"><span class="lt"><i></i>Лишилось, ' + nf0.format(100 - ep) + " %</span><b>" + z0(A - out) + "</b></div></div>";
   } else if (noIncome) {
