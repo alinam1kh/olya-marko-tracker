@@ -764,7 +764,7 @@ a.ins { color: var(--ink4); }
 #a-sum { margin-top: 16px; }
 .alab { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink2); }
 .alab .tag { flex: none; padding: 3px 10px; border-radius: 12px; background: var(--soft); font-size: 12px; font-weight: 500; color: var(--ink2); }
-.abig { margin-top: 6px; font-size: 28px; font-weight: 500; letter-spacing: -.01em; white-space: nowrap; }
+.abig { margin-top: 2px; font-size: 28px; font-weight: 500; letter-spacing: -.01em; white-space: nowrap; }
 .aline { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; margin-top: 6px; font-size: 14px; color: var(--ink2); }
 .legs .avg-leg + .avg-leg { margin-top: 12px; }
 /* «Куди пішли гроші»: під назвою категорії — дрібно «зазвичай …», як у «Що змінилось» */
