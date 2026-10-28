@@ -913,6 +913,8 @@ a.ins { color: var(--ink4); }
 .alab { display: flex; align-items: center; gap: 8px; min-height: 24px; font-size: 13px; color: var(--ink2); }
 /* перемикач «Ліміт» — квадратик-чекбокс праворуч у рядку підпису */
 .limt { margin: -6px -4px -6px auto; display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 4px; border: 0; background: transparent; font: 400 13px var(--font); color: var(--ink3); cursor: pointer; }
+.ach .limt { margin: 0 0 0 -4px; font-size: 14px; }
+#a-scale button { min-width: 88px; }  /* «Місяці / Тижні» ширше — місце в шапці звільнилось */
 .limt i { width: 16px; height: 16px; border-radius: 5px; display: grid; place-items: center; box-shadow: inset 0 0 0 1.5px var(--mute); }
 .limt i svg { opacity: 0; }
 .limt[aria-pressed="true"] i { background: var(--blue); box-shadow: none; }
@@ -2030,11 +2032,12 @@ function renderAnalytics(P) {
       }
     }
     if (!weeks || wi < 0) { $("a-sum").innerHTML = sumHTML("Щоденні витрати", extra, zr(M.variable), c); renderWhere(P, M, null, LM); }
-    // перемикач ліміту — праворуч у рядку підпису; вмикає ліміти і на графіку, і в «Куди пішли гроші»
+    // перемикач ліміту — у шапці картки ліворуч (праворуч «Місяці / Тижні»); вмикає ліміти і на графіку, і в «Витрати за …»
     var tg = h("button", "limt", '<i aria-hidden="true">' + svgI("#fff", '<path d="m5 12.5 4.5 4.5L19 7.5"/>', 12) + "</i>Ліміт");
     tg.type = "button"; tg.setAttribute("aria-pressed", String(lim));
     tg.onclick = function () { lim = !lim; try { localStorage.setItem("lim", lim ? "1" : "0"); } catch (e) {} render(); };
-    $("a-sum").querySelector(".alab").appendChild(tg);
+    var ach = $("a-scale").parentNode, old = ach.querySelector(".limt"); if (old) old.remove();
+    ach.insertBefore(tg, $("a-scale"));
   }
   // висновок «Більше, ніж зазвичай…» — рядком одразу під цифрою (у sumHTML), поруч із бейджем
   $("t-avg").innerHTML = note;
