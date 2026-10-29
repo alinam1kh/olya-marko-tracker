@@ -955,7 +955,7 @@ a.ins { color: var(--ink4); }
 .alab .sep { margin: 0 8px; }
 .abig { display: flex; align-items: center; gap: 10px; }
 .abig .bd { font-size: 12px; line-height: 1; letter-spacing: 0; }  /* без успадкованої висоти рядка — текст рівно посередині плашки */
-#a-sum .aline { margin-top: 4px; font-size: 14px; color: var(--ink2); }
+#a-sum .aline { align-items: flex-start; min-height: 2.8em; margin-top: 4px; font-size: 14px; line-height: 1.4; color: var(--ink2); }  /* завжди місце на два рядки — картка однакова в усіх місяцях і тижнях */
 #a-sum .anote { margin-top: 2px; font-size: 12px; color: var(--ink2); }  /* звідки ліміт */
 /* графік без осі й доріжок: лише стовпчики, назви місяців і пунктир середнього з підписом */
 .caps.plain .trk { background: none; overflow: visible; }
@@ -2026,7 +2026,7 @@ function vsUsual(now, u, goodIfMore, when) {
 // підсумок над графіком: підпис (уточнення — через нашу вертикальну риску), сума з бейджем, висновок
 function sumHTML(label, extra, big, c) {
   return '<div class="alab"><span>' + label + (extra ? '<i class="sep" aria-hidden="true"></i>' + extra : "") + "</span></div>" +
-    '<div class="abig"><span>' + big + "</span>" + (c.badge || "") + "</div>" + (c.text ? '<div class="aline">' + c.text + "</div>" : "") + (c.note ? '<div class="anote">' + c.note + "</div>" : "");
+    '<div class="abig"><span>' + big + "</span>" + (c.badge || "") + "</div>" + '<div class="aline">' + (c.text || "") + "</div>" + (c.note ? '<div class="anote">' + c.note + "</div>" : "");
 }
 var ascale = "m";  // масштаб графіка витрат: m — місяці, w — тижні обраного місяця
 var mpage = { who: -1, p: 0 };  // сторінка графіка місяців (0 — найновіша) для людини who
