@@ -696,7 +696,7 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .hero .lt { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
 .hero .lt i { flex: 0 0 8px; width: 8px; height: 8px; aspect-ratio: 1; border-radius: 50%;  /* 8px — на екранах 1,25×/1,5× 7px округлювався в сплющений овал */ background: rgba(255, 255, 255, .45); }
 .hero .ls .lt i { background: #fff; }
-.hero .lv { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; margin-top: 6px; }  /* бейдж «зазвичай» — окремим рядком під сумою */
+.hero .lv { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin-top: 6px; }  /* бейдж «зазвичай» — поруч із сумою (на вузькому — під нею) */
 .hero .lg2 b { font-size: 18px; font-weight: 500; }
 .hero .ls { flex: none; max-width: 52%; display: flex; flex-direction: column; align-items: flex-end; text-align: right; }
 .hero .ls .lt { justify-content: flex-end; }
@@ -1167,7 +1167,7 @@ a.ins { color: var(--ink4); }
 .jcat::-webkit-scrollbar-button { display: none; height: 0; }
 @supports not selector(::-webkit-scrollbar) { .jcat { scrollbar-width: thin; scrollbar-color: #D9DDE3 transparent; } }
 .jsug .opt .qi { flex: none; width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; background: var(--soft); color: var(--ink2); }
-.filters .catchip[aria-pressed="true"] { background: var(--blue); color: #fff; }
+.filters .catchip[aria-pressed="true"] { border-color: transparent; background: var(--blue-g); color: #fff; }
 .filters .catchip[aria-pressed="true"] .chev { color: #fff; }
 .jcash { flex: none; display: inline-flex; align-items: center; gap: 6px; height: 48px; padding: 0 16px; border-radius: 24px; background: var(--blue-g); color: #fff; font-size: 15px; font-weight: 500; box-shadow: 0 6px 14px rgba(29,95,224,.24); }
 .jcash svg { width: 16px; height: 16px; }
@@ -1525,6 +1525,9 @@ var growIO = "IntersectionObserver" in window ? new IntersectionObserver(functio
 // «тихе» перемальовування (тап по бару, ліміт, сортування): стовпчики й смужки одразу на місці, без повторного росту
 var still = false;
 function calm(fn) { still = true; try { fn(); } finally { still = false; } }
+// дані змінились (готівка, ціль): наступне перемальовування — тихе, навіть якщо його запускає зміна адреси
+var quietNext = false;
+function quiet() { quietNext = true; setTimeout(function () { quietNext = false; }, 800); }
 function grow(sel, attr) {
   if (still) { document.querySelectorAll(sel).forEach(function (e) { e.style.transition = "none"; e.style[attr] = e.dataset.to; }); return; }
   requestAnimationFrame(function () { requestAnimationFrame(function () {
@@ -2397,7 +2400,7 @@ function delCash(P, line, day, title, back, undo, cancel, doneMsg) {
       D = res.data;
       var ms = D.people[person].months.map(function (m) { return m.key; });
       month = ms.indexOf(mk) >= 0 ? ms.indexOf(mk) : curMonth(D.people[person]);
-      saved = null; reportKey = null;
+      saved = null; reportKey = null; quiet();
       justAdded = justAdded.filter(function (s) { return !(s.day === day && s.title === title); });
       if (back && location.hash !== back) location.hash = back; else render();
       // «Скасувати» записує той самий запис назад (та сама сума, категорія, опис і дата)
@@ -2418,7 +2421,7 @@ function restoreCash(P, u) {
     .then(function (r) { return r.json().catch(function () { return { ok: false, error: "Сервер не відповів" }; }); })
     .then(function (res) {
       if (!res.ok) throw new Error(res.error || "Не вдалося відновити");
-      D = res.data; saved = { amount: +u.amount, day: res.date, line: res.line, title: res.title }; markFresh(saved); reportKey = null; render();
+      D = res.data; saved = { amount: +u.amount, day: res.date, line: res.line, title: res.title }; markFresh(saved); reportKey = null; quiet(); render();
       toast(okMsg("Скасовано"));
     })
     .catch(function (err) { toast(err.message || "Немає звʼязку, спробуйте ще раз"); });
@@ -2522,7 +2525,7 @@ $("v-add").addEventListener("submit", function (e) {
       var ms = D.people[person].months.map(function (m) { return m.key; });
       if (ms.indexOf(res.month) >= 0) month = ms.indexOf(res.month);
       saved = { amount: amountValue(), day: res.date, line: res.line, title: res.title }; markFresh(saved);
-      reportKey = null; btn.disabled = false;
+      reportKey = null; quiet(); btn.disabled = false;
       // «Змінити»: новий запис уже додано — тепер прибираємо старий (він вище у файлі, його рядок не зсунувся)
       if (editing) {
         var ed = editing; editing = null;
@@ -2801,7 +2804,7 @@ function storedGoals(P) { return (((D.plans || {})[P.key]) || []).map(function (
 function planPost(P, goals) {
   return fetch("api/plan", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "same-origin", body: JSON.stringify({ person: P.key, goals: goals }) })
     .then(function (r) { return r.json().catch(function () { return { ok: false, error: "Сервер не відповів" }; }); })
-    .then(function (res) { if (!res.ok) throw new Error(res.error || "Не вдалося зберегти"); D.plans = res.plans; reportKey = null; render(); return res; });
+    .then(function (res) { if (!res.ok) throw new Error(res.error || "Не вдалося зберегти"); D.plans = res.plans; reportKey = null; quiet(); render(); return res; });
 }
 function planUndo(P, prev, msg) {
   toast(okMsg(msg), ["Скасувати", function () { planPost(P, prev).then(function () { toast(okMsg("Скасовано")); }).catch(function (err) { toast(err.message); }); }]);
@@ -2927,6 +2930,7 @@ function mcalName(base, M) {
     : selDay ? (+selDay.slice(8)) + " " + GEN[mi(M)] + " " + M.key.slice(0, 4) : M.name + " " + M.key.slice(0, 4);
 }
 function render() {
+  if (quietNext && !still) { quietNext = false; return calm(render); }
   var v = view(), P = D.people[person];
   renderPeople();
   if (v === "add" && !P.cash) { location.replace("#report"); return; }
@@ -2947,7 +2951,7 @@ function render() {
   if (base === "analytics") renderAnalytics(P); else if (base === "journal") renderJournal(P); else if (!sheetOnly) { renderReport(P); reportKey = rkey; }
   if (base !== lastBase) { lastBase = base; enter(base); }
   // інша людина чи місяць на головній — сума знову «набігає»
-  else if (newReport) countUp(document.querySelector("#hero .num"));
+  else if (newReport && !still) countUp(document.querySelector("#hero .num"));
   sheet(v === "add", P);
 }
 // поява: при першому показі екрана картки виїжджають по черзі, а головна сума «набігає»
