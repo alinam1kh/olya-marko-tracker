@@ -363,11 +363,11 @@ PAGE = r"""<!doctype html>
   --ink: #111318; --ink2: #6B7180; --ink3: #4A5060; --ink4: #2A2E38; --mute: #C4C8D0;
   --blue: #1F63E6; --blue-g: linear-gradient(180deg, #3B82F6, #1D5FE0); --blue-soft: #EAF1FF; --blue-txt: #1F55C9; --blue-l: #A9C6F8;
   --good: #15803D; --good-bg: #E3F7EA; --bad: #C0261B; --bad-bg: #FDE8E6; --cash: #7A4E00; --cash-bg: #FFF2DB;
-  --hero-on: #DCE3F4; --glow: rgba(120, 160, 245, .24); --glow2: rgba(130, 175, 255, .62); --glow3: rgba(190, 215, 255, .45); --glow4: rgba(90, 120, 255, .55); --glow5: rgba(150, 130, 255, .5); --h1: rgba(86, 146, 255, .72); --h2: rgba(56, 189, 248, .5); --h3: rgba(139, 92, 246, .58); --h4: rgba(4, 8, 32, .9); --h5: rgba(59, 91, 255, .62); --h6: rgba(110, 231, 255, .78); --g1: #3A62C2; --g2: #142A68; --g3: #030A24; --l1: #8AF2FF; --l2: #2F6BFF; --l3: #2CCFD8; --l4: #7C5CFF;
+  --hero-on: #DCE3F4; --glow: rgba(120, 160, 245, .24); --glow2: rgba(130, 175, 255, .62); --glow3: rgba(190, 215, 255, .45); --glow4: rgba(90, 120, 255, .55); --glow5: rgba(150, 130, 255, .5); --h1: rgba(86, 146, 255, .72); --h2: rgba(56, 189, 248, .5); --h3: rgba(139, 92, 246, .58); --h4: rgba(4, 8, 32, .9); --h5: rgba(59, 91, 255, .62); --h6: rgba(110, 231, 255, .78); --g1: #3A62C2; --g2: #142A68; --g3: #030A24; --l1: #8AF2FF; --l2: #2F6BFF; --l3: #2CCFD8; --l4: #7C5CFF; --k1: #2A14FF; --k2: #2CC2DE; --k3: #1236B4;
   --ease: cubic-bezier(.33, 1, .68, 1); --spring: cubic-bezier(.34, 1.2, .64, 1);
   --font: "Onest", "Outfit", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
-body.p-olya { --hero-on: #F1DDEA; --glow: rgba(214, 120, 182, .34); --glow2: rgba(232, 130, 200, .6); --glow3: rgba(255, 190, 230, .42); --glow4: rgba(255, 110, 170, .5); --glow5: rgba(190, 100, 230, .48); --h1: rgba(244, 114, 182, .62); --h2: rgba(251, 146, 120, .42); --h3: rgba(192, 86, 240, .55); --h4: rgba(28, 2, 20, .9); --h5: rgba(255, 72, 150, .55); --h6: rgba(255, 176, 120, .68); --g1: #BC3393; --g2: #5A0A4F; --g3: #10021C; --l1: #FFBDE6; --l2: #E8449A; --l3: #A855F7; --l4: #D58CFF; }
+body.p-olya { --hero-on: #F1DDEA; --glow: rgba(214, 120, 182, .34); --glow2: rgba(232, 130, 200, .6); --glow3: rgba(255, 190, 230, .42); --glow4: rgba(255, 110, 170, .5); --glow5: rgba(190, 100, 230, .48); --h1: rgba(244, 114, 182, .62); --h2: rgba(251, 146, 120, .42); --h3: rgba(192, 86, 240, .55); --h4: rgba(28, 2, 20, .9); --h5: rgba(255, 72, 150, .55); --h6: rgba(255, 176, 120, .68); --g1: #BC3393; --g2: #5A0A4F; --g3: #10021C; --l1: #FFBDE6; --l2: #E8449A; --l3: #A855F7; --l4: #D58CFF; --k1: #C21C9E; --k2: #FF8FCF; --k3: #6A1FC4; }
 * { box-sizing: border-box; }
 html, body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.4 var(--font); -webkit-font-smoothing: antialiased; font-variant-numeric: tabular-nums; }
 .app { max-width: 440px; margin: 0 auto; padding: 8px 14px 130px; }
@@ -452,11 +452,9 @@ a { color: inherit; text-decoration: none; }
    хвилясто (кут смуги «гуляє») проходить до правого нижнього кута й зникає. Кант і розмита рамка по краях
    горять разом зі смугою. Далі лишаються тільки мʼякі абстрактні форми, що повільно перетікають усередині */
 @property --p { syntax: "<percentage>"; inherits: true; initial-value: -40%; }
-@property --ex { syntax: "<percentage>"; inherits: true; initial-value: 0%; }
-@property --ey { syntax: "<percentage>"; inherits: true; initial-value: 20%; }
 @property --a { syntax: "<angle>"; inherits: true; initial-value: 115deg; }
 .liquid { position: absolute; inset: 0; z-index: 0; pointer-events: none; border-radius: inherit; --sheen: .45; }
-.liquid.sheen { animation: sheen 7s linear both, edge 12s linear infinite; }
+.liquid.sheen { animation: sheen 7s linear both; }
 body.p-olya .liquid { --sheen: .4; }
 .liquid > span { position: absolute; inset: 0; border-radius: inherit; }
 .liquid .glow, .liquid .halo, .liquid .rim { opacity: var(--sheen); }
@@ -535,117 +533,53 @@ body.p-olya .liquid { --sheen: .4; }
 .liquid.lit .after { -webkit-mask: none; mask: none; }  /* після першого проходу: те саме, що кінець бліку (--p 150%) */
 .liquid .after > .ehalo, .liquid .after > .erim { position: absolute; inset: 0; border-radius: inherit; }
 .liquid .after > .mesh { position: absolute; }
-body.p-olya .liquid .after { opacity: .68; }
+body.p-olya .liquid .after { opacity: .9; }
 /* рамка в Олі — яскравіша: світло-рожевий кант у найсвітлішій точці (кант мерехтить кадрами — тож свої кадри) */
-body.p-olya .liquid .ehalo { opacity: .62; }
-body.p-olya .liquid .erim { animation-name: glintRo; }
-@keyframes glintRo { 0%, 100% { opacity: .45; } 50% { opacity: .95; } }  /* в Олі світлі тони яскравіші — трохи тихіше, щоб лишалась глибина */
-.liquid .ehalo { opacity: .46; } .liquid .erim { opacity: .5; }
+body.p-olya .liquid .ehalo { opacity: .6; } body.p-olya .liquid .erim { opacity: .7; }
+.liquid .ehalo { opacity: .7; } .liquid .erim { opacity: .85; }
 .liquid .ehalo { filter: blur(8px); }
 .liquid .ehalo i, .liquid .erim { position: absolute; inset: 0; border-radius: inherit;
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
+/* позиції полів mesh (у координатах картки: шар mesh ширший за картку на 12% з кожного боку) */
+.liquid .after { --c1x: calc(var(--m1x) * 1.24 - 12%); --c1y: calc(var(--m1y) * 1.24 - 12%); --c2x: calc(var(--m2x) * 1.24 - 12%); --c2y: calc(var(--m2y) * 1.24 - 12%); }
 .liquid .ehalo i { padding: 12px; background:
-  radial-gradient(70% 90% at var(--ex) var(--ey), var(--l1) 0%, var(--l2) 30%, transparent 70%),
-  radial-gradient(60% 80% at calc(100% - var(--ex)) calc(100% - var(--ey)), var(--l3) 0%, color-mix(in srgb, var(--l3) 50%, transparent) 35%, transparent 70%); }
+  radial-gradient(55% 80% at var(--c2x) var(--c2y), var(--k2) 0%, color-mix(in srgb, var(--k2) 50%, transparent) 35%, transparent 70%),
+  radial-gradient(70% 90% at var(--c1x) var(--c1y), color-mix(in srgb, var(--k1) 70%, transparent) 0%, transparent 70%); }
 .liquid .erim { padding: 1.5px; background:
-  radial-gradient(55% 75% at var(--ex) var(--ey), #fff 0%, var(--l1) 25%, var(--l2) 50%, transparent 78%),
-  radial-gradient(45% 65% at calc(100% - var(--ex)) calc(100% - var(--ey)), var(--l1) 0%, var(--l2) 40%, transparent 75%); }
-@keyframes edge {
-  0.0% { --ex: 0.0%; --ey: 0.0%; }
-  2.5% { --ex: 7.2%; --ey: 0.0%; }
-  5.0% { --ex: 14.2%; --ey: 0.0%; }
-  7.5% { --ex: 20.9%; --ey: 0.0%; }
-  10.0% { --ex: 27.0%; --ey: 0.0%; }
-  12.5% { --ex: 32.5%; --ey: 0.0%; }
-  15.0% { --ex: 37.2%; --ey: 0.0%; }
-  17.5% { --ex: 41.0%; --ey: 0.0%; }
-  20.0% { --ex: 43.7%; --ey: 0.0%; }
-  22.5% { --ex: 45.4%; --ey: 0.0%; }
-  25.0% { --ex: 46.0%; --ey: 0.0%; }
-  27.5% { --ex: 45.4%; --ey: 0.0%; }
-  30.0% { --ex: 43.7%; --ey: 0.0%; }
-  32.5% { --ex: 41.0%; --ey: 0.0%; }
-  35.0% { --ex: 37.2%; --ey: 0.0%; }
-  37.5% { --ex: 32.5%; --ey: 0.0%; }
-  40.0% { --ex: 27.0%; --ey: 0.0%; }
-  42.5% { --ex: 20.9%; --ey: 0.0%; }
-  45.0% { --ex: 14.2%; --ey: 0.0%; }
-  47.5% { --ex: 7.2%; --ey: 0.0%; }
-  50.0% { --ex: 0.0%; --ey: 0.0%; }
-  52.5% { --ex: 0.0%; --ey: 12.8%; }
-  55.0% { --ex: 0.0%; --ey: 25.3%; }
-  57.5% { --ex: 0.0%; --ey: 37.2%; }
-  60.0% { --ex: 0.0%; --ey: 48.2%; }
-  62.5% { --ex: 0.0%; --ey: 58.0%; }
-  65.0% { --ex: 0.0%; --ey: 66.3%; }
-  67.5% { --ex: 0.0%; --ey: 73.1%; }
-  70.0% { --ex: 0.0%; --ey: 78.0%; }
-  72.5% { --ex: 0.0%; --ey: 81.0%; }
-  75.0% { --ex: 0.0%; --ey: 82.0%; }
-  77.5% { --ex: 0.0%; --ey: 81.0%; }
-  80.0% { --ex: 0.0%; --ey: 78.0%; }
-  82.5% { --ex: 0.0%; --ey: 73.1%; }
-  85.0% { --ex: 0.0%; --ey: 66.3%; }
-  87.5% { --ex: 0.0%; --ey: 58.0%; }
-  90.0% { --ex: 0.0%; --ey: 48.2%; }
-  92.5% { --ex: 0.0%; --ey: 37.2%; }
-  95.0% { --ex: 0.0%; --ey: 25.3%; }
-  97.5% { --ex: 0.0%; --ey: 12.8%; }
-  100.0% { --ex: 0.0%; --ey: 0.0%; }
-}
-/* mesh-градієнт: великі поля кольору, що перекриваються й течуть, як вода: зсуваються, розтікаються й збираються,
-   тануть і проявляються знову (кожен параметр — свій темп, тож рух не повторюється); між полями лишається темний фон */
-@property --m1x { syntax: "<percentage>"; inherits: false; initial-value: 52%; }
-@property --m1y { syntax: "<percentage>"; inherits: false; initial-value: -12%; }
-@property --m1w { syntax: "<percentage>"; inherits: false; initial-value: 58%; }
-@property --m1h { syntax: "<percentage>"; inherits: false; initial-value: 78%; }
-@property --m1a { syntax: "<percentage>"; inherits: false; initial-value: 55%; }
-@property --m2x { syntax: "<percentage>"; inherits: false; initial-value: 72%; }
-@property --m2y { syntax: "<percentage>"; inherits: false; initial-value: 42%; }
-@property --m2w { syntax: "<percentage>"; inherits: false; initial-value: 42%; }
-@property --m2h { syntax: "<percentage>"; inherits: false; initial-value: 58%; }
-@property --m2a { syntax: "<percentage>"; inherits: false; initial-value: 25%; }
-@property --m3x { syntax: "<percentage>"; inherits: false; initial-value: -8%; }
-@property --m3y { syntax: "<percentage>"; inherits: false; initial-value: 62%; }
-@property --m3w { syntax: "<percentage>"; inherits: false; initial-value: 42%; }
-@property --m3h { syntax: "<percentage>"; inherits: false; initial-value: 56%; }
-@property --m3a { syntax: "<percentage>"; inherits: false; initial-value: 60%; }
-@property --m4x { syntax: "<percentage>"; inherits: false; initial-value: -2%; }
-@property --m4y { syntax: "<percentage>"; inherits: false; initial-value: -12%; }
-@property --m4w { syntax: "<percentage>"; inherits: false; initial-value: 38%; }
-@property --m4h { syntax: "<percentage>"; inherits: false; initial-value: 52%; }
-@property --m4a { syntax: "<percentage>"; inherits: false; initial-value: 15%; }
-.liquid .mesh { inset: -12%; opacity: .74; filter: blur(34px);  /* сильне розмиття: лише плавні переходи кольору, без яскравих ядер */
-  background:
-  radial-gradient(var(--m1w) var(--m1h) at var(--m1x) var(--m1y), color-mix(in srgb, color-mix(in srgb, var(--l2) var(--m1a), transparent) 80%, transparent) 0%, color-mix(in srgb, color-mix(in srgb, var(--l2) var(--m1a), transparent) 55%, transparent) 28%, color-mix(in srgb, color-mix(in srgb, var(--l2) var(--m1a), transparent) 24%, transparent) 52%, transparent 78%),
-  radial-gradient(var(--m2w) var(--m2h) at var(--m2x) var(--m2y), color-mix(in srgb, color-mix(in srgb, var(--l4) var(--m2a), transparent) 80%, transparent) 0%, color-mix(in srgb, color-mix(in srgb, var(--l4) var(--m2a), transparent) 55%, transparent) 28%, color-mix(in srgb, color-mix(in srgb, var(--l4) var(--m2a), transparent) 24%, transparent) 52%, transparent 78%),
-  radial-gradient(var(--m3w) var(--m3h) at var(--m3x) var(--m3y), color-mix(in srgb, color-mix(in srgb, var(--l3) var(--m3a), transparent) 80%, transparent) 0%, color-mix(in srgb, color-mix(in srgb, var(--l3) var(--m3a), transparent) 55%, transparent) 28%, color-mix(in srgb, color-mix(in srgb, var(--l3) var(--m3a), transparent) 24%, transparent) 52%, transparent 78%),
-  radial-gradient(var(--m4w) var(--m4h) at var(--m4x) var(--m4y), color-mix(in srgb, color-mix(in srgb, color-mix(in srgb, var(--l2) 70%, var(--l4)) var(--m4a), transparent) 80%, transparent) 0%, color-mix(in srgb, color-mix(in srgb, color-mix(in srgb, var(--l2) 70%, var(--l4)) var(--m4a), transparent) 55%, transparent) 28%, color-mix(in srgb, color-mix(in srgb, color-mix(in srgb, var(--l2) 70%, var(--l4)) var(--m4a), transparent) 24%, transparent) 52%, transparent 78%);
-  animation: m1x 7s ease-in-out infinite alternate, m1y 9.5s ease-in-out infinite alternate, m1w 6.5s ease-in-out infinite alternate, m1h 8.5s ease-in-out infinite alternate, m1a 10.5s ease-in-out infinite alternate, m2x 8s ease-in-out infinite alternate, m2y 6.8s ease-in-out infinite alternate, m2w 9s ease-in-out infinite alternate, m2h 7.4s ease-in-out infinite alternate, m2a 8.8s ease-in-out infinite alternate, m3x 9.2s ease-in-out infinite alternate, m3y 7.6s ease-in-out infinite alternate, m3w 7.8s ease-in-out infinite alternate, m3h 10s ease-in-out infinite alternate, m3a 6.9s ease-in-out infinite alternate, m4x 6.6s ease-in-out infinite alternate, m4y 8.2s ease-in-out infinite alternate, m4w 9.6s ease-in-out infinite alternate, m4h 7s ease-in-out infinite alternate, m4a 9.4s ease-in-out infinite alternate; }
-@keyframes m1x { to { --m1x: 92%; } }
-@keyframes m1y { to { --m1y: 34%; } }
-@keyframes m1w { to { --m1w: 104%; } }
-@keyframes m1h { to { --m1h: 134%; } }
-@keyframes m1a { to { --m1a: 100%; } }
-@keyframes m2x { to { --m2x: 106%; } }
-@keyframes m2y { to { --m2y: 102%; } }
-@keyframes m2w { to { --m2w: 90%; } }
-@keyframes m2h { to { --m2h: 120%; } }
-@keyframes m2a { to { --m2a: 95%; } }
-@keyframes m3x { to { --m3x: 36%; } }
-@keyframes m3y { to { --m3y: 112%; } }
-@keyframes m3w { to { --m3w: 94%; } }
-@keyframes m3h { to { --m3h: 124%; } }
-@keyframes m3a { to { --m3a: 100%; } }
-@keyframes m4x { to { --m4x: 42%; } }
-@keyframes m4y { to { --m4y: 36%; } }
-@keyframes m4w { to { --m4w: 84%; } }
-@keyframes m4h { to { --m4h: 110%; } }
-@keyframes m4a { to { --m4a: 85%; } }
-.liquid .ehalo i { animation: glint 5s ease-in-out infinite; }
-.liquid .erim { animation: glintR 5s ease-in-out infinite; }
-@keyframes glintR { 0%, 100% { opacity: .3; } 50% { opacity: .62; } }
-@keyframes glint { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+  radial-gradient(45% 70% at var(--c2x) var(--c2y), #fff 0%, var(--k2) 30%, transparent 70%),
+  radial-gradient(60% 85% at var(--c1x) var(--c1y), color-mix(in srgb, var(--k1) 60%, #fff) 0%, color-mix(in srgb, var(--k1) 50%, transparent) 40%, transparent 72%); }
+/* mesh-градієнт: три насичені поля кольору (як розмиті «витягнуті» форми) — кольори лишаються яскравими й не зливаються в один,
+   між ними мʼякий перехід; поля динамічно, але плавно зсуваються й розтягуються (кожен параметр — свій темп).
+   Позиції спільні з рамкою: кант світиться там, де до краю підходять світлі кольори */
+@property --m1x { syntax: "<percentage>"; inherits: true; initial-value: 4%; }
+@property --m1y { syntax: "<percentage>"; inherits: true; initial-value: -14%; }
+@property --m1w { syntax: "<percentage>"; inherits: true; initial-value: 50%; }
+@property --m1h { syntax: "<percentage>"; inherits: true; initial-value: 48%; }
+@property --m2x { syntax: "<percentage>"; inherits: true; initial-value: 60%; }
+@property --m2y { syntax: "<percentage>"; inherits: true; initial-value: 2%; }
+@property --m2w { syntax: "<percentage>"; inherits: true; initial-value: 46%; }
+@property --m2h { syntax: "<percentage>"; inherits: true; initial-value: 52%; }
+@property --m3x { syntax: "<percentage>"; inherits: true; initial-value: 86%; }
+@property --m3y { syntax: "<percentage>"; inherits: true; initial-value: 56%; }
+@property --m3w { syntax: "<percentage>"; inherits: true; initial-value: 26%; }
+@property --m3h { syntax: "<percentage>"; inherits: true; initial-value: 56%; }
+.liquid .after { animation: m1x 6.2s ease-in-out infinite alternate, m1y 7.8s ease-in-out infinite alternate, m1w 5.6s ease-in-out infinite alternate, m1h 8.4s ease-in-out infinite alternate, m2x 7.4s ease-in-out infinite alternate, m2y 5.8s ease-in-out infinite alternate, m2w 8.8s ease-in-out infinite alternate, m2h 6.6s ease-in-out infinite alternate, m3x 5.4s ease-in-out infinite alternate, m3y 8.2s ease-in-out infinite alternate, m3w 7s ease-in-out infinite alternate, m3h 6s ease-in-out infinite alternate; }
+.liquid .mesh { inset: -12%; filter: blur(30px); background:
+  radial-gradient(var(--m3w) var(--m3h) at var(--m3x) var(--m3y), var(--k3) 0%, var(--k3) 38%, color-mix(in srgb, var(--k3) 45%, transparent) 58%, transparent 76%),
+  radial-gradient(var(--m2w) var(--m2h) at var(--m2x) var(--m2y), var(--k2) 0%, var(--k2) 38%, color-mix(in srgb, var(--k2) 45%, transparent) 58%, transparent 76%),
+  radial-gradient(var(--m1w) var(--m1h) at var(--m1x) var(--m1y), var(--k1) 0%, var(--k1) 38%, color-mix(in srgb, var(--k1) 45%, transparent) 58%, transparent 76%); }
+@keyframes m1x { to { --m1x: 34%; } }
+@keyframes m1y { to { --m1y: 14%; } }
+@keyframes m1w { to { --m1w: 78%; } }
+@keyframes m1h { to { --m1h: 78%; } }
+@keyframes m2x { to { --m2x: 88%; } }
+@keyframes m2y { to { --m2y: 36%; } }
+@keyframes m2w { to { --m2w: 78%; } }
+@keyframes m2h { to { --m2h: 88%; } }
+@keyframes m3x { to { --m3x: 106%; } }
+@keyframes m3y { to { --m3y: 100%; } }
+@keyframes m3w { to { --m3w: 46%; } }
+@keyframes m3h { to { --m3h: 100%; } }
 /* легка тінь під білим текстом — підпис лишається читабельним, коли блік пропливає під ним */
 .hero .lbl, .hero .num, .hero .sub, .hero .lt, .hero .lg2 b { text-shadow: 0 1px 10px rgba(5, 10, 30, .28); }
 .hero .sub .inc { color: inherit; }
@@ -3127,7 +3061,7 @@ function countUp(el) {
   requestAnimationFrame(step);
 }
 // mesh щоразу стартує з іншого положення
-$("liquid").querySelector(".mesh").style.animationDelay = "-" + (Math.random() * 60).toFixed(1) + "s";
+$("liquid").querySelector(".after").style.animationDelay = "-" + (Math.random() * 60).toFixed(1) + "s";
 // зерно головної картки: випадкова сіра крапка на кожен фізичний піксель плитки 160×160 (м'яке світло — не бруднить темні тони)
 (function () {
   var dpr = Math.min(3, window.devicePixelRatio || 1), s = Math.round(160 * dpr), c = document.createElement("canvas");
