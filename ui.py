@@ -1362,9 +1362,10 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
 [data-theme="dark"] .cashbtn, [data-theme="dark"] .save:not(:disabled) { box-shadow: 0 8px 22px rgba(29,95,224,.4), inset 0 1px 0 rgba(255,255,255,.2); }
 /* перемикач теми в меню профілю */
 /* тема — сегмент на всю ширину меню, як «Місяці / Тижні»: сонце й місяць */
-.pop .thseg { margin: 8px 6px 2px; }
+.pop .thseg { margin: 0 6px 2px; }
+.pop > p.thp { margin-top: 14px; }
 .pop .thseg button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 40px; font-size: 13px; }
-html.thm-anim, html.thm-anim * { transition: background-color .35s ease, color .35s ease, border-color .35s ease, fill .35s ease !important; }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: .3s; animation-timing-function: ease; }
 </style>
 </head>
 <body class="p-marko">
@@ -1379,7 +1380,7 @@ html.thm-anim, html.thm-anim * { transition: background-color .35s ease, color .
     <div class="who">
       <button type="button" id="who-btn" aria-haspopup="menu" aria-expanded="false" aria-controls="who-menu"><span class="av" id="who-av"></span><span id="who-name"></span><svg class="ico16 sw" style="width:14px;height:14px" viewBox="0 0 24 24" fill="none" stroke="#6B7180" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="sw-a" d="M3 6.5h18M16.5 2 21 6.5 16.5 11"/><path class="sw-b" d="M21 17.5H3M7.5 13 3 17.5 7.5 22"/></svg></button>
       <div class="pop" id="who-menu" role="menu" aria-label="Чиї дані показати" hidden><p>Профіль</p><div id="who-opts"></div>
-        <div class="seg sm thseg" id="theme-seg" role="group" aria-label="Тема"><button type="button" data-th="light" aria-pressed="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></svg>Світла</button><button type="button" data-th="dark" aria-pressed="false"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>Темна</button></div>
+        <p class="thp">Тема</p><div class="seg sm thseg" id="theme-seg" role="group" aria-label="Тема"><button type="button" data-th="light" aria-pressed="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></svg>Світла</button><button type="button" data-th="dark" aria-pressed="false"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>Темна</button></div>
         <form class="logout" method="post" action="logout"><button type="submit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 16l-4-4 4-4M6 12h10"/></svg>Вийти</button></form>
 </div>
     </div>
@@ -1654,7 +1655,12 @@ $("who-btn").onclick = function () { popMenu("w", $("who-menu").hidden); };
 // темна тема: перемикач у меню профілю; вибір запамʼятовуємо, без вибору — як у системі телефона
 function themeSet(dark, save) {
   var r = document.documentElement;
-  if (save) { r.classList.add("thm-anim"); setTimeout(function () { r.classList.remove("thm-anim"); }, 450); }  // плавний перехід кольорів
+  // плавно: один спільний перехід усієї сторінки, тож текст не блимає; без підтримки — миттєво
+  if (save && document.startViewTransition && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    document.startViewTransition(function () { themeSet(dark, false); });
+    try { localStorage.setItem("theme", dark ? "dark" : "light"); } catch (e) {}
+    return;
+  }
   r.setAttribute("data-theme", dark ? "dark" : "light");
   var m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = dark ? "#0D0F13" : "#F5F6F8";
   document.querySelectorAll("#theme-seg [data-th]").forEach(function (b) { b.setAttribute("aria-pressed", String((b.dataset.th === "dark") === dark)); });
