@@ -367,7 +367,7 @@ PAGE = r"""<!doctype html>
   --ease: cubic-bezier(.33, 1, .68, 1); --spring: cubic-bezier(.34, 1.2, .64, 1);
   --font: "Onest", "Outfit", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
-body.p-olya { --hero-on: #F1DDEA; --glow: rgba(214, 120, 182, .34); --glow2: rgba(232, 130, 200, .6); --glow3: rgba(255, 190, 230, .42); --glow4: rgba(255, 110, 170, .5); --glow5: rgba(190, 100, 230, .48); --h1: rgba(244, 114, 182, .62); --h2: rgba(251, 146, 120, .42); --h3: rgba(192, 86, 240, .55); --h4: rgba(28, 2, 20, .9); --h5: rgba(255, 72, 150, .55); --h6: rgba(255, 176, 120, .68); --g1: #BC3393; --g2: #5A0A4F; --g3: #040105; --l1: #FFBDE6; --l2: #E8449A; --l3: #A855F7; --l4: #D58CFF; }
+body.p-olya { --hero-on: #F1DDEA; --glow: rgba(214, 120, 182, .34); --glow2: rgba(232, 130, 200, .6); --glow3: rgba(255, 190, 230, .42); --glow4: rgba(255, 110, 170, .5); --glow5: rgba(190, 100, 230, .48); --h1: rgba(244, 114, 182, .62); --h2: rgba(251, 146, 120, .42); --h3: rgba(192, 86, 240, .55); --h4: rgba(28, 2, 20, .9); --h5: rgba(255, 72, 150, .55); --h6: rgba(255, 176, 120, .68); --g1: #BC3393; --g2: #5A0A4F; --g3: #10021C; --l1: #FFBDE6; --l2: #E8449A; --l3: #A855F7; --l4: #D58CFF; }
 * { box-sizing: border-box; }
 html, body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.4 var(--font); -webkit-font-smoothing: antialiased; font-variant-numeric: tabular-nums; }
 .app { max-width: 440px; margin: 0 auto; padding: 8px 14px 130px; }
@@ -444,6 +444,8 @@ a { color: inherit; text-decoration: none; }
 .hero-wrap { position: relative; isolation: isolate; margin-top: 12px; border-radius: 24px; overflow: hidden; clip-path: inset(0 round 24px); -webkit-mask-image: -webkit-radial-gradient(white, black);
   background: linear-gradient(160deg, color-mix(in srgb, var(--g2) 74%, var(--g3)) 0%, color-mix(in srgb, var(--g2) 58%, var(--g3)) 50%, color-mix(in srgb, var(--g2) 42%, var(--g3)) 100%); }
 .hero { position: relative; z-index: 1; padding: 22px 20px 20px; border-radius: 24px; color: #fff; }
+/* Оля: глибший фон — темніша глибина знизу справа, яскравіше світло зверху зліва (більший контраст між ними) */
+body.p-olya .hero-wrap { background: linear-gradient(160deg, color-mix(in srgb, var(--g2) 86%, var(--g3)) 0%, color-mix(in srgb, var(--g2) 56%, var(--g3)) 42%, color-mix(in srgb, var(--g2) 18%, var(--g3)) 100%); }
 .hero-wrap::after { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; border-radius: inherit; opacity: .26; mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
 /* SVG-шум браузер раструє зі своєю роздільністю й розмиває — тому JS малює зерно попіксельно під екран (одна крапка = один фізичний піксель); SVG лишається запасним */
