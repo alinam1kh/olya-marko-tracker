@@ -1412,8 +1412,7 @@ a.ins { color: var(--ink4); }
 .sp-name { font-size: 16px; font-weight: 500; color: var(--ink); opacity: 0; animation: rise .5s .15s var(--ease) both; }
 /* повзунок: швидко доходить до ~85 %, а коли все готово — до кінця */
 .sp-bar { width: 148px; height: 6px; margin-top: 4px; border-radius: 3px; background: var(--track); overflow: hidden; }
-.sp-bar b { display: block; height: 100%; width: 0; border-radius: 3px; background: var(--blue-g); transition: width 2.4s cubic-bezier(.35, .15, .65, .85); }
-.splash.done .sp-bar b { transition: width .5s cubic-bezier(.55, 0, 1, .45); }
+.sp-bar b { display: block; height: 100%; width: 0; border-radius: 3px; background: var(--blue-g); transition: width 2.6s cubic-bezier(.42, .1, .7, .85); }  /* одним рухом до кінця: спершу повільніше, далі швидше, без зупинки */
 @keyframes shine { 0% { transform: translateX(-100%); } 60%, 100% { transform: translateX(100%); } }
 @keyframes breathe { 50% { transform: scale(1.05); } }
 /* поява екрана: картки виїжджають знизу одна за одною */
@@ -3277,11 +3276,11 @@ window.addEventListener("hashchange", function () {
 });
 render();
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(function () {});
-// сплеш зникає, коли готовий шрифт (але не довше 3 с і не швидше 2,4 с — повний цикл анімації знака — щоб гроші й повзунок встигли спокійно зіграти)
+// сплеш зникає, коли готовий шрифт (але не довше 3 с і не швидше 2,6 с — повний цикл анімації знака — щоб гроші й повзунок встигли спокійно зіграти)
 (function () {
   var s = $("splash"), t = Date.now(), done = false, fill = $("sp-fill");
-  requestAnimationFrame(function () { fill.style.width = "90%"; });
-  function hide() { if (done) return; done = true; setTimeout(function () { s.classList.add("done"); fill.style.width = "100%"; setTimeout(function () { lastBase = null; render(); requestAnimationFrame(function () { requestAnimationFrame(function () { $("app").classList.remove("pre"); s.classList.add("out"); $("liquid").classList.add("sheen"); }); }); setTimeout(function () { s.remove(); }, 1500); }, 550); }, Math.max(0, 2400 - (Date.now() - t))); }
+  requestAnimationFrame(function () { fill.style.width = "100%"; });
+  function hide() { if (done) return; done = true; setTimeout(function () { s.classList.add("done"); setTimeout(function () { lastBase = null; render(); requestAnimationFrame(function () { requestAnimationFrame(function () { $("app").classList.remove("pre"); s.classList.add("out"); $("liquid").classList.add("sheen"); }); }); setTimeout(function () { s.remove(); }, 1500); }, 150); }, Math.max(0, 2600 - (Date.now() - t))); }
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(hide);
   setTimeout(hide, 3000);
 })();
