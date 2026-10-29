@@ -865,6 +865,7 @@ a.ins { color: var(--ink4); }
 .limc { display: block; color: inherit; text-decoration: none; }
 .limc .ch { min-height: 0; flex-wrap: nowrap; }
 .limc .ch svg { flex: none; color: var(--ink2); }
+.limc .ch .lmode.own svg { color: var(--blue-txt); }  /* «Вручну» — іконка теж синя */
 .lbig { display: flex; align-items: baseline; gap: 8px; margin-top: 12px; }
 .lbig b { font-size: 32px; font-weight: 500; line-height: 1; }
 .lbig span { font-size: 14px; color: var(--ink2); }
