@@ -292,7 +292,7 @@ PAGE = r"""<!doctype html>
   --ease: cubic-bezier(.33, 1, .68, 1); --spring: cubic-bezier(.34, 1.2, .64, 1);
   --font: "Onest", "Outfit", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
-body.p-olya { --hero-on: #F1DDEA; --glow: rgba(214, 120, 182, .34); --glow2: rgba(232, 130, 200, .6); --glow3: rgba(255, 190, 230, .42); --glow4: rgba(255, 110, 170, .5); --glow5: rgba(190, 100, 230, .48); --h1: rgba(244, 114, 182, .62); --h2: rgba(251, 146, 120, .42); --h3: rgba(192, 86, 240, .55); --h4: rgba(28, 2, 20, .9); --h5: rgba(255, 72, 150, .55); --h6: rgba(255, 176, 120, .68); --g1: #9A4783; --g2: #3E1338; --g3: #040105; --l1: #FFBDE6; --l2: #E8449A; --l3: #A855F7; --l4: #D58CFF; }
+body.p-olya { --hero-on: #F1DDEA; --glow: rgba(214, 120, 182, .34); --glow2: rgba(232, 130, 200, .6); --glow3: rgba(255, 190, 230, .42); --glow4: rgba(255, 110, 170, .5); --glow5: rgba(190, 100, 230, .48); --h1: rgba(244, 114, 182, .62); --h2: rgba(251, 146, 120, .42); --h3: rgba(192, 86, 240, .55); --h4: rgba(28, 2, 20, .9); --h5: rgba(255, 72, 150, .55); --h6: rgba(255, 176, 120, .68); --g1: #A93F8E; --g2: #4B0F43; --g3: #040105; --l1: #FFBDE6; --l2: #E8449A; --l3: #A855F7; --l4: #D58CFF; }
 * { box-sizing: border-box; }
 html, body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.4 var(--font); -webkit-font-smoothing: antialiased; font-variant-numeric: tabular-nums; }
 .app { max-width: 440px; margin: 0 auto; padding: 8px 14px 130px; }
