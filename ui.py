@@ -983,7 +983,7 @@ a.ins { color: var(--ink4); }
 .limt[aria-checked="true"]:active .sw i { transform: translateX(12px); }
 .limt:focus-visible { outline: none; } .limt:focus-visible .sw { box-shadow: 0 0 0 3px var(--blue-soft); }
 #a-scale button { min-width: 88px; }  /* «Місяці / Тижні» ширше — місце в шапці звільнилось */
-.wsort { display: inline-flex; align-items: center; gap: 4px; min-height: 28px; margin-top: -8px; padding: 0; border: 0; background: transparent; font: 500 13px var(--font); color: var(--blue); cursor: pointer; }  /* висота під тег «дані до …» — картка не стрибає між місяцями */
+.wsort { display: inline-flex; align-items: center; gap: 4px; min-height: 28px; padding: 0; border: 0; background: transparent; font: 500 13px var(--font); color: var(--blue); cursor: pointer; }  /* висота під тег «дані до …» — картка не стрибає між місяцями */
 .hero .tagx { gap: 4px; height: 28px; padding: 0 8px 0 10px; border: 0; font-family: var(--font); cursor: pointer; }  /* «на 7 жовтня ✕» — стан на обраний день, ✕ повертає до сьогодні */
 .alab .tag { flex: none; padding: 3px 10px; border-radius: 12px; background: var(--soft); font-size: 12px; font-weight: 500; color: var(--ink2); }
 .abig { margin-top: 2px; font-size: 28px; font-weight: 500; letter-spacing: -.01em; white-space: nowrap; }
@@ -1634,10 +1634,10 @@ function renderCal(P) {
   for (var c = 0; c < rows * 7; c++) {
     var d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + c), key = iso(d), inMonth = d.getMonth() === mo;
     var b = h("button", (withOps[key] && inMonth ? "has" : "") + (key === today ? " today" : ""), String(d.getDate()));
-    b.type = "button"; b.disabled = !inMonth || d.getDate() > lastDay;
-    b.setAttribute("aria-pressed", key === selDay);
+    b.type = "button"; b.disabled = !inMonth || (d.getDate() > lastDay && !withOps[key] && key !== today);
+    b.setAttribute("aria-pressed", key === selDay || (!selDay && key === today && ki === month));
     b.setAttribute("aria-label", d.getDate() + " " + GEN[d.getMonth()] + " " + d.getFullYear() + (b.disabled ? ", даних немає" : withOps[key] ? ", є операції" : ""));
-    if (!b.disabled) (function (key) { b.onclick = function () { selDay = key; month = ki; if (view() === "journal" && jq.trim()) jqMonth = true; calOpen(false); render(); scrollToDay(key); }; })(key);
+    if (!b.disabled) (function (key) { b.onclick = function () { selDay = key === today || key === selDay ? null : key; month = ki; if (view() === "journal" && jq.trim()) jqMonth = true; calOpen(false); render(); scrollToDay(key); }; })(key);
     grid.appendChild(b);
   }
   var lastM = P.months[P.months.length - 1];
