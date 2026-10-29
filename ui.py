@@ -908,10 +908,11 @@ a.ins { color: var(--ink4); }
 .lbar b { display: block; height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, #3B82F6, #1D5FE0); transition: width 2.1s var(--ease); }
 .lbar b.over { background: var(--bad); }
 .lnote { margin: 10px 0 0; font-size: 13px; color: var(--ink2); }
-.limc .lmain { display: block; color: inherit; }
+.limc .lmain { display: block; width: 100%; padding: 0; border: 0; background: none; font: inherit; text-align: left; color: inherit; cursor: pointer; }
 /* тихий рядок унизу картки: до шторки «Відкладати щомісяця» */
 .lfoot { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 40px; margin-top: 12px; padding: 8px 0 0; border: 0; border-top: 1px solid var(--soft); background: transparent; font: 400 14px var(--font); color: var(--ink3); text-align: left; cursor: pointer; }
 .lfoot .lft { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }  /* не налазить на «Змінити» */
+.lfoot .lft small { display: block; margin-top: 1px; font-size: 12px; color: var(--ink2); overflow: hidden; text-overflow: ellipsis; }  /* скільки ціль забирає з ліміту */
 .lfoot .lft b { font-weight: 500; color: var(--ink); }
 .lfoot .llink { display: inline-flex; align-items: center; gap: 6px; color: var(--blue); font-weight: 500; }
 .lfoot .llink svg { flex: none; stroke-width: 2.2; }  /* плюс більший і чіткіший за текстовий «+» */
@@ -978,12 +979,12 @@ a.ins { color: var(--ink4); }
 .plback { display: inline-flex; align-items: center; gap: 2px; min-height: 36px; margin: -4px 0 4px -4px; padding: 0 4px; border: 0; background: none; font: 500 14px var(--font); color: var(--blue); cursor: pointer; }
 /* картка ліміту: пігулка режиму «Авто / Своя сума» — відкриває «Як рахується» */
 .lhd { display: inline-flex; align-items: center; gap: 6px; }
-.lmode { display: inline-flex; align-items: center; gap: 5px; min-height: 28px; padding: 0 10px; border: 0; border-radius: 14px; background: var(--soft); color: var(--ink2); font: 500 12px var(--font); cursor: pointer; }
+.lmode { display: inline-flex; align-items: center; gap: 5px; min-height: 28px; padding: 0 10px; border-radius: 14px; background: var(--soft); color: var(--ink2); font-size: 12px; font-weight: 500; white-space: nowrap; }
 .lmode svg { width: 14px; height: 14px; }
 .lmode.own { background: var(--blue-soft); color: var(--blue-txt); }
-.lgo { display: grid; place-items: center; width: 32px; height: 44px; margin-right: -6px; color: var(--ink2); }
+.lhd > svg { flex: none; color: var(--ink2); }
 /* шторка ліміту */
-.lmseg { margin-top: 6px; }
+.lmseg { margin-top: 14px; }
 .lmseg button { min-height: 40px; font-size: 13px; }
 .lmh { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .lmh button { min-height: 36px; padding: 0 12px; border: 1px solid var(--border); border-radius: 18px; background: var(--card); color: var(--ink3); font: 400 13px var(--font); cursor: pointer; }
@@ -996,6 +997,7 @@ a.ins { color: var(--ink4); }
 .lmrow .nm { flex: 1; min-width: 0; }
 .lmrow .nm b { display: block; font-size: 14px; font-weight: 400; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .lmrow .nm small { font-size: 12px; color: var(--ink2); }
+.lmrow .lmv { font-size: 14px; font-weight: 500; white-space: nowrap; }
 .lmrow .pen { flex: none; width: 14px; height: 14px; color: var(--blue); opacity: 0; transition: opacity .2s; }
 .lmrow.own .pen { opacity: 1; }
 .lmin { display: flex; align-items: center; gap: 4px; width: 112px; min-height: 40px; padding: 0 10px; border: 1px solid var(--border); border-radius: 12px; background: var(--card); }
@@ -1004,6 +1006,7 @@ a.ins { color: var(--ink4); }
 .lmin input::placeholder { color: var(--ink2); }
 .lmin span { font-size: 13px; color: var(--ink2); }
 .lmrow.own .lmin { border-color: var(--blue-l); }
+.lmana { display: inline-flex; align-items: center; gap: 2px; margin: 18px 0 4px; font-size: 14px; font-weight: 500; color: var(--blue-txt); }
 .lmreset { display: block; margin: 8px 0 0; padding: 10px 0; border: 0; background: none; color: var(--blue-txt); font: 500 13px var(--font); cursor: pointer; }
 .plnote { margin: 12px 2px 0; font-size: 13px; color: var(--blue-txt); }
 .plwarn { margin: 6px 2px 0; font-size: 13px; color: var(--cash); }
@@ -1943,29 +1946,26 @@ function renderLimit(P) {
   var spent = cut ? M.ops.reduce(function (s, o) { return s + (!o.income && !o.fixed && o.day <= cut ? o.amount : 0); }, 0) : M.variable;
   var left = LM.total - spent, dn = cut ? +cut.slice(8) : M.last_op ? +M.last_op.slice(0, 2) : 0, dl = new Date(+M.key.slice(0, 4), +M.key.slice(5), 0).getDate() - dn;
   var p = LM.total ? Math.min(100, spent / LM.total * 100) : 100;
-  // Марко — скільки на день до кінця місяця; Оля — те саме, але видно, навіщо: щоб відкласти план
   var note = left < 0 ? "Щоденні вже понад ліміт, до кінця місяця ще " + dl + " " + plural(dl, "день", "дні", "днів")
-    : "Це ≈ " + zr(left / Math.max(1, dl)) + " на день" + (LM.src === "goal" || LM.src === "plan" ? ", щоб відкласти " + zr(LM.save) : " до кінця місяця");
+    : "Це ≈ " + zr(left / Math.max(1, dl)) + " на день до кінця місяця";
   // рядок до цілей: немає — «+ Відкладати щомісяця»; одна — її іконка й прогрес; кілька — скільки і разом на місяць
   var act = LM.goals || [], k0 = M.key, foot;
   if (!act.length) foot = '<button type="button" class="lfoot ladd" id="limc-plan"><span class="llink">' + svgI("currentColor", '<path d="M12 5v14M5 12h14"/>', 18) + "Відкладати щомісяця</span></button>";
   else if (act.length === 1) {
     var g1 = act[0], pr = goalProgress(P, g1), nm = g1.name || g1.kind === "cushion" ? esc(goalName(g1)) + ", " : "";
     foot = '<button type="button" class="lfoot" id="limc-plan"><span class="lpig">' + goalIcon(g1) + '</span><span class="lft">' +
-      (pr ? (nm || "Відкладено ") + "<b>" + pr.txt + "</b>" : (nm || "Відкладаєте ") + "<b>" + zr(goalMonthly(g1, k0, P)) + "</b> на місяць") + "</span>" + (pr ? pr.segs : "") + CHR + "</button>";
+      (pr ? (nm || "Відкладено ") + "<b>" + pr.txt + "</b>" : nm ? esc(goalName(g1)) : "Відкладаєте") + "<small>−" + zr(goalMonthly(g1, k0, P)) + " на місяць з ліміту</small></span>" + (pr ? pr.segs : "") + CHR + "</button>";
   } else {
     var sum = act.reduce(function (s, x) { return s + goalMonthly(x, k0, P); }, 0), dated = act.some(function (x) { return x.kind === "cushion" || x.until; });
     foot = '<button type="button" class="lfoot" id="limc-plan"><span class="lpig">' + (dated ? FLAG : PIG) + '</span><span class="lft"><b>' + act.length + " " + plural(act.length, "ціль", "цілі", "цілей") +
-      "</b>, разом " + zr(sum) + " на місяць</span>" + CHR + "</button>";
+      "</b><small>−" + zr(sum) + " на місяць з ліміту</small></span>" + CHR + "</button>";
   }
   var own = LM.src === "manual" || Object.keys(LM.own || {}).length;
-  box.innerHTML = '<div class="ch"><h2>Ліміт на щоденні витрати</h2><span class="lhd"><button type="button" class="lmode' + (own ? " own" : "") + '" id="limc-info" aria-label="Налаштування ліміту: ' + (LM.src === "manual" ? "своя сума" : own ? "свої категорії" : "авто") + '">' + TUNE +
-    (LM.src === "manual" ? "Своя сума" : own ? "Свої категорії" : "Авто") + '</button><a class="lgo" href="#analytics" aria-label="Ліміт в Аналітиці">' + CHR + "</a></span></div>" +
-    '<a class="lmain" href="#analytics">' +
+  box.innerHTML = '<button type="button" class="lmain" id="limc-info" aria-label="Ліміт на щоденні витрати, ' + (own ? "вручну" : "авто") + '. Налаштування">' +
+    '<div class="ch"><h2>Ліміт на щоденні витрати</h2><span class="lhd"><span class="lmode' + (own ? " own" : "") + '">' + TUNE + (own ? "Вручну" : "Авто") + "</span>" + CHR + "</span></div>" +
     '<div class="lbig"><b>' + zr(Math.abs(left)) + "</b><span>" + (left < 0 ? "понад ліміт " : "лишилось з ") + nf0.format(Math.round(LM.total)) + "</span></div>" +
     '<div class="lbar" role="img" aria-label="Витрачено ' + nf0.format(Math.round(p)) + ' % ліміту"><b' + (left < 0 ? ' class="over"' : "") + ' data-to="' + p.toFixed(2) + '%"></b></div>' +
-    '<p class="lnote">' + note + "</p></a>" + foot;
-  box.querySelectorAll(".lmain, .lgo").forEach(function (a) { a.onclick = function () { lim = true; ascale = "m"; try { localStorage.setItem("lim", "1"); } catch (e) {} }; });
+    '<p class="lnote">' + note + "</p></button>" + foot;
   $("limc-info").onclick = function () { limOpen(P); };
   $("limc-plan").onclick = function () { planOpen(P); };
   grow("#limc .lbar b", "width");
@@ -2228,11 +2228,12 @@ function limitsFor(P, j, man) {
     if (cut > 0 && wants > 0) { var f = Math.max(0, 1 - cut / wants); Object.keys(L).forEach(function (n) { if (WANTS[n] && !(n in mc)) L[n] *= f; }); }
   }
   var autoTotal = total, autoSrc = src;
-  // своя загальна сума: решту категорій (без своїх сум) пропорційно підганяємо під неї
+  // своя загальна сума: якщо не вміщає решту категорій (без своїх сум) — пропорційно зменшуємо їх
   if (man && man.total != null) {
     total = man.total; src = "manual";
+    Object.keys(u).forEach(function (n) { if (!(n in L)) L[n] = u[n]; });  // категорії з малою історією — теж у розподілі (за звичним)
     var own = Object.keys(mc).reduce(function (s, n) { return s + mc[n]; }, 0), rest = Object.keys(L).filter(function (n) { return !(n in mc); });
-    var other = rest.reduce(function (s, n) { return s + L[n]; }, 0), k = other > 0 ? Math.max(0, total - own) / other : 0;
+    var other = rest.reduce(function (s, n) { return s + L[n]; }, 0), k = other > 0 ? Math.min(1, Math.max(0, total - own) / other) : 0;  // лише зменшуємо: більша сума — просто запас
     rest.forEach(function (n) { L[n] *= k; });
   }
   return { cat: L, total: total, src: src, save: save, auto: catSum, wants: wants, goals: act,
@@ -2928,12 +2929,14 @@ var TUNE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-wi
 var PEN = '<svg class="pen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"/></svg>';
 function lmMan() {  // те, що зараз у шторці, — у вигляді запису історії
   var cats = {}; Object.keys(lmS.cats).forEach(function (n) { if (lmS.cats[n]) cats[n] = +lmS.cats[n]; });
-  var x = {}; if (lmS.mode === "manual" && lmS.total !== "") x.total = +lmS.total; if (Object.keys(cats).length) x.cats = cats;
+  var x = {}; if (lmS.mode !== "manual") return x;
+  if (lmS.total !== "") x.total = +lmS.total; if (Object.keys(cats).length) x.cats = cats;
   return x;
 }
 function limOpen(P) {
   var j = P.months.length - 1, cur = limSet(P, P.months[j].key) || {};
-  lmS = { P: P, j: j, mode: cur.total != null ? "manual" : "auto", total: cur.total != null ? String(cur.total) : "", cats: {}, start: "" };
+  var hasCats = cur.cats && Object.keys(cur.cats).length, LM0 = limitsFor(P, j);
+  lmS = { P: P, j: j, mode: cur.total != null || hasCats ? "manual" : "auto", total: cur.total != null ? String(cur.total) : hasCats && LM0 ? String(Math.round(LM0.total)) : "", cats: {}, start: "" };
   Object.keys(cur.cats || {}).forEach(function (n) { lmS.cats[n] = String(cur.cats[n]); });
   lmS.start = JSON.stringify(lmMan());
   limRender();
@@ -2953,7 +2956,7 @@ function limCalcHTML(LM) {
   if (lmS.mode === "auto") html += '<p class="plintro">' + (LM.src === "goal" ? "Спершу відкладаємо на цілі, решта доходу після обовʼязкових — на щоденні."
     : LM.src === "plan" ? "Звичні витрати не вміщають цілі, тож на щоденні — те, що лишається після цілей. Першими зменшуються бажання."
     : "Ліміт — сума лімітів категорій: потреби (продукти, транспорт) — як зазвичай, бажання (кафе, доставка, розваги, покупки) — як у найекономніший місяць.") + "</p>";
-  else html += '<p class="plintro">Ваша сума на щоденні за місяць. Категорії без своїх сум пропорційно підлаштуються під неї.</p>';
+  else html += '<p class="plintro">Ваша сума на щоденні за місяць. За бажання задайте свої суми категоріям — решта пропорційно підлаштується.</p>';
   html += '<div class="oplist plcalc">' + row("Дохід", zr(LM.inc)) + row("Обовʼязкові", "−" + zr(LM.fixU)) + (save ? row("Цілі", "−" + zr(save)) : "") +
     row("На щоденні", "−" + zr(LM.total)) + row(free >= -0.5 ? "Лишається вільним" : "Не вистачає", zr(Math.abs(free)), "tot") + "</div>";
   if (lmS.mode === "manual" && save && free < -0.5)
@@ -2968,7 +2971,8 @@ function limRefresh() {
   $("lm-calc").innerHTML = limCalcHTML(LM);
   $("lm-body").querySelectorAll(".lmrow").forEach(function (r) {
     var n = r.dataset.n, v = LM.cat[n] != null ? LM.cat[n] : LM.usual[n] || 0;
-    r.querySelector("input").placeholder = nf0.format(Math.round(v)); r.classList.toggle("own", !!lmS.cats[n]);
+    var inp = r.querySelector("input"); if (inp) inp.placeholder = nf0.format(Math.round(v)); else r.querySelector(".lmv").textContent = zr(v);
+    r.classList.toggle("own", lmS.mode === "manual" && !!lmS.cats[n]);
   });
   $("lm-reset").hidden = !Object.keys(lmMan().cats || {}).length;
   $("lm-save").disabled = JSON.stringify(lmMan()) === lmS.start || (lmS.mode === "manual" && lmS.total === "");
@@ -2977,7 +2981,7 @@ function limRender() {
   var P = lmS.P, LM = limitsFor(P, lmS.j, lmMan()), body = $("lm-body");
   if (!LM) { body.innerHTML = '<p class="plintro">Для ліміту потрібні хоча б два повні місяці.</p>'; return; }
   var html = '<div class="seg sm lmseg" role="group" aria-label="Як рахувати ліміт"><button type="button" data-mode="auto" aria-pressed="' + (lmS.mode === "auto") + '">Авто</button>' +
-    '<button type="button" data-mode="manual" aria-pressed="' + (lmS.mode === "manual") + '">Своя сума</button></div>';
+    '<button type="button" data-mode="manual" aria-pressed="' + (lmS.mode === "manual") + '">Вручну</button></div>';
   if (lmS.mode === "manual")
     html += '<label class="amount pla"><input id="lm-total" type="text" inputmode="numeric" autocomplete="off" placeholder="0" value="' + esc(lmS.total) + '"><span>зл</span></label>' +
       '<div class="lmh">' + (LM.spendU ? '<button type="button" data-fill="' + Math.round(LM.spendU) + '">зазвичай <b>' + nf0.format(Math.round(LM.spendU)) + "</b></button>" : "") +
@@ -2986,12 +2990,15 @@ function limRender() {
   // категорії: скільки зазвичай і ліміт; своя сума — поверх авто (решта підлаштовується)
   var names = Object.keys(LM.usual).concat(Object.keys(lmS.cats).filter(function (n) { return !(n in LM.usual); }))
     .sort(function (a, b) { return (LM.usual[b] || 0) - (LM.usual[a] || 0); });
-  html += '<div class="lmcats"><h3>Категорії</h3><p>Порожнє поле — ліміт рахується сам (сірим). Впишіть свою суму — решта підлаштується.</p>';
+  var man = lmS.mode === "manual";
+  html += '<div class="lmcats"><h3>Категорії</h3><p>' + (man ? "Порожнє поле — ліміт підлаштовується сам (сірим). Впишіть суму, щоб задати свою." : "Скільки зазвичай і який ліміт вийшов. Задати свої суми можна у «Вручну».") + "</p>";
   names.forEach(function (n) {
-    html += '<div class="lmrow" data-n="' + esc(n) + '"><div class="nm"><b>' + esc(n) + "</b><small>зазвичай " + zr(LM.usual[n] || 0) + (WANTS[n] ? ", бажання" : "") + "</small></div>" + PEN +
-      '<label class="lmin"><input type="text" inputmode="numeric" autocomplete="off" aria-label="Ліміт: ' + esc(n) + '" value="' + esc(lmS.cats[n] || "") + '"><span>зл</span></label></div>';
+    html += '<div class="lmrow" data-n="' + esc(n) + '"><div class="nm"><b>' + esc(n) + "</b><small>зазвичай " + zr(LM.usual[n] || 0) + (WANTS[n] ? ", бажання" : "") + "</small></div>" +
+      (man ? PEN + '<label class="lmin"><input type="text" inputmode="numeric" autocomplete="off" aria-label="Ліміт: ' + esc(n) + '" value="' + esc(lmS.cats[n] || "") + '"><span>зл</span></label>'
+        : '<b class="lmv">' + zr(LM.cat[n] != null ? LM.cat[n] : LM.usual[n] || 0) + "</b>") + "</div>";
   });
-  html += '<button type="button" class="lmreset" id="lm-reset" hidden>Скинути свої суми категорій</button></div>';
+  html += '<button type="button" class="lmreset" id="lm-reset" hidden>Скинути свої суми категорій</button></div>' +
+    '<a class="lmana" href="#analytics" id="lm-ana">Ліміти за категоріями в Аналітиці' + CHR + "</a>";
   body.innerHTML = html; $("lm-msg").textContent = "";
   var num = function (v) { v = v.replace(/\D/g, "").slice(0, 7); return v ? String(+v) : ""; };
   body.querySelectorAll("[data-mode]").forEach(function (b) { b.onclick = function () {
@@ -3004,6 +3011,7 @@ function limRender() {
   body.querySelectorAll(".lmrow input").forEach(function (inp) { inp.oninput = function () {
     var v = num(this.value); if (v !== this.value) this.value = v; var n = this.closest(".lmrow").dataset.n;
     if (v) lmS.cats[n] = v; else delete lmS.cats[n]; limRefresh(); }; });
+  $("lm-ana").onclick = function () { lim = true; ascale = "m"; try { localStorage.setItem("lim", "1"); } catch (e) {} };
   $("lm-reset").onclick = function () { lmS.cats = {}; body.querySelectorAll(".lmrow input").forEach(function (i) { i.value = ""; }); limRefresh(); };
   limRefresh();
 }
@@ -3021,7 +3029,7 @@ $("lm-save").onclick = function () {
   btn.disabled = true;
   limPost(P, hist).then(function () {
     limClose();
-    toast(okMsg(x.total != null ? "Свій ліміт: " + zr(x.total) : x.cats ? "Збережено свої категорії" : "Ліміт рахується сам"),
+    toast(okMsg(x.total != null ? "Ліміт вручну: " + zr(x.total) : "Ліміт рахується сам"),
       ["Скасувати", function () { limPost(P, prev).then(function () { toast(okMsg("Скасовано")); }).catch(function (err) { toast(err.message); }); }]);
   }).catch(function (err) { btn.disabled = false; $("lm-msg").textContent = err.message || "Немає звʼязку, спробуйте ще раз"; });
 };
