@@ -357,7 +357,7 @@ a { color: inherit; text-decoration: none; }
 .cal-grid button { position: relative; justify-self: center; width: 42px; height: 42px; padding: 0; border: 0; border-radius: 50%; background: transparent; font-size: 14px; cursor: pointer; }
 .cal-grid button:disabled { color: var(--mute); cursor: default; }
 .cal-grid button.has::after { content: ""; position: absolute; left: 50%; bottom: 6px; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: var(--blue); opacity: .55; }
-.cal-grid button:not(:disabled):hover { background: var(--soft); }
+@media (hover: hover) { .cal-grid button:not(:disabled):not([aria-pressed="true"]):hover { background: var(--soft); } }
 .cal-grid button.today { box-shadow: inset 0 0 0 1.5px var(--blue); }
 .cal-grid button[aria-pressed="true"] { background: var(--blue-g); color: #fff; }
 .cal-grid button[aria-pressed="true"].has::after { background: #fff; opacity: .8; }
@@ -2761,7 +2761,7 @@ function plCalHTML() {
   var y = +plS.calKey.slice(0, 4), mo = +plS.calKey.slice(5) - 1, first = new Date(y, mo, 1), dim = new Date(y, mo + 1, 0).getDate(), start = new Date(y, mo, 1 - WD0(first)), cells = "";
   for (var c = 0; c < Math.ceil((WD0(first) + dim) / 7) * 7; c++) {
     var d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + c), key = iso(d), inM = d.getMonth() === mo, off = !inM || key <= today;
-    cells += '<button type="button"' + (key === today ? ' class="today"' : "") + (off ? " disabled" : ' data-d="' + key + '"') + ' aria-pressed="' + (key === plS.until) + '"' +
+    cells += '<button type="button"' + (key === today && inM ? ' class="today"' : "") + (off ? " disabled" : ' data-d="' + key + '"') + ' aria-pressed="' + (key === plS.until) + '"' +
       (inM ? ' aria-label="' + d.getDate() + " " + GEN[mo] + " " + y + '"' : "") + ">" + (inM ? d.getDate() : "") + "</button>";
   }
   var arr = function (id, dir, dis) { return '<button type="button" id="' + id + '" aria-label="' + (dir < 0 ? "Попередній" : "Наступний") + ' місяць"' + (dis ? " disabled" : "") + '><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="' + (dir < 0 ? "m14 6-6 6 6 6" : "m10 6 6 6-6 6") + '"/></svg></button>'; };
