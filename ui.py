@@ -1954,11 +1954,12 @@ function renderLimit(P) {
   else if (act.length === 1) {
     var g1 = act[0], pr = goalProgress(P, g1), nm = g1.name || g1.kind === "cushion" ? esc(goalName(g1)) + ", " : "";
     foot = '<button type="button" class="lfoot" id="limc-plan"><span class="lpig">' + goalIcon(g1) + '</span><span class="lft">' +
-      (pr ? (nm || "Відкладено ") + "<b>" + pr.txt + "</b>" : nm ? esc(goalName(g1)) : "Відкладаєте") + "<small>−" + zr(goalMonthly(g1, k0, P)) + " на місяць з ліміту</small></span>" + (pr ? pr.segs : "") + CHR + "</button>";
+      (pr ? (nm || "Відкладено ") + "<b>" + pr.txt + "</b><small>Відкладаєте " + zr(goalMonthly(g1, k0, P)) + " на місяць</small>"
+        : (nm || "Відкладаєте ") + "<b>" + zr(goalMonthly(g1, k0, P)) + "</b> на місяць") + "</span>" + (pr ? pr.segs : "") + CHR + "</button>";
   } else {
     var sum = act.reduce(function (s, x) { return s + goalMonthly(x, k0, P); }, 0), dated = act.some(function (x) { return x.kind === "cushion" || x.until; });
     foot = '<button type="button" class="lfoot" id="limc-plan"><span class="lpig">' + (dated ? FLAG : PIG) + '</span><span class="lft"><b>' + act.length + " " + plural(act.length, "ціль", "цілі", "цілей") +
-      "</b><small>−" + zr(sum) + " на місяць з ліміту</small></span>" + CHR + "</button>";
+      "</b>, разом " + zr(sum) + " на місяць</span>" + CHR + "</button>";
   }
   var own = LM.src === "manual" || Object.keys(LM.own || {}).length;
   box.innerHTML = '<button type="button" class="lmain" id="limc-info" aria-label="Ліміт на щоденні витрати, ' + (own ? "вручну" : "авто") + '. Налаштування">' +
