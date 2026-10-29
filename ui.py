@@ -862,9 +862,12 @@ a.ins { color: var(--ink4); }
 .pldd-h b { font-weight: 500; color: var(--ink); }
 .pldd-h .chev { color: var(--ink2); transition: transform .2s; }
 .pldd.open .pldd-h .chev { transform: rotate(180deg); }
-.pldd-w { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows .38s cubic-bezier(.32, .72, 0, 1), opacity .25s ease; }
+.pldd-w { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows .5s cubic-bezier(.4, 0, .2, 1), opacity .3s ease; }
 .pldd-w > div { min-height: 0; overflow: hidden; }
-.pldd.open .pldd-w { grid-template-rows: 1fr; opacity: 1; }
+.pldd-b { transform: translateY(-6px); transition: transform .5s cubic-bezier(.4, 0, .2, 1); }
+.pldd.open .pldd-w { grid-template-rows: 1fr; opacity: 1; transition: grid-template-rows .5s cubic-bezier(.4, 0, .2, 1), opacity .35s ease .08s; }
+.pldd.open .pldd-b { transform: none; }
+@media (prefers-reduced-motion: reduce) { .pldd-w, .pldd-b { transition: none; } }
 .pldd-b { padding: 0 14px 14px; }
 .pldd-b .plcal { animation: none; }  /* календар перемальовується з кожним тапом — без повторної появи */
 .pldd-s { margin: 12px 0 0; font-size: 13px; color: var(--ink3); }
@@ -892,7 +895,7 @@ a.ins { color: var(--ink4); }
 .glrow > svg:last-child { flex: none; color: var(--ink2); }
 .pltot { margin: 10px 0 0; padding-top: 12px; border-top: 1px solid var(--soft); font-size: 14px; color: var(--ink3); }
 .pltot b { font-weight: 500; color: var(--ink); }
-.plname { display: block; width: 100%; min-height: 48px; margin-top: 14px; padding: 0 14px; border: 1px solid var(--border); border-radius: 16px; background: var(--card); font: 400 15px var(--font); color: var(--ink); }
+.plname { display: block; width: 100%; min-height: 48px; margin-top: 14px; padding: 0 14px; border: 1px solid var(--border); border-radius: 16px; background: var(--card); font: 400 16px var(--font); color: var(--ink); }
 .plname::placeholder { color: var(--ink2); }
 .plname:focus { outline: none; border-color: var(--blue-l); }
 .pldel { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; margin-top: 10px; padding: 0; border: 0; background: none; font: 500 14px var(--font); color: var(--bad); cursor: pointer; }
@@ -1190,6 +1193,9 @@ a.ins { color: var(--ink4); }
 .sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 41; max-width: 440px; max-height: 92vh; margin: 0 auto; display: flex; flex-direction: column;
   background: var(--card); border-radius: 28px 28px 0 0; transform: translateY(100%); transition: transform .7s cubic-bezier(.32, .72, 0, 1); will-change: transform; }
 .sheet.open { transform: none; }
+/* форма цілі — шторка на всю висоту: сума, підсумок і дропдауни не підкидають її вгору */
+#v-plan.pledit { height: 92vh; height: 92dvh; }
+#v-plan.pledit .sheet-scroll { flex: 1; }
 .sheet-bg.open { opacity: 1; }
 .sheet-head { display: grid; grid-template-columns: 1fr 44px; align-items: center; padding: 8px 16px 0; touch-action: none; }
 .sheet-head::before { content: ""; grid-column: 1 / -1; justify-self: center; width: 36px; height: 4px; margin-bottom: 10px; border-radius: 2px; background: #D9DDE3; }
@@ -2684,6 +2690,7 @@ function plEditStart(P, id) {
   if (plS.until) [3, 6, 12].some(function (s) { var d = new Date(); return iso(new Date(d.getFullYear(), d.getMonth() + s + 1, 0)) === plS.until && (plS.span = s); });
 }
 function plRender(keepFocus) {
+  $("v-plan").classList.toggle("pledit", plS.mode !== "list");
   if (plS.mode === "list") return plList();
   var P = plS.P, body = $("pl-body"), m = plS.monthly, html = "", cushion = plS.kind === "cushion", others = othersMonthly(P, plS.id);
   var amt = function (id, v, ph) { return '<label class="amount pla"><input id="' + id + '" type="text" inputmode="numeric" autocomplete="off" placeholder="' + ph + '" value="' + (v || "") + '"><span>зл</span></label>'; };
@@ -2698,7 +2705,7 @@ function plRender(keepFocus) {
     // подушка з інтервʼю: термін і розмір — з цілі, людина міняє лише суму на місяць
     var g = goalPlan(P), was = g ? g.need : 0;
     html += '<div class="plgoal"><span class="gdue">' + FLAG.replace(/width="16" height="16"/, 'width="14" height="14"') + "ціль до 1 " + GEN[g.G.deadline[1] - 1] + " " + g.G.deadline[0] + "</span><span>" + nf1.format(g.life) + " з " + g.G.months + " місяців витрат</span></div>" +
-      '<div class="plrow">' + amt("pl-amount", m, String(Math.round(g.need))) + (Math.round(was) !== m ? '<span class="plwas">треба ' + nf0.format(Math.round(was)) + "</span>" : "") + "</div>";
+      '<div class="plrow">' + amt("pl-amount", m, "0") + (Math.round(was) !== m ? '<span class="plwas">треба ' + nf0.format(Math.round(was)) + "</span>" : "") + "</div>";
     if (c && m) {
       html += calc(m + others, "Ліміт на щоденні", c.lim);
       var n = Math.ceil(g.left / m - .01), ei = g.li + n, ahead = g.di - ei;  // місяць, коли збереться подушка при такому плані
@@ -2713,10 +2720,10 @@ function plRender(keepFocus) {
     if (plS.isNew && !goalsOf(P).some(function (x) { return goalOn(x, curKey(P)); }) && c)
       html += '<p class="plintro">Зараз ліміт рахується сам: бажання — як у найекономніший місяць, решта — як зазвичай. З ним лишається ≈ ' + zr(c.free - c.auto) + " на місяць.</p>";
     // ціль із датою — плашка з прапорцем, без дати — з копілкою
-    if (m) html += '<div class="plgoal"><span class="gdue">' + (until ? FLAG : PIG).replace(/width="16" height="16"/, 'width="14" height="14"') + (until ? "ціль до " + dmy(until) : "без терміну") + "</span>" +
-      (until ? "<span>" + zr(m * n2) + " за " + n2 + " " + plural(n2, "місяць", "місяці", "місяців") + "</span>" : "") + "</div>";
+    html += '<div class="plgoal"><span class="gdue">' + (until ? FLAG : PIG).replace(/width="16" height="16"/, 'width="14" height="14"') + (until ? "ціль до " + dmy(until) : "без терміну") + "</span>" +
+      (until && m ? "<span>" + zr(m * n2) + " за " + n2 + " " + plural(n2, "місяць", "місяці", "місяців") + "</span>" : "") + "</div>";
     html += '<input class="plname" id="pl-name" type="text" maxlength="60" autocomplete="off" placeholder="Назва, наприклад «Відпустка»" value="' + esc(plS.name) + '">';
-    html += amt("pl-amount", m, "1000") + '<div class="chips plchips">' + [500, 1000, 2000, 5000].map(function (v) { return '<button type="button" data-v="' + v + '" aria-pressed="' + (m === v) + '">' + nf0.format(v) + "</button>"; }).join("") + "</div>";
+    html += amt("pl-amount", m, "0") + '<div class="chips plchips">' + [500, 1000, 2000, 5000].map(function (v) { return '<button type="button" data-v="' + v + '" aria-pressed="' + (m === v) + '">' + nf0.format(v) + "</button>"; }).join("") + "</div>";
     html += plDD("pl-cd", plS.cd, "На що", plS.cat ? esc(plS.cat) : "будь-що",
       '<div class="chips">' + [""].concat(cats).map(function (x) { return '<button type="button" data-cat="' + esc(x) + '" aria-pressed="' + (plS.cat === x) + '">' + (x ? esc(x) : "Будь-що") + "</button>"; }).join("") + "</div>");
     html += plDD("pl-dd", plS.dd, "До коли", until ? dmy(until) : "без терміну",
