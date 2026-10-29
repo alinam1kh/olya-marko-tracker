@@ -2901,8 +2901,8 @@ function lmMan() {  // те, що зараз у шторці, — у вигля�
 }
 function limOpen(P) {
   var j = P.months.length - 1, cur = limSet(P, P.months[j].key) || {};
-  var hasCats = cur.cats && Object.keys(cur.cats).length, LM0 = limitsFor(P, j);
-  lmS = { P: P, j: j, mode: cur.total != null || hasCats ? "manual" : "auto", total: cur.total != null ? String(cur.total) : hasCats && LM0 ? String(Math.round(LM0.total)) : "", cats: {}, start: "" };
+  var hasCats = cur.cats && Object.keys(cur.cats).length;
+  lmS = { P: P, j: j, mode: cur.total != null || hasCats ? "manual" : "auto", total: cur.total != null ? String(cur.total) : "", cats: {}, start: "" };
   Object.keys(cur.cats || {}).forEach(function (n) { lmS.cats[n] = String(cur.cats[n]); });
   lmS.start = JSON.stringify(lmMan());
   limRender();
@@ -2922,7 +2922,7 @@ function limCalcHTML(LM) {
   if (lmS.mode === "auto") html += '<p class="plintro">' + (LM.src === "goal" ? "Спершу відкладаємо на цілі, решта доходу після обовʼязкових — на щоденні."
     : LM.src === "plan" ? "Звичні витрати не вміщають цілі, тож на щоденні — те, що лишається після цілей. Першими зменшуються бажання."
     : "Ліміт — сума лімітів категорій: потреби (продукти, транспорт) — як зазвичай, бажання (кафе, доставка, розваги, покупки) — як у найекономніший місяць.") + "</p>";
-  else html += '<p class="plintro">Ваша сума на щоденні за місяць. За бажання задайте свої суми категоріям — решта пропорційно підлаштується.</p>';
+  else html += '<p class="plintro">Впишіть свою суму на місяць або задайте суми категоріям — решта підлаштується. Поки нічого не задано, ліміт рахується як в «Авто».</p>';
   html += '<div class="oplist plcalc">' + row("Дохід", zr(LM.inc)) + row("Обовʼязкові", "−" + zr(LM.fixU)) + (save ? row("Цілі", "−" + zr(save)) : "") +
     row("На щоденні", "−" + zr(LM.total)) + row(free >= -0.5 ? "Лишається вільним" : "Не вистачає", zr(Math.abs(free)), "tot") + "</div>";
   if (lmS.mode === "manual" && save && free < -0.5)
@@ -2941,7 +2941,7 @@ function limRefresh() {
     r.classList.toggle("own", lmS.mode === "manual" && !!lmS.cats[n]);
   });
   $("lm-reset").hidden = !Object.keys(lmMan().cats || {}).length;
-  $("lm-save").disabled = JSON.stringify(lmMan()) === lmS.start || (lmS.mode === "manual" && lmS.total === "");
+  $("lm-save").disabled = JSON.stringify(lmMan()) === lmS.start;  // нічого не задали у «Вручну» — це те саме «Авто», зберігати нічого
 }
 function limRender() {
   var P = lmS.P, LM = limitsFor(P, lmS.j, lmMan()), body = $("lm-body");
@@ -2949,7 +2949,7 @@ function limRender() {
   var html = '<div class="seg sm lmseg" role="group" aria-label="Як рахувати ліміт"><button type="button" data-mode="auto" aria-pressed="' + (lmS.mode === "auto") + '">Авто</button>' +
     '<button type="button" data-mode="manual" aria-pressed="' + (lmS.mode === "manual") + '">Вручну</button></div>';
   if (lmS.mode === "manual")
-    html += '<label class="amount pla"><input id="lm-total" type="text" inputmode="numeric" autocomplete="off" placeholder="0" value="' + esc(lmS.total) + '"><span>зл</span></label>' +
+    html += '<label class="amount pla"><input id="lm-total" type="text" inputmode="numeric" autocomplete="off" placeholder="' + nf0.format(Math.round(LM.autoTotal)) + '" value="' + esc(lmS.total) + '"><span>зл</span></label>' +
       '<div class="lmh">' + (LM.spendU ? '<button type="button" data-fill="' + Math.round(LM.spendU) + '">зазвичай <b>' + nf0.format(Math.round(LM.spendU)) + "</b></button>" : "") +
       '<button type="button" data-fill="' + Math.round(LM.autoTotal) + '">авто <b>' + nf0.format(Math.round(LM.autoTotal)) + "</b></button></div>";
   html += '<div id="lm-calc"></div>';
@@ -2969,7 +2969,7 @@ function limRender() {
   var num = function (v) { v = v.replace(/\D/g, "").slice(0, 7); return v ? String(+v) : ""; };
   body.querySelectorAll("[data-mode]").forEach(function (b) { b.onclick = function () {
     if (lmS.mode === b.dataset.mode) return;
-    lmS.mode = b.dataset.mode; if (lmS.mode === "manual" && lmS.total === "") lmS.total = String(Math.round(LM.autoTotal));
+    lmS.mode = b.dataset.mode;
     limRender(); }; });
   var tin = $("lm-total"), fit = function () { var mm = fitAmount.m || (fitAmount.m = document.body.appendChild(h("span", "amount-mirror"))); mm.textContent = tin.value || tin.placeholder; tin.style.width = Math.ceil(mm.getBoundingClientRect().width) + 4 + "px"; };
   if (tin) { fit(); tin.oninput = function () { var v = num(this.value); if (v !== this.value) this.value = v; lmS.total = v; fit(); limRefresh(); }; }
