@@ -535,7 +535,11 @@ body.p-olya .liquid { --sheen: .4; }
 .liquid.lit .after { -webkit-mask: none; mask: none; }  /* після першого проходу: те саме, що кінець бліку (--p 150%) */
 .liquid .after > .ehalo, .liquid .after > .erim { position: absolute; inset: 0; border-radius: inherit; }
 .liquid .after > .amb { position: absolute; }
-body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони яскравіші — трохи тихіше, щоб лишалась глибина */
+body.p-olya .liquid .after { opacity: .68; }
+/* рамка в Олі — яскравіша: світло-рожевий кант у найсвітлішій точці (кант мерехтить кадрами — тож свої кадри) */
+body.p-olya .liquid .ehalo { opacity: .62; }
+body.p-olya .liquid .erim { animation-name: glintRo; }
+@keyframes glintRo { 0%, 100% { opacity: .45; } 50% { opacity: .95; } }  /* в Олі світлі тони яскравіші — трохи тихіше, щоб лишалась глибина */
 .liquid .ehalo { opacity: .46; } .liquid .erim { opacity: .5; }
 .liquid .ehalo { filter: blur(8px); }
 .liquid .ehalo i, .liquid .erim { position: absolute; inset: 0; border-radius: inherit;
@@ -750,9 +754,9 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
   will-change: transform; opacity: .7; }
 .liquid .a3 { right: -44%; top: 6%; width: 68%; aspect-ratio: 1.2; background: radial-gradient(42% 38% at 30% 26%, var(--l4) 0%, color-mix(in srgb, var(--l4) 50%, transparent) 50%, transparent 100%), radial-gradient(32% 28% at 66% 76%, var(--l3) 0%, color-mix(in srgb, var(--l3) 45%, transparent) 50%, transparent 100%);
   animation: flow3 9.5s linear infinite; }
-.liquid .a1 { animation: flow1 11s linear infinite, dip 26s ease-in-out infinite; }
-/* верхній блік повільно спускається вздовж правого краю, біля нижньої рамки меншає й розчиняється за краєм (не заходить на суми), потім вертається вгору */
-@keyframes dip { 0%, 100% { translate: 0 0; scale: 1; } 45%, 55% { translate: 28% 92%; scale: .55; } }
+.liquid .a1 { animation: flow1 11s linear infinite, dip 16s ease-in-out infinite; }
+/* верхній блік спускається вздовж правого краю, біля нижньої рамки розчиняється (більше розмиття, менший) і вертається вгору */
+@keyframes dip { 0%, 100% { translate: 0 0; scale: 1; filter: blur(34px); } 50% { translate: 6% 86%; scale: .72; filter: blur(66px); } }  /* униз — розпливається, вгору — збирається знову */
 .liquid .a2 { animation: flow2 13s linear infinite; }
 .liquid .ehalo i { animation: glint 5s ease-in-out infinite; }
 .liquid .erim { animation: glintR 5s ease-in-out infinite; }
