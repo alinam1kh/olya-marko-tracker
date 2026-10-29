@@ -593,35 +593,54 @@ body.p-olya .liquid .erim { animation-name: glintRo; }
   97.5% { --ex: 0.0%; --ey: 12.8%; }
   100.0% { --ex: 0.0%; --ey: 0.0%; }
 }
-/* mesh-градієнт: кілька кольорових точок, що повільно дрейфують (x і y — з різним темпом, тож рух не повторюється й не зупиняється);
-   поля кольору великі й перекриваються — видно лише плавні переходи, без окремих форм */
-@property --m1x { syntax: "<percentage>"; inherits: false; initial-value: 58%; }
-@property --m1y { syntax: "<percentage>"; inherits: false; initial-value: -6%; }
-@property --m2x { syntax: "<percentage>"; inherits: false; initial-value: 78%; }
-@property --m2y { syntax: "<percentage>"; inherits: false; initial-value: 48%; }
-@property --m3x { syntax: "<percentage>"; inherits: false; initial-value: -4%; }
-@property --m3y { syntax: "<percentage>"; inherits: false; initial-value: 66%; }
-@property --m4x { syntax: "<percentage>"; inherits: false; initial-value: 4%; }
-@property --m4y { syntax: "<percentage>"; inherits: false; initial-value: -4%; }
-@property --m5x { syntax: "<percentage>"; inherits: false; initial-value: 34%; }
-@property --m5y { syntax: "<percentage>"; inherits: false; initial-value: 18%; }
-.liquid .mesh { inset: -12%; opacity: .78; background:
-  radial-gradient(80% 100% at var(--m1x) var(--m1y), var(--l2) 0%, color-mix(in srgb, var(--l2) 50%, transparent) 38%, transparent 72%),
-  radial-gradient(62% 85% at var(--m2x) var(--m2y), var(--l4) 0%, color-mix(in srgb, var(--l4) 50%, transparent) 38%, transparent 72%),
-  radial-gradient(58% 85% at var(--m3x) var(--m3y), var(--l3) 0%, color-mix(in srgb, var(--l3) 50%, transparent) 38%, transparent 72%),
-  radial-gradient(55% 80% at var(--m4x) var(--m4y), color-mix(in srgb, var(--l2) 70%, var(--l4)) 0%, color-mix(in srgb, color-mix(in srgb, var(--l2) 70%, var(--l4)) 50%, transparent) 38%, transparent 72%),
-  radial-gradient(36% 52% at var(--m5x) var(--m5y), color-mix(in srgb, var(--l1) 55%, transparent) 0%, color-mix(in srgb, color-mix(in srgb, var(--l1) 55%, transparent) 50%, transparent) 38%, transparent 72%);
-  animation: m1x 13s ease-in-out infinite alternate, m1y 17s ease-in-out infinite alternate, m2x 15s ease-in-out infinite alternate, m2y 11s ease-in-out infinite alternate, m3x 17s ease-in-out infinite alternate, m3y 13s ease-in-out infinite alternate, m4x 19s ease-in-out infinite alternate, m4y 14s ease-in-out infinite alternate, m5x 11s ease-in-out infinite alternate, m5y 16s ease-in-out infinite alternate; }
+/* mesh-градієнт: великі поля кольору, що перекриваються й течуть, як вода: зсуваються, розтікаються й збираються,
+   тануть і проявляються знову (кожен параметр — свій темп, тож рух не повторюється); між полями лишається темний фон */
+@property --m1x { syntax: "<percentage>"; inherits: false; initial-value: 52%; }
+@property --m1y { syntax: "<percentage>"; inherits: false; initial-value: -12%; }
+@property --m1w { syntax: "<percentage>"; inherits: false; initial-value: 58%; }
+@property --m1h { syntax: "<percentage>"; inherits: false; initial-value: 78%; }
+@property --m1a { syntax: "<percentage>"; inherits: false; initial-value: 55%; }
+@property --m2x { syntax: "<percentage>"; inherits: false; initial-value: 72%; }
+@property --m2y { syntax: "<percentage>"; inherits: false; initial-value: 42%; }
+@property --m2w { syntax: "<percentage>"; inherits: false; initial-value: 42%; }
+@property --m2h { syntax: "<percentage>"; inherits: false; initial-value: 58%; }
+@property --m2a { syntax: "<percentage>"; inherits: false; initial-value: 25%; }
+@property --m3x { syntax: "<percentage>"; inherits: false; initial-value: -8%; }
+@property --m3y { syntax: "<percentage>"; inherits: false; initial-value: 62%; }
+@property --m3w { syntax: "<percentage>"; inherits: false; initial-value: 42%; }
+@property --m3h { syntax: "<percentage>"; inherits: false; initial-value: 56%; }
+@property --m3a { syntax: "<percentage>"; inherits: false; initial-value: 25%; }
+@property --m4x { syntax: "<percentage>"; inherits: false; initial-value: -2%; }
+@property --m4y { syntax: "<percentage>"; inherits: false; initial-value: -12%; }
+@property --m4w { syntax: "<percentage>"; inherits: false; initial-value: 38%; }
+@property --m4h { syntax: "<percentage>"; inherits: false; initial-value: 52%; }
+@property --m4a { syntax: "<percentage>"; inherits: false; initial-value: 15%; }
+.liquid .mesh { inset: -12%; opacity: .74; background:
+  radial-gradient(var(--m1w) var(--m1h) at var(--m1x) var(--m1y), color-mix(in srgb, var(--l2) var(--m1a), transparent) 0%, color-mix(in srgb, color-mix(in srgb, var(--l2) var(--m1a), transparent) 45%, transparent) 34%, transparent 66%),
+  radial-gradient(var(--m2w) var(--m2h) at var(--m2x) var(--m2y), color-mix(in srgb, var(--l4) var(--m2a), transparent) 0%, color-mix(in srgb, color-mix(in srgb, var(--l4) var(--m2a), transparent) 45%, transparent) 34%, transparent 66%),
+  radial-gradient(var(--m3w) var(--m3h) at var(--m3x) var(--m3y), color-mix(in srgb, var(--l3) var(--m3a), transparent) 0%, color-mix(in srgb, color-mix(in srgb, var(--l3) var(--m3a), transparent) 45%, transparent) 34%, transparent 66%),
+  radial-gradient(var(--m4w) var(--m4h) at var(--m4x) var(--m4y), color-mix(in srgb, color-mix(in srgb, var(--l2) 70%, var(--l4)) var(--m4a), transparent) 0%, color-mix(in srgb, color-mix(in srgb, color-mix(in srgb, var(--l2) 70%, var(--l4)) var(--m4a), transparent) 45%, transparent) 34%, transparent 66%);
+  animation: m1x 7s ease-in-out infinite alternate, m1y 9.5s ease-in-out infinite alternate, m1w 6.5s ease-in-out infinite alternate, m1h 8.5s ease-in-out infinite alternate, m1a 10.5s ease-in-out infinite alternate, m2x 8s ease-in-out infinite alternate, m2y 6.8s ease-in-out infinite alternate, m2w 9s ease-in-out infinite alternate, m2h 7.4s ease-in-out infinite alternate, m2a 8.8s ease-in-out infinite alternate, m3x 9.2s ease-in-out infinite alternate, m3y 7.6s ease-in-out infinite alternate, m3w 7.8s ease-in-out infinite alternate, m3h 10s ease-in-out infinite alternate, m3a 6.9s ease-in-out infinite alternate, m4x 6.6s ease-in-out infinite alternate, m4y 8.2s ease-in-out infinite alternate, m4w 9.6s ease-in-out infinite alternate, m4h 7s ease-in-out infinite alternate, m4a 9.4s ease-in-out infinite alternate; }
 @keyframes m1x { to { --m1x: 92%; } }
-@keyframes m1y { to { --m1y: 30%; } }
-@keyframes m2x { to { --m2x: 104%; } }
-@keyframes m2y { to { --m2y: 96%; } }
-@keyframes m3x { to { --m3x: 30%; } }
-@keyframes m3y { to { --m3y: 106%; } }
-@keyframes m4x { to { --m4x: 36%; } }
-@keyframes m4y { to { --m4y: 34%; } }
-@keyframes m5x { to { --m5x: 70%; } }
-@keyframes m5y { to { --m5y: 62%; } }
+@keyframes m1y { to { --m1y: 34%; } }
+@keyframes m1w { to { --m1w: 104%; } }
+@keyframes m1h { to { --m1h: 134%; } }
+@keyframes m1a { to { --m1a: 100%; } }
+@keyframes m2x { to { --m2x: 106%; } }
+@keyframes m2y { to { --m2y: 102%; } }
+@keyframes m2w { to { --m2w: 90%; } }
+@keyframes m2h { to { --m2h: 120%; } }
+@keyframes m2a { to { --m2a: 95%; } }
+@keyframes m3x { to { --m3x: 36%; } }
+@keyframes m3y { to { --m3y: 112%; } }
+@keyframes m3w { to { --m3w: 94%; } }
+@keyframes m3h { to { --m3h: 124%; } }
+@keyframes m3a { to { --m3a: 95%; } }
+@keyframes m4x { to { --m4x: 42%; } }
+@keyframes m4y { to { --m4y: 36%; } }
+@keyframes m4w { to { --m4w: 84%; } }
+@keyframes m4h { to { --m4h: 110%; } }
+@keyframes m4a { to { --m4a: 85%; } }
 .liquid .ehalo i { animation: glint 5s ease-in-out infinite; }
 .liquid .erim { animation: glintR 5s ease-in-out infinite; }
 @keyframes glintR { 0%, 100% { opacity: .3; } 50% { opacity: .62; } }
