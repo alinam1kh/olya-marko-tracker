@@ -701,7 +701,7 @@ body.p-olya .liquid .erim { animation-name: glintRo; }
 /* мʼякі абстрактні форми після бліку: три великі розмиті плями біля країв (рух і яскравість — у кадрах flow1–3) */
 .liquid .amb { inset: auto; width: 96%; aspect-ratio: 1.3; border-radius: 50%; filter: blur(46px); mix-blend-mode: normal;
   will-change: transform; opacity: .7;
-  -webkit-mask-image: radial-gradient(closest-side, #000 50%, rgba(0,0,0,.8) 72%, transparent 100%); mask-image: radial-gradient(closest-side, #000 50%, rgba(0,0,0,.8) 72%, transparent 100%); }  /* краї форми розчиняються у фон */
+  -webkit-mask-image: radial-gradient(closest-side, #000 52%, rgba(0,0,0,.78) 66%, rgba(0,0,0,.42) 80%, rgba(0,0,0,.14) 92%, transparent 100%); mask-image: radial-gradient(closest-side, #000 52%, rgba(0,0,0,.78) 66%, rgba(0,0,0,.42) 80%, rgba(0,0,0,.14) 92%, transparent 100%); }  /* краї форми розчиняються у фон */
 .liquid .a3 { right: -32%; top: 12%; width: 68%; aspect-ratio: 1.2; background: radial-gradient(42% 38% at 30% 26%, var(--l4) 0%, color-mix(in srgb, var(--l4) 50%, transparent) 50%, transparent 100%), radial-gradient(32% 28% at 66% 76%, var(--l3) 0%, color-mix(in srgb, var(--l3) 45%, transparent) 50%, transparent 100%);
   animation: flow3 9.5s linear infinite, melt3 16s ease-in-out infinite; }
 .liquid .a1 { animation: flow1 11s linear infinite, dip 16s ease-in-out infinite; }
