@@ -750,27 +750,28 @@ body.p-olya .liquid .erim { animation-name: glintRo; }
   100.0% { transform: translate(-10.9%, -2.4%) rotate(4.4deg) scale(0.660, 1.051); border-radius: 29% 39% 72% 60% / 29% 50% 71% 29%; opacity: 0.69; }
 }
 /* мʼякі абстрактні форми після бліку: три великі розмиті плями біля країв (рух і яскравість — у кадрах flow1–3) */
-.liquid .amb { inset: auto; width: 96%; aspect-ratio: 1.3; border-radius: 50%; filter: blur(34px); mix-blend-mode: normal;
-  will-change: transform; opacity: .7; }
+.liquid .amb { inset: auto; width: 96%; aspect-ratio: 1.3; border-radius: 50%; filter: blur(46px); mix-blend-mode: normal;
+  will-change: transform; opacity: .7;
+  -webkit-mask-image: radial-gradient(closest-side, #000 50%, rgba(0,0,0,.8) 72%, transparent 100%); mask-image: radial-gradient(closest-side, #000 50%, rgba(0,0,0,.8) 72%, transparent 100%); }  /* краї форми розчиняються у фон */
 .liquid .a3 { right: -32%; top: 12%; width: 68%; aspect-ratio: 1.2; background: radial-gradient(42% 38% at 30% 26%, var(--l4) 0%, color-mix(in srgb, var(--l4) 50%, transparent) 50%, transparent 100%), radial-gradient(32% 28% at 66% 76%, var(--l3) 0%, color-mix(in srgb, var(--l3) 45%, transparent) 50%, transparent 100%);
   animation: flow3 9.5s linear infinite, melt3 16s ease-in-out infinite; }
 .liquid .a1 { animation: flow1 11s linear infinite, dip 16s ease-in-out infinite; }
 /* верхній блік спускається вздовж правого краю, біля нижньої рамки розчиняється (більше розмиття, менший) і вертається вгору */
-@keyframes dip { 0%, 100% { translate: 0 0; scale: 1; filter: blur(34px); } 50% { translate: 6% 86%; scale: .72; filter: blur(66px); } }  /* униз — розпливається, вгору — збирається знову */
+@keyframes dip { 0%, 100% { translate: 0 0; scale: 1; filter: blur(46px); } 50% { translate: 6% 86%; scale: .72; filter: blur(89px); } }  /* униз — розпливається, вгору — збирається знову */
 .liquid .a2 { animation: flow2 13s linear infinite, meet2 16s ease-in-out infinite; }
 /* спільний цикл (той самий, що й dip): права форма піднімається назустріч бліку, що спускається, — проходять одна крізь одну;
    ліва (бірюзова) не йде в центр — піднімається лівим краєм і розчиняється; потім усі розходяться */
 /* фіолетова форма не «сама по собі»: підпливає й зливається з синім бліком, розтікається мʼякою плямою вгору (сильніше розмивається, без сплющування в смугу),
    збирається в іншу — витягнуту вздовж правого краю — форму і вертається */
 @keyframes melt3 {
-  0%, 100% { translate: 0 0; scale: 1; filter: blur(34px); }
-  22% { translate: -16% -22%; scale: 1.15 .95; filter: blur(34px); }
-  42% { translate: -20% -34%; scale: 1.3 .82; filter: blur(58px); }
-  52% { translate: -10% -30%; scale: 1.22 .86; filter: blur(62px); }
-  68% { translate: 12% 4%; scale: .78 1.3; filter: blur(42px); }
-  84% { translate: 6% 2%; scale: .85 1.15; filter: blur(34px); }
+  0%, 100% { translate: 0 0; scale: 1; filter: blur(46px); }
+  22% { translate: -16% -22%; scale: 1.15 .95; filter: blur(46px); }
+  42% { translate: -20% -34%; scale: 1.3 .82; filter: blur(78px); }
+  52% { translate: -10% -30%; scale: 1.22 .86; filter: blur(84px); }
+  68% { translate: 12% 4%; scale: .78 1.3; filter: blur(57px); }
+  84% { translate: 6% 2%; scale: .85 1.15; filter: blur(46px); }
 }
-@keyframes meet2 { 0%, 100% { translate: 0 0; scale: 1; filter: blur(34px); } 50% { translate: -8% -26%; scale: .88; filter: blur(56px); } }  /* бірюзова тримається лівого боку: піднімається краєм і розчиняється, не заходить у центр */
+@keyframes meet2 { 0%, 100% { translate: 0 0; scale: 1; filter: blur(46px); } 50% { translate: -8% -26%; scale: .88; filter: blur(76px); } }  /* бірюзова тримається лівого боку: піднімається краєм і розчиняється, не заходить у центр */
 .liquid .ehalo i { animation: glint 5s ease-in-out infinite; }
 .liquid .erim { animation: glintR 5s ease-in-out infinite; }
 @keyframes glintR { 0%, 100% { opacity: .3; } 50% { opacity: .62; } }
