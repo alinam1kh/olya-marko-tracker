@@ -609,17 +609,18 @@ body.p-olya .liquid .erim { animation-name: glintRo; }
 @property --m3y { syntax: "<percentage>"; inherits: false; initial-value: 62%; }
 @property --m3w { syntax: "<percentage>"; inherits: false; initial-value: 42%; }
 @property --m3h { syntax: "<percentage>"; inherits: false; initial-value: 56%; }
-@property --m3a { syntax: "<percentage>"; inherits: false; initial-value: 25%; }
+@property --m3a { syntax: "<percentage>"; inherits: false; initial-value: 60%; }
 @property --m4x { syntax: "<percentage>"; inherits: false; initial-value: -2%; }
 @property --m4y { syntax: "<percentage>"; inherits: false; initial-value: -12%; }
 @property --m4w { syntax: "<percentage>"; inherits: false; initial-value: 38%; }
 @property --m4h { syntax: "<percentage>"; inherits: false; initial-value: 52%; }
 @property --m4a { syntax: "<percentage>"; inherits: false; initial-value: 15%; }
-.liquid .mesh { inset: -12%; opacity: .74; background:
-  radial-gradient(var(--m1w) var(--m1h) at var(--m1x) var(--m1y), color-mix(in srgb, var(--l2) var(--m1a), transparent) 0%, color-mix(in srgb, color-mix(in srgb, var(--l2) var(--m1a), transparent) 45%, transparent) 34%, transparent 66%),
-  radial-gradient(var(--m2w) var(--m2h) at var(--m2x) var(--m2y), color-mix(in srgb, var(--l4) var(--m2a), transparent) 0%, color-mix(in srgb, color-mix(in srgb, var(--l4) var(--m2a), transparent) 45%, transparent) 34%, transparent 66%),
-  radial-gradient(var(--m3w) var(--m3h) at var(--m3x) var(--m3y), color-mix(in srgb, var(--l3) var(--m3a), transparent) 0%, color-mix(in srgb, color-mix(in srgb, var(--l3) var(--m3a), transparent) 45%, transparent) 34%, transparent 66%),
-  radial-gradient(var(--m4w) var(--m4h) at var(--m4x) var(--m4y), color-mix(in srgb, color-mix(in srgb, var(--l2) 70%, var(--l4)) var(--m4a), transparent) 0%, color-mix(in srgb, color-mix(in srgb, color-mix(in srgb, var(--l2) 70%, var(--l4)) var(--m4a), transparent) 45%, transparent) 34%, transparent 66%);
+.liquid .mesh { inset: -12%; opacity: .74; filter: blur(34px);  /* сильне розмиття: лише плавні переходи кольору, без яскравих ядер */
+  background:
+  radial-gradient(var(--m1w) var(--m1h) at var(--m1x) var(--m1y), color-mix(in srgb, color-mix(in srgb, var(--l2) var(--m1a), transparent) 80%, transparent) 0%, color-mix(in srgb, color-mix(in srgb, var(--l2) var(--m1a), transparent) 55%, transparent) 28%, color-mix(in srgb, color-mix(in srgb, var(--l2) var(--m1a), transparent) 24%, transparent) 52%, transparent 78%),
+  radial-gradient(var(--m2w) var(--m2h) at var(--m2x) var(--m2y), color-mix(in srgb, color-mix(in srgb, var(--l4) var(--m2a), transparent) 80%, transparent) 0%, color-mix(in srgb, color-mix(in srgb, var(--l4) var(--m2a), transparent) 55%, transparent) 28%, color-mix(in srgb, color-mix(in srgb, var(--l4) var(--m2a), transparent) 24%, transparent) 52%, transparent 78%),
+  radial-gradient(var(--m3w) var(--m3h) at var(--m3x) var(--m3y), color-mix(in srgb, color-mix(in srgb, var(--l3) var(--m3a), transparent) 80%, transparent) 0%, color-mix(in srgb, color-mix(in srgb, var(--l3) var(--m3a), transparent) 55%, transparent) 28%, color-mix(in srgb, color-mix(in srgb, var(--l3) var(--m3a), transparent) 24%, transparent) 52%, transparent 78%),
+  radial-gradient(var(--m4w) var(--m4h) at var(--m4x) var(--m4y), color-mix(in srgb, color-mix(in srgb, color-mix(in srgb, var(--l2) 70%, var(--l4)) var(--m4a), transparent) 80%, transparent) 0%, color-mix(in srgb, color-mix(in srgb, color-mix(in srgb, var(--l2) 70%, var(--l4)) var(--m4a), transparent) 55%, transparent) 28%, color-mix(in srgb, color-mix(in srgb, color-mix(in srgb, var(--l2) 70%, var(--l4)) var(--m4a), transparent) 24%, transparent) 52%, transparent 78%);
   animation: m1x 7s ease-in-out infinite alternate, m1y 9.5s ease-in-out infinite alternate, m1w 6.5s ease-in-out infinite alternate, m1h 8.5s ease-in-out infinite alternate, m1a 10.5s ease-in-out infinite alternate, m2x 8s ease-in-out infinite alternate, m2y 6.8s ease-in-out infinite alternate, m2w 9s ease-in-out infinite alternate, m2h 7.4s ease-in-out infinite alternate, m2a 8.8s ease-in-out infinite alternate, m3x 9.2s ease-in-out infinite alternate, m3y 7.6s ease-in-out infinite alternate, m3w 7.8s ease-in-out infinite alternate, m3h 10s ease-in-out infinite alternate, m3a 6.9s ease-in-out infinite alternate, m4x 6.6s ease-in-out infinite alternate, m4y 8.2s ease-in-out infinite alternate, m4w 9.6s ease-in-out infinite alternate, m4h 7s ease-in-out infinite alternate, m4a 9.4s ease-in-out infinite alternate; }
 @keyframes m1x { to { --m1x: 92%; } }
 @keyframes m1y { to { --m1y: 34%; } }
@@ -635,7 +636,7 @@ body.p-olya .liquid .erim { animation-name: glintRo; }
 @keyframes m3y { to { --m3y: 112%; } }
 @keyframes m3w { to { --m3w: 94%; } }
 @keyframes m3h { to { --m3h: 124%; } }
-@keyframes m3a { to { --m3a: 95%; } }
+@keyframes m3a { to { --m3a: 100%; } }
 @keyframes m4x { to { --m4x: 42%; } }
 @keyframes m4y { to { --m4y: 36%; } }
 @keyframes m4w { to { --m4w: 84%; } }
