@@ -1338,8 +1338,8 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
    Головна картка вже темна (свій градієнт) — лишається як є; решта — темні поверхні, світлий текст, ті самі акценти. */
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg: #0D0F13; --card: #171A20; --border: #252932; --soft: #1F232A; --track: #232730; --seg: #1F232A;
-  --ink: #F1F3F6; --ink2: #959CAA; --ink3: #C2C7D1; --ink4: #DADEE5; --mute: #464C57;
+  --bg: #0D0F13; --card: #171A20; --border: #2C313A; --soft: #1F232A; --track: #232730; --seg: #1F232A;
+  --ink: #F1F3F6; --ink2: #959CAA; --ink3: #C2C7D1; --ink4: #DADEE5; --mute: #636A76;
   --blue: #5B95FF; --blue-soft: rgba(91, 149, 255, .16); --blue-txt: #8FB5FF; --blue-l: #34507F;
   --good: #4ADE80; --good-bg: rgba(74, 222, 128, .14); --bad: #FF7468; --bad-bg: rgba(255, 116, 104, .15); --cash: #F2C46D; --cash-bg: rgba(242, 196, 109, .14);
 }
@@ -1350,6 +1350,10 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
 [data-theme="dark"] .toast { background: rgba(32, 36, 44, .82); border-color: rgba(255,255,255,.06); box-shadow: 0 12px 34px rgba(0,0,0,.45); }
 [data-theme="dark"] .sheet-bg { background: rgba(0,0,0,.6); }
 [data-theme="dark"] .sheet-head::before, [data-theme="dark"] .jcat::-webkit-scrollbar-thumb { background-color: #3A3F49; }
+/* перемикачі: активна кнопка світліша за доріжку (у світлій навпаки — біла на сірому), неактивні — читабельні */
+[data-theme="dark"] .seg button[aria-pressed="true"] { background: #30353F; color: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.07); }
+[data-theme="dark"] .seg button[aria-pressed="false"] { color: #A9AFBB; }
+[data-theme="dark"] .pop .opt[aria-checked="true"] { background: #252A33; }
 [data-theme="dark"] .save:disabled { background: #2A2E36; color: var(--ink2); }
 /* стовпчики: сірі — темніші, штрихування — у темних тонах; порожні капсули й пунктир середнього — темно-сірі */
 [data-theme="dark"] .cap.dim .fill .main { background: #3A404B; }
