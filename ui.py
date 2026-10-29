@@ -178,7 +178,82 @@ def _plans():
 def _data():
     data = report_data.report()
     data["plans"] = _plans()
+    data["limits"] = _limits()
     return data
+
+
+# Свій ліміт на щоденні — теж налаштування людини, у limits.json поруч із цілями (у git не йде):
+# {person: [{from: "YYYY-MM", total?: зл, cats?: {категорія: зл}}]} — з якого місяця діє; без total і cats — знову «Авто».
+LIMITS = ROOT / "limits.json"
+
+
+def _limits():
+    try:
+        data = json.loads(LIMITS.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def _zl(value):
+    """Ціла сума 0…1 000 000 або None."""
+    try:
+        n = int(Decimal(str(value)).quantize(Decimal("1")))
+    except (InvalidOperation, ValueError, TypeError):
+        return None
+    return n if 0 <= n <= 1_000_000 else None
+
+
+def _limit(raw, today):
+    """Перевіряє один запис історії ліміту; повертає словник або None."""
+    if not isinstance(raw, dict) or not _YM.match(str(raw.get("from", ""))) or str(raw["from"]) > today.strftime("%Y-%m"):
+        return None
+    item = {"from": str(raw["from"])}
+    if raw.get("total") is not None:
+        item["total"] = _zl(raw["total"])
+        if item["total"] is None:
+            return None
+    cats = raw.get("cats") or {}
+    if not isinstance(cats, dict) or len(cats) > 40:
+        return None
+    clean = {}
+    for name, value in cats.items():
+        name, n = re.sub(r"\s+", " ", str(name)).strip()[:40], _zl(value)
+        if not name or n is None:
+            return None
+        clean[name] = n
+    if clean:
+        item["cats"] = clean
+    return item
+
+
+@ui_app.post("/api/limit")
+def save_limit():
+    """Зберігає історію ліміту людини: {person, hist: [...]} (своя сума, свої категорії, «Авто» чи «Скасувати»)."""
+    origin = request.headers.get("Origin", "")
+    if not request.is_json or urlparse(origin).netloc != request.host:
+        return jsonify({"ok": False, "error": "Запит не з трекера"}), 403
+    body = request.get_json(silent=True) or {}
+    person = str(body.get("person", ""))
+    if person not in {key for key, _, _ in report_data.LEDGERS}:
+        return _fail("Невідома людина")
+    raw = body.get("hist")
+    if not isinstance(raw, list) or len(raw) > 60:
+        return _fail("Невірний ліміт")
+    today = date.today()
+    hist = [_limit(x, today) for x in raw]
+    if None in hist or len({x["from"] for x in hist}) != len(hist):
+        return _fail("Невірний ліміт")
+    with _write_lock:
+        limits = _limits()
+        if hist:
+            limits[person] = sorted(hist, key=lambda x: x["from"])
+        else:
+            limits.pop(person, None)
+        tmp = LIMITS.with_suffix(".tmp")
+        tmp.write_text(json.dumps(limits, ensure_ascii=False, indent=2), encoding="utf-8")
+        tmp.replace(LIMITS)
+    return jsonify({"ok": True, "limits": limits})
 
 
 def _goal(raw, today):
@@ -901,6 +976,35 @@ a.ins { color: var(--ink4); }
 .pldel { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; margin-top: 10px; padding: 0; border: 0; background: none; font: 500 14px var(--font); color: var(--bad); cursor: pointer; }
 .pldel svg { width: 18px; height: 18px; }
 .plback { display: inline-flex; align-items: center; gap: 2px; min-height: 36px; margin: -4px 0 4px -4px; padding: 0 4px; border: 0; background: none; font: 500 14px var(--font); color: var(--blue); cursor: pointer; }
+/* картка ліміту: пігулка режиму «Авто / Своя сума» — відкриває «Як рахується» */
+.lhd { display: inline-flex; align-items: center; gap: 6px; }
+.lmode { display: inline-flex; align-items: center; gap: 5px; min-height: 28px; padding: 0 10px; border: 0; border-radius: 14px; background: var(--soft); color: var(--ink2); font: 500 12px var(--font); cursor: pointer; }
+.lmode svg { width: 14px; height: 14px; }
+.lmode.own { background: var(--blue-soft); color: var(--blue-txt); }
+.lgo { display: grid; place-items: center; width: 32px; height: 44px; margin-right: -6px; color: var(--ink2); }
+/* шторка ліміту */
+.lmseg { margin-top: 6px; }
+.lmseg button { min-height: 40px; font-size: 13px; }
+.lmh { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.lmh button { min-height: 36px; padding: 0 12px; border: 1px solid var(--border); border-radius: 18px; background: var(--card); color: var(--ink3); font: 400 13px var(--font); cursor: pointer; }
+.lmh button b { font-weight: 500; color: var(--ink); }
+.lmcats { margin-top: 22px; }
+.lmcats h3 { margin: 0; font-size: 15px; font-weight: 500; }
+.lmcats > p { margin: 4px 0 4px; font-size: 13px; line-height: 1.4; color: var(--ink2); }
+.lmrow { display: flex; align-items: center; gap: 10px; min-height: 60px; border-top: 1px solid var(--soft); }
+.lmcats > p + .lmrow { border-top: 0; }
+.lmrow .nm { flex: 1; min-width: 0; }
+.lmrow .nm b { display: block; font-size: 14px; font-weight: 400; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lmrow .nm small { font-size: 12px; color: var(--ink2); }
+.lmrow .pen { flex: none; width: 14px; height: 14px; color: var(--blue); opacity: 0; transition: opacity .2s; }
+.lmrow.own .pen { opacity: 1; }
+.lmin { display: flex; align-items: center; gap: 4px; width: 112px; min-height: 40px; padding: 0 10px; border: 1px solid var(--border); border-radius: 12px; background: var(--card); }
+.lmin:focus-within { border-color: var(--blue-l); }
+.lmin input { width: 100%; min-width: 0; border: 0; outline: 0; background: none; font: 400 16px var(--font); color: var(--ink); text-align: right; }
+.lmin input::placeholder { color: var(--ink2); }
+.lmin span { font-size: 13px; color: var(--ink2); }
+.lmrow.own .lmin { border-color: var(--blue-l); }
+.lmreset { display: block; margin: 8px 0 0; padding: 10px 0; border: 0; background: none; color: var(--blue-txt); font: 500 13px var(--font); cursor: pointer; }
 .plnote { margin: 12px 2px 0; font-size: 13px; color: var(--blue-txt); }
 .plwarn { margin: 6px 2px 0; font-size: 13px; color: var(--cash); }
 .goal .gbig { display: flex; align-items: baseline; gap: 8px; margin: 14px 0 0; }
@@ -1194,7 +1298,8 @@ a.ins { color: var(--ink4); }
   background: var(--card); border-radius: 28px 28px 0 0; transform: translateY(100%); transition: transform .7s cubic-bezier(.32, .72, 0, 1); will-change: transform; }
 .sheet.open { transform: none; }
 /* форма цілі — шторка на всю висоту: сума, підсумок і дропдауни не підкидають її вгору */
-#v-plan.pledit { height: 92vh; height: 92dvh; }
+#v-plan.pledit, #v-lim { height: 92vh; height: 92dvh; }
+#v-lim .sheet-scroll { flex: 1; }
 #v-plan.pledit .sheet-scroll { flex: 1; }
 .sheet-bg.open { opacity: 1; }
 .sheet-head { display: grid; grid-template-columns: 1fr 44px; align-items: center; padding: 8px 16px 0; touch-action: none; }
@@ -1467,6 +1572,14 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
   </form>
   <!-- картка операції: тап по рядку в Журналі чи «Останніх операціях» -->
   <!-- «Відкладати щомісяця»: з картки ліміту на Головній -->
+  <!-- «Як рахується ліміт»: з картки ліміту на Головній; «Авто» чи своя сума, свої суми категорій -->
+  <div class="sheet-bg" id="lm-bg" hidden></div>
+  <div class="sheet" id="v-lim" hidden role="dialog" aria-modal="true" aria-labelledby="lm-title">
+    <div class="sheet-head"><h2 id="lm-title">Ліміт на щоденні</h2>
+      <button type="button" id="lm-close" aria-label="Закрити"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+    <div class="sheet-scroll" id="lm-body"></div>
+    <div class="sheet-foot"><p class="msg" id="lm-msg" role="status"></p><button class="save" id="lm-save" type="button" disabled>Зберегти</button></div>
+  </div>
   <div class="sheet-bg" id="pl-bg" hidden></div>
   <div class="sheet" id="v-plan" hidden role="dialog" aria-modal="true" aria-labelledby="pl-title">
     <div class="sheet-head" id="pl-head"><h2 id="pl-title">Відкладати щомісяця</h2>
@@ -1832,7 +1945,7 @@ function renderLimit(P) {
   var p = LM.total ? Math.min(100, spent / LM.total * 100) : 100;
   // Марко — скільки на день до кінця місяця; Оля — те саме, але видно, навіщо: щоб відкласти план
   var note = left < 0 ? "Щоденні вже понад ліміт, до кінця місяця ще " + dl + " " + plural(dl, "день", "дні", "днів")
-    : "Це ≈ " + zr(left / Math.max(1, dl)) + " на день" + (LM.src !== "best" ? ", щоб відкласти " + zr(LM.save) : " до кінця місяця");
+    : "Це ≈ " + zr(left / Math.max(1, dl)) + " на день" + (LM.src === "goal" || LM.src === "plan" ? ", щоб відкласти " + zr(LM.save) : " до кінця місяця");
   // рядок до цілей: немає — «+ Відкладати щомісяця»; одна — її іконка й прогрес; кілька — скільки і разом на місяць
   var act = LM.goals || [], k0 = M.key, foot;
   if (!act.length) foot = '<button type="button" class="lfoot ladd" id="limc-plan"><span class="llink">' + svgI("currentColor", '<path d="M12 5v14M5 12h14"/>', 18) + "Відкладати щомісяця</span></button>";
@@ -1845,11 +1958,15 @@ function renderLimit(P) {
     foot = '<button type="button" class="lfoot" id="limc-plan"><span class="lpig">' + (dated ? FLAG : PIG) + '</span><span class="lft"><b>' + act.length + " " + plural(act.length, "ціль", "цілі", "цілей") +
       "</b>, разом " + zr(sum) + " на місяць</span>" + CHR + "</button>";
   }
-  box.innerHTML = '<a class="lmain" href="#analytics"><div class="ch"><h2>Ліміт на щоденні витрати</h2>' + CHR + "</div>" +
+  var own = LM.src === "manual" || Object.keys(LM.own || {}).length;
+  box.innerHTML = '<div class="ch"><h2>Ліміт на щоденні витрати</h2><span class="lhd"><button type="button" class="lmode' + (own ? " own" : "") + '" id="limc-info" aria-label="Як рахується ліміт">' + INFO +
+    (LM.src === "manual" ? "Своя сума" : own ? "Свої категорії" : "Авто") + '</button><a class="lgo" href="#analytics" aria-label="Ліміт в Аналітиці">' + CHR + "</a></span></div>" +
+    '<a class="lmain" href="#analytics">' +
     '<div class="lbig"><b>' + zr(Math.abs(left)) + "</b><span>" + (left < 0 ? "понад ліміт " : "лишилось з ") + nf0.format(Math.round(LM.total)) + "</span></div>" +
     '<div class="lbar" role="img" aria-label="Витрачено ' + nf0.format(Math.round(p)) + ' % ліміту"><b' + (left < 0 ? ' class="over"' : "") + ' data-to="' + p.toFixed(2) + '%"></b></div>' +
     '<p class="lnote">' + note + "</p></a>" + foot;
-  box.querySelector(".lmain").onclick = function () { lim = true; ascale = "m"; try { localStorage.setItem("lim", "1"); } catch (e) {} };
+  box.querySelectorAll(".lmain, .lgo").forEach(function (a) { a.onclick = function () { lim = true; ascale = "m"; try { localStorage.setItem("lim", "1"); } catch (e) {} }; });
+  $("limc-info").onclick = function () { limOpen(P); };
   $("limc-plan").onclick = function () { planOpen(P); };
   grow("#limc .lbar b", "width");
 }
@@ -2079,26 +2196,48 @@ function goalPlan(P) {
 // • загальний: є ціль — дохід мінус обовʼязкові мінус план відкладень («скільки можна, щоб устигнути»);
 //   цілі немає — сума лімітів категорій (категорії з малою кількістю даних — за звичним)
 // якщо ліміт від цілі менший за суму категорій — різницю знімаємо лише з «бажань»
-function limitsFor(P, j) {
+// свій ліміт людини на місяць: останній запис історії, що діє з цього місяця чи раніше ({total?, cats?}), або null
+function limSet(P, key) {
+  var h = ((D.limits || {})[P.key] || []).filter(function (x) { return x.from <= key; }), x = h[h.length - 1];
+  return x && (x.total != null || x.cats && Object.keys(x.cats).length) ? x : null;
+}
+// man — щоб порахувати «а що, якби» у шторці ліміту (не збережене); без нього — збережене для цього місяця
+function limitsFor(P, j, man) {
   var base = usualMonths(P, j), M = P.months[j], u = {}, mn = {}, cnt = {}, g = goalPlan(P);
   if (base.length < (g ? 1 : 2)) return null;
+  if (man === undefined) man = limSet(P, M.key);
+  var mc = man && man.cats || {};
   base.forEach(function (m) { var f = fixedCats(m); m.categories.forEach(function (c) { if (f[c.name]) return;
     u[c.name] = (u[c.name] || 0) + c.amount / base.length; mn[c.name] = Math.min(mn[c.name] === undefined ? Infinity : mn[c.name], c.amount); cnt[c.name] = (cnt[c.name] || 0) + 1; }); });
-  var L = {}, wants = 0;
-  Object.keys(u).forEach(function (n) { if (cnt[n] >= 2) { L[n] = WANTS[n] ? mn[n] : u[n]; if (WANTS[n]) wants += L[n]; } });
-  var catSum = Object.keys(u).reduce(function (s, n) { return s + (n in L ? L[n] : u[n]); }, 0), total = catSum, src = "best";
-  var pm = M.income > 0 ? M : prevWithIncome(P, j);
+  var L = {}, A = {}, wants = 0;
+  Object.keys(u).forEach(function (n) { if (cnt[n] >= 2) L[n] = WANTS[n] ? mn[n] : u[n]; });
+  Object.keys(L).forEach(function (n) { A[n] = L[n]; });  // авто-ліміти категорій (до цілей і своїх сум)
+  Object.keys(mc).forEach(function (n) { L[n] = mc[n]; });  // свої суми категорій — поверх авто
+  Object.keys(L).forEach(function (n) { if (WANTS[n] && !(n in mc)) wants += L[n]; });
+  var names = Object.keys(u).concat(Object.keys(mc).filter(function (n) { return !(n in u); }));
+  var catSum = names.reduce(function (s, n) { return s + (n in L ? L[n] : u[n]); }, 0), total = catSum, src = "best";
+  var pm = M.income > 0 ? M : prevWithIncome(P, j), fixU = avgOf(base, function (m) { return m.expenses - m.variable; });
   // скільки відкладати: сума всіх цілей, що діють у цьому місяці (подушка без своєї суми — скільки треба, щоб устигнути)
   var act = goalsOf(P).filter(function (x) { return goalOn(x, M.key) && (x.kind !== "cushion" || g); });
   var save = act.length ? act.reduce(function (s, x) { return s + goalMonthly(x, M.key, P); }, 0) : null, hasC = act.some(function (x) { return x.kind === "cushion"; });
   if (save !== null && pm) {
-    var cap = Math.max(0, pm.income - avgOf(base, function (m) { return m.expenses - m.variable; }) - save);
+    var cap = Math.max(0, pm.income - fixU - save);
     if (hasC) { total = cap; src = "goal"; }
     else if (cap < catSum) { total = cap; src = "plan"; }  // без цілі план лише знижує ліміт, якщо він не вміщається
     var cut = catSum - total;
-    if (cut > 0 && wants > 0) { var f = Math.max(0, 1 - cut / wants); Object.keys(L).forEach(function (n) { if (WANTS[n]) L[n] *= f; }); }
+    if (cut > 0 && wants > 0) { var f = Math.max(0, 1 - cut / wants); Object.keys(L).forEach(function (n) { if (WANTS[n] && !(n in mc)) L[n] *= f; }); }
   }
-  return { cat: L, total: total, src: src, save: save, auto: catSum, wants: wants, goals: act };
+  var autoTotal = total, autoSrc = src;
+  // своя загальна сума: решту категорій (без своїх сум) пропорційно підганяємо під неї
+  if (man && man.total != null) {
+    total = man.total; src = "manual";
+    var own = Object.keys(mc).reduce(function (s, n) { return s + mc[n]; }, 0), rest = Object.keys(L).filter(function (n) { return !(n in mc); });
+    var other = rest.reduce(function (s, n) { return s + L[n]; }, 0), k = other > 0 ? Math.max(0, total - own) / other : 0;
+    rest.forEach(function (n) { L[n] *= k; });
+  }
+  return { cat: L, total: total, src: src, save: save, auto: catSum, wants: wants, goals: act,
+    man: man, autoCat: A, usual: u, own: mc, autoTotal: autoTotal, autoSrc: autoSrc, fixU: fixU, inc: pm ? pm.income : 0,
+    spendU: avgOf(base, function (m) { return m.variable; }) };
 }
 function renderAnalytics(P) {
   if (month >= P.months.length) month = curMonth(P);
@@ -2656,7 +2795,7 @@ function planCalc(P, m, cushion) {
   var fixU = avgOf(base, function (x) { return x.expenses - x.variable; }), free = pm.income - fixU, g = cushion ? goalPlan(P) : null;
   var cap = Math.max(0, free - m);
   return { inc: pm.income, fixU: fixU, free: free, auto: LM.auto, floor: LM.auto - LM.wants, now: LM.total, cap: cap,
-    lim: g ? cap : Math.min(LM.auto, cap), g: g, usual: avgOf(base, function (x) { return x.variable; }) };
+    lim: LM.src === "manual" ? LM.total : g ? cap : Math.min(LM.auto, cap), g: g, usual: avgOf(base, function (x) { return x.variable; }) };
 }
 function plResult(c, m) {
   if (!m || !c) return "";
@@ -2783,6 +2922,111 @@ function plCalHTML() {
     '<div class="cal-wd" aria-hidden="true"><span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Нд</span></div><div class="cal-grid">' + cells + "</div></div>";
 }
 function plShift(n) { var y = +plS.calKey.slice(0, 4), mo = +plS.calKey.slice(5) - 1 + n; plS.calKey = iso(new Date(y, mo, 1)).slice(0, 7); plRender(); }
+// ---------- «Як рахується ліміт»: Авто / Своя сума + свої суми категорій ----------
+var lmS = null;
+var PEN = '<svg class="pen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"/></svg>';
+function lmMan() {  // те, що зараз у шторці, — у вигляді запису історії
+  var cats = {}; Object.keys(lmS.cats).forEach(function (n) { if (lmS.cats[n]) cats[n] = +lmS.cats[n]; });
+  var x = {}; if (lmS.mode === "manual" && lmS.total !== "") x.total = +lmS.total; if (Object.keys(cats).length) x.cats = cats;
+  return x;
+}
+function limOpen(P) {
+  var j = P.months.length - 1, cur = limSet(P, P.months[j].key) || {};
+  lmS = { P: P, j: j, mode: cur.total != null ? "manual" : "auto", total: cur.total != null ? String(cur.total) : "", cats: {}, start: "" };
+  Object.keys(cur.cats || {}).forEach(function (n) { lmS.cats[n] = String(cur.cats[n]); });
+  lmS.start = JSON.stringify(lmMan());
+  limRender();
+  var s = $("v-lim"), bg = $("lm-bg");
+  s.hidden = bg.hidden = false; document.body.style.overflow = "hidden";
+  requestAnimationFrame(function () { requestAnimationFrame(function () { s.classList.add("open"); bg.classList.add("open"); }); });
+}
+function limClose() {
+  var s = $("v-lim"), bg = $("lm-bg"); if (s.hidden) return;
+  s.classList.remove("open"); bg.classList.remove("open"); document.body.style.overflow = "";
+  setTimeout(function () { if (!s.classList.contains("open")) s.hidden = bg.hidden = true; }, 300);
+}
+// розрахунок і попередження — перемальовуємо лише їх, щоб поле вводу не втрачало фокус
+function limCalcHTML(LM) {
+  var row = function (a, b, cls) { return '<div class="oprow' + (cls ? " " + cls : "") + '"><span>' + a + "</span><b>" + b + "</b></div>"; };
+  var save = LM.save || 0, free = LM.inc - LM.fixU - save - LM.total, html = "";
+  if (lmS.mode === "auto") html += '<p class="plintro">' + (LM.src === "goal" ? "Спершу відкладаємо на цілі, решта доходу після обовʼязкових — на щоденні."
+    : LM.src === "plan" ? "Звичні витрати не вміщають цілі, тож на щоденні — те, що лишається після цілей. Першими зменшуються бажання."
+    : "Ліміт — сума лімітів категорій: потреби (продукти, транспорт) — як зазвичай, бажання (кафе, доставка, розваги, покупки) — як у найекономніший місяць.") + "</p>";
+  else html += '<p class="plintro">Ваша сума на щоденні за місяць. Категорії без своїх сум пропорційно підлаштуються під неї.</p>';
+  html += '<div class="oplist plcalc">' + row("Дохід", zr(LM.inc)) + row("Обовʼязкові", "−" + zr(LM.fixU)) + (save ? row("Цілі", "−" + zr(save)) : "") +
+    row("На щоденні", "−" + zr(LM.total)) + row(free >= -0.5 ? "Лишається вільним" : "Не вистачає", zr(Math.abs(free)), "tot") + "</div>";
+  if (lmS.mode === "manual" && save && free < -0.5)
+    html += '<div class="plres warn"><b>Цілі не вміщаються</b><span>З таким лімітом на цілі лишиться ' + zr(Math.max(0, save + free)) + " замість " + zr(save) + ".</span></div>";
+  else if (lmS.mode === "manual" && LM.spendU && LM.total < LM.spendU * .7)
+    html += '<p class="plwarn">Це на ' + zr(LM.spendU - LM.total) + " менше, ніж ви зазвичай витрачаєте на щоденні</p>";
+  return html;
+}
+function limRefresh() {
+  var LM = limitsFor(lmS.P, lmS.j, lmMan());
+  if (!LM) return;
+  $("lm-calc").innerHTML = limCalcHTML(LM);
+  $("lm-body").querySelectorAll(".lmrow").forEach(function (r) {
+    var n = r.dataset.n, v = LM.cat[n] != null ? LM.cat[n] : LM.usual[n] || 0;
+    r.querySelector("input").placeholder = nf0.format(Math.round(v)); r.classList.toggle("own", !!lmS.cats[n]);
+  });
+  $("lm-reset").hidden = !Object.keys(lmMan().cats || {}).length;
+  $("lm-save").disabled = JSON.stringify(lmMan()) === lmS.start || (lmS.mode === "manual" && lmS.total === "");
+}
+function limRender() {
+  var P = lmS.P, LM = limitsFor(P, lmS.j, lmMan()), body = $("lm-body");
+  if (!LM) { body.innerHTML = '<p class="plintro">Для ліміту потрібні хоча б два повні місяці.</p>'; return; }
+  var html = '<div class="seg sm lmseg" role="group" aria-label="Як рахувати ліміт"><button type="button" data-mode="auto" aria-pressed="' + (lmS.mode === "auto") + '">Авто</button>' +
+    '<button type="button" data-mode="manual" aria-pressed="' + (lmS.mode === "manual") + '">Своя сума</button></div>';
+  if (lmS.mode === "manual")
+    html += '<label class="amount pla"><input id="lm-total" type="text" inputmode="numeric" autocomplete="off" placeholder="0" value="' + esc(lmS.total) + '"><span>зл</span></label>' +
+      '<div class="lmh">' + (LM.spendU ? '<button type="button" data-fill="' + Math.round(LM.spendU) + '">зазвичай <b>' + nf0.format(Math.round(LM.spendU)) + "</b></button>" : "") +
+      '<button type="button" data-fill="' + Math.round(LM.autoTotal) + '">авто <b>' + nf0.format(Math.round(LM.autoTotal)) + "</b></button></div>";
+  html += '<div id="lm-calc"></div>';
+  // категорії: скільки зазвичай і ліміт; своя сума — поверх авто (решта підлаштовується)
+  var names = Object.keys(LM.usual).concat(Object.keys(lmS.cats).filter(function (n) { return !(n in LM.usual); }))
+    .sort(function (a, b) { return (LM.usual[b] || 0) - (LM.usual[a] || 0); });
+  html += '<div class="lmcats"><h3>Категорії</h3><p>Порожнє поле — ліміт рахується сам (сірим). Впишіть свою суму — решта підлаштується.</p>';
+  names.forEach(function (n) {
+    html += '<div class="lmrow" data-n="' + esc(n) + '"><div class="nm"><b>' + esc(n) + "</b><small>зазвичай " + zr(LM.usual[n] || 0) + (WANTS[n] ? ", бажання" : "") + "</small></div>" + PEN +
+      '<label class="lmin"><input type="text" inputmode="numeric" autocomplete="off" aria-label="Ліміт: ' + esc(n) + '" value="' + esc(lmS.cats[n] || "") + '"><span>зл</span></label></div>';
+  });
+  html += '<button type="button" class="lmreset" id="lm-reset" hidden>Скинути свої суми категорій</button></div>';
+  body.innerHTML = html; $("lm-msg").textContent = "";
+  var num = function (v) { v = v.replace(/\D/g, "").slice(0, 7); return v ? String(+v) : ""; };
+  body.querySelectorAll("[data-mode]").forEach(function (b) { b.onclick = function () {
+    if (lmS.mode === b.dataset.mode) return;
+    lmS.mode = b.dataset.mode; if (lmS.mode === "manual" && lmS.total === "") lmS.total = String(Math.round(LM.autoTotal));
+    limRender(); }; });
+  var tin = $("lm-total"), fit = function () { var mm = fitAmount.m || (fitAmount.m = document.body.appendChild(h("span", "amount-mirror"))); mm.textContent = tin.value || tin.placeholder; tin.style.width = Math.ceil(mm.getBoundingClientRect().width) + 4 + "px"; };
+  if (tin) { fit(); tin.oninput = function () { var v = num(this.value); if (v !== this.value) this.value = v; lmS.total = v; fit(); limRefresh(); }; }
+  body.querySelectorAll("[data-fill]").forEach(function (b) { b.onclick = function () { lmS.total = b.dataset.fill; tin.value = b.dataset.fill; fit(); limRefresh(); }; });
+  body.querySelectorAll(".lmrow input").forEach(function (inp) { inp.oninput = function () {
+    var v = num(this.value); if (v !== this.value) this.value = v; var n = this.closest(".lmrow").dataset.n;
+    if (v) lmS.cats[n] = v; else delete lmS.cats[n]; limRefresh(); }; });
+  $("lm-reset").onclick = function () { lmS.cats = {}; body.querySelectorAll(".lmrow input").forEach(function (i) { i.value = ""; }); limRefresh(); };
+  limRefresh();
+}
+function limPost(P, hist) {
+  return fetch("api/limit", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "same-origin", body: JSON.stringify({ person: P.key, hist: hist }) })
+    .then(function (r) { return r.json().catch(function () { return { ok: false, error: "Сервер не відповів" }; }); })
+    .then(function (res) { if (!res.ok) throw new Error(res.error || "Не вдалося зберегти"); D.limits = res.limits; reportKey = null; quiet(); render(); return res; });
+}
+$("lm-save").onclick = function () {
+  var P = lmS.P, btn = this, k = P.months[lmS.j].key, prev = JSON.parse(JSON.stringify(((D.limits || {})[P.key]) || []));
+  var hist = prev.filter(function (x) { return x.from !== k; }), x = lmMan();  // діє з поточного місяця: минулі місяці зберігають свій ліміт
+  var before = hist.filter(function (y) { return y.from < k; }).pop();
+  // «Авто» без своїх категорій: запис потрібен, лише якщо раніше діяла своя сума (щоб її зупинити)
+  if (x.total != null || x.cats || (before && (before.total != null || before.cats))) { x.from = k; hist.push(x); }
+  btn.disabled = true;
+  limPost(P, hist).then(function () {
+    limClose();
+    toast(okMsg(x.total != null ? "Свій ліміт: " + zr(x.total) : x.cats ? "Збережено свої категорії" : "Ліміт рахується сам"),
+      ["Скасувати", function () { limPost(P, prev).then(function () { toast(okMsg("Скасовано")); }).catch(function (err) { toast(err.message); }); }]);
+  }).catch(function (err) { btn.disabled = false; $("lm-msg").textContent = err.message || "Немає звʼязку, спробуйте ще раз"; });
+};
+$("lm-close").onclick = limClose; $("lm-bg").onclick = limClose;
+document.addEventListener("keydown", function (e) { if (e.key === "Escape") limClose(); });
+window.addEventListener("hashchange", limClose);
 function LMnow(P) { return limitsFor(P, P.months.length - 1) || {}; }
 // з картки: цілей немає — одразу нова ціль; є — список
 function planOpen(P) {

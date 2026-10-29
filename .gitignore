@@ -10,3 +10,5 @@ __pycache__/
 # Налаштування людей («Відкладати щомісяця») — живуть лише на сервері
 plans.json
 plans.tmp
+limits.json
+limits.tmp
