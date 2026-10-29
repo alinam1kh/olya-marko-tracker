@@ -750,7 +750,9 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
   will-change: transform; opacity: .7; }
 .liquid .a3 { right: -44%; top: 6%; width: 68%; aspect-ratio: 1.2; background: radial-gradient(42% 38% at 30% 26%, var(--l4) 0%, color-mix(in srgb, var(--l4) 50%, transparent) 50%, transparent 100%), radial-gradient(32% 28% at 66% 76%, var(--l3) 0%, color-mix(in srgb, var(--l3) 45%, transparent) 50%, transparent 100%);
   animation: flow3 9.5s linear infinite; }
-.liquid .a1 { animation: flow1 11s linear infinite; }
+.liquid .a1 { animation: flow1 11s linear infinite, dip 26s ease-in-out infinite; }
+/* верхній блік повільно спускається вздовж правого краю, біля нижньої рамки меншає й розчиняється за краєм (не заходить на суми), потім вертається вгору */
+@keyframes dip { 0%, 100% { translate: 0 0; scale: 1; } 45%, 55% { translate: 28% 92%; scale: .55; } }
 .liquid .a2 { animation: flow2 13s linear infinite; }
 .liquid .ehalo i { animation: glint 5s ease-in-out infinite; }
 .liquid .erim { animation: glintR 5s ease-in-out infinite; }
