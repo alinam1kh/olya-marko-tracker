@@ -984,7 +984,7 @@ a.ins { color: var(--ink4); }
 .lmode.own { background: var(--blue-soft); color: var(--blue-txt); }
 .lhd > svg { flex: none; color: var(--ink2); }
 /* шторка ліміту */
-.lmseg { margin-top: 14px; }
+#lm-body { padding-top: 16px; }  /* перемикач не тулиться до хрестика */
 .lmseg button { min-height: 40px; font-size: 13px; }
 .lmh { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .lmh button { min-height: 36px; padding: 0 12px; border: 1px solid var(--border); border-radius: 18px; background: var(--card); color: var(--ink3); font: 400 13px var(--font); cursor: pointer; }
@@ -1267,12 +1267,12 @@ a.ins { color: var(--ink4); }
 .jsug .opt .cic { width: 32px; height: 32px; }
 .jcat { width: 300px; max-height: min(60vh, 440px); overflow-y: auto; overscroll-behavior: contain; }
 /* повзунок прокрутки в меню: тонка сіра «пігулка» з відступом від країв, без стрілок */
-.jcat::-webkit-scrollbar { width: 12px; }
-.jcat::-webkit-scrollbar-track { margin: 18px 0; background: transparent; }
-.jcat::-webkit-scrollbar-thumb { border: 4px solid transparent; border-radius: 6px; background: #D9DDE3 padding-box; }
-.jcat::-webkit-scrollbar-thumb:hover { background-color: #C4C8D0; }
-.jcat::-webkit-scrollbar-button { display: none; height: 0; }
-@supports not selector(::-webkit-scrollbar) { .jcat { scrollbar-width: thin; scrollbar-color: #D9DDE3 transparent; } }
+.jcat::-webkit-scrollbar, .sheet-scroll::-webkit-scrollbar { width: 12px; }
+.jcat::-webkit-scrollbar-track, .sheet-scroll::-webkit-scrollbar-track { margin: 18px 0; background: transparent; }
+.jcat::-webkit-scrollbar-thumb, .sheet-scroll::-webkit-scrollbar-thumb { border: 4px solid transparent; border-radius: 6px; background: #D9DDE3 padding-box; }
+.jcat::-webkit-scrollbar-thumb:hover, .sheet-scroll::-webkit-scrollbar-thumb:hover { background-color: #C4C8D0; }
+.jcat::-webkit-scrollbar-button, .sheet-scroll::-webkit-scrollbar-button { display: none; height: 0; }
+@supports not selector(::-webkit-scrollbar) { .jcat, .sheet-scroll { scrollbar-width: thin; scrollbar-color: #D9DDE3 transparent; } }
 .jsug .opt .qi { flex: none; width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; background: var(--soft); color: var(--ink2); }
 .filters .catchip[aria-pressed="true"] { border-color: transparent; background: var(--blue-g); color: #fff; }
 .filters .catchip[aria-pressed="true"] .chev { color: #fff; }
@@ -1457,7 +1457,8 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
 [data-theme="dark"] .nav, [data-theme="dark"] .pop { box-shadow: 0 12px 34px rgba(0,0,0,.5); }
 [data-theme="dark"] .toast { background: rgba(32, 36, 44, .82); border-color: rgba(255,255,255,.06); box-shadow: 0 12px 34px rgba(0,0,0,.45); }
 [data-theme="dark"] .sheet-bg { background: rgba(0,0,0,.6); }
-[data-theme="dark"] .sheet-head::before, [data-theme="dark"] .jcat::-webkit-scrollbar-thumb { background-color: #3A3F49; }
+[data-theme="dark"] .sheet-head::before, [data-theme="dark"] .jcat::-webkit-scrollbar-thumb, [data-theme="dark"] .sheet-scroll::-webkit-scrollbar-thumb { background-color: #3A3F49; }
+@supports not selector(::-webkit-scrollbar) { [data-theme="dark"] .jcat, [data-theme="dark"] .sheet-scroll { scrollbar-color: #3A3F49 transparent; } }
 /* перемикачі: активна кнопка світліша за доріжку (у світлій навпаки — біла на сірому), неактивні — читабельні */
 [data-theme="dark"] .seg button[aria-pressed="true"] { background: #30353F; color: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.07); }
 [data-theme="dark"] .seg button[aria-pressed="false"] { color: #A9AFBB; }
