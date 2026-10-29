@@ -452,11 +452,9 @@ a { color: inherit; text-decoration: none; }
    хвилясто (кут смуги «гуляє») проходить до правого нижнього кута й зникає. Кант і розмита рамка по краях
    горять разом зі смугою. Далі лишаються тільки мʼякі абстрактні форми, що повільно перетікають усередині */
 @property --p { syntax: "<percentage>"; inherits: true; initial-value: -40%; }
-@property --ex { syntax: "<percentage>"; inherits: true; initial-value: 0%; }
-@property --ey { syntax: "<percentage>"; inherits: true; initial-value: 20%; }
 @property --a { syntax: "<angle>"; inherits: true; initial-value: 115deg; }
 .liquid { position: absolute; inset: 0; z-index: 0; pointer-events: none; border-radius: inherit; --sheen: .45; }
-.liquid.sheen { animation: sheen 7s linear both, edge 12s linear infinite; }
+.liquid.sheen { animation: sheen 7s linear both; }
 body.p-olya .liquid { --sheen: .4; }
 .liquid > span { position: absolute; inset: 0; border-radius: inherit; }
 .liquid .glow, .liquid .halo, .liquid .rim { opacity: var(--sheen); }
@@ -528,8 +526,8 @@ body.p-olya .liquid { --sheen: .4; }
   98.2% { --p: 149.9%; --a: 112.2deg; }
   100.0% { --p: 150.0%; --a: 112.4deg; }
 }
-/* після бліку світло лишається на краях: розмита рамка й тонкий кант біля лівого верхнього й правого нижнього кутів,
-   повільно ковзають уздовж країв і перетікають (дві точки дзеркальні одна одній) */
+/* після бліку світло лишається на краях: рамка — це ті самі форми (копії з тим самим рухом), видимі лише в кільці по краю.
+   Де форма підходить до краю, там і світиться рамка — що ближче, то яскравіше; окремого руху в рамки немає */
 .liquid .after { -webkit-mask: linear-gradient(var(--a), #000 calc(var(--p) - 14%), transparent calc(var(--p) + 6%)), linear-gradient(rgba(0, 0, 0, .7) 0 0);
   mask: linear-gradient(var(--a), #000 calc(var(--p) - 14%), transparent calc(var(--p) + 6%)), linear-gradient(rgba(0, 0, 0, .7) 0 0); }
 .liquid.lit .after { -webkit-mask: none; mask: none; }  /* після першого проходу: те саме, що кінець бліку (--p 150%) */
@@ -540,55 +538,12 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 .liquid .ehalo { filter: blur(8px); }
 .liquid .ehalo i, .liquid .erim { position: absolute; inset: 0; border-radius: inherit;
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
-.liquid .ehalo i { padding: 12px; background:
-  radial-gradient(70% 90% at var(--ex) var(--ey), var(--l1) 0%, var(--l2) 30%, transparent 70%),
-  radial-gradient(60% 80% at calc(100% - var(--ex)) calc(100% - var(--ey)), var(--l3) 0%, color-mix(in srgb, var(--l3) 50%, transparent) 35%, transparent 70%); }
-.liquid .erim { padding: 1.5px; background:
-  radial-gradient(55% 75% at var(--ex) var(--ey), #fff 0%, var(--l1) 25%, var(--l2) 50%, transparent 78%),
-  radial-gradient(45% 65% at calc(100% - var(--ex)) calc(100% - var(--ey)), var(--l1) 0%, var(--l2) 40%, transparent 75%); }
-@keyframes edge {
-  0.0% { --ex: 0.0%; --ey: 0.0%; }
-  2.5% { --ex: 7.2%; --ey: 0.0%; }
-  5.0% { --ex: 14.2%; --ey: 0.0%; }
-  7.5% { --ex: 20.9%; --ey: 0.0%; }
-  10.0% { --ex: 27.0%; --ey: 0.0%; }
-  12.5% { --ex: 32.5%; --ey: 0.0%; }
-  15.0% { --ex: 37.2%; --ey: 0.0%; }
-  17.5% { --ex: 41.0%; --ey: 0.0%; }
-  20.0% { --ex: 43.7%; --ey: 0.0%; }
-  22.5% { --ex: 45.4%; --ey: 0.0%; }
-  25.0% { --ex: 46.0%; --ey: 0.0%; }
-  27.5% { --ex: 45.4%; --ey: 0.0%; }
-  30.0% { --ex: 43.7%; --ey: 0.0%; }
-  32.5% { --ex: 41.0%; --ey: 0.0%; }
-  35.0% { --ex: 37.2%; --ey: 0.0%; }
-  37.5% { --ex: 32.5%; --ey: 0.0%; }
-  40.0% { --ex: 27.0%; --ey: 0.0%; }
-  42.5% { --ex: 20.9%; --ey: 0.0%; }
-  45.0% { --ex: 14.2%; --ey: 0.0%; }
-  47.5% { --ex: 7.2%; --ey: 0.0%; }
-  50.0% { --ex: 0.0%; --ey: 0.0%; }
-  52.5% { --ex: 0.0%; --ey: 12.8%; }
-  55.0% { --ex: 0.0%; --ey: 25.3%; }
-  57.5% { --ex: 0.0%; --ey: 37.2%; }
-  60.0% { --ex: 0.0%; --ey: 48.2%; }
-  62.5% { --ex: 0.0%; --ey: 58.0%; }
-  65.0% { --ex: 0.0%; --ey: 66.3%; }
-  67.5% { --ex: 0.0%; --ey: 73.1%; }
-  70.0% { --ex: 0.0%; --ey: 78.0%; }
-  72.5% { --ex: 0.0%; --ey: 81.0%; }
-  75.0% { --ex: 0.0%; --ey: 82.0%; }
-  77.5% { --ex: 0.0%; --ey: 81.0%; }
-  80.0% { --ex: 0.0%; --ey: 78.0%; }
-  82.5% { --ex: 0.0%; --ey: 73.1%; }
-  85.0% { --ex: 0.0%; --ey: 66.3%; }
-  87.5% { --ex: 0.0%; --ey: 58.0%; }
-  90.0% { --ex: 0.0%; --ey: 48.2%; }
-  92.5% { --ex: 0.0%; --ey: 37.2%; }
-  95.0% { --ex: 0.0%; --ey: 25.3%; }
-  97.5% { --ex: 0.0%; --ey: 12.8%; }
-  100.0% { --ex: 0.0%; --ey: 0.0%; }
-}
+.liquid .ehalo i { padding: 12px; }
+.liquid .erim { padding: 1.5px; }
+/* копії форм у кільці: менше розмиття — світло швидко згасає з відстанню від краю; світліші, щоб кант читався */
+.liquid .ehalo .amb, .liquid .erim .amb { position: absolute; }
+.liquid .ehalo .amb { filter: blur(22px) brightness(1.25); }
+.liquid .erim .amb { filter: blur(16px) brightness(1.9) saturate(.8); }
 /* плавні безупинні траєкторії (згенеровано синусами, лінійно між точками — без «зависань»):
    форми дрейфують біля своїх кутів, по черзі заходять усередину, змінюють обрис (коло ↔ абстрактна пляма)
    і яскравість — то розгоряються, то згасають, перетікаючи одна в одну */
@@ -752,10 +707,6 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
   animation: flow3 9.5s linear infinite; }
 .liquid .a1 { animation: flow1 11s linear infinite; }
 .liquid .a2 { animation: flow2 13s linear infinite; }
-.liquid .ehalo i { animation: glint 5s ease-in-out infinite; }
-.liquid .erim { animation: glintR 5s ease-in-out infinite; }
-@keyframes glintR { 0%, 100% { opacity: .3; } 50% { opacity: .62; } }
-@keyframes glint { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
 .liquid .a1 { right: -38%; top: -48%; background: radial-gradient(44% 52% at 35% 40%, var(--l2) 0%, color-mix(in srgb, var(--l2) 55%, transparent) 55%, transparent 100%), radial-gradient(65% 60% at 68% 62%, var(--l4) 0%, color-mix(in srgb, var(--l4) 50%, transparent) 50%, transparent 100%); }
 .liquid .a2 { left: -36%; bottom: -50%; width: 74%; background: radial-gradient(46% 54% at 35% 40%, var(--l3) 0%, color-mix(in srgb, var(--l3) 55%, transparent) 55%, transparent 100%), radial-gradient(48% 44% at 68% 62%, var(--l2) 0%, color-mix(in srgb, var(--l2) 50%, transparent) 50%, transparent 100%); }
 /* легка тінь під білим текстом — підпис лишається читабельним, коли блік пропливає під ним */
@@ -1518,7 +1469,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
 
   <div id="v-report">
     <div id="h-alert"></div>
-    <div class="hero-wrap"><div class="liquid" id="liquid" aria-hidden="true"><span class="after"><span class="amb a1"></span><span class="amb a2"></span><span class="amb a3"></span><span class="ehalo"><i></i></span><span class="erim"></span></span><span class="glow"></span><span class="halo"><i></i></span><span class="rim"></span></div><section class="hero" id="hero" aria-live="polite"></section></div>
+    <div class="hero-wrap"><div class="liquid" id="liquid" aria-hidden="true"><span class="after"><span class="amb a1"></span><span class="amb a2"></span><span class="amb a3"></span><span class="ehalo"><i><span class="amb a1"></span><span class="amb a2"></span><span class="amb a3"></span></i></span><span class="erim"><span class="amb a1"></span><span class="amb a2"></span><span class="amb a3"></span></span></span><span class="glow"></span><span class="halo"><i></i></span><span class="rim"></span></div><section class="hero" id="hero" aria-live="polite"></section></div>
     <a class="cashbtn" id="cash" href="#add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg>Додати готівку</a>
     <section class="card limc" id="limc" hidden></section>
     <section class="card list fadein" id="insights" hidden></section>
