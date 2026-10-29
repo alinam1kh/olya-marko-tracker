@@ -647,57 +647,6 @@ body.p-olya .liquid .erim { animation-name: glintRo; }
   97.9% { transform: translate(-0.8%, -0.8%) rotate(-2.9deg) scale(1.123, 0.725); border-radius: 47% 73% 52% 26% / 44% 72% 33% 47%; opacity: 0.63; }
   100.0% { transform: translate(-0.0%, -0.0%) rotate(-0.0deg) scale(1.163, 0.735); border-radius: 50% 74% 49% 26% / 50% 71% 29% 50%; opacity: 0.66; }
 }
-@keyframes flow2 {
-  0.0% { transform: translate(13.0%, -4.0%) rotate(21.9deg) scale(1.175, 1.212); border-radius: 71% 37% 30% 64% / 71% 29% 50% 71%; opacity: 0.61; }
-  2.1% { transform: translate(13.8%, -5.5%) rotate(22.0deg) scale(1.136, 1.234); border-radius: 69% 32% 32% 68% / 67% 28% 57% 69%; opacity: 0.58; }
-  4.2% { transform: translate(14.2%, -6.9%) rotate(21.7deg) scale(1.094, 1.252); border-radius: 67% 29% 34% 72% / 62% 27% 62% 67%; opacity: 0.56; }
-  6.2% { transform: translate(14.2%, -8.0%) rotate(21.1deg) scale(1.050, 1.266); border-radius: 65% 27% 37% 74% / 56% 26% 67% 64%; opacity: 0.55; }
-  8.3% { transform: translate(13.7%, -8.8%) rotate(20.1deg) scale(1.006, 1.275); border-radius: 62% 26% 39% 74% / 50% 26% 71% 62%; opacity: 0.54; }
-  10.4% { transform: translate(12.9%, -9.2%) rotate(18.7deg) scale(0.962, 1.280); border-radius: 59% 27% 42% 73% / 44% 26% 73% 59%; opacity: 0.54; }
-  12.5% { transform: translate(11.7%, -9.2%) rotate(17.0deg) scale(0.918, 1.279); border-radius: 56% 30% 45% 70% / 38% 27% 74% 56%; opacity: 0.55; }
-  14.6% { transform: translate(10.1%, -8.9%) rotate(15.1deg) scale(0.876, 1.274); border-radius: 53% 34% 48% 65% / 33% 28% 73% 53%; opacity: 0.57; }
-  16.7% { transform: translate(8.2%, -8.2%) rotate(12.9deg) scale(0.835, 1.264); border-radius: 50% 39% 52% 60% / 29% 29% 71% 49%; opacity: 0.59; }
-  18.8% { transform: translate(6.2%, -7.2%) rotate(10.4deg) scale(0.798, 1.250); border-radius: 47% 45% 55% 54% / 27% 31% 67% 46%; opacity: 0.62; }
-  20.8% { transform: translate(4.0%, -5.9%) rotate(7.8deg) scale(0.764, 1.232); border-radius: 44% 51% 58% 48% / 26% 33% 62% 43%; opacity: 0.65; }
-  22.9% { transform: translate(1.9%, -4.5%) rotate(5.1deg) scale(0.734, 1.209); border-radius: 41% 57% 61% 42% / 27% 36% 56% 40%; opacity: 0.68; }
-  25.0% { transform: translate(-0.1%, -3.0%) rotate(2.2deg) scale(0.709, 1.183); border-radius: 38% 63% 63% 36% / 29% 38% 50% 38%; opacity: 0.71; }
-  27.1% { transform: translate(-1.8%, -1.4%) rotate(-0.7deg) scale(0.688, 1.154); border-radius: 35% 68% 66% 32% / 33% 41% 43% 35%; opacity: 0.74; }
-  29.2% { transform: translate(-3.2%, -0.1%) rotate(-3.5deg) scale(0.673, 1.122); border-radius: 33% 71% 68% 28% / 38% 44% 38% 33%; opacity: 0.76; }
-  31.2% { transform: translate(-4.2%, 1.0%) rotate(-6.3deg) scale(0.664, 1.088); border-radius: 31% 73% 70% 26% / 44% 47% 33% 31%; opacity: 0.77; }
-  33.3% { transform: translate(-4.8%, 1.8%) rotate(-9.0deg) scale(0.660, 1.053); border-radius: 29% 74% 72% 26% / 50% 50% 29% 29%; opacity: 0.78; }
-  35.4% { transform: translate(-4.9%, 2.2%) rotate(-11.6deg) scale(0.662, 1.016); border-radius: 28% 73% 73% 27% / 56% 53% 27% 28%; opacity: 0.78; }
-  37.5% { transform: translate(-4.5%, 2.2%) rotate(-13.9deg) scale(0.670, 0.980); border-radius: 27% 70% 74% 30% / 62% 56% 26% 27%; opacity: 0.77; }
-  39.6% { transform: translate(-3.8%, 1.9%) rotate(-16.0deg) scale(0.684, 0.943); border-radius: 26% 66% 74% 35% / 67% 59% 27% 26%; opacity: 0.75; }
-  41.7% { transform: translate(-2.7%, 1.2%) rotate(-17.8deg) scale(0.703, 0.908); border-radius: 26% 61% 74% 40% / 71% 62% 29% 26%; opacity: 0.73; }
-  43.8% { transform: translate(-1.4%, 0.2%) rotate(-19.4deg) scale(0.727, 0.874); border-radius: 26% 55% 74% 46% / 73% 65% 33% 26%; opacity: 0.70; }
-  45.8% { transform: translate(0.2%, -1.1%) rotate(-20.6deg) scale(0.755, 0.843); border-radius: 27% 49% 73% 52% / 74% 67% 38% 27%; opacity: 0.67; }
-  47.9% { transform: translate(1.9%, -2.5%) rotate(-21.4deg) scale(0.788, 0.814); border-radius: 28% 43% 72% 58% / 73% 69% 44% 28%; opacity: 0.64; }
-  50.0% { transform: translate(3.5%, -4.0%) rotate(-21.9deg) scale(0.825, 0.788); border-radius: 29% 37% 70% 64% / 71% 71% 50% 29%; opacity: 0.61; }
-  52.1% { transform: translate(5.0%, -5.5%) rotate(-22.0deg) scale(0.864, 0.766); border-radius: 31% 32% 68% 68% / 67% 72% 57% 31%; opacity: 0.58; }
-  54.2% { transform: translate(6.4%, -6.9%) rotate(-21.7deg) scale(0.906, 0.748); border-radius: 33% 29% 66% 72% / 62% 73% 62% 33%; opacity: 0.56; }
-  56.2% { transform: translate(7.5%, -8.0%) rotate(-21.1deg) scale(0.950, 0.734); border-radius: 35% 27% 63% 74% / 56% 74% 67% 36%; opacity: 0.55; }
-  58.3% { transform: translate(8.3%, -8.8%) rotate(-20.1deg) scale(0.994, 0.725); border-radius: 38% 26% 61% 74% / 50% 74% 71% 38%; opacity: 0.54; }
-  60.4% { transform: translate(8.8%, -9.2%) rotate(-18.7deg) scale(1.038, 0.720); border-radius: 41% 27% 58% 73% / 44% 74% 73% 41%; opacity: 0.54; }
-  62.5% { transform: translate(8.8%, -9.2%) rotate(-17.0deg) scale(1.082, 0.721); border-radius: 44% 30% 55% 70% / 38% 73% 74% 44%; opacity: 0.55; }
-  64.6% { transform: translate(8.7%, -8.9%) rotate(-15.1deg) scale(1.124, 0.726); border-radius: 47% 34% 52% 65% / 33% 72% 73% 47%; opacity: 0.57; }
-  66.7% { transform: translate(8.2%, -8.2%) rotate(-12.9deg) scale(1.165, 0.736); border-radius: 50% 39% 48% 60% / 29% 71% 71% 51%; opacity: 0.59; }
-  68.8% { transform: translate(7.7%, -7.2%) rotate(-10.4deg) scale(1.202, 0.750); border-radius: 53% 45% 45% 54% / 27% 69% 67% 54%; opacity: 0.62; }
-  70.8% { transform: translate(6.9%, -5.9%) rotate(-7.8deg) scale(1.236, 0.768); border-radius: 56% 51% 42% 48% / 26% 67% 62% 57%; opacity: 0.65; }
-  72.9% { transform: translate(6.2%, -4.5%) rotate(-5.1deg) scale(1.266, 0.791); border-radius: 59% 57% 39% 42% / 27% 64% 56% 60%; opacity: 0.68; }
-  75.0% { transform: translate(5.5%, -3.0%) rotate(-2.2deg) scale(1.291, 0.817); border-radius: 62% 63% 37% 36% / 29% 62% 50% 62%; opacity: 0.71; }
-  77.1% { transform: translate(5.0%, -1.4%) rotate(0.7deg) scale(1.312, 0.846); border-radius: 65% 68% 34% 32% / 33% 59% 43% 65%; opacity: 0.74; }
-  79.2% { transform: translate(4.7%, -0.1%) rotate(3.5deg) scale(1.327, 0.878); border-radius: 67% 71% 32% 28% / 38% 56% 38% 67%; opacity: 0.76; }
-  81.2% { transform: translate(4.5%, 1.0%) rotate(6.3deg) scale(1.336, 0.912); border-radius: 69% 73% 30% 26% / 44% 53% 33% 69%; opacity: 0.77; }
-  83.3% { transform: translate(4.8%, 1.8%) rotate(9.0deg) scale(1.340, 0.947); border-radius: 71% 74% 28% 26% / 50% 50% 29% 71%; opacity: 0.78; }
-  85.4% { transform: translate(5.3%, 2.2%) rotate(11.6deg) scale(1.338, 0.984); border-radius: 72% 73% 27% 27% / 56% 47% 27% 72%; opacity: 0.78; }
-  87.5% { transform: translate(6.0%, 2.2%) rotate(13.9deg) scale(1.330, 1.020); border-radius: 73% 70% 26% 30% / 62% 44% 26% 73%; opacity: 0.77; }
-  89.6% { transform: translate(7.1%, 1.9%) rotate(16.0deg) scale(1.316, 1.057); border-radius: 74% 66% 26% 35% / 67% 41% 27% 74%; opacity: 0.75; }
-  91.7% { transform: translate(8.3%, 1.2%) rotate(17.8deg) scale(1.297, 1.092); border-radius: 74% 61% 26% 40% / 71% 38% 29% 74%; opacity: 0.73; }
-  93.8% { transform: translate(9.6%, 0.2%) rotate(19.4deg) scale(1.273, 1.126); border-radius: 74% 55% 26% 46% / 73% 35% 33% 74%; opacity: 0.70; }
-  95.8% { transform: translate(10.8%, -1.1%) rotate(20.6deg) scale(1.245, 1.157); border-radius: 73% 49% 27% 52% / 74% 33% 38% 73%; opacity: 0.67; }
-  97.9% { transform: translate(12.0%, -2.5%) rotate(21.4deg) scale(1.212, 1.186); border-radius: 72% 43% 28% 58% / 73% 31% 44% 72%; opacity: 0.64; }
-  100.0% { transform: translate(13.0%, -4.0%) rotate(21.9deg) scale(1.175, 1.212); border-radius: 71% 37% 30% 64% / 71% 29% 50% 71%; opacity: 0.61; }
-}
 @keyframes flow3 {
   0.0% { transform: translate(-10.9%, -2.4%) rotate(4.4deg) scale(0.660, 1.051); border-radius: 29% 39% 72% 60% / 29% 50% 71% 29%; opacity: 0.69; }
   2.1% { transform: translate(-9.9%, -1.6%) rotate(1.6deg) scale(0.662, 1.015); border-radius: 28% 45% 73% 54% / 27% 54% 67% 28%; opacity: 0.71; }
@@ -758,7 +707,7 @@ body.p-olya .liquid .erim { animation-name: glintRo; }
 .liquid .a1 { animation: flow1 11s linear infinite, dip 16s ease-in-out infinite; }
 /* верхній блік спускається вздовж правого краю, біля нижньої рамки розчиняється (більше розмиття, менший) і вертається вгору */
 @keyframes dip { 0%, 100% { translate: 0 0; scale: 1; filter: blur(46px); } 50% { translate: 6% 86%; scale: .72; filter: blur(89px); } }  /* униз — розпливається, вгору — збирається знову */
-.liquid .a2 { animation: flow2 13s linear infinite, meet2 16s ease-in-out infinite; }
+.liquid .a2 { animation: spill2 16s ease-in-out infinite; }
 /* спільний цикл (той самий, що й dip): права форма піднімається назустріч бліку, що спускається, — проходять одна крізь одну;
    ліва (бірюзова) не йде в центр — піднімається лівим краєм і розчиняється; потім усі розходяться */
 /* фіолетова форма не «сама по собі»: підпливає й зливається з синім бліком, розтікається мʼякою плямою вгору (сильніше розмивається, без сплющування в смугу),
@@ -771,13 +720,21 @@ body.p-olya .liquid .erim { animation-name: glintRo; }
   68% { translate: 12% 4%; scale: .78 1.3; filter: blur(57px); }
   84% { translate: 6% 2%; scale: .85 1.15; filter: blur(46px); }
 }
-@keyframes meet2 { 0%, 100% { translate: 0 0; scale: 1; filter: blur(46px); } 50% { translate: -8% -26%; scale: .88; filter: blur(76px); } }  /* бірюзова тримається лівого боку: піднімається краєм і розчиняється, не заходить у центр */
+/* бірюзова — «розлита рідина» з центром у лівому нижньому куті: розтікається вздовж нижнього краю, стікається назад,
+   розтікається вгору лівим краєм і знову збирається; до середини картки не заходить */
+@keyframes spill2 {
+  0%, 100% { translate: 0 0; scale: 1 1; rotate: 0deg; filter: blur(46px); opacity: .72; border-radius: 50% 50% 50% 50% / 50% 50% 50% 50%; }
+  24% { translate: 22% 8%; scale: 1.9 .6; rotate: -4deg; filter: blur(70px); opacity: .58; border-radius: 40% 60% 46% 54% / 62% 38% 60% 40%; }
+  40% { translate: 0 0; scale: .9 .9; rotate: 0deg; filter: blur(46px); opacity: .76; border-radius: 52% 48% 55% 45% / 48% 54% 46% 52%; }
+  64% { translate: -10% -24%; scale: .6 1.8; rotate: 6deg; filter: blur(70px); opacity: .58; border-radius: 58% 42% 50% 50% / 40% 60% 42% 58%; }
+  82% { translate: 0 0; scale: 1.05 1; rotate: 0deg; filter: blur(46px); opacity: .74; border-radius: 48% 52% 52% 48% / 52% 48% 50% 50%; }
+}
 .liquid .ehalo i { animation: glint 5s ease-in-out infinite; }
 .liquid .erim { animation: glintR 5s ease-in-out infinite; }
 @keyframes glintR { 0%, 100% { opacity: .3; } 50% { opacity: .62; } }
 @keyframes glint { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
 .liquid .a1 { right: -38%; top: -48%; background: radial-gradient(44% 52% at 35% 40%, var(--l2) 0%, color-mix(in srgb, var(--l2) 55%, transparent) 55%, transparent 100%), radial-gradient(65% 60% at 68% 62%, var(--l4) 0%, color-mix(in srgb, var(--l4) 50%, transparent) 50%, transparent 100%); }
-.liquid .a2 { left: -38%; bottom: -44%; width: 74%; background: radial-gradient(46% 54% at 35% 40%, var(--l3) 0%, color-mix(in srgb, var(--l3) 55%, transparent) 55%, transparent 100%), radial-gradient(48% 44% at 68% 62%, var(--l2) 0%, color-mix(in srgb, var(--l2) 50%, transparent) 50%, transparent 100%); }
+.liquid .a2 { left: -32%; bottom: -46%; width: 70%; background: radial-gradient(46% 54% at 35% 40%, var(--l3) 0%, color-mix(in srgb, var(--l3) 55%, transparent) 55%, transparent 100%), radial-gradient(48% 44% at 68% 62%, var(--l2) 0%, color-mix(in srgb, var(--l2) 50%, transparent) 50%, transparent 100%); }
 /* легка тінь під білим текстом — підпис лишається читабельним, коли блік пропливає під ним */
 .hero .lbl, .hero .num, .hero .sub, .hero .lt, .hero .lg2 b { text-shadow: 0 1px 10px rgba(5, 10, 30, .28); }
 .hero .sub .inc { color: inherit; }
@@ -1032,10 +989,10 @@ a.ins { color: var(--ink4); }
 .lmsum span { flex-basis: 100%; font-size: 13px; color: var(--ink2); }
 .lmsum b { font-size: 34px; font-weight: 500; letter-spacing: -.01em; }
 .lmsum small { font-size: 13px; color: var(--ink2); }
-/* підказки для бажань: тап — підставити суму */
-.lmsug { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+/* підказки для кафе, доставки, розваг і покупок: тап — підставити суму */
+.lmsug { display: flex; flex-wrap: nowrap; gap: 6px; margin-top: 6px; }
 .lmsug button { white-space: nowrap; min-height: 30px; padding: 0 10px; border: 1px solid var(--border); border-radius: 15px; background: var(--card); color: var(--ink3); font: 400 12px var(--font); cursor: pointer; }
-.lmsug button b { font-weight: 500; color: var(--ink); }
+.lmrow .nm .lmsug b { display: inline; font-size: inherit; font-weight: 500; color: var(--ink); }  /* не як назва категорії — в одному рядку з відсотком */
 .lmrow { padding: 8px 0; }
 .lmana { padding: 0; border: 0; background: none; cursor: pointer; font-family: var(--font);
   display: inline-flex; align-items: center; gap: 2px; margin: 18px 0 4px; font-size: 14px; font-weight: 500; color: var(--blue-txt); }
@@ -2843,7 +2800,7 @@ function plResult(c, m) {
   if (!c.g && c.cap >= c.auto) return '<div class="plres ok"><b>Ліміт не зміниться — ' + zr(c.auto) + "</b><span>Ви й так лишаєте більше, ніж " + zr(m) +
     ". Ліміт стане нижчим, лише якщо відкладати понад " + zr(c.free - c.auto) + ".</span></div>";
   var d0 = c.lim - c.now;
-  return '<div class="plres"><b>Ліміт на щоденні — ' + zr(c.lim) + "</b><span>" + (Math.abs(d0) < 1 ? "Як зараз." : (d0 < 0 ? "На " + zr(-d0) + " менше, ніж зараз; першими зменшаться бажання — Кафе, Доставка, Розваги, Покупки." : "На " + zr(d0) + " більше, ніж зараз.")) + "</span></div>";
+  return '<div class="plres"><b>Ліміт на щоденні — ' + zr(c.lim) + "</b><span>" + (Math.abs(d0) < 1 ? "Як зараз." : (d0 < 0 ? "На " + zr(-d0) + " менше, ніж зараз; першими зменшаться Кафе, Доставка, Розваги й Покупки." : "На " + zr(d0) + " більше, ніж зараз.")) + "</span></div>";
 }
 // рядок-дропдаун у шторці: заголовок (підпис і значення) і вміст, що плавно розгортається
 function plDD(id, open, label, value, inner) {
@@ -2901,7 +2858,7 @@ function plRender(keepFocus) {
     var spans = [[null, "Без терміну"], [3, "3 міс."], [6, "6 міс."], [12, "Рік"], [0, "Інша дата"]];
     var cats = (P.accounts || []).map(function (a) { return a.name; });
     if (plS.isNew && !goalsOf(P).some(function (x) { return goalOn(x, curKey(P)); }) && c)
-      html += '<p class="plintro">Зараз ліміт рахується сам: бажання — як у найекономніший місяць, решта — як зазвичай. З ним лишається ≈ ' + zr(c.free - c.auto) + " на місяць.</p>";
+      html += '<p class="plintro">Зараз ліміт рахується сам: кафе, доставка, розваги й покупки — як у найекономніший місяць, решта — як зазвичай. З ним лишається ≈ ' + zr(c.free - c.auto) + " на місяць.</p>";
     // ціль із датою — плашка з прапорцем, без дати — з копілкою
     html += '<div class="plgoal"><span class="gdue">' + (until ? FLAG : PIG).replace(/width="16" height="16"/, 'width="14" height="14"') + (until ? "ціль до " + dmy(until) : "без терміну") + "</span>" +
       (until && m ? "<span>" + zr(m * n2) + " за " + n2 + " " + plural(n2, "місяць", "місяці", "місяців") + "</span>" : "") + "</div>";
@@ -2991,13 +2948,14 @@ function limFormula(LM) {
     (LM.src === "best" ? lmRow("На щоденні", "−" + zr(LM.total)) + lmRow("Лишається вільним", zr(LM.inc - LM.fixU - save - LM.total), "tot")  // ліміт — з категорій, решта — вільна
       : lmRow("На щоденні", zr(LM.total), "tot")) + "</div>" +
     '<p class="plintro">' + (LM.src === "goal" ? "Спершу відкладаємо на цілі — решта доходу після обовʼязкових іде на щоденні."
-      : LM.src === "plan" ? "Звичні витрати не вміщають цілі, тож на щоденні — те, що лишається після цілей. Першими зменшуються бажання."
-      : "На щоденні — стільки, скільки ви зазвичай витрачаєте, але бажання (кафе, доставка, розваги, покупки) — як у найекономніший місяць.") + "</p>";
+      : LM.src === "plan" ? "Звичні витрати не вміщають цілі, тож на щоденні — те, що лишається після цілей. Першими зменшуються кафе, доставка, розваги й покупки."
+      : "На щоденні — стільки, скільки ви зазвичай витрачаєте, а кафе, доставка, розваги й покупки — як у найекономніший місяць.") + "</p>";
 }
 // «Вручну»: живий підсумок — ліміт = сума категорій; попередження, якщо не вміщаються цілі
 function limSummary(LM, auto) {
   var save = LM.save || 0, free = LM.inc - LM.fixU - save - LM.total;
-  return '<div class="lmsum"><span>Ліміт на щоденні</span><b>' + zr(LM.total) + "</b><small>авто " + zr(auto) + "</small></div>" +
+  var d = LM.total - auto;  // з чим порівняти: показуємо, лише коли свої суми щось змінили
+  return '<div class="lmsum"><span>Ліміт на щоденні</span><b>' + zr(LM.total) + "</b>" + (Math.abs(d) >= 1 ? "<small>на " + zr(Math.abs(d)) + (d < 0 ? " менше" : " більше") + ", ніж рахує «Авто»</small>" : "") + "</div>" +
     (save && free < -0.5 ? '<div class="plres warn"><b>Цілі не вміщаються</b><span>З таким лімітом на цілі лишиться ' + zr(Math.max(0, save + free)) + " замість " + zr(save) + ".</span></div>" : "");
 }
 function limRefresh() {
@@ -3019,14 +2977,14 @@ function limRender() {
   html += man ? '<div id="lm-sum"></div>' : limFormula(A);
   var names = Object.keys(A.usual).concat(Object.keys(lmS.cats).filter(function (n) { return !(n in A.usual); }))
     .sort(function (a, b) { return (A.usual[b] || 0) - (A.usual[a] || 0); });
-  html += '<div class="lmcats"><h3>Категорії</h3><p>' + (man ? "Порожнє поле — ліміт рахується сам (сірим). Для бажань є підказки: скільки врізати від звичного."
+  html += '<div class="lmcats"><h3>Категорії</h3><p>' + (man ? "Порожнє поле — ліміт рахується сам (сірим). Для кафе, доставки, розваг і покупок є підказки: сума, якщо витрачати на 25% чи 50% менше, ніж зазвичай."
     : "Скільки зазвичай і який ліміт вийшов. Змінити суми — у «Вручну».") + "</p>";
   names.forEach(function (n) {
     var us = A.usual[n] || 0, au = A.cat[n] != null ? A.cat[n] : us;
     // підказки — скільки врізати від звичного; лише ті, що нижчі за авто-ліміт (інакше вони б його підняли)
     var sug = man && WANTS[n] ? [[us * .75, "−25%"], [us * .5, "−50%"]].filter(function (x) { return x[0] >= 1 && Math.round(x[0]) < Math.round(au); }) : [];
     html += '<div class="lmrow" data-n="' + esc(n) + '"><div class="nm"><b>' + esc(n) + "</b><small>зазвичай " + zr(us) + "</small>" +
-      (sug.length ? '<span class="lmsug">' + sug.map(function (x) { var v = Math.round(x[0]); return '<button type="button" data-v="' + v + '">' + x[1] + " — <b>" + nf0.format(v) + "</b></button>"; }).join("") + "</span>" : "") + "</div>" +
+      (sug.length ? '<span class="lmsug">' + sug.map(function (x) { var v = Math.round(x[0]); return '<button type="button" data-v="' + v + '"><b>' + nf0.format(v) + "</b> (" + x[1] + ")</button>"; }).join("") + "</span>" : "") + "</div>" +
       (man ? PEN + '<label class="lmin"><input type="text" inputmode="numeric" autocomplete="off" aria-label="Ліміт: ' + esc(n) + '" value="' + esc(lmS.cats[n] || "") + '"><span>зл</span></label>'
         : '<b class="lmv">' + zr(au) + "</b>") + "</div>";
   });
