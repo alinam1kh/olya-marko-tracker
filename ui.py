@@ -753,14 +753,23 @@ body.p-olya .liquid .erim { animation-name: glintRo; }
 .liquid .amb { inset: auto; width: 96%; aspect-ratio: 1.7; border-radius: 50%; filter: blur(34px); mix-blend-mode: normal;
   will-change: transform; opacity: .7; }
 .liquid .a3 { right: -32%; top: 12%; width: 68%; aspect-ratio: 1.2; background: radial-gradient(42% 38% at 30% 26%, var(--l4) 0%, color-mix(in srgb, var(--l4) 50%, transparent) 50%, transparent 100%), radial-gradient(32% 28% at 66% 76%, var(--l3) 0%, color-mix(in srgb, var(--l3) 45%, transparent) 50%, transparent 100%);
-  animation: flow3 9.5s linear infinite, meet3 16s ease-in-out infinite; }
+  animation: flow3 9.5s linear infinite, melt3 16s ease-in-out infinite; }
 .liquid .a1 { animation: flow1 11s linear infinite, dip 16s ease-in-out infinite; }
 /* верхній блік спускається вздовж правого краю, біля нижньої рамки розчиняється (більше розмиття, менший) і вертається вгору */
 @keyframes dip { 0%, 100% { translate: 0 0; scale: 1; filter: blur(34px); } 50% { translate: 6% 86%; scale: .72; filter: blur(66px); } }  /* униз — розпливається, вгору — збирається знову */
 .liquid .a2 { animation: flow2 13s linear infinite, meet2 16s ease-in-out infinite; }
 /* спільний цикл (той самий, що й dip): права форма піднімається назустріч бліку, що спускається, — проходять одна крізь одну;
    унизу блік зустрічає ліва форма, що підпливла праворуч; потім усі розходяться */
-@keyframes meet3 { 0%, 100% { translate: 0 0; } 50% { translate: -18% -34%; } }
+/* фіолетова форма не «сама по собі»: підпливає й зливається з синім бліком, розтікається тонкою смугою вздовж верхнього краю,
+   збирається в іншу — витягнуту вздовж правого краю — форму і вертається */
+@keyframes melt3 {
+  0%, 100% { translate: 0 0; scale: 1; filter: blur(34px); }
+  22% { translate: -16% -22%; scale: 1.15 .95; filter: blur(34px); }
+  42% { translate: -22% -46%; scale: 2.5 .34; filter: blur(46px); }
+  52% { translate: -10% -42%; scale: 2.1 .4; filter: blur(50px); }
+  68% { translate: 14% 4%; scale: .62 1.55; filter: blur(38px); }
+  84% { translate: 6% 2%; scale: .85 1.15; filter: blur(34px); }
+}
 @keyframes meet2 { 0%, 100% { translate: 0 0; } 50% { translate: 34% -8%; } }
 .liquid .ehalo i { animation: glint 5s ease-in-out infinite; }
 .liquid .erim { animation: glintR 5s ease-in-out infinite; }
