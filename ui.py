@@ -1575,7 +1575,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
   <!-- «Як рахується ліміт»: з картки ліміту на Головній; «Авто» чи своя сума, свої суми категорій -->
   <div class="sheet-bg" id="lm-bg" hidden></div>
   <div class="sheet" id="v-lim" hidden role="dialog" aria-modal="true" aria-labelledby="lm-title">
-    <div class="sheet-head"><h2 id="lm-title">Ліміт на щоденні</h2>
+    <div class="sheet-head"><h2 id="lm-title">Налаштування ліміту</h2>
       <button type="button" id="lm-close" aria-label="Закрити"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
     <div class="sheet-scroll" id="lm-body"></div>
     <div class="sheet-foot"><p class="msg" id="lm-msg" role="status"></p><button class="save" id="lm-save" type="button" disabled>Зберегти</button></div>
@@ -1959,7 +1959,7 @@ function renderLimit(P) {
       "</b>, разом " + zr(sum) + " на місяць</span>" + CHR + "</button>";
   }
   var own = LM.src === "manual" || Object.keys(LM.own || {}).length;
-  box.innerHTML = '<div class="ch"><h2>Ліміт на щоденні витрати</h2><span class="lhd"><button type="button" class="lmode' + (own ? " own" : "") + '" id="limc-info" aria-label="Як рахується ліміт">' + INFO +
+  box.innerHTML = '<div class="ch"><h2>Ліміт на щоденні витрати</h2><span class="lhd"><button type="button" class="lmode' + (own ? " own" : "") + '" id="limc-info" aria-label="Налаштування ліміту: ' + (LM.src === "manual" ? "своя сума" : own ? "свої категорії" : "авто") + '">' + TUNE +
     (LM.src === "manual" ? "Своя сума" : own ? "Свої категорії" : "Авто") + '</button><a class="lgo" href="#analytics" aria-label="Ліміт в Аналітиці">' + CHR + "</a></span></div>" +
     '<a class="lmain" href="#analytics">' +
     '<div class="lbig"><b>' + zr(Math.abs(left)) + "</b><span>" + (left < 0 ? "понад ліміт " : "лишилось з ") + nf0.format(Math.round(LM.total)) + "</span></div>" +
@@ -2924,6 +2924,7 @@ function plCalHTML() {
 function plShift(n) { var y = +plS.calKey.slice(0, 4), mo = +plS.calKey.slice(5) - 1 + n; plS.calKey = iso(new Date(y, mo, 1)).slice(0, 7); plRender(); }
 // ---------- «Як рахується ліміт»: Авто / Своя сума + свої суми категорій ----------
 var lmS = null;
+var TUNE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>';  // повзунки — «налаштувати»
 var PEN = '<svg class="pen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"/></svg>';
 function lmMan() {  // те, що зараз у шторці, — у вигляді запису історії
   var cats = {}; Object.keys(lmS.cats).forEach(function (n) { if (lmS.cats[n]) cats[n] = +lmS.cats[n]; });
