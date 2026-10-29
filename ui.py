@@ -536,7 +536,7 @@ body.p-olya .liquid { --sheen: .4; }
 .liquid .after > .ehalo, .liquid .after > .erim { position: absolute; inset: 0; border-radius: inherit; }
 .liquid .after > .amb { position: absolute; }
 body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони яскравіші — трохи тихіше, щоб лишалась глибина */
-.liquid .ehalo { opacity: .46; } .liquid .erim { opacity: .5; }
+.liquid .ehalo { opacity: .6; } .liquid .erim { opacity: .9; }
 .liquid .ehalo { filter: blur(8px); }
 .liquid .ehalo i, .liquid .erim { position: absolute; inset: 0; border-radius: inherit;
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
@@ -545,7 +545,18 @@ body.p-olya .liquid .after { opacity: .68; }  /* в Олі світлі тони
 /* копії форм у кільці: менше розмиття — світло швидко згасає з відстанню від краю; світліші, щоб кант читався */
 .liquid .ehalo .amb, .liquid .erim .amb { position: absolute; }
 .liquid .ehalo .amb { filter: blur(22px) brightness(1.25); }
-.liquid .erim .amb { filter: blur(16px) brightness(1.9) saturate(.8); }
+.liquid .erim .amb { filter: blur(16px) brightness(2.4) saturate(.75); }
+/* менші форми, що ковзають уздовж країв: на площині ледь видно, на рамці — бігуче світло */
+.liquid .ee { width: 46%; aspect-ratio: 1; border-radius: 50%; opacity: .22; animation-timing-function: ease-in-out; animation-iteration-count: infinite; animation-direction: alternate; }
+.liquid .ehalo .ee, .liquid .erim .ee { opacity: 1; }
+.liquid .e1 { left: -24%; top: -30%; background: radial-gradient(closest-side, var(--l1), color-mix(in srgb, var(--l2) 60%, transparent) 55%, transparent); animation-name: edgeT; animation-duration: 14s; }
+.liquid .e2 { right: -24%; bottom: -30%; background: radial-gradient(closest-side, var(--l2), color-mix(in srgb, var(--l3) 55%, transparent) 55%, transparent); animation-name: edgeB; animation-duration: 17s; }
+.liquid .e3 { left: -22%; top: -10%; width: 34%; background: radial-gradient(closest-side, var(--l4), color-mix(in srgb, var(--l4) 50%, transparent) 55%, transparent); animation-name: edgeL; animation-duration: 11s; }
+.liquid .e4 { right: -22%; bottom: -10%; width: 34%; background: radial-gradient(closest-side, var(--l1), color-mix(in srgb, var(--l3) 55%, transparent) 55%, transparent); animation-name: edgeR; animation-duration: 12.5s; }
+@keyframes edgeT { 0% { transform: translate(0, 0) scale(1, .8); } 50% { transform: translate(110%, 6%) scale(1.15, .7); } 100% { transform: translate(225%, -4%) scale(.9, .85); } }
+@keyframes edgeB { 0% { transform: translate(0, 0) scale(1, .8); } 50% { transform: translate(-115%, -5%) scale(1.2, .7); } 100% { transform: translate(-225%, 4%) scale(.9, .85); } }
+@keyframes edgeL { 0% { transform: translate(0, 0) scale(.8, 1); } 50% { transform: translate(8%, 55%) scale(.7, 1.15); } 100% { transform: translate(-4%, 115%) scale(.85, .9); } }
+@keyframes edgeR { 0% { transform: translate(0, 0) scale(.8, 1); } 50% { transform: translate(-8%, -55%) scale(.7, 1.2); } 100% { transform: translate(4%, -115%) scale(.85, .9); } }
 /* плавні безупинні траєкторії (згенеровано синусами, лінійно між точками — без «зависань»):
    форми дрейфують біля своїх кутів, по черзі заходять усередину, змінюють обрис (коло ↔ абстрактна пляма)
    і яскравість — то розгоряються, то згасають, перетікаючи одна в одну */
@@ -1471,7 +1482,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
 
   <div id="v-report">
     <div id="h-alert"></div>
-    <div class="hero-wrap"><div class="liquid" id="liquid" aria-hidden="true"><span class="after"><span class="amb a1"></span><span class="amb a2"></span><span class="amb a3"></span><span class="ehalo"><i><span class="amb a1"></span><span class="amb a2"></span><span class="amb a3"></span></i></span><span class="erim"><span class="amb a1"></span><span class="amb a2"></span><span class="amb a3"></span></span></span><span class="glow"></span><span class="halo"><i></i></span><span class="rim"></span></div><section class="hero" id="hero" aria-live="polite"></section></div>
+    <div class="hero-wrap"><div class="liquid" id="liquid" aria-hidden="true"><span class="after"><span class="amb a1"></span><span class="amb a2"></span><span class="amb a3"></span><span class="amb ee e1"></span><span class="amb ee e2"></span><span class="amb ee e3"></span><span class="amb ee e4"></span><span class="ehalo"><i><span class="amb a1"></span><span class="amb a2"></span><span class="amb a3"></span><span class="amb ee e1"></span><span class="amb ee e2"></span><span class="amb ee e3"></span><span class="amb ee e4"></span></i></span><span class="erim"><span class="amb a1"></span><span class="amb a2"></span><span class="amb a3"></span><span class="amb ee e1"></span><span class="amb ee e2"></span><span class="amb ee e3"></span><span class="amb ee e4"></span></span></span><span class="glow"></span><span class="halo"><i></i></span><span class="rim"></span></div><section class="hero" id="hero" aria-live="polite"></section></div>
     <a class="cashbtn" id="cash" href="#add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg>Додати готівку</a>
     <section class="card limc" id="limc" hidden></section>
     <section class="card list fadein" id="insights" hidden></section>
