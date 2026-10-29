@@ -2992,11 +2992,8 @@ $("lm-save").onclick = function () {
   // «Авто» без своїх категорій: запис потрібен, лише якщо раніше діяла своя сума (щоб її зупинити)
   if (x.total != null || x.cats || (before && (before.total != null || before.cats))) { x.from = k; hist.push(x); }
   btn.disabled = true;
-  limPost(P, hist).then(function () {
-    limClose();
-    toast(okMsg(x.total != null ? "Ліміт вручну: " + zr(x.total) : "Ліміт рахується сам"),
-      ["Скасувати", function () { limPost(P, prev).then(function () { toast(okMsg("Скасовано")); }).catch(function (err) { toast(err.message); }); }]);
-  }).catch(function (err) { btn.disabled = false; $("lm-msg").textContent = err.message || "Немає звʼязку, спробуйте ще раз"; });
+  limPost(P, hist).then(function () { limClose(); })  // без тосту: нове значення одразу видно на картці
+  .catch(function (err) { btn.disabled = false; $("lm-msg").textContent = err.message || "Немає звʼязку, спробуйте ще раз"; });
 };
 $("lm-close").onclick = limClose; $("lm-bg").onclick = limClose;
 document.addEventListener("keydown", function (e) { if (e.key === "Escape") limClose(); });
