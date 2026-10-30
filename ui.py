@@ -151,7 +151,8 @@ def delete_cash():
 
 # Цілі «Відкладати щомісяця» — налаштування людей, а не облік; лежать на сервері в plans.json (у git не йде),
 # однаково на всіх телефонах. Для кожної людини — список цілей:
-# {id, name?, cat?, kind? ("cushion" — подушка з інтервʼю), hist: [{from: "YYYY-MM", monthly}], until?, total?, to?}
+# {id, name?, cat?, kind? ("cushion" — подушка з інтервʼю), hist: [{from: "YYYY-MM", monthly}], until?, total?, to?,
+#  adds?: [{date: "YYYY-MM-DD", amount, note?}]} — adds: готівка, яку людина доклала до цілі (поза випискою, лише в «зібрано»)
 # hist — сума по місяцях (зміна діє з поточного місяця, минулі місяці зберігають свій ліміт); to — з якого місяця ціль видалено.
 PLANS = ROOT / "plans.json"
 _YM = re.compile(r"\d{4}-\d{2}$")
@@ -295,6 +296,25 @@ def _goal(raw, today):
         if not _YM.match(str(raw["to"])):
             return None
         goal["to"] = str(raw["to"])
+    adds = raw.get("adds") or []
+    if not isinstance(adds, list) or len(adds) > 300:
+        return None
+    clean = []
+    for a in adds:
+        try:
+            day = date.fromisoformat(str(a.get("date", "")))
+            amount = int(Decimal(str(a.get("amount", ""))).quantize(Decimal("1")))
+        except (InvalidOperation, ValueError, TypeError, AttributeError):
+            return None
+        if not date(2026, 1, 1) <= day <= today or not 1 <= amount <= 1_000_000:
+            return None
+        item = {"date": day.isoformat(), "amount": amount}
+        note = re.sub(r"\s+", " ", str(a.get("note") or "")).strip()[:60]
+        if note:
+            item["note"] = note
+        clean.append(item)
+    if clean:
+        goal["adds"] = sorted(clean, key=lambda x: x["date"])
     return goal
 
 
@@ -817,7 +837,6 @@ a.ins { color: var(--ink4); }
 .lfoot .llink { display: inline-flex; align-items: center; gap: 6px; color: var(--blue); font-weight: 500; }
 .lfoot .llink svg { flex: none; stroke-width: 2.2; }  /* плюс більший і чіткіший за текстовий «+» */
 .lfoot > svg { flex: none; color: var(--ink2); }
-.lpig { flex: none; display: grid; margin-right: -6px; color: var(--ink2); }  /* прапорець цілі без кола, «Відкладено» — впритул */
 .lsegs { flex: none; display: flex; gap: 3px; width: 120px; }  /* однакова ширина за будь-якої кількості сегментів */
 .lsegs i { display: block; flex: 1; min-width: 0; height: 6px; border-radius: 3px; background: var(--track); overflow: hidden; }
 .lsegs b { display: block; height: 100%; background: var(--blue); }
@@ -835,6 +854,19 @@ a.ins { color: var(--ink4); }
 .lfoot.lgoal .lft { overflow: visible; }
 .pllab { margin: 16px 0 -4px; font-size: 13px; color: var(--ink2); }
 .plneed { margin: 14px 0 0; font-size: 15px; color: var(--ink3); } .plneed b { font-weight: 500; color: var(--ink); }
+/* готівка до відкладень і історія накопичень */
+.gadd { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; margin-top: 12px; padding: 0; border: 0; background: none; font: 500 14px var(--font); color: var(--blue); cursor: pointer; }
+.gaddf { display: grid; gap: 8px; margin-top: 14px; padding: 12px; border-radius: 16px; background: var(--soft); }
+.gaddf .plname { margin: 0; background: var(--card); }
+.gaddb { display: flex; justify-content: flex-end; gap: 8px; }
+.gbtn { min-height: 40px; padding: 0 16px; border: 0; border-radius: 20px; background: var(--card); font: 500 14px var(--font); color: var(--ink3); cursor: pointer; }
+.gbtn.pri { background: var(--blue); color: #fff; }
+.ghist { display: grid; }
+.ghr { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 0; border-top: 1px solid var(--soft); font-size: 14px; color: var(--ink); }
+.ghr:first-child { border-top: 0; }
+.ghr > span { flex: 1; min-width: 0; } .ghr small { display: block; margin-top: 1px; font-size: 12px; color: var(--ink2); }
+.ghr b { font-weight: 500; white-space: nowrap; } .ghr b.neg { color: var(--bad); } .ghr b.cash { color: var(--good); }
+.ghdel { flex: none; display: grid; place-items: center; width: 32px; height: 32px; margin-right: -6px; border: 0; border-radius: 16px; background: none; color: var(--ink2); cursor: pointer; }
 /* шторка «Відкладати щомісяця» */
 .plintro { margin: 6px 0 0; font-size: 14px; line-height: 1.45; color: var(--ink3); }
 .amount.pla { justify-content: flex-start; padding-top: 14px; }  /* у шторці плану все — від лівого краю */
@@ -891,6 +923,9 @@ a.ins { color: var(--ink4); }
 .pldel { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; margin-top: 10px; padding: 0; border: 0; background: none; font: 500 14px var(--font); color: var(--bad); cursor: pointer; }
 .pldel svg { width: 18px; height: 18px; }
 .plback { display: inline-flex; align-items: center; gap: 2px; min-height: 36px; margin: -4px 0 4px -4px; padding: 0 4px; border: 0; background: none; font: 500 14px var(--font); color: var(--blue); cursor: pointer; }
+/* «Усі цілі» — над назвою цілі, у шапці шторки (своїм рядком) */
+.plback-slot { grid-column: 1 / -1; } .plback-slot:empty { display: none; }
+.sheet-head .plback { width: auto; height: auto; margin: 0 0 0 -4px; border-radius: 0; background: none; }
 /* картка ліміту: пігулка режиму «Авто / Своя сума» — відкриває «Як рахується» */
 .lhd { display: inline-flex; align-items: center; gap: 6px; }
 .lmode { display: inline-flex; align-items: center; gap: 5px; min-height: 28px; padding: 0 10px; border-radius: 14px; background: var(--soft); color: var(--ink2); font-size: 12px; font-weight: 500; white-space: nowrap; }
@@ -1514,7 +1549,7 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
   </div>
   <div class="sheet-bg" id="pl-bg" hidden></div>
   <div class="sheet" id="v-plan" hidden role="dialog" aria-modal="true" aria-labelledby="pl-title">
-    <div class="sheet-head" id="pl-head"><h2 id="pl-title">Відкладати щомісяця</h2>
+    <div class="sheet-head" id="pl-head"><div class="plback-slot" id="pl-backslot"></div><h2 id="pl-title">Відкладати щомісяця</h2>
       <button type="button" id="pl-close" aria-label="Закрити"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
     <div class="sheet-scroll" id="pl-body"></div>
     <div class="sheet-foot"><p class="msg" id="pl-msg" role="status"></p><button class="save" id="pl-save" type="button">Зберегти</button></div>
@@ -1879,14 +1914,15 @@ function payDays(P) {
 // (відкладене за місяць = дохід мінус витрати, PERSONA.md), разом із поточним місяцем — не чекаючи зарплати
 function monthsBetween(a, b) { return Math.max(1, (+b.slice(0, 4) * 12 + +b.slice(5, 7)) - (+a.slice(0, 4) * 12 + +a.slice(5, 7))); }
 function savedSince(P, from) { return Math.max(0, P.months.reduce(function (s, m) { return s + (m.key >= from ? m.saved : 0); }, 0)); }
+function addsSum(x) { return (x && x.adds || []).reduce(function (s, a) { return s + a.amount; }, 0); }  // готівка, докладена до цілі
 function goalTerm(P, g) {
-  if (g.kind === "cushion") { var c = goalPlan(P); return c ? { start: c.start, until: c.until, total: c.total } : null; }
-  return g.until && g.total ? { start: goalFrom(g), until: g.until, total: g.total } : null;
+  if (g.kind === "cushion") { var c = goalPlan(P); return c ? { start: c.start, until: c.until, total: c.total, adds: c.adds } : null; }
+  return g.until && g.total ? { start: goalFrom(g), until: g.until, total: g.total, adds: g.adds } : null;
 }
 // t = {start: "YYYY-MM", until: "YYYY-MM-DD", total}: n — місяців (сегментів), скільки минуло й зібрано (у сегментах), скільки треба на місяць
 function termBars(P, t) {
   var n = monthsBetween(t.start, t.until), a = new Date(t.start + "-01T00:00:00"), e = new Date(t.until + "T00:00:00");
-  var tf = Math.max(0, Math.min(1, (Date.now() - a) / Math.max(1, e - a))), got = Math.min(t.total, savedSince(P, t.start)), mf = t.total ? got / t.total : 0;
+  var tf = Math.max(0, Math.min(1, (Date.now() - a) / Math.max(1, e - a))), got = Math.min(t.total, savedSince(P, t.start) + addsSum(t)), mf = t.total ? got / t.total : 0;
   return { n: n, tDone: tf * n, mDone: mf * n, got: got, total: t.total, until: t.until, start: t.start, need: Math.max(0, t.total - got) / plMonths(t.until), behind: mf < tf - .02 };
 }
 function goalBars(P, g) { var t = goalTerm(P, g); return t ? termBars(P, t) : null; }
@@ -1917,17 +1953,17 @@ function renderLimit(P) {
   var p = LM.total ? Math.min(100, spent / LM.total * 100) : 100;
   var note = left < 0 ? "Щоденні вже понад ліміт, до кінця місяця ще " + dl + " " + plural(dl, "день", "дні", "днів")
     : "Це ≈ " + zr(left / Math.max(1, dl)) + " на день до кінця місяця";
-  // рядок до цілей: немає — «+ Відкладати щомісяця»; одна — її іконка й прогрес; кілька — скільки і разом на місяць
+  // рядок до цілей: немає — «+ Відкладати щомісяця»; одна — назва й смуги (без іконки: вона — у шторці цілі); кілька — скільки і разом на місяць
   var act = LM.goals || [], k0 = M.key, foot;
   if (!act.length) foot = '<button type="button" class="lfoot ladd" id="limc-plan"><span class="llink">' + svgI("currentColor", '<path d="M12 5v14M5 12h14"/>', 18) + "Відкладати щомісяця</span></button>";
   else if (act.length === 1) {
     var g1 = act[0], pr = goalProgress(P, g1), nm = g1.name || g1.kind === "cushion" ? esc(goalName(g1)) + ", " : "";
-    foot = '<button type="button" class="lfoot' + (pr ? " lgoal" : "") + '" id="limc-plan"><span class="lpig">' + goalIcon(g1) + '</span><span class="lft">' +
+    foot = '<button type="button" class="lfoot' + (pr ? " lgoal" : "") + '" id="limc-plan"><span class="lft">' +
       (pr ? "<b>" + esc(goalName(g1)) + "</b><small>Відкладати ≈ " + zr(goalMonthly(g1, k0, P)) + " на місяць</small>" + pr.html
         : (nm || "Відкладаєте ") + "<b>" + zr(goalMonthly(g1, k0, P)) + "</b> на місяць") + "</span>" + CHR + "</button>";
   } else {
-    var sum = act.reduce(function (s, x) { return s + goalMonthly(x, k0, P); }, 0), dated = act.some(function (x) { return x.kind === "cushion" || x.until; });
-    foot = '<button type="button" class="lfoot" id="limc-plan"><span class="lpig">' + (dated ? FLAG : PIG) + '</span><span class="lft"><b>' + act.length + " " + plural(act.length, "ціль", "цілі", "цілей") +
+    var sum = act.reduce(function (s, x) { return s + goalMonthly(x, k0, P); }, 0);
+    foot = '<button type="button" class="lfoot" id="limc-plan"><span class="lft"><b>' + act.length + " " + plural(act.length, "ціль", "цілі", "цілей") +
       "</b>, разом " + zr(sum) + " на місяць</span>" + CHR + "</button>";
   }
   var own = LM.src === "manual" || Object.keys(LM.own || {}).length;
@@ -2168,8 +2204,8 @@ function goalPlan(P) {
   var avgExp = full.reduce(function (s, m) { return s + m.expenses; }, 0) / full.length, def = Math.round(G.months * avgExp / 100) * 100;
   var start = P.months.filter(function (m) { return !m.ghost; })[0].key, total = st && st.total || def;
   var until = st && st.until || G.deadline[0] + "-" + ("0" + G.deadline[1]).slice(-2) + "-01";
-  var got = Math.min(total, savedSince(P, start)), left = Math.max(0, total - got);
-  return { start: start, until: until, total: total, def: def, avgExp: avgExp, got: got, left: left, need: left / plMonths(until), G: G };
+  var got = Math.min(total, savedSince(P, start) + addsSum(st)), left = Math.max(0, total - got);
+  return { start: start, until: until, total: total, def: def, avgExp: avgExp, got: got, left: left, need: left / plMonths(until), G: G, adds: st && st.adds || [] };
 }
 // ліміти щоденних витрат на місяць j (з повних місяців перед ним):
 // • категорії: потреби — звичне (середнє), «бажання» — як у найекономніший місяць; потрібно ≥ 2 місяці з категорією
@@ -2811,7 +2847,7 @@ function plList() {
       (g.cat ? esc(g.cat) + ", " : "") + (pr ? "≈ " : "") + zr(mm) + " на місяць</small>" + (pr ? pr.html : "") + "</span>" + CHR + "</button>";
   });
   html += "</div>" + (act.length > 1 ? '<p class="pltot">Разом відкладати <b>' + zr(total) + "</b> на місяць</p>" : "");
-  $("pl-title").textContent = "Цілі";
+  $("pl-title").textContent = "Цілі"; $("pl-backslot").innerHTML = "";
   $("pl-body").innerHTML = html;
   $("pl-save").disabled = false; $("pl-save").textContent = "+ Нова ціль"; $("pl-msg").textContent = "";
   $("pl-body").querySelectorAll("[data-id]").forEach(function (b) { b.onclick = function () { plEditStart(P, b.dataset.id); plRender(); }; });
@@ -2846,7 +2882,7 @@ function plRender(keepFocus) {
   var need = function (b) { return '<p class="plneed">' + (b.total && b.got >= b.total ? "Ціль уже зібрано" : "Відкладати ≈ <b>" + zr(b.need) + "</b> на місяць") + "</p>"; };
   if (cushion) {
     // подушка: скільки зібрати (порожньо — 6 міс. витрат) і до коли; старт — перший місяць обліку
-    var g = goalPlan(P), until = plUntil() || g.until, tot = plS.total || g.def, b = termBars(P, { start: g.start, until: until, total: tot });
+    var g = goalPlan(P), until = plUntil() || g.until, tot = plS.total || g.def, b = termBars(P, { start: g.start, until: until, total: tot, adds: g.adds });
     m = Math.round(b.need); c = planCalc(P, m + others, withC);  // сума на місяць — з нової суми й терміну
     html += '<div class="plgoal"><span class="gdue">' + FLAG.replace(/width="16" height="16"/, 'width="14" height="14"') + "ціль до " + dmy(until) + "</span><span>від " + GEN[+g.start.slice(5) - 1] + " " + g.start.slice(0, 4) + "</span></div>" +
       '<div class="plprog">' + goalBarsHTML(b) + "</div>" +
@@ -2865,7 +2901,8 @@ function plRender(keepFocus) {
       html += '<p class="plintro">Зараз ліміт рахується сам: кафе, доставка, розваги й покупки — як у найекономніший місяць, решта — як зазвичай. З ним лишається ≈ ' + zr(c.free - c.auto) + " на місяць.</p>";
     // ціль із датою — плашка з прапорцем, без дати — з копілкою
     // з терміном — вводимо, скільки зібрати (сума на місяць рахується сама); без терміну — скільки відкладати щомісяця
-    var tb = until && plS.total ? termBars(P, { start: plS.isNew ? curKey(P) : goalFrom(goalsOf(P).filter(function (x) { return x.id === plS.id; })[0] || { hist: [] }), until: until, total: plS.total }) : null;
+    var sg0 = goalsOf(P).filter(function (x) { return x.id === plS.id; })[0];
+    var tb = until && plS.total ? termBars(P, { start: plS.isNew ? curKey(P) : goalFrom(sg0 || { hist: [] }), until: until, total: plS.total, adds: sg0 && sg0.adds }) : null;
     if (until) { m = tb ? Math.round(tb.need) : 0; c = planCalc(P, m + others, withC); }
     html += '<div class="plgoal"><span class="gdue">' + (until ? FLAG : PIG).replace(/width="16" height="16"/, 'width="14" height="14"') + (until ? "ціль до " + dmy(until) : "без терміну") + "</span></div>" +
       (tb && !plS.isNew ? '<div class="plprog">' + goalBarsHTML(tb) + "</div>" : "");
@@ -2879,8 +2916,8 @@ function plRender(keepFocus) {
     if (until && m && c) html += calc(m + others, "Лишається на щоденні", c.cap);
     html += plResult(c, m + others);
   }
-  if (!plS.isNew) html += '<button type="button" class="pldel" id="pl-del">' + TRASH + "Видалити ціль</button>";
-  if (plS.back) html = '<button type="button" class="plback" id="pl-back">' + svgI("currentColor", '<path d="m15 6-6 6 6 6"/>', 18) + "Усі цілі</button>" + html;
+  if (!plS.isNew) html += plHist(P) + '<button type="button" class="pldel" id="pl-del">' + TRASH + "Видалити ціль</button>";
+  $("pl-backslot").innerHTML = plS.back ? '<button type="button" class="plback" id="pl-back">' + svgI("currentColor", '<path d="m15 6-6 6 6 6"/>', 18) + "Усі цілі</button>" : "";
   plS.m = m;
   body.innerHTML = html;
   var byTotal = cushion || !!plUntil();  // у полі — сума цілі, а не на місяць
@@ -2900,11 +2937,49 @@ function plRender(keepFocus) {
   if ($("pl-cal-prev")) $("pl-cal-prev").onclick = function () { plShift(-1); };
   if ($("pl-cal-next")) $("pl-cal-next").onclick = function () { plShift(1); };
   // розгортання — без перемальовування: міняємо клас, висота плавно їде (grid 0fr → 1fr)
-  [["pl-dd", "dd"], ["pl-cd", "cd"]].forEach(function (x) {
+  [["pl-dd", "dd"], ["pl-cd", "cd"], ["pl-hd", "hd"]].forEach(function (x) {
     if ($(x[0])) $(x[0]).onclick = function () { plS[x[1]] = !plS[x[1]]; this.parentNode.classList.toggle("open", plS[x[1]]); this.setAttribute("aria-expanded", String(plS[x[1]])); };
   });
   if ($("pl-back")) $("pl-back").onclick = function () { plS = { P: P, mode: "list" }; plRender(); };
   if ($("pl-del")) $("pl-del").onclick = plDelete;
+  if ($("pl-add")) $("pl-add").onclick = function () { plS.addOpen = true; plRender(); $("pl-add-amt").focus(); };
+  if ($("pl-add-x")) $("pl-add-x").onclick = function () { plS.addOpen = false; plRender(); };
+  if ($("pl-add-amt")) $("pl-add-amt").oninput = function () { var v = this.value.replace(/\D/g, "").slice(0, 7); if (v !== this.value) this.value = v; };
+  if ($("pl-add-ok")) $("pl-add-ok").onclick = function () {
+    var a = plNum("pl-add-amt"), note = $("pl-add-note").value.replace(/\s+/g, " ").trim().slice(0, 60);
+    if (!a) { $("pl-add-amt").focus(); return; }
+    plAdds(P, function (list) { return list.concat([note ? { date: iso(new Date()), amount: a, note: note } : { date: iso(new Date()), amount: a }]); }, "Додано до відкладень: " + zr(a));
+  };
+  body.querySelectorAll("[data-add]").forEach(function (b) { b.onclick = function () {
+    var i = +b.dataset.add; plAdds(P, function (list) { return list.filter(function (_, j) { return j !== i; }); }, "Внесок прибрано");
+  }; });
+}
+// збереженої цілі: «+ Додати готівку» (сума й звідки — йде лише в «зібрано») та «Історія накопичень»:
+// за кожен місяць від старту — скільки відкладено (дохід мінус витрати), і кожен готівковий внесок; найновіші — вгорі
+function plHist(P) {
+  var sg = goalsOf(P).filter(function (x) { return x.id === plS.id; })[0]; if (!sg) return "";
+  var start = sg.kind === "cushion" ? (goalPlan(P) || {}).start : goalFrom(sg); if (!start) return "";
+  var rows = [];
+  P.months.forEach(function (m) { if (!m.ghost && m.key >= start) rows.push({ d: m.key + "-99", t: "За " + MONTHS_FULL[mi(m)].toLowerCase() + (m.incomplete ? " (поки що)" : "") + " відкладено", v: m.saved }); });
+  (sg.adds || []).forEach(function (a, i) { rows.push({ d: a.date, t: esc(a.note || "Готівка") + "<small>готівка, " + dmy(a.date) + "</small>", v: a.amount, i: i }); });
+  rows.sort(function (a, b) { return a.d < b.d ? 1 : -1; });
+  var list = '<div class="ghist">' + rows.map(function (r) {
+    return '<div class="ghr"><span>' + r.t + '</span><b class="' + (r.v < 0 ? "neg" : r.i !== undefined ? "cash" : "") + '">' + (r.v > 0 ? "+" : "") + zr(r.v) + "</b>" +
+      (r.i !== undefined ? '<button type="button" class="ghdel" data-add="' + r.i + '" aria-label="Прибрати внесок">' + svgI("currentColor", '<path d="M6 6l12 12M18 6 6 18"/>', 14) + "</button>" : "") + "</div>";
+  }).join("") + "</div>";
+  var add = plS.addOpen
+    ? '<div class="gaddf"><input class="plname" id="pl-add-amt" type="text" inputmode="numeric" autocomplete="off" placeholder="Сума, зл"><input class="plname" id="pl-add-note" type="text" maxlength="60" autocomplete="off" placeholder="Звідки, напр. «Порадувала мама»">' +
+      '<div class="gaddb"><button type="button" class="gbtn" id="pl-add-x">Скасувати</button><button type="button" class="gbtn pri" id="pl-add-ok">Додати</button></div></div>'
+    : '<button type="button" class="gadd" id="pl-add">' + svgI("currentColor", '<path d="M12 5v14M5 12h14"/>', 16) + "Додати готівку до відкладень</button>";
+  return add + plDD("pl-hd", plS.hd, "Історія накопичень", rows.length + " " + plural(rows.length, "запис", "записи", "записів"), list);
+}
+// готівковий внесок: додаємо / прибираємо одразу (без «Зберегти»), зі «Скасувати» в повідомленні
+function plAdds(P, change, msg) {
+  var prev = storedGoals(P), list = storedGoals(P), cur = list.filter(function (g) { return g.id === plS.id; })[0];
+  if (!cur) { cur = { id: plS.id, hist: [], kind: plS.kind }; list.push(cur); }  // подушка, якої ще не торкались
+  cur.adds = change(cur.adds || []); if (!cur.adds.length) delete cur.adds;
+  planPost(P, list).then(function () { plS.addOpen = false; plRender(); planUndo(P, prev, msg); })
+    .catch(function (err) { $("pl-msg").textContent = err.message || "Немає звʼязку, спробуйте ще раз"; });
 }
 // «Інша дата» — наш календар (як у шторці готівки), лише майбутні дні: від завтра до 10 років уперед
 function plCalHTML() {
