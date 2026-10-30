@@ -903,6 +903,7 @@ a.ins { color: var(--ink4); }
 .pldd.open { border-color: var(--blue-l); }
 .pldd-h { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 52px; padding: 0 14px; border: 0; background: transparent; font: 400 14px var(--font); color: var(--ink2); text-align: left; cursor: pointer; }
 .pldd-h span { flex: 1; }
+.pldd-h span svg { margin-right: 8px; vertical-align: -3px; color: var(--ink2); }
 .pldd-h b { font-weight: 500; color: var(--ink); }
 .pldd-h b svg { margin-right: 5px; vertical-align: -2px; }  /* обраний термін — з прапорцем цілі, усе синім */
 .pldd-h b:has(svg), .pldd-h:has(b svg) .chev { color: var(--blue); }
@@ -3103,8 +3104,9 @@ function plHist(P) {
     return '<div class="ghr"><span>' + r.t + '</span><b' + (r.v < 0 ? ' class="neg"' : "") + ">" + (r.v > 0 ? "+" : "") + zr(r.v) + "</b>" +
       (r.i !== undefined ? '<button type="button" class="ghdel" data-add="' + r.i + '" aria-label="Прибрати внесок">' + svgI("currentColor", '<path d="M6 6l12 12M18 6 6 18"/>', 14) + "</button>" : "") + "</div>";
   }).join("") + "</div>";
-  return plDD("pl-hd", plS.hd, "Історія накопичень", rows.length + " " + plural(rows.length, "запис", "записи", "записів"), list);
+  return plDD("pl-hd", plS.hd, HISTI + "Історія накопичень", rows.length + " " + plural(rows.length, "запис", "записи", "записів"), list);
 }
+var HISTI = svgI("currentColor", '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>', 16);  // годинник біля «Історії» — сірий, як підпис
 // банка: «Поповнити» і «Взяти з банки» (сума й підпис) та історія її рухів — найновіші вгорі
 function plJarHist(sg) {
   var adds = sg.adds || [], rows = adds.map(function (a, i) { return { a: a, i: i }; }).reverse();
@@ -3113,7 +3115,7 @@ function plJarHist(sg) {
     return '<div class="ghr"><span>' + esc(a.note || (out ? "Взяли з банки" : "Поповнення")) + "<small>" + dmy(a.date) + '</small></span><b' + (out ? ' class="neg"' : "") + ">" + (out ? "−" : "+") + zr(Math.abs(a.amount)) + "</b>" +
       '<button type="button" class="ghdel" data-add="' + r.i + '" aria-label="Прибрати запис">' + svgI("currentColor", '<path d="M6 6l12 12M18 6 6 18"/>', 14) + "</button></div>";
   }).join("") + "</div>";
-  return (adds.length ? plDD("pl-hd", plS.hd, "Історія банки", adds.length + " " + plural(adds.length, "запис", "записи", "записів"), list) : "");
+  return (adds.length ? plDD("pl-hd", plS.hd, HISTI + "Історія банки", adds.length + " " + plural(adds.length, "запис", "записи", "записів"), list) : "");
 }
 // під смугами: розгорнута форма суми й підпису (відкривають і підтверджують її кнопки підвалу)
 function plAddHTML(P) {
