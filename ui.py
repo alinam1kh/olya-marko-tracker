@@ -867,7 +867,6 @@ a.ins { color: var(--ink4); }
 .plsub { margin: 0; font-size: 13px; color: var(--ink2); }  /* тип цілі під назвою в поточному стані */
 .plneed { margin: 14px 0 0; font-size: 15px; color: var(--ink3); } .plneed b { font-weight: 500; color: var(--ink); }
 /* готівка до відкладень і історія накопичень */
-.gtop { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }  /* готівка — пігулками одразу під смугами */
 .gadd { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px; border: 0; border-radius: 18px; background: var(--blue-soft); font: 500 14px var(--font); color: var(--blue-txt); cursor: pointer; }
 .gaddf { display: grid; gap: 8px; margin-top: 14px; padding: 12px; border-radius: 16px; background: var(--soft); }
 .gaddf .plname { margin: 0; background: var(--card); }
@@ -947,7 +946,11 @@ a.ins { color: var(--ink4); }
 /* порядок: ручка шторки → «Усі цілі» і хрестик → назва */
 .plback-slot { grid-column: 1; grid-row: 2; } .plback-slot:empty { display: none; }
 #pl-head:has(.plback)::before { grid-row: 1; }
-#pl-close { grid-column: 2; grid-row: 2; }
+#pl-close { grid-column: 3; grid-row: 2; }
+#pl-head { grid-template-columns: 1fr auto 44px; column-gap: 8px; } #pl-edit { grid-column: 2; grid-row: 2; } #pl-edit[hidden] { display: none; }
+/* підвал поточного стану: світла дія + головна синя */
+.plfoot { display: flex; gap: 10px; } .plfoot .save { flex: 1; min-width: 0; } .plfoot .save[hidden] { display: none; }
+.save.sec { background: var(--blue-soft); box-shadow: none; color: var(--blue-txt); }
 /* назва шторки цілей прокручується разом зі вмістом: у шапці лишаються ручка, «Усі цілі» й хрестик (h2 шапки — для читачів екрана) */
 #pl-title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 #pl-head { grid-template-rows: auto 44px; padding-bottom: 12px; }  /* вміст при прокрутці не підлазить під шапку впритул */
@@ -1586,9 +1589,10 @@ button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .mor
   <div class="sheet-bg" id="pl-bg" hidden></div>
   <div class="sheet" id="v-plan" hidden role="dialog" aria-modal="true" aria-labelledby="pl-title">
     <div class="sheet-head" id="pl-head"><div class="plback-slot" id="pl-backslot"></div><h2 id="pl-title">Відкладати щомісяця</h2>
+      <button type="button" id="pl-edit" aria-label="Редагувати банку" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"/></svg></button>
       <button type="button" id="pl-close" aria-label="Закрити"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
     <div class="sheet-scroll" id="pl-body"></div>
-    <div class="sheet-foot"><p class="msg" id="pl-msg" role="status"></p><button class="save" id="pl-save" type="button">Зберегти</button></div>
+    <div class="sheet-foot"><p class="msg" id="pl-msg" role="status"></p><div class="plfoot"><button class="save sec" id="pl-sec" type="button" hidden></button><button class="save" id="pl-save" type="button">Зберегти</button></div></div>
   </div>
   <div class="sheet-bg" id="op-bg" hidden></div>
   <div class="sheet" id="v-op" hidden role="dialog" aria-modal="true" aria-labelledby="op-title">
@@ -2917,7 +2921,7 @@ function plList() {
   html += "</div>" + (act.filter(function (g) { return g.kind !== "jar"; }).length > 1 ? '<p class="pltot">Разом відкладати <b>' + zr(total) + "</b> на місяць</p>" : "");
   $("pl-title").textContent = "Цілі"; $("pl-backslot").innerHTML = "";
   $("pl-body").innerHTML = '<h2 class="plh" aria-hidden="true">Цілі</h2>' + html;
-  $("pl-save").disabled = false; $("pl-save").textContent = "+ Нова ціль"; $("pl-msg").textContent = "";
+  $("pl-save").disabled = false; $("pl-save").textContent = "+ Нова ціль"; $("pl-msg").textContent = ""; $("pl-sec").hidden = $("pl-edit").hidden = true;
   $("pl-body").querySelectorAll("[data-id]").forEach(function (b) { b.onclick = function () { plMorph(function () { plEditStart(P, b.dataset.id); plRender(); }); }; });
 }
 // ---------- одна ціль ----------
@@ -3009,7 +3013,14 @@ function plRender(keepFocus) {
   plS.m = m;
   body.innerHTML = '<h2 class="plh" aria-hidden="true">' + esc($("pl-title").textContent) + "</h2>" + html;
   var byTotal = cushion || jar || !!plUntil();  // у полі — сума цілі, а не на місяць
-  $("pl-save").textContent = view ? "Редагувати" : "Зберегти"; $("pl-save").disabled = view ? false : byTotal ? !(cushion || plS.total) : !m; $("pl-msg").textContent = "";
+  // підвал: поточний стан — «Редагувати» + «Додати готівку» (банка — «Взяти» + «Поповнити», редагувати — олівцем у шапці);
+  // форма готівки відкрита — «Скасувати» + «Додати»; форма цілі — лише «Зберегти»
+  var sec = $("pl-sec"), canOut = jar && sgv && addsSum(sgv) > 0, ao = plS.addOpen;
+  $("pl-edit").hidden = !(view && jar);
+  sec.hidden = !(view && (ao || !jar || canOut));
+  sec.textContent = ao ? "Скасувати" : jar ? "Взяти" : "Редагувати";
+  $("pl-save").textContent = !view ? "Зберегти" : ao ? (ao === "out" ? "Взяти" : jar ? "Поповнити" : "Додати") : jar ? "Поповнити" : "Додати готівку";
+  $("pl-save").disabled = view ? false : byTotal ? !(cushion || plS.total) : !m; $("pl-msg").textContent = "";
   body.querySelectorAll("[data-kind]").forEach(function (b) { b.onclick = function () {
     if ((plS.kind || "") === b.dataset.kind) return;
     plS.kind = b.dataset.kind || undefined; plS.total = 0; plS.monthly = 0; plRender(); }; });
@@ -3034,24 +3045,33 @@ function plRender(keepFocus) {
   if ($("pl-vback")) $("pl-vback").onclick = function () { plView(P, plS.id); };  // «Назад» — до поточного стану, без змін
   if ($("pl-del")) $("pl-del").onclick = plDelete;
   // форма розгортається плавно лише в мить відкриття (подальші перемальовування — без анімації)
-  var addOpen = function (v) { plS.addOpen = v; plS.addAnim = true; plRender(); plS.addAnim = false; $("pl-add-amt").focus({ preventScroll: true }); };
-  if ($("pl-add")) $("pl-add").onclick = function () { addOpen(true); };
-  if ($("pl-out")) $("pl-out").onclick = function () { addOpen("out"); };
-  if ($("pl-add-x")) $("pl-add-x").onclick = function () { plS.addOpen = false; plRender(); };
   if ($("pl-add-amt")) $("pl-add-amt").oninput = function () { var v = this.value.replace(/\D/g, "").slice(0, 7); if (v !== this.value) this.value = v; };
-  if ($("pl-add-ok")) $("pl-add-ok").onclick = function () {
-    var a = plNum("pl-add-amt"), note = $("pl-add-note").value.replace(/\s+/g, " ").trim().slice(0, 60);
-    if (!a) { $("pl-add-amt").focus(); return; }
-    var out = plS.addOpen === "out", sgo = goalsOf(P).filter(function (x) { return x.id === plS.id; })[0], have = addsSum(sgo);
-    if (out && a > have) { $("pl-msg").textContent = "У банці лише " + zr(have); $("pl-add-amt").focus(); return; }
-    var v = out ? -a : a;
-    plAdds(P, function (list) { return list.concat([note ? { date: iso(new Date()), amount: v, note: note } : { date: iso(new Date()), amount: v }]); },
-      out ? "Взяли з банки: " + zr(a) : plS.kind === "jar" ? "Банку поповнено: " + zr(a) : "Додано до відкладень: " + zr(a));
-  };
   body.querySelectorAll("[data-add]").forEach(function (b) { b.onclick = function () {
     var i = +b.dataset.add; plAdds(P, function (list) { return list.filter(function (_, j) { return j !== i; }); }, plS.kind === "jar" ? "Запис прибрано" : "Внесок прибрано");
   }; });
 }
+// форма готівки (під смугами) розгортається плавно лише в мить відкриття; v — true (додати / поповнити) чи "out" (взяти)
+function plAddOpen(v) {
+  plS.addOpen = v; plS.addAnim = true; plRender(); plS.addAnim = false;
+  var f = $("pl-add-amt"); if (f) { f.focus({ preventScroll: true }); f.closest(".gaddf").scrollIntoView({ block: "nearest", behavior: "smooth" }); }
+}
+function plAddSubmit(P) {
+  var a = plNum("pl-add-amt"), note = $("pl-add-note").value.replace(/\s+/g, " ").trim().slice(0, 60);
+  if (!a) { $("pl-add-amt").focus(); return; }
+  var out = plS.addOpen === "out", sgo = goalsOf(P).filter(function (x) { return x.id === plS.id; })[0], have = addsSum(sgo);
+  if (out && a > have) { $("pl-msg").textContent = "У банці лише " + zr(have); $("pl-add-amt").focus(); return; }
+  var v = out ? -a : a;
+  plAdds(P, function (list) { return list.concat([note ? { date: iso(new Date()), amount: v, note: note } : { date: iso(new Date()), amount: v }]); },
+    out ? "Взяли з банки: " + zr(a) : plS.kind === "jar" ? "Банку поповнено: " + zr(a) : "Додано до відкладень: " + zr(a));
+}
+function plToEdit() { plMorph(function () { plS.edit = true; plS.addOpen = false; plRender(); }); }
+// світла кнопка підвалу: «Скасувати» (форма готівки) / «Взяти» (банка) / «Редагувати»
+$("pl-sec").onclick = function () {
+  if (plS.addOpen) { plS.addOpen = false; plRender(); }
+  else if (plS.kind === "jar") plAddOpen("out");
+  else plToEdit();
+};
+$("pl-edit").onclick = plToEdit;
 // збережена ціль — знову поточний стан (зі свіжих даних; «Усі цілі» лишається, якщо був)
 function plView(P, id) { var back = plS.back; plMorph(function () { plEditStart(P, id); plS.back = back; plRender(); }); }
 // поточний стан цілі: тип, смуги (і готівка під ними), скільки щомісяця й до коли
@@ -3062,7 +3082,7 @@ function plViewHTML(P, sg) {
   var rows = jar ? (b && b.until && !done ? row("Щоб встигнути", "≈ " + zr(b.need) + " на місяць") : "")
     : row("Відкладати щомісяця", done ? "зібрано" : (b ? "≈ " : "") + zr(mm));
   rows += row("До коли", until ? dmy(until) : "без терміну");
-  return '<p class="plsub">' + (jar ? "Банка — поповнюєте самі" : sg.kind === "cushion" ? "З залишку зарплати" : "Відкладати щомісяця — з залишку зарплати") + "</p>" +
+  return '<p class="plsub">' + (jar ? "Банка — поповнюєте самі" : "З залишку зарплати") + "</p>" +
     (b ? '<div class="plprog">' + goalBarsHTML(b) + "</div>" : "") + "<!--add-->" + '<div class="oplist plcalc">' + rows + "</div>";
 }
 // збереженої цілі: «+ Додати готівку» (сума й звідки — йде лише в «зібрано») та «Історія накопичень»:
@@ -3091,16 +3111,13 @@ function plJarHist(sg) {
   }).join("") + "</div>";
   return (adds.length ? plDD("pl-hd", plS.hd, "Історія банки", adds.length + " " + plural(adds.length, "запис", "записи", "записів"), list) : "");
 }
-// під смугами: пігулка «+ Додати готівку» (у банки — «+ Поповнити» і «− Взяти») або розгорнута форма суми й підпису
+// під смугами: розгорнута форма суми й підпису (відкривають і підтверджують її кнопки підвалу)
 function plAddHTML(P) {
   var sg = goalsOf(P).filter(function (x) { return x.id === plS.id; })[0]; if (!sg) return "";
   var jar = sg.kind === "jar", out = plS.addOpen === "out";
   if (plS.addOpen) return '<div class="gaddf' + (plS.addAnim ? " in" : "") + '"><input class="plname" id="pl-add-amt" type="text" inputmode="numeric" autocomplete="off" placeholder="' + (out ? "Скільки взяли, зл" : jar ? "Скільки поклали, зл" : "Сума, зл") + '">' +
-    '<input class="plname" id="pl-add-note" type="text" maxlength="60" autocomplete="off" placeholder="' + (out ? "На що, напр. «Ремонт»" : jar ? "Звідки, напр. «Премія»" : "Звідки, напр. «Порадувала мама»") + '">' +
-    '<div class="gaddb"><button type="button" class="gbtn" id="pl-add-x">Скасувати</button><button type="button" class="gbtn pri" id="pl-add-ok">' + (out ? "Взяти" : jar ? "Поповнити" : "Додати") + "</button></div></div>";
-  var plus = svgI("currentColor", '<path d="M12 5v14M5 12h14"/>', 16);
-  return '<div class="gtop"><button type="button" class="gadd" id="pl-add">' + plus + (jar ? "Поповнити" : "Додати готівку") + "</button>" +
-    (jar && addsSum(sg) > 0 ? '<button type="button" class="gadd" id="pl-out">' + svgI("currentColor", '<path d="M5 12h14"/>', 16) + "Взяти</button>" : "") + "</div>";
+    '<input class="plname" id="pl-add-note" type="text" maxlength="60" autocomplete="off" placeholder="' + (out ? "На що, напр. «Ремонт»" : jar ? "Звідки, напр. «Премія»" : "Звідки, напр. «Порадувала мама»") + '"></div>';
+  return "";
 }
 // готівковий внесок: додаємо / прибираємо одразу (без «Зберегти»), зі «Скасувати» в повідомленні
 function plAdds(P, change, msg) {
@@ -3262,7 +3279,7 @@ function planUndo(P, prev, msg) {
 $("pl-save").onclick = function () {
   var P = plS.P, btn = this;
   if (plS.mode === "list") { plMorph(function () { plEditStart(P, null); plS.back = true; plRender(); }); return; }
-  if (!plS.isNew && !plS.edit) { plMorph(function () { plS.edit = true; plS.addOpen = false; plRender(); }); return; }
+  if (!plS.isNew && !plS.edit) { if (plS.addOpen) plAddSubmit(P); else plAddOpen(true); return; }
   var m = plS.m, k = curKey(P), prev = storedGoals(P), list = storedGoals(P), cur = list.filter(function (g) { return g.id === plS.id; })[0];
   var cushion = plS.kind === "cushion", jar = plS.kind === "jar", until = plUntil() || (cushion ? goalPlan(P).until : "");
   if (jar ? !plS.total : until ? !(cushion || plS.total) : !m) return;
