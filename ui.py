@@ -932,6 +932,9 @@ a.ins { color: var(--ink4); }
 #pl-title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 #pl-head { grid-template-rows: auto 44px; }
 .plh { margin: 0 0 4px; font-size: 18px; font-weight: 500; }
+/* без «Усі цілі» назва стоїть у шапці навпроти хрестика; рядком нижче опускається лише під «Усі цілі» */
+#pl-head:not(:has(.plback)) #pl-title { position: static; width: auto; height: auto; overflow: visible; clip: auto; grid-column: 1; grid-row: 2; }
+#v-plan:not(:has(.plback)) .plh { display: none; }
 .sheet-head .plback { display: inline-flex; width: auto; height: auto; margin: 0 0 0 -4px; border-radius: 0; background: none; }
 /* картка ліміту: пігулка режиму «Авто / Своя сума» — відкриває «Як рахується» */
 .lhd { display: inline-flex; align-items: center; gap: 6px; }
