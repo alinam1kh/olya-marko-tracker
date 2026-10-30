@@ -538,7 +538,7 @@ body.p-olya .liquid { --sheen: .4; }
 /* «дихаючий» mesh Paper Shaders (WebGL): розмиті поля споріднених відтінків; якщо WebGL недоступний — лишається CSS-mesh */
 .liquid .after > .pmesh { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; opacity: 0; transition: opacity 1.2s ease; }
 .liquid .after > .pmesh canvas { display: block; width: 100%; height: 100%; }
-.liquid.webgl .after > .pmesh { inset: -15%; opacity: .75; filter: blur(28px); }  /* дуже розмито (як матове скло); шар ширший за картку, щоб розмиття не темнило краї */
+.liquid.webgl .after > .pmesh { inset: -5%; opacity: .75; filter: blur(28px); }  /* дуже розмито (як матове скло); шар трохи ширший за картку — щоб розмиття не темнило краї, але світлі плями не запливали за край */
 .liquid.webgl .after > .mesh { display: none; }
 body.p-olya .liquid .after { opacity: .68; }
 /* рамка в Олі — яскравіша: світло-рожевий кант у найсвітлішій точці (кант мерехтить кадрами — тож свої кадри) */
@@ -3193,8 +3193,9 @@ Promise.all([import(V + "shader-mount.js"), import(V + "shaders/mesh-gradient.js
   var ShaderMount = m[0].ShaderMount, frag = m[1].meshGradientFragmentShader, box = document.getElementById("pmesh");
   function hex(v) { var h = getComputedStyle(document.body).getPropertyValue(v).trim().replace("#", "");
     return [parseInt(h.slice(0, 2), 16) / 255, parseInt(h.slice(2, 4), 16) / 255, parseInt(h.slice(4, 6), 16) / 255, 1]; }
-  // відтінки одного кольору людини; темних плям (--g3 найглибший, --g2) більше, ніж яскравих
-  function colors() { return [hex("--g3"), hex("--g2"), hex("--l2"), hex("--g3"), hex("--l4"), hex("--g2")]; }
+  // відтінки одного кольору людини: глибокі (--g2), лише одна майже чорна (--g3) і три світліші (--l2, --l4, середній --g1) —
+  // навіть коли світлі плями відпливають, картка лишається насичено-кольоровою, а не чорною
+  function colors() { return [hex("--g2"), hex("--g3"), hex("--l2"), hex("--g2"), hex("--l4"), hex("--g1")]; }
   var c = colors();
   var mount = new ShaderMount(box, frag, {
     u_colors: c, u_colorsCount: c.length, u_distortion: .35, u_swirl: 0, u_grainMixer: 0, u_grainOverlay: 0,
