@@ -922,9 +922,11 @@ a.ins { color: var(--ink4); }
 .pldel { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; margin-top: 10px; padding: 0; border: 0; background: none; font: 500 14px var(--font); color: var(--bad); cursor: pointer; }
 .pldel svg { width: 18px; height: 18px; }
 .plback { display: inline-flex; align-items: center; gap: 2px; min-height: 36px; margin: -4px 0 4px -4px; padding: 0 4px; border: 0; background: none; font: 500 14px var(--font); color: var(--blue); cursor: pointer; }
-/* «Усі цілі» — над назвою цілі, у шапці шторки (своїм рядком) */
-.plback-slot { grid-column: 1 / -1; } .plback-slot:empty { display: none; }
-.sheet-head .plback { width: auto; height: auto; margin: 0 0 0 -4px; border-radius: 0; background: none; }
+/* «Усі цілі» — у шапці шторки в одному ряду з хрестиком; назва цілі — рядком нижче */
+.plback-slot { grid-column: 1; grid-row: 1; } .plback-slot:empty { display: none; }
+#pl-head:has(.plback) #pl-close { grid-column: 2; grid-row: 1; }
+#pl-head:has(.plback) h2 { grid-column: 1 / -1; grid-row: 2; margin-top: 4px; }
+.sheet-head .plback { display: inline-flex; width: auto; height: auto; margin: 0 0 0 -4px; border-radius: 0; background: none; }
 /* картка ліміту: пігулка режиму «Авто / Своя сума» — відкриває «Як рахується» */
 .lhd { display: inline-flex; align-items: center; gap: 6px; }
 .lmode { display: inline-flex; align-items: center; gap: 5px; min-height: 28px; padding: 0 10px; border-radius: 14px; background: var(--soft); color: var(--ink2); font-size: 12px; font-weight: 500; white-space: nowrap; }
