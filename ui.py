@@ -915,6 +915,8 @@ a.ins { color: var(--ink4); }
 .lmsug { display: flex; flex-wrap: nowrap; gap: 6px; margin-top: 6px; }
 .lmsug button { white-space: nowrap; min-height: 30px; padding: 0 10px; border: 1px solid var(--border); border-radius: 15px; background: var(--card); color: var(--ink3); font: 400 12px var(--font); cursor: pointer; }
 .lmrow .nm .lmsug b { display: inline; font-size: inherit; font-weight: 500; color: var(--ink); }  /* не як назва категорії — в одному рядку з відсотком */
+.lmsug button[aria-pressed="true"] { border-color: var(--blue); color: var(--blue); }  /* обрана підказка — лише блакитна обводка й текст */
+.lmrow .nm .lmsug button[aria-pressed="true"] b { color: var(--blue); }
 .lmrow { padding: 8px 0; }
 .lmana { padding: 0; border: 0; background: none; cursor: pointer; font-family: var(--font);
   display: inline-flex; align-items: center; gap: 2px; margin: 18px 0 4px; font-size: 14px; font-weight: 500; color: var(--blue-txt); }
@@ -1334,6 +1336,7 @@ a.ins { color: var(--ink4); }
 button, .cashbtn, .ch a, .hero .le, .more, .op { transition: transform .45s var(--spring), background-color .4s var(--ease), box-shadow .4s var(--ease), color .4s var(--ease); }
 button:active:not(:disabled), .cashbtn:active, .ch a:active, .more:active { transition-duration: .12s; }
 button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .more:active { transform: scale(.96); }
+.limc .lmain:active, .limc .lfoot:active { transform: none; }  /* картка ліміту — велика площа: без «стискання», як інші картки */
 .cashbtn:hover { box-shadow: 0 10px 22px rgba(29,95,224,.4), inset 0 1px 0 rgba(255,255,255,.3); }
 /* спливаючі меню розкриваються від кнопки */
 .pop:not([hidden]) { animation: popin .45s var(--ease) both; transform-origin: top left; }
@@ -2941,7 +2944,7 @@ function limRender() {
     // підказки — скільки врізати від звичного; лише ті, що нижчі за авто-ліміт (інакше вони б його підняли)
     var sug = man && WANTS[n] ? [[us * .75, "−25%"], [us * .5, "−50%"]].filter(function (x) { return x[0] >= 1 && Math.round(x[0]) < Math.round(au); }) : [];
     html += '<div class="lmrow" data-n="' + esc(n) + '"><div class="nm"><b>' + esc(n) + "</b><small>зазвичай " + zr(us) + "</small>" +
-      (sug.length ? '<span class="lmsug">' + sug.map(function (x) { var v = Math.round(x[0]); return '<button type="button" data-v="' + v + '"><b>' + nf0.format(v) + "</b> (" + x[1] + ")</button>"; }).join("") + "</span>" : "") + "</div>" +
+      (sug.length ? '<span class="lmsug">' + sug.map(function (x) { var v = Math.round(x[0]); return '<button type="button" data-v="' + v + '" aria-pressed="' + (String(lmS.cats[n] || "") === String(v)) + '"><b>' + nf0.format(v) + "</b> (" + x[1] + ")</button>"; }).join("") + "</span>" : "") + "</div>" +
       (man ? PEN + '<label class="lmin"><input type="text" inputmode="numeric" autocomplete="off" aria-label="Ліміт: ' + esc(n) + '" value="' + esc(lmS.cats[n] || "") + '"><span>зл</span></label>'
         : '<b class="lmv">' + zr(au) + "</b>") + "</div>";
   });
@@ -2950,12 +2953,16 @@ function limRender() {
   body.innerHTML = html; $("lm-msg").textContent = "";
   var num = function (v) { v = v.replace(/\D/g, "").slice(0, 7); return v ? String(+v) : ""; };
   body.querySelectorAll("[data-mode]").forEach(function (b) { b.onclick = function () { if (lmS.mode !== b.dataset.mode) { lmS.mode = b.dataset.mode; limRender(); } }; });
+  var sugSync = function (r) { var v = r.querySelector("input").value; r.querySelectorAll(".lmsug [data-v]").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.v === v)); }); };
   body.querySelectorAll(".lmrow input").forEach(function (inp) { inp.oninput = function () {
-    var v = num(this.value); if (v !== this.value) this.value = v; var n = this.closest(".lmrow").dataset.n;
-    if (v) lmS.cats[n] = v; else delete lmS.cats[n]; limRefresh(); }; });
+    var v = num(this.value); if (v !== this.value) this.value = v; var r = this.closest(".lmrow"), n = r.dataset.n;
+    if (v) lmS.cats[n] = v; else delete lmS.cats[n]; sugSync(r); limRefresh(); }; });
   body.querySelectorAll(".lmsug [data-v]").forEach(function (b) { b.onclick = function () {
-    var r = b.closest(".lmrow"); r.querySelector("input").value = b.dataset.v; lmS.cats[r.dataset.n] = b.dataset.v; limRefresh(); }; });
-  if ($("lm-reset")) $("lm-reset").onclick = function () { lmS.cats = {}; body.querySelectorAll(".lmrow input").forEach(function (i) { i.value = ""; }); limRefresh(); };
+    var r = b.closest(".lmrow"), off = b.getAttribute("aria-pressed") === "true";
+    r.querySelector("input").value = off ? "" : b.dataset.v;
+    if (off) delete lmS.cats[r.dataset.n]; else lmS.cats[r.dataset.n] = b.dataset.v;
+    sugSync(r); limRefresh(); }; });
+  if ($("lm-reset")) $("lm-reset").onclick = function () { lmS.cats = {}; body.querySelectorAll(".lmrow input").forEach(function (i) { i.value = ""; }); body.querySelectorAll(".lmrow").forEach(sugSync); limRefresh(); };
   $("lm-goal").onclick = function () { limClose(); setTimeout(function () { planOpen(P); }, 320); };  // відкласти суму — це ціль: вона сама зменшить ліміт
   limRefresh();
 }
