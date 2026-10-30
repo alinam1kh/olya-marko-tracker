@@ -873,6 +873,9 @@ a.ins { color: var(--ink4); }
 .gaddf .plname { margin: 0; background: var(--card); }
 /* поява форми готівки — спокійно, як дропдауни: висота й прозорість, без зсуву */
 @keyframes gaddIn { from { opacity: 0; max-height: 0; padding-top: 0; padding-bottom: 0; } to { opacity: 1; max-height: 260px; } }
+@keyframes nameIn { from { opacity: 0; max-height: 0; margin-top: 0; border-width: 0; } to { opacity: 1; max-height: 48px; } }
+.plname.nin { overflow: hidden; animation: nameIn .6s cubic-bezier(.32, .72, 0, 1); }
+@media (prefers-reduced-motion: reduce) { .plname.nin { animation: none; } }
 .gaddf.in { overflow: hidden; animation: gaddIn .6s cubic-bezier(.32, .72, 0, 1); }
 @media (prefers-reduced-motion: reduce) { .gaddf.in { animation: none; } }
 .gaddb { display: flex; justify-content: flex-end; gap: 8px; }
@@ -2992,7 +2995,9 @@ function plRender(keepFocus) {
     var tb = until && plS.total ? termBars(P, { start: plS.isNew ? curKey(P) : goalFrom(sg0 || { hist: [] }), until: until, total: plS.total, adds: sg0 && sg0.adds }) : null;
     if (until) { m = tb ? Math.round(tb.need) : 0; c = planCalc(P, m + others, withC); }
     html += (tb && !plS.isNew ? '<div class="plprog">' + goalBarsHTML(tb) + "</div><!--add-->" : "");
-    html += '<input class="plname" id="pl-name" type="text" maxlength="60" autocomplete="off" placeholder="Назва, наприклад «Відпустка»" value="' + esc(plS.name) + '">';
+    // назва — лише в цілі з терміном (гроші збираються під щось); просто «відкладати щомісяця» — без назви. Поле з'являється плавно
+    if (until) html += '<input class="plname' + (plS.nameOn === false ? " nin" : "") + '" id="pl-name" type="text" maxlength="60" autocomplete="off" placeholder="Назва, наприклад «Відпустка»" value="' + esc(plS.name) + '">';
+    plS.nameOn = !!until;
     var cur0 = until ? plS.total : m, vals = until ? [1000, 3000, 5000, 10000] : [500, 1000, 2000, 5000];
     html += '<p class="pllab">' + (until ? "Скільки зібрати" : "Відкладати щомісяця") + "</p>" + amt("pl-amount", cur0, "0") +
       '<div class="chips plchips">' + vals.map(function (v) { return '<button type="button" data-v="' + v + '" aria-pressed="' + (cur0 === v) + '">' + nf0.format(v) + "</button>"; }).join("") + "</div>";
@@ -3293,7 +3298,7 @@ $("pl-save").onclick = function () {
   else if (!cushion) { if (last && last.from === k) last.monthly = m; else if (!until || !last) cur.hist.push({ from: k, monthly: m }); }
   if (cushion) { if (plS.total) cur.total = plS.total; else delete cur.total; cur.until = until; if (!cur.total) cur.total = goalPlan(P).def; }
   else {
-    var name = plS.name.trim();
+    var name = until || !plS.isNew ? plS.name.trim() : "";  // нова ціль без терміну — без назви
     if (name) cur.name = name; else delete cur.name;
     delete cur.cat;  // «На що» прибрали: назви цілі достатньо
     if (until) { cur.until = until; cur.total = plS.total; } else if (jar) { delete cur.until; cur.total = plS.total; } else { delete cur.until; delete cur.total; }
