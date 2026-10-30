@@ -2928,7 +2928,7 @@ function plRender(keepFocus) {
       '<div class="chips">' + list.map(function (x) { return '<button type="button" data-span="' + x[0] + '" aria-pressed="' + (plS.span === x[0]) + '">' + x[1] + "</button>"; }).join("") + "</div>" + (plS.span === 0 ? plCalHTML() : ""));
   };
   // відкладати на місяць — рахується з суми й терміну; поле — лише для цілі без терміну
-  var need = function (b) { return '<p class="plneed">' + (b.total && b.got >= b.total ? "Ціль уже зібрано" : "Відкладати ≈ <b>" + zr(b.need) + "</b> на місяць") + "</p>"; };
+  var need = function (b) { return '<p class="plneed">' + (b.total && b.got >= b.total ? "Ціль уже зібрано" : "Відкладати ≈ <b>" + zr(b.need) + "</b> щомісяця") + "</p>"; };
   if (jar) {
     // банка: назва, скільки зібрати й (необовʼязково) до коли; зібране — лише поповнення, ліміт не змінюється
     var sgj = goalsOf(P).filter(function (x) { return x.id === plS.id; })[0], uj = plUntil();
@@ -2943,10 +2943,9 @@ function plRender(keepFocus) {
     // подушка: скільки зібрати (порожньо — 6 міс. витрат) і до коли; старт — перший місяць обліку
     var g = goalPlan(P), until = plUntil() || g.until, tot = plS.total || g.def, b = termBars(P, { start: g.start, until: until, total: tot, adds: g.adds });
     m = Math.round(b.need); c = planCalc(P, m + others, withC);  // сума на місяць — з нової суми й терміну
-    html += '<div class="plprog">' + goalBarsHTML(b) + "</div><!--add-->" +
-      '<p class="pllab">Скільки зібрати</p>' + amt("pl-amount", plS.total || "", String(g.def)) +
-      '<div class="chips plchips">' + [3, 6].map(function (k) { var v = Math.round(k * g.avgExp / 100) * 100; return '<button type="button" data-v="' + v + '" aria-pressed="' + (tot === v) + '">' + k + " міс. витрат · " + nf0.format(v) + "</button>"; }).join("") + "</div>" +
-      dueDD(until, spans.slice(1)) + need(b);
+    // порядок: скільки зібрати (поле) → скільки відкладати щомісяця → до коли → смуги й готівка
+    html += '<p class="pllab">Скільки зібрати</p>' + amt("pl-amount", plS.total || "", String(g.def)) + need(b) +
+      dueDD(until, spans.slice(1)) + '<div class="plprog">' + goalBarsHTML(b) + "</div><!--add-->";
     if (c && m) {
       html += calc(m + others, "Ліміт на щоденні", c.lim);
       if (c.cap < c.floor) html += plResult(c, m + others);
