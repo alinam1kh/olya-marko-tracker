@@ -2063,7 +2063,7 @@ function capsules(boxId, tickId, items, max, sel, onPick, n, avg, opt) {
 function pageStart(g, p) { return Math.max(0, g.n - g.per * (p + 1)); }
 function pageTo(box, p, anim, dx) {
   var g = box._pg; if (!g) return;
-  g.trk.style.transition = anim ? "transform .38s cubic-bezier(.32, .72, 0, 1)" : "none";
+  g.trk.style.transition = anim ? "transform .6s cubic-bezier(.22, 1, .36, 1)" : "none";  // довгий м'який доїзд — сторінка «допливає» на місце
   g.trk.style.transform = "translateX(calc(" + (-pageStart(g, p) * 100 / g.per) + "% + " + (dx || 0) + "px))";
 }
 // «зазвичай» для Аналітики: повні місяці перед k (є зарплата, місяць закрито), не більше 6 останніх
@@ -2275,7 +2275,7 @@ function renderAnalytics(P) {
         { avgLabel: M.ghost ? "" : avgTag(uw), lim: lw, paged: { per: 4, page: P.months.length - 1 - month, onPage: function (pg) {
           // доклацнули до сусіднього місяця — міняємо дані (підсумок, категорії, шапку) тихо, графік уже на місці
           var nm = P.months.length - 1 - pg; if (nm === month || nm < 0) return;
-          amon = P.months[nm].key; setTimeout(function () { calm(render); }, 400);
+          amon = P.months[nm].key; setTimeout(function () { calm(render); }, 620);  // дані міняємо, коли сторінка вже доїхала
         } } });
       if (wi >= 0) {
         var B = bounds[wi], upTo = Math.min(B[1], last), days = upTo - B[0] + 1, wpart = upTo < B[1], wt = B[0] + "–" + B[1] + " " + GEN[k];
