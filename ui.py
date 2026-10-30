@@ -865,7 +865,7 @@ a.ins { color: var(--ink4); }
 .ghr { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 0; border-top: 1px solid var(--soft); font-size: 14px; color: var(--ink); }
 .ghr:first-child { border-top: 0; }
 .ghr > span { flex: 1; min-width: 0; } .ghr small { display: block; margin-top: 1px; font-size: 12px; color: var(--ink2); }
-.ghr b { font-weight: 500; white-space: nowrap; } .ghr b.neg { color: var(--bad); } .ghr b.cash { color: var(--good); }
+.ghr b { font-weight: 500; white-space: nowrap; color: var(--good); } .ghr b.neg { color: var(--bad); }  /* додалось — зелене з «+», мінус — червоне */
 .ghdel { flex: none; display: grid; place-items: center; width: 32px; height: 32px; margin-right: -6px; border: 0; border-radius: 16px; background: none; color: var(--ink2); cursor: pointer; }
 /* шторка «Відкладати щомісяця» */
 .plintro { margin: 6px 0 0; font-size: 14px; line-height: 1.45; color: var(--ink3); }
@@ -2978,7 +2978,7 @@ function plHist(P) {
   (sg.adds || []).forEach(function (a, i) { rows.push({ d: a.date, t: esc(a.note || "Готівка") + "<small>готівка, " + dmy(a.date) + "</small>", v: a.amount, i: i }); });
   rows.sort(function (a, b) { return a.d < b.d ? 1 : -1; });
   var list = '<div class="ghist">' + rows.map(function (r) {
-    return '<div class="ghr"><span>' + r.t + '</span><b class="' + (r.v < 0 ? "neg" : r.i !== undefined ? "cash" : "") + '">' + (r.v > 0 ? "+" : "") + zr(r.v) + "</b>" +
+    return '<div class="ghr"><span>' + r.t + '</span><b' + (r.v < 0 ? ' class="neg"' : "") + ">" + (r.v > 0 ? "+" : "") + zr(r.v) + "</b>" +
       (r.i !== undefined ? '<button type="button" class="ghdel" data-add="' + r.i + '" aria-label="Прибрати внесок">' + svgI("currentColor", '<path d="M6 6l12 12M18 6 6 18"/>', 14) + "</button>" : "") + "</div>";
   }).join("") + "</div>";
   var add = plS.addOpen
