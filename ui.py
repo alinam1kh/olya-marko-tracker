@@ -864,6 +864,7 @@ a.ins { color: var(--ink4); }
 .lfoot.lgoal > svg { align-self: center; }
 .lfoot.lgoal .lft { overflow: visible; }
 .pllab { margin: 16px 0 -4px; font-size: 13px; color: var(--ink2); }
+.plsub { margin: 0; font-size: 13px; color: var(--ink2); }  /* тип цілі під назвою в поточному стані */
 .plneed { margin: 14px 0 0; font-size: 15px; color: var(--ink3); } .plneed b { font-weight: 500; color: var(--ink); }
 /* готівка до відкладень і історія накопичень */
 .gtop { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }  /* готівка — пігулками одразу під смугами */
@@ -1297,9 +1298,9 @@ a.ins { color: var(--ink4); }
 #v-lim .sheet-scroll { flex: 1; }
 #v-plan.pledit .sheet-scroll { flex: 1; }
 .sheet-bg.open { opacity: 1; }
-#v-plan.morph { overflow: hidden; transition: transform .7s cubic-bezier(.32, .72, 0, 1), height .45s cubic-bezier(.32, .72, 0, 1); }
+#v-plan.morph { overflow: hidden; transition: transform .7s cubic-bezier(.32, .72, 0, 1), height .75s cubic-bezier(.32, .72, 0, 1); }
 @keyframes plfade { from { opacity: 0; } }
-.plfade { animation: plfade .35s ease-out; }
+.plfade { animation: plfade .55s ease-out; }
 .sheet-head { display: grid; grid-template-columns: 1fr 44px; align-items: center; padding: 8px 16px 0; touch-action: none; }
 .sheet-head::before { content: ""; grid-column: 1 / -1; justify-self: center; width: 36px; height: 4px; margin-bottom: 10px; border-radius: 2px; background: #D9DDE3; }
 .sheet-head h2 { margin: 0; font-size: 18px; font-weight: 500; }
@@ -2901,7 +2902,7 @@ function plMorph(fn) {
   if (Math.abs(h1 - h0) < 2 || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   s.style.height = h0 + "px"; void s.offsetHeight;
   s.classList.add("morph"); s.style.height = h1 + "px";
-  clearTimeout(plMorph.t); plMorph.t = setTimeout(function () { s.classList.remove("morph"); s.style.height = ""; }, 480);
+  clearTimeout(plMorph.t); plMorph.t = setTimeout(function () { s.classList.remove("morph"); s.style.height = ""; }, 780);
 }
 // ---------- список цілей ----------
 function plList() {
@@ -2929,7 +2930,7 @@ function plEditStart(P, id) {
   if (plS.until) [3, 6, 12].some(function (s) { var d = new Date(); return iso(new Date(d.getFullYear(), d.getMonth() + s + 1, 0)) === plS.until && (plS.span = s); });
 }
 function plRender(keepFocus) {
-  $("v-plan").classList.toggle("pledit", plS.mode !== "list");
+  $("v-plan").classList.toggle("pledit", plS.mode !== "list" && (plS.isNew || !!plS.edit));  // на весь екран — лише форма; список і поточний стан — за вмістом
   if (plS.mode === "list") return plList();
   var P = plS.P, body = $("pl-body"), m = plS.monthly, html = "", cushion = plS.kind === "cushion", others = othersMonthly(P, plS.id);
   var amt = function (id, v, ph) { return '<label class="amount pla"><input id="' + id + '" type="text" inputmode="numeric" autocomplete="off" placeholder="' + ph + '" value="' + (v || "") + '"><span>зл</span></label>'; };
@@ -2939,8 +2940,9 @@ function plRender(keepFocus) {
       (others ? '<div class="oprow"><span>Інші цілі</span><b>−' + zr(others) + "</b></div>" : "") +
       '<div class="oprow"><span>' + (others ? "Ця ціль" : "Відкладати") + "</span><b>−" + zr(m) + '</b></div><div class="oprow tot"><span>' + limLabel + "</span><b>" + zr(limV) + "</b></div></div>";
   };
-  var jar = plS.kind === "jar";
-  $("pl-title").textContent = cushion ? "Подушка безпеки" : jar ? (plS.isNew ? "Нова банка" : "Банка") : plS.isNew ? "Нова ціль" : "Ціль";
+  var jar = plS.kind === "jar", view = !plS.isNew && !plS.edit;  // збережена ціль — спершу поточний стан, форма — з «Редагувати»
+  var sgv = goalsOf(P).filter(function (x) { return x.id === plS.id; })[0];
+  $("pl-title").textContent = view && sgv ? goalName(sgv) : cushion ? "Подушка безпеки" : jar ? (plS.isNew ? "Нова банка" : "Редагувати банку") : plS.isNew ? "Нова ціль" : "Редагувати ціль";
   // нова ціль: звідки гроші — із залишку зарплати (щомісяця чи до терміну) або окрема банка, яку поповнюєте самі
   if (plS.isNew && !cushion) html += '<div class="seg sm lmseg plkind" role="group" aria-label="Тип цілі"><button type="button" data-kind="" aria-pressed="' + !jar + '">Відкладати щомісяця</button>' +
     '<button type="button" data-kind="jar" aria-pressed="' + jar + '">Накопичити банку</button></div>';
@@ -2951,7 +2953,8 @@ function plRender(keepFocus) {
   };
   // відкладати на місяць — рахується з суми й терміну; поле — лише для цілі без терміну
   var need = function (b) { return '<p class="plneed">' + (b.total && b.got >= b.total ? "Ціль уже зібрано" : "Відкладати ≈ <b>" + zr(b.need) + "</b> щомісяця") + "</p>"; };
-  if (jar) {
+  if (view) html += plViewHTML(P, sgv);
+  else if (jar) {
     // банка: назва, скільки зібрати й (необовʼязково) до коли; зібране — лише поповнення, ліміт не змінюється
     var sgj = goalsOf(P).filter(function (x) { return x.id === plS.id; })[0], uj = plUntil();
     var jb = plS.total ? termBars(P, { start: plS.isNew ? curKey(P) : goalFrom(sgj || { hist: [] }), until: uj, total: plS.total, adds: sgj && sgj.adds, jar: true }) : null;
@@ -2991,16 +2994,22 @@ function plRender(keepFocus) {
     if (until && m && c) html += calc(m + others, "Лишається на щоденні", c.cap);
     html += plResult(c, m + others);
   }
-  if (!plS.isNew) {
+  // перегляд: готівка під смугами й історія; редагування: поля й «Видалити ціль»
+  if (view) {
     var addH = plAddHTML(P);
     html = html.indexOf("<!--add-->") < 0 ? addH + html : html.replace("<!--add-->", addH);
-    html += plHist(P) + '<button type="button" class="pldel" id="pl-del">' + TRASH + "Видалити ціль</button>";
+    html += plHist(P);
+  } else {
+    html = html.replace(/<!--add-->/g, "");
+    if (!plS.isNew) html += '<button type="button" class="pldel" id="pl-del">' + TRASH + "Видалити ціль</button>";
   }
-  $("pl-backslot").innerHTML = plS.back ? '<button type="button" class="plback" id="pl-back">' + svgI("currentColor", '<path d="m15 6-6 6 6 6"/>', 18) + "Усі цілі</button>" : "";
+  var BACK = svgI("currentColor", '<path d="m15 6-6 6 6 6"/>', 18);
+  $("pl-backslot").innerHTML = plS.edit ? '<button type="button" class="plback" id="pl-vback">' + BACK + "Назад</button>"
+    : plS.back ? '<button type="button" class="plback" id="pl-back">' + BACK + "Усі цілі</button>" : "";
   plS.m = m;
   body.innerHTML = '<h2 class="plh" aria-hidden="true">' + esc($("pl-title").textContent) + "</h2>" + html;
   var byTotal = cushion || jar || !!plUntil();  // у полі — сума цілі, а не на місяць
-  $("pl-save").textContent = "Зберегти"; $("pl-save").disabled = byTotal ? !(cushion || plS.total) : !m; $("pl-msg").textContent = "";
+  $("pl-save").textContent = view ? "Редагувати" : "Зберегти"; $("pl-save").disabled = view ? false : byTotal ? !(cushion || plS.total) : !m; $("pl-msg").textContent = "";
   body.querySelectorAll("[data-kind]").forEach(function (b) { b.onclick = function () {
     if ((plS.kind || "") === b.dataset.kind) return;
     plS.kind = b.dataset.kind || undefined; plS.total = 0; plS.monthly = 0; plRender(); }; });
@@ -3022,6 +3031,7 @@ function plRender(keepFocus) {
     if ($(x[0])) $(x[0]).onclick = function () { plS[x[1]] = !plS[x[1]]; this.parentNode.classList.toggle("open", plS[x[1]]); this.setAttribute("aria-expanded", String(plS[x[1]])); };
   });
   if ($("pl-back")) $("pl-back").onclick = function () { plMorph(function () { plS = { P: P, mode: "list" }; plRender(); }); };
+  if ($("pl-vback")) $("pl-vback").onclick = function () { plView(P, plS.id); };  // «Назад» — до поточного стану, без змін
   if ($("pl-del")) $("pl-del").onclick = plDelete;
   // форма розгортається плавно лише в мить відкриття (подальші перемальовування — без анімації)
   var addOpen = function (v) { plS.addOpen = v; plS.addAnim = true; plRender(); plS.addAnim = false; $("pl-add-amt").focus({ preventScroll: true }); };
@@ -3041,6 +3051,19 @@ function plRender(keepFocus) {
   body.querySelectorAll("[data-add]").forEach(function (b) { b.onclick = function () {
     var i = +b.dataset.add; plAdds(P, function (list) { return list.filter(function (_, j) { return j !== i; }); }, plS.kind === "jar" ? "Запис прибрано" : "Внесок прибрано");
   }; });
+}
+// збережена ціль — знову поточний стан (зі свіжих даних; «Усі цілі» лишається, якщо був)
+function plView(P, id) { var back = plS.back; plMorph(function () { plEditStart(P, id); plS.back = back; plRender(); }); }
+// поточний стан цілі: тип, смуги (і готівка під ними), скільки щомісяця й до коли
+function plViewHTML(P, sg) {
+  if (!sg) return "";
+  var b = goalBars(P, sg), jar = sg.kind === "jar", until = sg.kind === "cushion" ? (goalPlan(P) || {}).until : sg.until, mm = goalMonthly(sg, curKey(P), P);
+  var row = function (a, v) { return '<div class="oprow"><span>' + a + "</span><b>" + v + "</b></div>"; }, done = b && b.total && b.got >= b.total;
+  var rows = jar ? (b && b.until && !done ? row("Щоб встигнути", "≈ " + zr(b.need) + " на місяць") : "")
+    : row("Відкладати щомісяця", done ? "зібрано" : (b ? "≈ " : "") + zr(mm));
+  rows += row("До коли", until ? dmy(until) : "без терміну");
+  return '<p class="plsub">' + (jar ? "Банка — поповнюєте самі" : sg.kind === "cushion" ? "З залишку зарплати" : "Відкладати щомісяця — з залишку зарплати") + "</p>" +
+    (b ? '<div class="plprog">' + goalBarsHTML(b) + "</div>" : "") + "<!--add-->" + '<div class="oplist plcalc">' + rows + "</div>";
 }
 // збереженої цілі: «+ Додати готівку» (сума й звідки — йде лише в «зібрано») та «Історія накопичень»:
 // за кожен період від зарплати до зарплати — скільки відкладено (дохід мінус витрати), і кожен готівковий внесок; найновіші — вгорі
@@ -3239,6 +3262,7 @@ function planUndo(P, prev, msg) {
 $("pl-save").onclick = function () {
   var P = plS.P, btn = this;
   if (plS.mode === "list") { plMorph(function () { plEditStart(P, null); plS.back = true; plRender(); }); return; }
+  if (!plS.isNew && !plS.edit) { plMorph(function () { plS.edit = true; plS.addOpen = false; plRender(); }); return; }
   var m = plS.m, k = curKey(P), prev = storedGoals(P), list = storedGoals(P), cur = list.filter(function (g) { return g.id === plS.id; })[0];
   var cushion = plS.kind === "cushion", jar = plS.kind === "jar", until = plUntil() || (cushion ? goalPlan(P).until : "");
   if (jar ? !plS.total : until ? !(cushion || plS.total) : !m) return;
@@ -3258,7 +3282,7 @@ $("pl-save").onclick = function () {
   delete cur.to;
   btn.disabled = true;
   var msg = jar ? (plS.isNew ? "Банку додано: " : "Збережено: ") + zr(cur.total) + (until ? " до " + dmy(until) : "") : until ? (plS.isNew ? "Ціль додано: " : "Збережено: ") + zr(cur.total) + " до " + dmy(until) : (plS.isNew ? "Ціль додано: " : "Збережено: ") + zr(m) + " на місяць";
-  planPost(P, list).then(function () { btn.disabled = false; planClose(); planUndo(P, prev, msg); })
+  planPost(P, list).then(function () { btn.disabled = false; plView(P, plS.id); planUndo(P, prev, msg); })
     .catch(function (err) { btn.disabled = false; $("pl-msg").textContent = err.message || "Немає звʼязку, спробуйте ще раз"; });
 };
 // видалення: ціль, створену цього місяця, прибираємо зовсім; давнішу — закриваємо з поточного місяця (минулі місяці зберігають свій ліміт)
