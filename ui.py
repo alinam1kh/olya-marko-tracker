@@ -882,7 +882,8 @@ a.ins { color: var(--ink4); }
 .pldd-h { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 52px; padding: 0 14px; border: 0; background: transparent; font: 400 14px var(--font); color: var(--ink2); text-align: left; cursor: pointer; }
 .pldd-h span { flex: 1; }
 .pldd-h b { font-weight: 500; color: var(--ink); }
-.pldd-h b svg { margin-right: 5px; vertical-align: -2px; color: var(--blue); }  /* обраний термін — з прапорцем цілі */
+.pldd-h b svg { margin-right: 5px; vertical-align: -2px; }  /* обраний термін — з прапорцем цілі, усе синім */
+.pldd-h b:has(svg), .pldd-h:has(b svg) .chev { color: var(--blue); }
 .pldd-h .chev { color: var(--ink2); transition: transform .2s; }
 .pldd.open .pldd-h .chev { transform: rotate(180deg); }
 .pldd-w { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows .5s cubic-bezier(.4, 0, .2, 1), opacity .3s ease; }
@@ -891,7 +892,7 @@ a.ins { color: var(--ink4); }
 .pldd.open .pldd-w { grid-template-rows: 1fr; opacity: 1; transition: grid-template-rows .5s cubic-bezier(.4, 0, .2, 1), opacity .35s ease .08s; }
 .pldd.open .pldd-b { transform: none; }
 @media (prefers-reduced-motion: reduce) { .pldd-w, .pldd-b { transition: none; } }
-.pldd-b { padding: 0 14px 14px; }
+.pldd-b { padding: 6px 14px 14px; }  /* запас зверху під виїзд (translateY −6px) — чипи не зрізаються */
 .pldd-b .plcal { animation: none; }  /* календар перемальовується з кожним тапом — без повторної появи */
 .pldd-s { margin: 12px 0 0; font-size: 13px; color: var(--ink3); }
 .pldd-s b { font-weight: 500; color: var(--ink); }
