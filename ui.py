@@ -1960,7 +1960,7 @@ function renderLimit(P) {
   else if (act.length === 1) {
     var g1 = act[0], pr = goalProgress(P, g1), nm = g1.name || g1.kind === "cushion" ? esc(goalName(g1)) + ", " : "";
     foot = '<button type="button" class="lfoot' + (pr ? " lgoal" : "") + '" id="limc-plan"><span class="lft">' +
-      (pr ? "<b>" + esc(goalName(g1)) + "</b><small>Відкладати ≈ " + zr(goalMonthly(g1, k0, P)) + " на місяць</small>" + pr.html
+      (pr ? "<b>" + esc(goalName(g1)) + "</b>" + pr.html
         : (nm || "Відкладаєте ") + "<b>" + zr(goalMonthly(g1, k0, P)) + "</b> на місяць") + "</span>" + CHR + "</button>";
   } else {
     var sum = act.reduce(function (s, x) { return s + goalMonthly(x, k0, P); }, 0);
