@@ -2841,15 +2841,16 @@ $("op-close").onclick = closeOp; $("op-bg").onclick = closeOp;
 
 // ---------- шторка «Цілі» / «Відкладати щомісяця» ----------
 // Цілей може бути кілька. Список — з рядка внизу картки ліміту; тап по цілі — її редагування (назва, сума, термін),
-// унизу «Видалити ціль». Ціль із датою (і подушка) — прапорець, без дати — копілка.
+// унизу «Видалити ціль». Іконка — за типом: відкладати щомісяця — подушка, банка — банка.
 // Ліміт рахується від суми всіх цілей: з подушкою — дохід мінус обовʼязкові й відкладення, без неї — менший з автоматичного.
-var PIG = svgI("currentColor", '<path d="M4.5 11.5a6.5 5.5 0 0 1 6.5-5.5h3a6.5 5.5 0 0 1 6 3.4l1.5.4v3.4l-1.6.5a6.5 5.5 0 0 1-2.4 2.7V20h-2.6v-1.8h-3.8V20H8.5v-2.6a5.5 5.5 0 0 1-4-5.9z"/><path d="M11 6V4.2M10 9.5h3.5"/><circle cx="16.5" cy="10.5" r=".6" fill="currentColor"/>', 16);
 var FLAG = svgI("currentColor", '<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>', 16);
 var CHEV_D = '<svg class="ico16 chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
 function dmy(iso) { return +iso.slice(8) + " " + GEN[+iso.slice(5, 7) - 1] + " " + iso.slice(0, 4); }
 function curKey(P) { return P.months[P.months.length - 1].key; }
 var JAR = svgI("currentColor", '<path d="M8.5 3h7M8 6h8M8 6c-1.8 1.2-2.5 2.8-2.5 4.8V18a3 3 0 0 0 3 3h7a3 3 0 0 0 3-3v-7.2c0-2-.7-3.6-2.5-4.8"/><path d="M9.5 13.5h5"/>', 16);
-function goalIcon(g) { return g.kind === "jar" ? JAR : g.kind === "cushion" || g.until ? FLAG : PIG; }
+// два типи — дві іконки: відкладати щомісяця (і подушка) — подушка, банка — банка
+var PILLOW = svgI("currentColor", '<path d="M4 6Q12 3.8 20 6Q22.2 12 20 18Q12 20.2 4 18Q1.8 12 4 6z"/><path d="M8 9.5Q12 8.7 16 9.5"/>', 16);
+function goalIcon(g) { return g.kind === "jar" ? JAR : PILLOW; }
 function goalName(g) { return g.kind === "cushion" ? g.title || "Подушка безпеки" : g.name || (g.kind === "jar" ? "Банка" : g.until ? "Ціль до " + dmy(g.until) : "Відкладати щомісяця"); }
 // прогрес цілі з терміном (і подушки) — дві смуги: час і гроші; без терміну — лише сума на місяць
 function goalProgress(P, g) { var b = goalBars(P, g); return b ? { b: b, html: goalBarsHTML(b) } : null; }
