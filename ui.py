@@ -873,7 +873,7 @@ a.ins { color: var(--ink4); }
 .gaddf .plname { margin: 0; background: var(--card); }
 /* поява форми готівки — спокійно, як дропдауни: висота й прозорість, без зсуву */
 @keyframes gaddIn { from { opacity: 0; max-height: 0; padding-top: 0; padding-bottom: 0; } to { opacity: 1; max-height: 260px; } }
-.gaddf.in { overflow: hidden; animation: gaddIn .35s ease-out; }
+.gaddf.in { overflow: hidden; animation: gaddIn .6s cubic-bezier(.32, .72, 0, 1); }
 @media (prefers-reduced-motion: reduce) { .gaddf.in { animation: none; } }
 .gaddb { display: flex; justify-content: flex-end; gap: 8px; }
 .gbtn { min-height: 40px; padding: 0 16px; border: 0; border-radius: 20px; background: var(--card); font: 500 14px var(--font); color: var(--ink3); cursor: pointer; }
@@ -896,17 +896,18 @@ a.ins { color: var(--ink4); }
 .plres.ok { background: var(--good-bg); } .plres.ok b { color: var(--good); }
 .plres.warn { background: var(--cash-bg); } .plres.warn b { color: var(--cash); }
 /* «До коли» — рядок-дропдаун: згорнутий показує термін, розгорнутий — пігулки і скільки збереться */
-.pldd { margin-top: 14px; border: 1px solid var(--border); border-radius: 16px; background: var(--card); transition: border-color .2s; }
+.pldd { margin-top: 14px; border: 1px solid var(--border); border-radius: 16px; background: var(--card); transition: border-color .45s ease; }
 .pldd.open { border-color: var(--blue-l); }
 .pldd-h { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 52px; padding: 0 14px; border: 0; background: transparent; font: 400 14px var(--font); color: var(--ink2); text-align: left; cursor: pointer; }
 .pldd-h span { flex: 1; }
 .pldd-h b { font-weight: 500; color: var(--ink); }
 .pldd-h b svg { margin-right: 5px; vertical-align: -2px; }  /* обраний термін — з прапорцем цілі, усе синім */
 .pldd-h b:has(svg), .pldd-h:has(b svg) .chev { color: var(--blue); }
-.pldd-h .chev { color: var(--ink2); transition: transform .2s; }
+.pldd-h .chev { color: var(--ink2); transition: transform .6s cubic-bezier(.32, .72, 0, 1); }
 .pldd.open .pldd-h .chev { transform: rotate(180deg); }
-/* розгортання — спокійне: висота плавно, вміст проявляється, без виїзду й «пружини» */
-.pldd-w { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows .3s ease-out, opacity .2s ease-out; }
+/* розгортання — спокійне й повільне, як рух шторки: висота плавно, вміст проявляється слідом, без виїзду й «пружини» */
+.pldd-w { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows .6s cubic-bezier(.32, .72, 0, 1), opacity .45s ease; }
+.pldd.open .pldd-w { transition: grid-template-rows .6s cubic-bezier(.32, .72, 0, 1), opacity .5s ease .1s; }
 .pldd-w > div { min-height: 0; overflow: hidden; }
 .pldd.open .pldd-w { grid-template-rows: 1fr; opacity: 1; }
 .pldd .pldd-h:active { transform: none; }  /* заголовок дропдауну не «стискається» при тапі */
