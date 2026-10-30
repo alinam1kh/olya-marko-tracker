@@ -1018,6 +1018,7 @@ a.ins { color: var(--ink4); }
 .wrow .ir { display: inline-flex; align-items: center; gap: 4px; color: var(--ink2); }
 #an-where .dh { align-items: baseline; margin: 18px 0 2px; padding: 0 0 10px; border-bottom: 1px solid var(--soft); font-size: 15px; }  /* заголовок розділу: наш шрифт списків, 500, роздільник під ним */
 #an-where .dh b { font-weight: 500; color: var(--ink); }
+#an-where .wnone { margin: 14px 0 2px; font-size: 15px; color: var(--ink2); }  /* місяць без даних — лише прочерк під заголовком */
 #an-where .dh > span { font-size: 14px; color: var(--ink2); }
 /* підсумок місяця під категоріями: «Лишилось з доходу» — як заголовок розділу, але з роздільником зверху */
 #an-where .lrow { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin: 14px 0 6px; padding-top: 14px; border-top: 1px solid var(--soft); }
@@ -2227,7 +2228,7 @@ function renderAnalytics(P) {
       var avgV = avgOf(allFull, function (m) { return m.variable; });
       // неповний місяць порівнюємо зі звичним на те саме число — і на графіку це риска, а не середнє за місяць
       var uDay = M.incomplete ? avgOf(base, function (m) { return m.ops.reduce(function (s, o) { return s + (!o.income && !o.fixed && dayOf(o) <= dn ? o.amount : 0); }, 0); }) : null;
-      monthBars(function (m) { return m.variable; }, avgV, false, LM ? LM.total : 0);
+      monthBars(function (m) { return m.variable; }, M.ghost ? 0 : avgV, false, LM ? LM.total : 0);
       c = lim ? vsLim(M.variable, LM && LM.total, M.incomplete, "на місяць", true)
         : M.incomplete ? vsUsual(M.variable, uDay, false, " на " + dn + "-те") : vsUsual(M.variable, avgOf(base, function (m) { return m.variable; }), false, " за місяць");
     } else {
@@ -2257,8 +2258,8 @@ function renderAnalytics(P) {
       capsules("mbars", "mticks", [].concat.apply([], WK.map(function (X, j) {
         var Mj = P.months[j];
         return X.bounds.map(function (b, i) { var future = b[0] > X.last; return { v: future ? 0 : X.sums[i], label: b[0] + "–" + b[1], aria: b[0] + "–" + b[1] + " " + GEN[mi(Mj)], empty: future, nopick: future, sub: Mj.ghost ? Mj.name.slice(0, 3) : future ? "—" : nf0.format(X.sums[i]) + " зл" }; });
-      })), axW.max, wi >= 0 ? month * 4 + wi : -1, pickW, axW.n, uw || 0,
-        { avgLabel: avgTag(uw), lim: lw, paged: { per: 4, page: P.months.length - 1 - month, onPage: function (pg) {
+      })), axW.max, wi >= 0 ? month * 4 + wi : -1, pickW, axW.n, M.ghost ? 0 : uw || 0,
+        { avgLabel: M.ghost ? "" : avgTag(uw), lim: lw, paged: { per: 4, page: P.months.length - 1 - month, onPage: function (pg) {
           // доклацнули до сусіднього місяця — міняємо дані (підсумок, категорії, шапку) тихо, графік уже на місці
           var nm = P.months.length - 1 - pg; if (nm === month || nm < 0) return;
           amon = P.months[nm].key; setTimeout(function () { calm(render); }, 400);
@@ -2279,7 +2280,8 @@ function renderAnalytics(P) {
         if (top >= 0) c.text = "Найдорожчий тиждень — " + bounds[top][0] + "–" + bounds[top][1];
       }
     }
-    if (M.ghost) { $("a-sum").innerHTML = sumHTML("Щоденні витрати", "", zr(0), { text: "За цей місяць даних немає — облік почався з " + GEN[+f0.slice(5) - 1] }); $("an-where").hidden = true; }
+    if (M.ghost) { $("a-sum").innerHTML = sumHTML("Щоденні витрати", "", zr(0), { text: "За цей місяць даних немає — облік почався з " + GEN[+f0.slice(5) - 1] });
+      $("an-where").hidden = false; $("an-where").innerHTML = '<div class="ch"><h2>Витрати за ' + M.name.toLowerCase() + '</h2></div><p class="wnone">—</p>'; }
     else if (!weeks || wi < 0) { $("a-sum").innerHTML = sumHTML("Щоденні витрати", extra, zr(M.variable), c); renderWhere(P, M, null, LM); }
     // перемикач ліміту — у шапці картки праворуч (ліворуч «Місяці / Тижні»); вмикає ліміти і на графіку, і в «Витрати за …»
     var tg = h("button", "limt", 'Ліміт<span class="sw" aria-hidden="true"><i></i></span>');  // тугл-перемикач: сірий → синій
