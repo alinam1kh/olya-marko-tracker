@@ -1297,6 +1297,9 @@ a.ins { color: var(--ink4); }
 #v-lim .sheet-scroll { flex: 1; }
 #v-plan.pledit .sheet-scroll { flex: 1; }
 .sheet-bg.open { opacity: 1; }
+#v-plan.morph { overflow: hidden; transition: transform .7s cubic-bezier(.32, .72, 0, 1), height .45s cubic-bezier(.32, .72, 0, 1); }
+@keyframes plfade { from { opacity: 0; } }
+.plfade { animation: plfade .35s ease-out; }
 .sheet-head { display: grid; grid-template-columns: 1fr 44px; align-items: center; padding: 8px 16px 0; touch-action: none; }
 .sheet-head::before { content: ""; grid-column: 1 / -1; justify-self: center; width: 36px; height: 4px; margin-bottom: 10px; border-radius: 2px; background: #D9DDE3; }
 .sheet-head h2 { margin: 0; font-size: 18px; font-weight: 500; }
@@ -1414,6 +1417,9 @@ a.ins { color: var(--ink4); }
 button, .cashbtn, .ch a, .hero .le, .more, .op { transition: transform .45s var(--spring), background-color .4s var(--ease), box-shadow .4s var(--ease), color .4s var(--ease); }
 button:active:not(:disabled), .cashbtn:active, .ch a:active, .more:active { transition-duration: .12s; }
 button:active:not(:disabled), .cashbtn:active, .nav a:active, .ch a:active, .more:active { transform: scale(.96); }
+/* шторки цілей і ліміту: тап — лише спокійна зміна кольору, без пружного стискання */
+#v-plan button, #v-lim button { transition: background-color .25s ease, border-color .25s ease, color .25s ease, box-shadow .25s ease; }
+#v-plan button:active:not(:disabled), #v-lim button:active:not(:disabled) { transform: none; }
 .limc .lmain:active, .limc .lfoot:active { transform: none; }  /* картка ліміту — велика площа: без «стискання», як інші картки */
 .cashbtn:hover { box-shadow: 0 10px 22px rgba(29,95,224,.4), inset 0 1px 0 rgba(255,255,255,.3); }
 /* спливаючі меню розкриваються від кнопки */
@@ -2885,6 +2891,17 @@ function plDD(id, open, label, value, inner) {
   return '<div class="pldd' + (open ? " open" : "") + '"><button type="button" class="pldd-h" id="' + id + '" aria-expanded="' + !!open + '"><span>' + label + "</span><b>" + value + "</b>" + CHEV_D + "</button>" +
     '<div class="pldd-w"><div><div class="pldd-b">' + inner + "</div></div></div></div>";
 }
+// перехід усередині шторки (список ↔ ціль): висота перетікає зі старої в нову, новий вміст спокійно проявляється
+function plMorph(fn) {
+  var s = $("v-plan"), body = $("pl-body"), h0 = s.getBoundingClientRect().height;
+  fn();
+  body.classList.remove("plfade"); void body.offsetWidth; body.classList.add("plfade");
+  var h1 = s.getBoundingClientRect().height;
+  if (Math.abs(h1 - h0) < 2 || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  s.style.height = h0 + "px"; void s.offsetHeight;
+  s.classList.add("morph"); s.style.height = h1 + "px";
+  clearTimeout(plMorph.t); plMorph.t = setTimeout(function () { s.classList.remove("morph"); s.style.height = ""; }, 480);
+}
 // ---------- список цілей ----------
 function plList() {
   var P = plS.P, k = curKey(P), act = goalsOf(P).filter(function (g) { return goalOn(g, k); }), total = 0, html = '<div class="gl">';
@@ -2899,7 +2916,7 @@ function plList() {
   $("pl-title").textContent = "Цілі"; $("pl-backslot").innerHTML = "";
   $("pl-body").innerHTML = '<h2 class="plh" aria-hidden="true">Цілі</h2>' + html;
   $("pl-save").disabled = false; $("pl-save").textContent = "+ Нова ціль"; $("pl-msg").textContent = "";
-  $("pl-body").querySelectorAll("[data-id]").forEach(function (b) { b.onclick = function () { plEditStart(P, b.dataset.id); plRender(); }; });
+  $("pl-body").querySelectorAll("[data-id]").forEach(function (b) { b.onclick = function () { plMorph(function () { plEditStart(P, b.dataset.id); plRender(); }); }; });
 }
 // ---------- одна ціль ----------
 function plEditStart(P, id) {
@@ -3003,7 +3020,7 @@ function plRender(keepFocus) {
   [["pl-dd", "dd"], ["pl-hd", "hd"]].forEach(function (x) {
     if ($(x[0])) $(x[0]).onclick = function () { plS[x[1]] = !plS[x[1]]; this.parentNode.classList.toggle("open", plS[x[1]]); this.setAttribute("aria-expanded", String(plS[x[1]])); };
   });
-  if ($("pl-back")) $("pl-back").onclick = function () { plS = { P: P, mode: "list" }; plRender(); };
+  if ($("pl-back")) $("pl-back").onclick = function () { plMorph(function () { plS = { P: P, mode: "list" }; plRender(); }); };
   if ($("pl-del")) $("pl-del").onclick = plDelete;
   // форма розгортається плавно лише в мить відкриття (подальші перемальовування — без анімації)
   var addOpen = function (v) { plS.addOpen = v; plS.addAnim = true; plRender(); plS.addAnim = false; $("pl-add-amt").focus({ preventScroll: true }); };
@@ -3106,7 +3123,7 @@ function limOpen(P) {
 function limClose() {
   var s = $("v-lim"), bg = $("lm-bg"); if (s.hidden) return;
   s.classList.remove("open"); bg.classList.remove("open"); document.body.style.overflow = "";
-  setTimeout(function () { if (!s.classList.contains("open")) s.hidden = bg.hidden = true; }, 300);
+  setTimeout(function () { if (!s.classList.contains("open")) s.hidden = bg.hidden = true; }, 700);
 }
 var lmRow = function (a, b, cls) { return '<div class="oprow' + (cls ? " " + cls : "") + '"><span>' + a + "</span><b>" + b + "</b></div>"; };
 // «Авто»: формула — звідки ліміт
@@ -3171,7 +3188,7 @@ function limRender() {
     if (off) delete lmS.cats[r.dataset.n]; else lmS.cats[r.dataset.n] = b.dataset.v;
     sugSync(r); limRefresh(); }; });
   if ($("lm-reset")) $("lm-reset").onclick = function () { lmS.cats = {}; body.querySelectorAll(".lmrow input").forEach(function (i) { i.value = ""; }); body.querySelectorAll(".lmrow").forEach(sugSync); limRefresh(); };
-  $("lm-goal").onclick = function () { limClose(); setTimeout(function () { planOpen(P); }, 320); };  // відкласти суму — це ціль: вона сама зменшить ліміт
+  $("lm-goal").onclick = function () { limClose(); setTimeout(function () { planOpen(P); }, 450); };  // відкласти суму — це ціль: вона сама зменшить ліміт
   limRefresh();
 }
 function limPost(P, hist) {
@@ -3206,7 +3223,7 @@ function planOpen(P) {
 function planClose() {
   var s = $("v-plan"), bg = $("pl-bg"); if (s.hidden) return;
   s.classList.remove("open"); bg.classList.remove("open"); document.body.style.overflow = "";
-  setTimeout(function () { if (!s.classList.contains("open")) s.hidden = bg.hidden = true; }, 300);
+  setTimeout(function () { if (!s.classList.contains("open")) s.hidden = bg.hidden = true; }, 700);
 }
 // збережений список цілей людини (без «віртуальної» подушки, якої ще не торкались)
 function storedGoals(P) { return (((D.plans || {})[P.key]) || []).map(function (g) { return JSON.parse(JSON.stringify(g)); }); }
@@ -3220,7 +3237,7 @@ function planUndo(P, prev, msg) {
 }
 $("pl-save").onclick = function () {
   var P = plS.P, btn = this;
-  if (plS.mode === "list") { plEditStart(P, null); plS.back = true; plRender(); return; }
+  if (plS.mode === "list") { plMorph(function () { plEditStart(P, null); plS.back = true; plRender(); }); return; }
   var m = plS.m, k = curKey(P), prev = storedGoals(P), list = storedGoals(P), cur = list.filter(function (g) { return g.id === plS.id; })[0];
   var cushion = plS.kind === "cushion", jar = plS.kind === "jar", until = plUntil() || (cushion ? goalPlan(P).until : "");
   if (jar ? !plS.total : until ? !(cushion || plS.total) : !m) return;
