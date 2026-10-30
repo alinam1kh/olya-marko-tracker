@@ -882,6 +882,7 @@ a.ins { color: var(--ink4); }
 .pldd-h { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 52px; padding: 0 14px; border: 0; background: transparent; font: 400 14px var(--font); color: var(--ink2); text-align: left; cursor: pointer; }
 .pldd-h span { flex: 1; }
 .pldd-h b { font-weight: 500; color: var(--ink); }
+.pldd-h b svg { margin-right: 5px; vertical-align: -2px; color: var(--blue); }  /* обраний термін — з прапорцем цілі */
 .pldd-h .chev { color: var(--ink2); transition: transform .2s; }
 .pldd.open .pldd-h .chev { transform: rotate(180deg); }
 .pldd-w { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows .5s cubic-bezier(.4, 0, .2, 1), opacity .3s ease; }
@@ -896,8 +897,6 @@ a.ins { color: var(--ink4); }
 .pldd-s b { font-weight: 500; color: var(--ink); }
 .pllab { margin: 16px 2px 0; font-size: 13px; color: var(--ink2); }
 .pldate { display: block; width: 100%; min-height: 44px; margin-top: 10px; padding: 0 12px; border: 1px solid var(--border); border-radius: 14px; background: var(--card); font: 400 15px var(--font); color: var(--ink); }
-.plgoal { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-top: 6px; font-size: 12px; color: var(--ink2); }
-.plgoal .gdue { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 12px; background: var(--blue-soft); color: var(--blue); font-weight: 500; white-space: nowrap; }
 .plrow { position: relative; }
 .plwas { position: absolute; right: 2px; bottom: 12px; font-size: 12px; color: var(--ink2); }
 .plcalc { margin-top: 14px; padding: 0 14px; border-radius: 14px; background: #F8F9FB; }
@@ -2875,7 +2874,7 @@ function plRender(keepFocus) {
   $("pl-title").textContent = cushion ? "Подушка безпеки" : plS.isNew ? "Нова ціль" : "Ціль";
   var spans = [[null, "Без терміну"], [3, "3 міс."], [6, "6 міс."], [12, "Рік"], [0, "Інша дата"]];
   var dueDD = function (until, list) {
-    return plDD("pl-dd", plS.dd, "До коли", until ? dmy(until) : "без терміну",
+    return plDD("pl-dd", plS.dd, "До коли", until ? FLAG.replace(/width="16" height="16"/, 'width="14" height="14"') + dmy(until) : "без терміну",
       '<div class="chips">' + list.map(function (x) { return '<button type="button" data-span="' + x[0] + '" aria-pressed="' + (plS.span === x[0]) + '">' + x[1] + "</button>"; }).join("") + "</div>" + (plS.span === 0 ? plCalHTML() : ""));
   };
   // відкладати на місяць — рахується з суми й терміну; поле — лише для цілі без терміну
@@ -2884,8 +2883,7 @@ function plRender(keepFocus) {
     // подушка: скільки зібрати (порожньо — 6 міс. витрат) і до коли; старт — перший місяць обліку
     var g = goalPlan(P), until = plUntil() || g.until, tot = plS.total || g.def, b = termBars(P, { start: g.start, until: until, total: tot, adds: g.adds });
     m = Math.round(b.need); c = planCalc(P, m + others, withC);  // сума на місяць — з нової суми й терміну
-    html += '<div class="plgoal"><span class="gdue">' + FLAG.replace(/width="16" height="16"/, 'width="14" height="14"') + "ціль до " + dmy(until) + "</span><span>від " + GEN[+g.start.slice(5) - 1] + " " + g.start.slice(0, 4) + "</span></div>" +
-      '<div class="plprog">' + goalBarsHTML(b) + "</div>" +
+    html += '<div class="plprog">' + goalBarsHTML(b) + "</div>" +
       '<p class="pllab">Скільки зібрати</p>' + amt("pl-amount", plS.total || "", String(g.def)) +
       '<div class="chips plchips">' + [3, 6].map(function (k) { var v = Math.round(k * g.avgExp / 100) * 100; return '<button type="button" data-v="' + v + '" aria-pressed="' + (tot === v) + '">' + k + " міс. витрат · " + nf0.format(v) + "</button>"; }).join("") + "</div>" +
       dueDD(until, spans.slice(1)) + need(b);
@@ -2904,8 +2902,7 @@ function plRender(keepFocus) {
     var sg0 = goalsOf(P).filter(function (x) { return x.id === plS.id; })[0];
     var tb = until && plS.total ? termBars(P, { start: plS.isNew ? curKey(P) : goalFrom(sg0 || { hist: [] }), until: until, total: plS.total, adds: sg0 && sg0.adds }) : null;
     if (until) { m = tb ? Math.round(tb.need) : 0; c = planCalc(P, m + others, withC); }
-    html += '<div class="plgoal"><span class="gdue">' + (until ? FLAG : PIG).replace(/width="16" height="16"/, 'width="14" height="14"') + (until ? "ціль до " + dmy(until) : "без терміну") + "</span></div>" +
-      (tb && !plS.isNew ? '<div class="plprog">' + goalBarsHTML(tb) + "</div>" : "");
+    html += (tb && !plS.isNew ? '<div class="plprog">' + goalBarsHTML(tb) + "</div>" : "");
     html += '<input class="plname" id="pl-name" type="text" maxlength="60" autocomplete="off" placeholder="Назва, наприклад «Відпустка»" value="' + esc(plS.name) + '">';
     var cur0 = until ? plS.total : m, vals = until ? [1000, 3000, 5000, 10000] : [500, 1000, 2000, 5000];
     html += '<p class="pllab">' + (until ? "Скільки зібрати" : "Відкладати щомісяця") + "</p>" + amt("pl-amount", cur0, "0") +
