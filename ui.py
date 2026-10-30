@@ -535,10 +535,10 @@ body.p-olya .liquid { --sheen: .4; }
 .liquid.lit .after { -webkit-mask: none; mask: none; }  /* після першого проходу: те саме, що кінець бліку (--p 150%) */
 .liquid .after > .ehalo, .liquid .after > .erim { position: absolute; inset: 0; border-radius: inherit; }
 .liquid .after > .mesh { position: absolute; }
-/* mesh-градієнт Paper Shaders (WebGL): плями кольору течуть і закручуються; якщо WebGL недоступний — лишається CSS-mesh */
+/* «дим» Paper Shaders (WebGL): клубочиться всередині картки; якщо WebGL недоступний — лишається CSS-mesh */
 .liquid .after > .pmesh { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; opacity: 0; transition: opacity 1.2s ease; }
 .liquid .after > .pmesh canvas { display: block; width: 100%; height: 100%; }
-.liquid.webgl .after > .pmesh { opacity: .62; }
+.liquid.webgl .after > .pmesh { opacity: .7; filter: blur(6px); }  /* приглушено й розмито — не відволікає від цифр */
 .liquid.webgl .after > .mesh { display: none; }
 body.p-olya .liquid .after { opacity: .68; }
 /* рамка в Олі — яскравіша: світло-рожевий кант у найсвітлішій точці (кант мерехтить кадрами — тож свої кадри) */
@@ -3185,25 +3185,30 @@ if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catc
 })();
 </script>
 <script type="module">
+// «дим» Paper Shaders (Gem Smoke): форма = вся картка, тож дим клубочиться всередині й тане біля країв
 var V = "https://cdn.jsdelivr.net/npm/@paper-design/shaders@0.0.82/dist/";
-Promise.all([import(V + "shader-mount.js"), import(V + "shaders/mesh-gradient.js")]).then(function (m) {
-  var ShaderMount = m[0].ShaderMount, frag = m[1].meshGradientFragmentShader, box = document.getElementById("pmesh");
-  // кольори людини з CSS (--l2 синій/рожевий, --l4, --l3) + дві «порожні» плями, крізь які видно темний фон картки
-  function hex(v) { var h = getComputedStyle(document.body).getPropertyValue(v).trim().replace("#", "");
-    return [parseInt(h.slice(0, 2), 16) / 255, parseInt(h.slice(2, 4), 16) / 255, parseInt(h.slice(4, 6), 16) / 255, 1]; }
-  // спокійніші кольори: 30 % темного фону картки (--g2) у кожній плямі
-  function calm(v) { var c = hex(v), g = hex("--g2"); return [0, 1, 2].map(function (i) { return c[i] * .7 + g[i] * .3; }).concat(1); }
-  function colors() { var none = [0, 0, 0, 0]; return [calm("--l2"), none, calm("--l4"), calm("--l3"), none]; }
-  var c = colors();
-  var mount = new ShaderMount(box, frag, {
-    u_colors: c, u_colorsCount: c.length, u_distortion: .8, u_swirl: .15, u_grainMixer: 0, u_grainOverlay: 0,
-    u_fit: 2, u_scale: .6, u_rotation: 0, u_offsetX: 0, u_offsetY: 0, u_originX: .5, u_originY: .5, u_worldWidth: 0, u_worldHeight: 0
-  }, { premultipliedAlpha: false }, .5, Math.random() * 600000, 1);
-  document.getElementById("liquid").classList.add("webgl");
-  // перемкнули людину — нові кольори
-  var last = document.body.className;
-  new MutationObserver(function () { if (document.body.className === last) return; last = document.body.className; mount.setUniforms({ u_colors: colors() }); })
-    .observe(document.body, { attributes: true, attributeFilter: ["class"] });
+Promise.all([import(V + "shader-mount.js"), import(V + "shaders/gem-smoke.js")]).then(function (m) {
+  var ShaderMount = m[0].ShaderMount, frag = m[1].gemSmokeFragmentShader, box = document.getElementById("pmesh");
+  function hex(v, a) { var h = getComputedStyle(document.body).getPropertyValue(v).trim().replace("#", "");
+    return [parseInt(h.slice(0, 2), 16) / 255, parseInt(h.slice(2, 4), 16) / 255, parseInt(h.slice(4, 6), 16) / 255, a]; }
+  // кольори людини: від краю диму до серцевини (--l4 → --l2 → --l3)
+  function colors() { return [hex("--l4", .55), hex("--l2", .9), hex("--l3", .9)]; }
+  var img = new Image();
+  img.onload = function () {
+    var c = colors();
+    var mount = new ShaderMount(box, frag, {
+      u_image: img, u_isImage: false, u_shape: 0, u_imageAspectRatio: 1,
+      u_colors: c, u_colorsCount: c.length, u_colorBack: [0, 0, 0, 0], u_colorInner: [0, 0, 0, 0],
+      u_innerGlow: 1, u_outerGlow: 0, u_innerDistortion: .9, u_outerDistortion: 0, u_offset: 0, u_angle: 0, u_size: .6,
+      u_fit: 1, u_scale: 1, u_rotation: 0, u_offsetX: 0, u_offsetY: 0, u_originX: .5, u_originY: .5, u_worldWidth: 0, u_worldHeight: 0
+    }, {}, .5, Math.random() * 600000, 1);
+    document.getElementById("liquid").classList.add("webgl");
+    // перемкнули людину — нові кольори
+    var last = document.body.className;
+    new MutationObserver(function () { if (document.body.className === last) return; last = document.body.className; mount.setUniforms({ u_colors: colors() }); })
+      .observe(document.body, { attributes: true, attributeFilter: ["class"] });
+  };
+  img.src = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";  // порожня текстура: форма не з картинки
 }).catch(function () {});
 </script>
 </body>
