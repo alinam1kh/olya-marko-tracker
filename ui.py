@@ -1716,7 +1716,7 @@ function ghostOf(key) { return { key: key, name: MONTHS_FULL[+key.slice(5) - 1],
 function ghostNote(P) { return "За цей місяць даних немає — облік почався з " + GEN[+P.months[0].key.slice(5) - 1]; }
 function toCur(P) { selDay = null; }  // переходи з Головної в Журнал — той самий місяць, що в шапці, без обраного дня
 var person = 0, month = curMonth(D.people[0]), trendMonth = null, filter = "all", amode = "month", catF = null, jq = "", jqMonth = false;  // jqMonth — пошук лише в обраному місяці  // catF — фільтр Журналу за категорією (з «Що змінилось»)
-var GOAL = { olya: { months: 6, deadline: [2027, 6], title: "Подушка безпеки" } };  // фіча 5 з роадмапу ДЗ
+var GOAL = { olya: { months: 6, deadline: [2027, 6], title: "Відкладати щомісяця" } };  // фіча 5 з роадмапу ДЗ; назва — як тип цілі в перемикачі (свою назву цілі «з зарплати» без терміну не дають)
 var VIEWS = { report: 1, analytics: 1, journal: 1, add: 1 };
 var saved = null;  // після збереження готівки: сума й дата, щоб підсвітити новий запис
 var justAdded = [];  // усі записи, додані за цей сеанс, — кожен має «щойно»
@@ -2244,7 +2244,7 @@ function dayChip(cut, k, id) {
 function goalsOf(P) {
   var list = (((D.plans || {})[P.key]) || []).map(function (g) { return Object.assign({}, g, { hist: g.hist || [] }); });
   if (GOAL[P.key] && !list.some(function (g) { return g.kind === "cushion"; })) list.unshift({ id: "cushion", kind: "cushion", hist: [] });
-  list.forEach(function (g) { if (g.kind === "cushion") g.title = GOAL[P.key] ? GOAL[P.key].title : "Подушка безпеки"; });
+  list.forEach(function (g) { if (g.kind === "cushion") g.title = GOAL[P.key] ? GOAL[P.key].title : "Відкладати щомісяця"; });
   return list;
 }
 function goalFrom(g) { return g.hist.length ? g.hist[0].from : "0000-00"; }
@@ -2862,7 +2862,7 @@ var JAR = svgI("currentColor", '<path d="M8.5 3h7M8 6h8M8 6c-1.8 1.2-2.5 2.8-2.5
 // два типи — дві іконки: відкладати щомісяця (і подушка) — подушка, банка — банка
 var PILLOW = svgI("currentColor", '<path d="M4 6Q12 3.8 20 6Q22.2 12 20 18Q12 20.2 4 18Q1.8 12 4 6z"/><path d="M8 9.5Q12 8.7 16 9.5"/>', 16);
 function goalIcon(g) { return g.kind === "jar" ? JAR : PILLOW; }
-function goalName(g) { return g.kind === "cushion" ? g.title || "Подушка безпеки" : g.name || (g.kind === "jar" ? "Банка" : g.until ? "Ціль до " + dmy(g.until) : "Відкладати щомісяця"); }
+function goalName(g) { return g.kind === "cushion" ? g.title || "Відкладати щомісяця" : g.name || (g.kind === "jar" ? "Банка" : "Відкладати щомісяця"); }  // без своєї назви — як тип у перемикачі
 // прогрес цілі з терміном (і подушки) — дві смуги: час і гроші; без терміну — лише сума на місяць
 function goalProgress(P, g) { var b = goalBars(P, g); return b ? { b: b, html: goalBarsHTML(b) } : null; }
 var plS = null;  // стан шторки: { P, mode: "list" | "edit", id, isNew, kind, name, monthly, total, span (null — без терміну, 3/6/12, 0 — інша дата), until, dd, hd, addOpen, calKey, m }
@@ -2952,7 +2952,7 @@ function plRender(keepFocus) {
   };
   var jar = plS.kind === "jar", view = !plS.isNew && !plS.edit;  // збережена ціль — спершу поточний стан, форма — з «Редагувати»
   var sgv = goalsOf(P).filter(function (x) { return x.id === plS.id; })[0];
-  $("pl-title").textContent = view && sgv ? goalName(sgv) : cushion ? "Подушка безпеки" : jar ? (plS.isNew ? "Нова банка" : "Редагувати банку") : plS.isNew ? "Нова ціль" : "Редагувати ціль";
+  $("pl-title").textContent = view && sgv ? goalName(sgv) : cushion ? "Редагувати ціль" : jar ? (plS.isNew ? "Нова банка" : "Редагувати банку") : plS.isNew ? "Нова ціль" : "Редагувати ціль";
   // нова ціль: звідки гроші — із залишку зарплати (щомісяця чи до терміну) або окрема банка, яку поповнюєте самі
   if (plS.isNew && !cushion) html += '<div class="seg sm lmseg plkind" role="group" aria-label="Тип цілі"><button type="button" data-kind="" aria-pressed="' + !jar + '">Відкладати щомісяця</button>' +
     '<button type="button" data-kind="jar" aria-pressed="' + jar + '">Накопичити банку</button></div>';
