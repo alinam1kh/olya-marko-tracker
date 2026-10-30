@@ -944,7 +944,7 @@ a.ins { color: var(--ink4); }
 #pl-close { grid-column: 2; grid-row: 2; }
 /* назва шторки цілей прокручується разом зі вмістом: у шапці лишаються ручка, «Усі цілі» й хрестик (h2 шапки — для читачів екрана) */
 #pl-title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-#pl-head { grid-template-rows: auto 44px; }
+#pl-head { grid-template-rows: auto 44px; padding-bottom: 12px; }  /* вміст при прокрутці не підлазить під шапку впритул */
 .plh { margin: 0 0 4px; font-size: 18px; font-weight: 500; }
 /* без «Усі цілі» назва стоїть у шапці навпроти хрестика; рядком нижче опускається лише під «Усі цілі» */
 #pl-head:not(:has(.plback)) #pl-title { position: static; width: auto; height: auto; overflow: visible; clip: auto; grid-column: 1; grid-row: 2; }
@@ -2918,8 +2918,8 @@ function plRender(keepFocus) {
   var jar = plS.kind === "jar";
   $("pl-title").textContent = cushion ? "Подушка безпеки" : jar ? (plS.isNew ? "Нова банка" : "Банка") : plS.isNew ? "Нова ціль" : "Ціль";
   // нова ціль: звідки гроші — із залишку зарплати (щомісяця чи до терміну) або окрема банка, яку поповнюєте самі
-  if (plS.isNew && !cushion) html += '<div class="seg sm lmseg plkind" role="group" aria-label="Тип цілі"><button type="button" data-kind="" aria-pressed="' + !jar + '">З залишку зарплати</button>' +
-    '<button type="button" data-kind="jar" aria-pressed="' + jar + '">Банка</button></div>';
+  if (plS.isNew && !cushion) html += '<div class="seg sm lmseg plkind" role="group" aria-label="Тип цілі"><button type="button" data-kind="" aria-pressed="' + !jar + '">Відкладати щомісяця</button>' +
+    '<button type="button" data-kind="jar" aria-pressed="' + jar + '">Накопичити банку</button></div>';
   var spans = [[null, "Без терміну"], [3, "3 міс."], [6, "6 міс."], [12, "Рік"], [0, "Інша дата"]];
   var dueDD = function (until, list) {
     return plDD("pl-dd", plS.dd, "До коли", until ? FLAG.replace(/width="16" height="16"/, 'width="14" height="14"') + dmy(until) : "без терміну",
@@ -2932,8 +2932,7 @@ function plRender(keepFocus) {
     var sgj = goalsOf(P).filter(function (x) { return x.id === plS.id; })[0], uj = plUntil();
     var jb = plS.total ? termBars(P, { start: plS.isNew ? curKey(P) : goalFrom(sgj || { hist: [] }), until: uj, total: plS.total, adds: sgj && sgj.adds, jar: true }) : null;
     m = 0;
-    if (plS.isNew) html += '<p class="plintro">Гроші, які відкладаєте окремо, — на машину, ремонт чи просто «на потім». Поповнюєте, коли зручно; ліміт на щоденні не змінюється.</p>';
-    else if (jb) html += '<div class="plprog">' + goalBarsHTML(jb) + "</div><!--add-->";
+    if (!plS.isNew && jb) html += '<div class="plprog">' + goalBarsHTML(jb) + "</div><!--add-->";
     html += '<input class="plname" id="pl-name" type="text" maxlength="60" autocomplete="off" placeholder="Назва, наприклад «Машина»" value="' + esc(plS.name) + '">';
     html += '<p class="pllab">Скільки зібрати</p>' + amt("pl-amount", plS.total, "0") +
       '<div class="chips plchips">' + [1000, 5000, 10000, 20000].map(function (v) { return '<button type="button" data-v="' + v + '" aria-pressed="' + (plS.total === v) + '">' + nf0.format(v) + "</button>"; }).join("") + "</div>";
