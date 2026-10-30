@@ -1551,6 +1551,7 @@ var quietNext = false;
 function quiet() { quietNext = true; setTimeout(function () { quietNext = false; }, 800); }
 function grow(sel, attr) {
   if (still) { document.querySelectorAll(sel).forEach(function (e) { e.style.transition = "none"; e.style[attr] = e.dataset.to; }); return; }
+  if ($("app").classList.contains("pre")) { document.addEventListener("app:shown", function () { grow(sel, attr); }, { once: true }); return; }
   requestAnimationFrame(function () { requestAnimationFrame(function () {
     document.querySelectorAll(sel).forEach(function (e, i) {
       if (growIO) { e.dataset.attr = attr; growIO.observe(e); }
@@ -3119,10 +3120,11 @@ function enter(base) {
 }
 function countUp(el) {
   if (!el || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  if ($("app").classList.contains("pre")) { document.addEventListener("app:shown", function () { countUp(document.querySelector("#hero .num")); }, { once: true }); return; }
   el.classList.add("cu");
-  var txt = el.textContent, m = txt.match(/\d[\d\s\u00a0\u202f]*,\d{2}/);
+  var txt = el.textContent, m = txt.match(/\d(?:[\d\s\u00a0\u202f]*\d)?(,\d{2})?/);
   if (!m) return;
-  var to = Math.floor(parseFloat(m[0].replace(/[\s\u00a0\u202f]/g, "").replace(",", "."))), from = Math.round(to * .85), cents = m[0].slice(-3), t0 = null, dur = 1400;
+  var cents = m[1] || "", to = Math.floor(parseFloat(m[0].slice(0, m[0].length - cents.length).replace(/[\s\u00a0\u202f]/g, ""))), from = Math.round(to * .85), t0 = null, dur = 1400;
   function step(ts) {
     if (t0 === null) t0 = ts;
     var k = Math.min(1, (ts - t0) / dur), e = k === 1 ? 1 : 1 - Math.pow(2, -10 * k);
@@ -3178,7 +3180,7 @@ if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catc
 (function () {
   var s = $("splash"), t = Date.now(), done = false, fill = $("sp-fill");
   requestAnimationFrame(function () { fill.style.width = "100%"; });
-  function hide() { if (done) return; done = true; setTimeout(function () { s.classList.add("done"); setTimeout(function () { lastBase = null; render(); requestAnimationFrame(function () { requestAnimationFrame(function () { $("app").classList.remove("pre"); s.classList.add("out"); $("liquid").classList.add("sheen"); }); }); setTimeout(function () { s.remove(); }, 1500); }, 150); }, Math.max(0, 2600 - (Date.now() - t))); }
+  function hide() { if (done) return; done = true; setTimeout(function () { s.classList.add("done"); setTimeout(function () { lastBase = null; render(); requestAnimationFrame(function () { requestAnimationFrame(function () { $("app").classList.remove("pre"); document.dispatchEvent(new Event("app:shown")); s.classList.add("out"); $("liquid").classList.add("sheen"); }); }); setTimeout(function () { s.remove(); }, 1500); }, 150); }, Math.max(0, 2600 - (Date.now() - t))); }
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(hide);
   setTimeout(hide, 3000);
 })();
