@@ -3124,10 +3124,11 @@ function countUp(el) {
   el.classList.add("cu");
   var txt = el.textContent, m = txt.match(/\d(?:[\d\s\u00a0\u202f]*\d)?(,\d{2})?/);
   if (!m) return;
-  var cents = m[1] || "", to = Math.floor(parseFloat(m[0].slice(0, m[0].length - cents.length).replace(/[\s\u00a0\u202f]/g, ""))), from = Math.round(to * .85), t0 = null, dur = 1400;
+  var cents = m[1] || "", to = Math.floor(parseFloat(m[0].slice(0, m[0].length - cents.length).replace(/[\s\u00a0\u202f]/g, ""))), from = Math.round(to * .85), t0 = null, dur = 1600;
   function step(ts) {
     if (t0 === null) t0 = ts;
-    var k = Math.min(1, (ts - t0) / dur), e = k === 1 ? 1 : 1 - Math.pow(2, -10 * k);
+    // м'яке гальмування до кінця (кубічне): останні цифри доходять поступово, без застигання й стрибка
+    var k = Math.min(1, (ts - t0) / dur), e = 1 - Math.pow(1 - k, 3);
     el.textContent = txt.replace(m[0], nf0.format(Math.round(from + (to - from) * e)) + cents);
     if (k < 1) requestAnimationFrame(step); else el.textContent = txt;
   }
