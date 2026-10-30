@@ -839,6 +839,7 @@ a.ins { color: var(--ink4); }
 .lbar b { display: block; height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, #3B82F6, #1D5FE0); transition: width 2.1s var(--ease); }
 .lbar b.over { background: var(--bad); }
 .lnote { margin: 10px 0 0; font-size: 13px; color: var(--ink2); }
+.limc.gonly .lfoot { margin-top: 2px; padding-top: 4px; border-top: 0; }  /* без ліміту картка — лише «Цілі» */
 .limc .lmain { display: block; width: 100%; padding: 0; border: 0; background: none; font: inherit; text-align: left; color: inherit; cursor: pointer; }
 /* тихий рядок унизу картки: до шторки «Відкладати щомісяця» */
 .lfoot { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 40px; margin-top: 12px; padding: 8px 0 0; border: 0; border-top: 1px solid var(--soft); background: transparent; font: 400 14px var(--font); color: var(--ink3); text-align: left; cursor: pointer; }
@@ -1983,9 +1984,9 @@ function goalTerm(P, g) {
 }
 // t = {start: "YYYY-MM", until: "YYYY-MM-DD", total}: n — місяців (сегментів), скільки минуло й зібрано (у сегментах), скільки треба на місяць
 function termBars(P, t) {
-  if (t.jar && !t.until) { var g0 = Math.max(0, Math.min(t.total, addsSum(t))); return { n: 1, tDone: 0, mDone: t.total ? g0 / t.total : 0, got: g0, total: t.total, until: "", start: t.start, need: 0, behind: false }; }
+  if (t.jar && !t.until) { var g0 = Math.max(0, Math.min(t.total, savedSince(P, t.start) + addsSum(t))); return { n: 1, tDone: 0, mDone: t.total ? g0 / t.total : 0, got: g0, total: t.total, until: "", start: t.start, need: 0, behind: false }; }
   var n = monthsBetween(t.start, t.until), a = new Date(t.start + "-01T00:00:00"), e = new Date(t.until + "T00:00:00");
-  var tf = Math.max(0, Math.min(1, (Date.now() - a) / Math.max(1, e - a))), got = Math.max(0, Math.min(t.total, (t.jar ? 0 : savedSince(P, t.start)) + addsSum(t))), mf = t.total ? got / t.total : 0;
+  var tf = Math.max(0, Math.min(1, (Date.now() - a) / Math.max(1, e - a))), got = Math.max(0, Math.min(t.total, savedSince(P, t.start) + addsSum(t))), mf = t.total ? got / t.total : 0;
   return { n: n, tDone: tf * n, mDone: mf * n, got: got, total: t.total, until: t.until, start: t.start, need: Math.max(0, t.total - got) / plMonths(t.until), behind: mf < tf - .02 };
 }
 function goalBars(P, g) { var t = goalTerm(P, g); return t ? termBars(P, t) : null; }
@@ -2004,21 +2005,15 @@ function progSegs(n, done) {
   var s = ""; for (var i = 0; i < n; i++) s += '<i><b style="width:' + (Math.max(0, Math.min(1, done - i)) * 100).toFixed(2) + '%"></b></i>';
   return '<span class="lsegs" aria-hidden="true">' + s + "</span>";
 }
-// картка ліміту: лише для поточного (неповного) місяця і коли ліміт уже є; тап — Аналітика з увімкненим лімітом.
-// Внизу — тихий рядок до шторки «Відкладати щомісяця»: у Марка «+ Відкладати щомісяця» (або його план), в Олі — подушка
+// картка на Головній (поточний місяць): ліміт — лише коли банці з терміном бракує звичного залишку; тоді зверху ліміт, унизу цілі.
+// Ліміту немає — картка «Цілі»: «+ Нова ціль», одна ціль зі смугами чи «N цілей, разом … на місяць»
 function renderLimit(P) {
-  var box = $("limc"), j = P.months.length - 1, M = P.months[j], LM = month === j && M.incomplete ? limitsFor(P, j) : null;
-  box.hidden = !LM; if (!LM) return;
-  // обраний у календарі день — витрачене до нього включно і скільки днів лишається після нього
-  var cut = selDay && selDay.slice(0, 7) === M.key ? selDay : null;
-  var spent = cut ? M.ops.reduce(function (s, o) { return s + (!o.income && !o.fixed && o.day <= cut ? o.amount : 0); }, 0) : M.variable;
-  var left = LM.total - spent, dn = cut ? +cut.slice(8) : M.last_op ? +M.last_op.slice(0, 2) : 0, dl = new Date(+M.key.slice(0, 4), +M.key.slice(5), 0).getDate() - dn;
-  var p = LM.total ? Math.min(100, spent / LM.total * 100) : 100;
-  var note = left < 0 ? "Щоденні вже понад ліміт, до кінця місяця ще " + dl + " " + plural(dl, "день", "дні", "днів")
-    : "Це ≈ " + zr(left / Math.max(1, dl)) + " на день до кінця місяця";
+  var box = $("limc"), j = P.months.length - 1, M = P.months[j], now = month === j && M.incomplete && !gkey, LM0 = now ? limitsFor(P, j) : null;
+  box.hidden = !now; if (!now) return;
+  var LM = LM0 && LM0.on ? LM0 : null;  // ліміт — лише від банки, якій бракує звичного залишку
   // рядок до цілей: немає — «+ Відкладати щомісяця»; одна — назва й смуги (без іконки: вона — у шторці цілі); кілька — скільки і разом на місяць
-  var act = LM.goals || [], k0 = M.key, foot;
-  if (!act.length) foot = '<button type="button" class="lfoot ladd" id="limc-plan"><span class="llink">' + svgI("currentColor", '<path d="M12 5v14M5 12h14"/>', 18) + "Відкладати щомісяця</span></button>";
+  var gp = goalPlan(P), act = goalsOf(P).filter(function (x) { return goalOn(x, M.key) && (x.kind !== "cushion" || gp); }), k0 = M.key, foot;
+  if (!act.length) foot = '<button type="button" class="lfoot ladd" id="limc-plan"><span class="llink">' + svgI("currentColor", '<path d="M12 5v14M5 12h14"/>', 18) + "Нова ціль</span></button>";
   else if (act.length === 1) {
     var g1 = act[0], pr = goalProgress(P, g1), nm = g1.name || g1.kind === "cushion" ? esc(goalName(g1)) + ", " : "";
     foot = '<button type="button" class="lfoot' + (pr ? " lgoal" : "") + '" id="limc-plan"><span class="lft">' +
@@ -2029,6 +2024,19 @@ function renderLimit(P) {
     foot = '<button type="button" class="lfoot" id="limc-plan"><span class="lft"><b>' + act.length + " " + plural(act.length, "ціль", "цілі", "цілей") +
       "</b>, разом " + zr(sum) + " на місяць</span>" + CHR + "</button>";
   }
+  box.classList.toggle("gonly", !LM);
+  if (!LM) {  // ліміту немає — лише цілі
+    box.innerHTML = '<div class="ch"><h2>Цілі</h2></div>' + foot;
+    $("limc-plan").onclick = function () { planOpen(P); };
+    return;
+  }
+  // обраний у календарі день — витрачене до нього включно і скільки днів лишається після нього
+  var cut = selDay && selDay.slice(0, 7) === M.key ? selDay : null;
+  var spent = cut ? M.ops.reduce(function (s, o) { return s + (!o.income && !o.fixed && o.day <= cut ? o.amount : 0); }, 0) : M.variable;
+  var left = LM.total - spent, dn = cut ? +cut.slice(8) : M.last_op ? +M.last_op.slice(0, 2) : 0, dl = new Date(+M.key.slice(0, 4), +M.key.slice(5), 0).getDate() - dn;
+  var p = LM.total ? Math.min(100, spent / LM.total * 100) : 100;
+  var note = left < 0 ? "Щоденні вже понад ліміт, до кінця місяця ще " + dl + " " + plural(dl, "день", "дні", "днів")
+    : "Це ≈ " + zr(left / Math.max(1, dl)) + " на день до кінця місяця";
   var own = LM.src === "manual" || Object.keys(LM.own || {}).length;
   box.innerHTML = '<button type="button" class="lmain" id="limc-info" aria-label="Ліміт на щоденні витрати, ' + (own ? "вручну" : "авто") + '. Налаштування">' +
     '<div class="ch"><h2>Ліміт на щоденні витрати</h2><span class="lhd"><span class="lmode' + (own ? " own" : "") + '">' + TUNE + (own ? "Вручну" : "Авто") + "</span>" + CHR + "</span></div>" +
@@ -2254,7 +2262,7 @@ function goalOn(g, key) { return goalFrom(g) <= key && (!g.to || key < g.to) && 
 // сума на місяць: ціль із терміном (і подушка) — рахується сама: скільки бракує ÷ місяців до терміну; без терміну — збережена
 function goalMonthly(g, key, P) {
   if (g.kind === "cushion") { var c = goalPlan(P); return c ? c.need : 0; }
-  if (g.kind === "jar") return 0;  // банку поповнюють самі — ліміт вона не зменшує
+  if (g.kind === "jar") return g.until && g.total ? goalBars(P, g).need : 0;  // банка з терміном — скільки треба щомісяця, щоб устигнути
   if (g.until && g.total) return goalBars(P, g).need;
   var h = g.hist.filter(function (x) { return x.from <= key; });
   return h.length ? h[h.length - 1].monthly : 0;
@@ -2297,30 +2305,31 @@ function limitsFor(P, j, man) {
   var names = Object.keys(u).concat(Object.keys(mc).filter(function (n) { return !(n in u); }));
   var catSum = names.reduce(function (s, n) { return s + (n in L ? L[n] : u[n]); }, 0), total = catSum, src = "best";
   var pm = M.income > 0 ? M : prevWithIncome(P, j), fixU = avgOf(base, function (m) { return m.expenses - m.variable; });
-  // скільки відкладати: сума всіх цілей, що діють у цьому місяці (подушка без своєї суми — скільки треба, щоб устигнути)
+  // ліміт є лише тоді, коли банкам із терміном треба більше, ніж лишається від звичних витрат: решту беремо з основних грошей,
+  // і на щоденні лишається дохід мінус обовʼязкові мінус банки. «Відкладати щомісяця» живе із залишку й ліміту не створює.
+  // (Попередня модель — ліміт завжди, від усіх цілей — у тезі pre-no-limits.)
   var act = goalsOf(P).filter(function (x) { return goalOn(x, M.key) && (x.kind !== "cushion" || g); });
-  var sv = act.filter(function (x) { return x.kind !== "jar"; });
-  var save = sv.length ? sv.reduce(function (s, x) { return s + goalMonthly(x, M.key, P); }, 0) : null, hasC = act.some(function (x) { return x.kind === "cushion"; });
+  var jars = act.filter(function (x) { return x.kind === "jar" && x.until && x.total; }), on = false;
+  var save = jars.length ? jars.reduce(function (s, x) { return s + goalMonthly(x, M.key, P); }, 0) : null;
   if (save !== null && pm) {
     var cap = Math.max(0, pm.income - fixU - save);
-    if (hasC) { total = cap; src = "goal"; }
-    else if (cap < catSum) { total = cap; src = "plan"; }  // без цілі план лише знижує ліміт, якщо він не вміщається
+    if (cap < catSum) { total = cap; src = "plan"; on = true; }
     var cut = catSum - total;
     if (cut > 0 && wants > 0) { var f = Math.max(0, 1 - cut / wants); Object.keys(L).forEach(function (n) { if (WANTS[n] && !(n in mc)) L[n] *= f; }); }
   }
   var autoTotal = total, autoSrc = src;
   // своя загальна сума: якщо не вміщає решту категорій (без своїх сум) — пропорційно зменшуємо їх
-  if (man && man.total != null) {
+  if (on && man && man.total != null) {  // свої суми — лише коли ліміт є
     total = man.total; src = "manual";
     Object.keys(u).forEach(function (n) { if (!(n in L)) L[n] = u[n]; });  // категорії з малою історією — теж у розподілі (за звичним)
     var own = Object.keys(mc).reduce(function (s, n) { return s + mc[n]; }, 0), rest = Object.keys(L).filter(function (n) { return !(n in mc); });
     var other = rest.reduce(function (s, n) { return s + L[n]; }, 0), k = other > 0 ? Math.min(1, Math.max(0, total - own) / other) : 0;  // лише зменшуємо: більша сума — просто запас
     rest.forEach(function (n) { L[n] *= k; });
-  } else if (man && Object.keys(mc).length) {
+  } else if (on && man && Object.keys(mc).length) {
     Object.keys(u).forEach(function (n) { if (!(n in L)) L[n] = u[n]; });
     total = Object.keys(L).reduce(function (s, n) { return s + L[n]; }, 0); src = "manual";
   }
-  return { cat: L, total: total, src: src, save: save, auto: catSum, wants: wants, goals: act,
+  return { on: on, cat: L, total: total, src: src, save: save, auto: catSum, wants: wants, goals: act,
     man: man, autoCat: A, usual: u, own: mc, autoTotal: autoTotal, autoSrc: autoSrc, fixU: fixU, inc: pm ? pm.income : 0,
     spendU: avgOf(base, function (m) { return m.variable; }) };
 }
@@ -2371,7 +2380,7 @@ function renderAnalytics(P) {
   };
   var note = "";
   {
-    var c, extra = cutA ? dayChip(cutA, k, "a-day") : M.incomplete ? "дані до " + M.last_op : "", LM = lim ? limitsFor(P0, month) : null;
+    var c, extra = cutA ? dayChip(cutA, k, "a-day") : M.incomplete ? "дані до " + M.last_op : "", LMa = limitsFor(P0, month), LM = lim && LMa && LMa.on ? LMa : null, limOn = !!LM;
     var dimM = new Date(+M.key.slice(0, 4), +M.key.slice(5), 0).getDate(), G = GOAL[P.key];
     // з лімітом: бейдж «лишилось …» / «+… понад ліміт»; рядком — ліміт (і скільки на день до кінця місяця), нижче — звідки він
     var vsLim = function (spent, l, open, per, perDay) {
@@ -2385,7 +2394,7 @@ function renderAnalytics(P) {
       // неповний місяць порівнюємо зі звичним на те саме число — і на графіку це риска, а не середнє за місяць
       var uDay = M.incomplete ? avgOf(base, function (m) { return m.ops.reduce(function (s, o) { return s + (!o.income && !o.fixed && dayOf(o) <= dn ? o.amount : 0); }, 0); }) : null;
       monthBars(function (m) { return m.variable; }, M.ghost ? 0 : avgV, false, LM ? LM.total : 0);
-      c = lim ? vsLim(M.variable, LM && LM.total, M.incomplete, "на місяць", true)
+      c = limOn ? vsLim(M.variable, LM.total, M.incomplete, "на місяць", true)
         : M.incomplete ? vsUsual(M.variable, uDay, false, " на " + dn + "-те") : vsUsual(M.variable, avgOf(base, function (m) { return m.variable; }), false, " за місяць");
     } else {
       // 4 тижні в місяці: 1–7, 8–14, 15–21 і 22–кінець; усі місяці — однією стрічкою, сторінка = місяць
@@ -2422,15 +2431,15 @@ function renderAnalytics(P) {
         } } });
       if (wi >= 0) {
         var B = bounds[wi], upTo = Math.min(B[1], last), days = upTo - B[0] + 1, wpart = upTo < B[1], wt = B[0] + "–" + B[1] + " " + GEN[k];
-        c = lim ? vsLim(w[wi], LM && LM.total * (B[1] - B[0] + 1) / dim, wpart, "на тиждень")
+        c = limOn ? vsLim(w[wi], LM.total * (B[1] - B[0] + 1) / dim, wpart, "на тиждень")
           : vsUsual(w[wi], uw === null ? null : uw * days / 7, false, wpart ? " на " + upTo + "-те" : " за тиждень");
         var wc = {};
         M.ops.forEach(function (o) { var d = dayOf(o); if (!o.income && d >= B[0] && d <= B[1]) wc[o.cat] = (wc[o.cat] || 0) + o.amount; });
         var wcats = Object.keys(wc).map(function (n) { return { name: n, amount: wc[n] }; }).sort(function (a, b) { return b.amount - a.amount; });
         $("a-sum").innerHTML = sumHTML("Щоденні витрати", wt + (cutA ? " " + dayChip(cutA, k, "a-day") : ""), zr(w[wi]), c);
         renderWhere(P, M, { cats: wcats, k: (B[1] - B[0] + 1) / dim, title: wt, partial: wpart }, LM);
-      } else if (lim) {
-        c = vsLim(M.variable, LM && LM.total, M.incomplete, "на місяць", true);
+      } else if (limOn) {
+        c = vsLim(M.variable, LM.total, M.incomplete, "на місяць", true);
       } else {
         c = top >= 0 ? vsUsual(w[top], uw, false, "") : { badge: "", text: "" };
         if (top >= 0) c.text = "Найдорожчий тиждень — " + bounds[top][0] + "–" + bounds[top][1];
@@ -2446,7 +2455,7 @@ function renderAnalytics(P) {
     tg.onclick = function () { lim = !lim; try { localStorage.setItem("lim", lim ? "1" : "0"); } catch (e) {} tg.setAttribute("aria-checked", String(lim)); tg.setAttribute("aria-pressed", String(lim)); setTimeout(function () { calm(render); }, 280); };
     if ($("a-day")) $("a-day").onclick = function () { selDay = null; render(); };
     var ach = $("a-scale").parentNode, old = ach.querySelector(".limt"); if (old) old.remove();
-    ach.appendChild(tg);  // праворуч від «Місяці / Тижні»
+    if (LMa && LMa.on) ach.appendChild(tg);  // праворуч від «Місяці / Тижні»; ліміту немає — і перемикача немає
   }
   // висновок «Більше, ніж зазвичай…» — рядком одразу під цифрою (у sumHTML), поруч із бейджем
   $("t-avg").innerHTML = note;
@@ -2978,6 +2987,8 @@ function plRender(keepFocus) {
     html += '<p class="pllab">Скільки зібрати</p>' + amt("pl-amount", plS.total, "0") +
       '<div class="chips plchips">' + [1000, 5000, 10000, 20000].map(function (v) { return '<button type="button" data-v="' + v + '" aria-pressed="' + (plS.total === v) + '">' + nf0.format(v) + "</button>"; }).join("") + "</div>";
     html += dueDD(uj, spans) + (jb && uj ? '<p class="plneed">' + (jb.got >= jb.total ? "Банку вже зібрано" : "Щоб встигнути — ≈ <b>" + zr(jb.need) + "</b> на місяць") + "</p>" : "");
+    if (jb && uj && jb.got < jb.total) html += plJarLimit(P, jb.need);
+    html += plOverlap(P);
   } else if (cushion) {
     // подушка: скільки зібрати (порожньо — 6 міс. витрат) і до коли; старт — перший місяць обліку
     var g = goalPlan(P), until = plUntil() || g.until, tot = plS.total || g.def, b = termBars(P, { start: g.start, until: until, total: tot, adds: g.adds });
@@ -2985,15 +2996,8 @@ function plRender(keepFocus) {
     // порядок: скільки зібрати (поле) → скільки відкладати щомісяця → смуги → до коли
     html += '<p class="pllab">Скільки зібрати</p>' + amt("pl-amount", plS.total || "", String(g.def)) + need(b) +
       '<div class="plprog">' + goalBarsHTML(b) + "</div><!--add-->" + dueDD(until, spans.slice(1));
-    if (c && m) {
-      html += calc(m + others, "Ліміт на щоденні", c.lim);
-      if (c.cap < c.floor) html += plResult(c, m + others);
-      else if (c.usual && c.lim < c.usual) html += '<p class="plwarn">Ліміт на ' + zr(c.usual - c.lim) + " нижчий, ніж ви зазвичай витрачаєте на щоденні</p>";
-    }
   } else {
     var until = plUntil(), n2 = plMonths(until);
-    if (plS.isNew && !goalsOf(P).some(function (x) { return goalOn(x, curKey(P)); }) && c)
-      html += '<p class="plintro">Зараз ліміт рахується сам: кафе, доставка, розваги й покупки — як у найекономніший місяць, решта — як зазвичай. З ним лишається ≈ ' + zr(c.free - c.auto) + " на місяць.</p>";
     // ціль із датою — плашка з прапорцем, без дати — з копілкою
     // з терміном — вводимо, скільки зібрати (сума на місяць рахується сама); без терміну — скільки відкладати щомісяця
     var sg0 = goalsOf(P).filter(function (x) { return x.id === plS.id; })[0];
@@ -3007,8 +3011,6 @@ function plRender(keepFocus) {
     html += '<p class="pllab">' + (until ? "Скільки зібрати" : "Відкладати щомісяця") + "</p>" + amt("pl-amount", cur0, "0") +
       '<div class="chips plchips">' + vals.map(function (v) { return '<button type="button" data-v="' + v + '" aria-pressed="' + (cur0 === v) + '">' + nf0.format(v) + "</button>"; }).join("") + "</div>";
     html += dueDD(until, spans) + (tb ? need(tb) : "");
-    if (until && m && c) html += calc(m + others, "Лишається на щоденні", c.cap);
-    html += plResult(c, m + others);
   }
   // поточний стан: готівка під смугами, історія й «Видалити ціль»; редагування — лише поля
   if (view) {
@@ -3024,7 +3026,7 @@ function plRender(keepFocus) {
   var byTotal = cushion || jar || !!plUntil();  // у полі — сума цілі, а не на місяць
   // підвал: поточний стан — «Редагувати» + «Додати готівку» (банка — «Взяти» + «Поповнити», редагувати — олівцем у шапці);
   // форма готівки відкрита — «Скасувати» + «Додати»; форма цілі — лише «Зберегти»
-  var sec = $("pl-sec"), canOut = jar && sgv && addsSum(sgv) > 0, ao = plS.addOpen;
+  var sec = $("pl-sec"), canOut = jar && sgv && ((goalBars(P, sgv) || {}).got || 0) > 0, ao = plS.addOpen;
   $("pl-edit").hidden = !(view && jar);
   sec.hidden = !(view && (ao || !jar || canOut));
   sec.textContent = ao ? "Скасувати" : jar ? "Взяти" : "Редагувати";
@@ -3067,7 +3069,7 @@ function plAddOpen(v) {
 function plAddSubmit(P) {
   var a = plNum("pl-add-amt"), note = $("pl-add-note").value.replace(/\s+/g, " ").trim().slice(0, 60);
   if (!a) { $("pl-add-amt").focus(); return; }
-  var out = plS.addOpen === "out", sgo = goalsOf(P).filter(function (x) { return x.id === plS.id; })[0], have = addsSum(sgo);
+  var out = plS.addOpen === "out", sgo = goalsOf(P).filter(function (x) { return x.id === plS.id; })[0], have = ((sgo && goalBars(P, sgo)) || {}).got || 0;  // у банці — залишок зарплати й поповнення
   if (out && a > have) { $("pl-msg").textContent = "У банці лише " + zr(have); $("pl-add-amt").focus(); return; }
   var v = out ? -a : a;
   plAdds(P, function (list) { return list.concat([note ? { date: iso(new Date()), amount: v, note: note } : { date: iso(new Date()), amount: v }]); },
@@ -3081,6 +3083,23 @@ $("pl-sec").onclick = function () {
   else plToEdit();
 };
 $("pl-edit").onclick = plToEdit;
+// банка й інші цілі беруть той самий залишок зарплати — попереджаємо, що одна сума рахується в кількох місцях
+function plOverlap(P) {
+  var k = curKey(P), gp = goalPlan(P), o = goalsOf(P).filter(function (x) { return x.id !== plS.id && goalOn(x, k) && (x.kind !== "cushion" || gp); });
+  if (!o.length) return "";
+  var names = o.map(function (x) { return "«" + esc(goalName(x)) + "»"; }).join(", ");
+  return '<p class="plwarn">Банка бере гроші з того самого залишку зарплати, що й ' + names + ": одна й та сама сума показується в обох.</p>";
+}
+// банці з терміном не вистачає звичного залишку — решту беремо з основних грошей, і з'являється ліміт на щоденні
+function plJarLimit(P, need) {
+  var k = curKey(P), others = goalsOf(P).filter(function (x) { return x.id !== plS.id && x.kind === "jar" && x.until && x.total && goalOn(x, k); })
+    .reduce(function (s, x) { return s + goalMonthly(x, k, P); }, 0), c = planCalc(P, need + others, false);
+  if (!c) return "";
+  if (c.cap < c.floor) return '<div class="plres warn"><b>Забагато для цього доходу</b><span>Ліміт тоді не вмістить навіть потреби (продукти, транспорт). Подовжте термін або зменште суму.</span></div>';
+  if (c.cap >= c.auto) return '<div class="plres ok"><b>Ліміт не потрібен</b><span>Звичного залишку вистачає: щомісяця лишається ≈ ' + zr(c.free - c.auto) + ".</span></div>";
+  return '<div class="plres"><b>Ліміт на щоденні — ' + zr(c.cap) + "</b><span>Звичного залишку не вистачає, тож ≈ " + zr(c.auto - c.cap) +
+    " щомісяця беремо з основних грошей: на щоденні — менше, ніж зазвичай (" + zr(c.auto) + ").</span></div>";
+}
 // збережена ціль — знову поточний стан (зі свіжих даних; «Усі цілі» лишається, якщо був)
 function plView(P, id) { var back = plS.back; plMorph(function () { plEditStart(P, id); plS.back = back; plRender(); }); }
 // поточний стан цілі: тип, смуги (і готівка під ними), скільки щомісяця й до коли
@@ -3091,8 +3110,11 @@ function plViewHTML(P, sg) {
   var rows = jar ? (b && b.until && !done ? row("Щоб встигнути", "≈ " + zr(b.need) + " на місяць") : "")
     : row("Відкладати щомісяця", done ? "зібрано" : (b ? "≈ " : "") + zr(mm));
   rows += row("До коли", until ? dmy(until) : "без терміну");
-  return '<p class="plsub">' + (jar ? "Банка — поповнюєте самі" : "З залишку зарплати") + "</p>" +
-    (b ? '<div class="plprog">' + goalBarsHTML(b) + "</div>" : "") + "<!--add-->" + '<div class="oplist plcalc">' + rows + "</div>";
+  var LMv = jar && b && b.until && !done ? LMnow(P) : null;
+  if (LMv && LMv.on) rows += row("Ліміт на щоденні", zr(LMv.total));
+  var warn = jar ? plOverlap(P) : "";
+  return '<p class="plsub">' + (jar ? "Банка — із залишку зарплати й поповнень" : "З залишку зарплати") + "</p>" +
+    (b ? '<div class="plprog">' + goalBarsHTML(b) + "</div>" : "") + "<!--add-->" + '<div class="oplist plcalc">' + rows + "</div>" + warn;
 }
 // збереженої цілі: «+ Додати готівку» (сума й звідки — йде лише в «зібрано») та «Історія накопичень»:
 // за кожен період від зарплати до зарплати — скільки відкладено (дохід мінус витрати), і кожен готівковий внесок; найновіші — вгорі
