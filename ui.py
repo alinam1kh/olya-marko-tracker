@@ -151,8 +151,10 @@ def delete_cash():
 
 # Цілі «Відкладати щомісяця» — налаштування людей, а не облік; лежать на сервері в plans.json (у git не йде),
 # однаково на всіх телефонах. Для кожної людини — список цілей:
-# {id, name?, cat?, kind? ("cushion" — подушка з інтервʼю), hist: [{from: "YYYY-MM", monthly}], until?, total?, to?,
+# {id, name?, cat?, kind? ("cushion" — подушка з інтервʼю, "jar" — банка), hist: [{from: "YYYY-MM", monthly}], until?, total?, to?,
 #  adds?: [{date: "YYYY-MM-DD", amount, note?}]} — adds: готівка, яку людина доклала до цілі (поза випискою, лише в «зібрано»)
+# Банка — сума без прив'язки до зарплати: «зібрано» — лише її поповнення (amount < 0 — взяли з банки), термін необовʼязковий,
+# ліміт на щоденні не змінює; hist — лише з якого місяця існує (monthly 0)
 # hist — сума по місяцях (зміна діє з поточного місяця, минулі місяці зберігають свій ліміт); to — з якого місяця ціль видалено.
 PLANS = ROOT / "plans.json"
 _YM = re.compile(r"\d{4}-\d{2}$")
@@ -268,8 +270,8 @@ def _goal(raw, today):
         goal["name"] = name
     if cat:
         goal["cat"] = cat
-    if raw.get("kind") == "cushion":
-        goal["kind"] = "cushion"
+    if raw.get("kind") in ("cushion", "jar"):
+        goal["kind"] = raw["kind"]
     hist = []
     for h in raw.get("hist") or []:
         try:
@@ -292,6 +294,14 @@ def _goal(raw, today):
         if not date(2026, 1, 1) <= until <= today + timedelta(days=3660) or not 0 <= total <= 10_000_000:
             return None
         goal.update(until=until.isoformat(), total=total)
+    elif goal.get("kind") == "jar":  # банка без терміну — лише сума
+        try:
+            total = int(Decimal(str(raw.get("total", 0))).quantize(Decimal("1")))
+        except (InvalidOperation, ValueError, TypeError):
+            return None
+        if not 1 <= total <= 10_000_000:
+            return None
+        goal["total"] = total
     if raw.get("to"):
         if not _YM.match(str(raw["to"])):
             return None
@@ -306,7 +316,8 @@ def _goal(raw, today):
             amount = int(Decimal(str(a.get("amount", ""))).quantize(Decimal("1")))
         except (InvalidOperation, ValueError, TypeError, AttributeError):
             return None
-        if not date(2026, 1, 1) <= day <= today or not 1 <= amount <= 1_000_000:
+        low = -1_000_000 if goal.get("kind") == "jar" else 1  # з банки можна брати
+        if not date(2026, 1, 1) <= day <= today or not low <= amount <= 1_000_000 or amount == 0:
             return None
         item = {"date": day.isoformat(), "amount": amount}
         note = re.sub(r"\s+", " ", str(a.get("note") or "")).strip()[:60]
@@ -862,6 +873,8 @@ a.ins { color: var(--ink4); }
 .gbtn { min-height: 40px; padding: 0 16px; border: 0; border-radius: 20px; background: var(--card); font: 500 14px var(--font); color: var(--ink3); cursor: pointer; }
 .gbtn.pri { background: var(--blue); color: #fff; }
 .ghist { display: grid; }
+.plkind { margin-top: 2px; }  /* тип нової цілі — одразу під назвою шторки */
+.gjar { display: flex; gap: 20px; }
 .ghr { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 0; border-top: 1px solid var(--soft); font-size: 14px; color: var(--ink); }
 .ghr:first-child { border-top: 0; }
 .ghr > span { flex: 1; min-width: 0; } .ghr small { display: block; margin-top: 1px; font-size: 12px; color: var(--ink2); }
@@ -1940,12 +1953,14 @@ function savedSince(P, from) { return Math.max(0, payPeriods(P).reduce(function 
 function addsSum(x) { return (x && x.adds || []).reduce(function (s, a) { return s + a.amount; }, 0); }  // готівка, докладена до цілі
 function goalTerm(P, g) {
   if (g.kind === "cushion") { var c = goalPlan(P); return c ? { start: c.start, until: c.until, total: c.total, adds: c.adds } : null; }
+  if (g.kind === "jar") return g.total ? { start: goalFrom(g), until: g.until || "", total: g.total, adds: g.adds, jar: true } : null;
   return g.until && g.total ? { start: goalFrom(g), until: g.until, total: g.total, adds: g.adds } : null;
 }
 // t = {start: "YYYY-MM", until: "YYYY-MM-DD", total}: n — місяців (сегментів), скільки минуло й зібрано (у сегментах), скільки треба на місяць
 function termBars(P, t) {
+  if (t.jar && !t.until) { var g0 = Math.max(0, Math.min(t.total, addsSum(t))); return { n: 1, tDone: 0, mDone: t.total ? g0 / t.total : 0, got: g0, total: t.total, until: "", start: t.start, need: 0, behind: false }; }
   var n = monthsBetween(t.start, t.until), a = new Date(t.start + "-01T00:00:00"), e = new Date(t.until + "T00:00:00");
-  var tf = Math.max(0, Math.min(1, (Date.now() - a) / Math.max(1, e - a))), got = Math.min(t.total, savedSince(P, t.start) + addsSum(t)), mf = t.total ? got / t.total : 0;
+  var tf = Math.max(0, Math.min(1, (Date.now() - a) / Math.max(1, e - a))), got = Math.max(0, Math.min(t.total, (t.jar ? 0 : savedSince(P, t.start)) + addsSum(t))), mf = t.total ? got / t.total : 0;
   return { n: n, tDone: tf * n, mDone: mf * n, got: got, total: t.total, until: t.until, start: t.start, need: Math.max(0, t.total - got) / plMonths(t.until), behind: mf < tf - .02 };
 }
 function goalBars(P, g) { var t = goalTerm(P, g); return t ? termBars(P, t) : null; }
@@ -1954,8 +1969,8 @@ var COINS = svgI("currentColor", '<ellipse cx="12" cy="6.5" rx="7" ry="3"/><path
 // дві смуги з однаковою кількістю сегментів: час (годинник) і гроші (монети) — видно, чи гроші відстають від часу
 function goalBarsHTML(b) {
   var mo = Math.round(b.tDone);
-  return '<span class="gbars' + (b.behind ? " behind" : "") + '">' +
-    '<span class="gbar" role="img" aria-label="Минуло ' + mo + " з " + b.n + ' місяців">' + '<span class="gbi">' + CLOCK + "</span>" + progSegs(b.n, b.tDone) + '<span class="gbt">' + mo + " з " + b.n + " міс.</span></span>" +
+  return '<span class="gbars' + (b.behind ? " behind" : "") + '">' + (!b.until ? "" :
+    '<span class="gbar" role="img" aria-label="Минуло ' + mo + " з " + b.n + ' місяців">' + '<span class="gbi">' + CLOCK + "</span>" + progSegs(b.n, b.tDone) + '<span class="gbt">' + mo + " з " + b.n + " міс.</span></span>") +
     '<span class="gbar gm" role="img" aria-label="Зібрано ' + nf0.format(Math.round(b.got)) + " з " + zr(b.total) + '">' + '<span class="gbi">' + COINS + "</span>" + progSegs(b.n, b.mDone) + '<span class="gbt"><b>' + nf0.format(Math.round(b.got)) + "</b> з " + zr(b.total) + "</span></span></span>";
 }
 // прогрес: n сегментів, заповнено «done» (дробове); n поза 2–12 — одна суцільна смужка
@@ -2210,10 +2225,11 @@ function goalsOf(P) {
   return list;
 }
 function goalFrom(g) { return g.hist.length ? g.hist[0].from : "0000-00"; }
-function goalOn(g, key) { return goalFrom(g) <= key && (!g.to || key < g.to) && (!g.until || key <= g.until.slice(0, 7)); }
+function goalOn(g, key) { return goalFrom(g) <= key && (!g.to || key < g.to) && (g.kind === "jar" || !g.until || key <= g.until.slice(0, 7)); }
 // сума на місяць: ціль із терміном (і подушка) — рахується сама: скільки бракує ÷ місяців до терміну; без терміну — збережена
 function goalMonthly(g, key, P) {
   if (g.kind === "cushion") { var c = goalPlan(P); return c ? c.need : 0; }
+  if (g.kind === "jar") return 0;  // банку поповнюють самі — ліміт вона не зменшує
   if (g.until && g.total) return goalBars(P, g).need;
   var h = g.hist.filter(function (x) { return x.from <= key; });
   return h.length ? h[h.length - 1].monthly : 0;
@@ -2258,7 +2274,8 @@ function limitsFor(P, j, man) {
   var pm = M.income > 0 ? M : prevWithIncome(P, j), fixU = avgOf(base, function (m) { return m.expenses - m.variable; });
   // скільки відкладати: сума всіх цілей, що діють у цьому місяці (подушка без своєї суми — скільки треба, щоб устигнути)
   var act = goalsOf(P).filter(function (x) { return goalOn(x, M.key) && (x.kind !== "cushion" || g); });
-  var save = act.length ? act.reduce(function (s, x) { return s + goalMonthly(x, M.key, P); }, 0) : null, hasC = act.some(function (x) { return x.kind === "cushion"; });
+  var sv = act.filter(function (x) { return x.kind !== "jar"; });
+  var save = sv.length ? sv.reduce(function (s, x) { return s + goalMonthly(x, M.key, P); }, 0) : null, hasC = act.some(function (x) { return x.kind === "cushion"; });
   if (save !== null && pm) {
     var cap = Math.max(0, pm.income - fixU - save);
     if (hasC) { total = cap; src = "goal"; }
@@ -2819,8 +2836,9 @@ var FLAG = svgI("currentColor", '<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>', 16);
 var CHEV_D = '<svg class="ico16 chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
 function dmy(iso) { return +iso.slice(8) + " " + GEN[+iso.slice(5, 7) - 1] + " " + iso.slice(0, 4); }
 function curKey(P) { return P.months[P.months.length - 1].key; }
-function goalIcon(g) { return g.kind === "cushion" || g.until ? FLAG : PIG; }
-function goalName(g) { return g.kind === "cushion" ? g.title || "Подушка безпеки" : g.name || (g.until ? "Ціль до " + dmy(g.until) : "Відкладати щомісяця"); }
+var JAR = svgI("currentColor", '<path d="M8.5 3h7M8 6h8M8 6c-1.8 1.2-2.5 2.8-2.5 4.8V18a3 3 0 0 0 3 3h7a3 3 0 0 0 3-3v-7.2c0-2-.7-3.6-2.5-4.8"/><path d="M9.5 13.5h5"/>', 16);
+function goalIcon(g) { return g.kind === "jar" ? JAR : g.kind === "cushion" || g.until ? FLAG : PIG; }
+function goalName(g) { return g.kind === "cushion" ? g.title || "Подушка безпеки" : g.name || (g.kind === "jar" ? "Банка" : g.until ? "Ціль до " + dmy(g.until) : "Відкладати щомісяця"); }
 // прогрес цілі з терміном (і подушки) — дві смуги: час і гроші; без терміну — лише сума на місяць
 function goalProgress(P, g) { var b = goalBars(P, g); return b ? { b: b, html: goalBarsHTML(b) } : null; }
 var plS = null;  // стан шторки: { P, mode: "list" | "edit", id, isNew, kind, name, monthly, total, span (null — без терміну, 3/6/12, 0 — інша дата), until, dd, hd, addOpen, calKey, m }
@@ -2865,11 +2883,12 @@ function plDD(id, open, label, value, inner) {
 function plList() {
   var P = plS.P, k = curKey(P), act = goalsOf(P).filter(function (g) { return goalOn(g, k); }), total = 0, html = '<div class="gl">';
   act.forEach(function (g) {
-    var mm = goalMonthly(g, k, P), pr = goalProgress(P, g); total += mm;
+    var mm = goalMonthly(g, k, P), pr = goalProgress(P, g), jar = g.kind === "jar"; total += mm;
+    var sub = jar ? "Банка" + (pr && pr.b.until && pr.b.need ? " · щоб встигнути ≈ " + zr(pr.b.need) + " на місяць" : "") : (pr ? "≈ " : "") + zr(mm) + " на місяць";
     html += '<button type="button" class="glrow" data-id="' + esc(g.id) + '"><span class="glic">' + goalIcon(g) + '</span><span class="gltx"><b>' + esc(goalName(g)) + "</b><small>" +
-      (pr ? "≈ " : "") + zr(mm) + " на місяць</small>" + (pr ? pr.html : "") + "</span>" + CHR + "</button>";
+      sub + "</small>" + (pr ? pr.html : "") + "</span>" + CHR + "</button>";
   });
-  html += "</div>" + (act.length > 1 ? '<p class="pltot">Разом відкладати <b>' + zr(total) + "</b> на місяць</p>" : "");
+  html += "</div>" + (act.filter(function (g) { return g.kind !== "jar"; }).length > 1 ? '<p class="pltot">Разом відкладати <b>' + zr(total) + "</b> на місяць</p>" : "");
   $("pl-title").textContent = "Цілі"; $("pl-backslot").innerHTML = "";
   $("pl-body").innerHTML = '<h2 class="plh" aria-hidden="true">Цілі</h2>' + html;
   $("pl-save").disabled = false; $("pl-save").textContent = "+ Нова ціль"; $("pl-msg").textContent = "";
@@ -2895,7 +2914,11 @@ function plRender(keepFocus) {
       (others ? '<div class="oprow"><span>Інші цілі</span><b>−' + zr(others) + "</b></div>" : "") +
       '<div class="oprow"><span>' + (others ? "Ця ціль" : "Відкладати") + "</span><b>−" + zr(m) + '</b></div><div class="oprow tot"><span>' + limLabel + "</span><b>" + zr(limV) + "</b></div></div>";
   };
-  $("pl-title").textContent = cushion ? "Подушка безпеки" : plS.isNew ? "Нова ціль" : "Ціль";
+  var jar = plS.kind === "jar";
+  $("pl-title").textContent = cushion ? "Подушка безпеки" : jar ? (plS.isNew ? "Нова банка" : "Банка") : plS.isNew ? "Нова ціль" : "Ціль";
+  // нова ціль: звідки гроші — із залишку зарплати (щомісяця чи до терміну) або окрема банка, яку поповнюєте самі
+  if (plS.isNew && !cushion) html += '<div class="seg sm lmseg plkind" role="group" aria-label="Тип цілі"><button type="button" data-kind="" aria-pressed="' + !jar + '">З залишку зарплати</button>' +
+    '<button type="button" data-kind="jar" aria-pressed="' + jar + '">Банка</button></div>';
   var spans = [[null, "Без терміну"], [3, "3 міс."], [6, "6 міс."], [12, "Рік"], [0, "Інша дата"]];
   var dueDD = function (until, list) {
     return plDD("pl-dd", plS.dd, "До коли", until ? FLAG.replace(/width="16" height="16"/, 'width="14" height="14"') + dmy(until) : "без терміну",
@@ -2903,7 +2926,18 @@ function plRender(keepFocus) {
   };
   // відкладати на місяць — рахується з суми й терміну; поле — лише для цілі без терміну
   var need = function (b) { return '<p class="plneed">' + (b.total && b.got >= b.total ? "Ціль уже зібрано" : "Відкладати ≈ <b>" + zr(b.need) + "</b> на місяць") + "</p>"; };
-  if (cushion) {
+  if (jar) {
+    // банка: назва, скільки зібрати й (необовʼязково) до коли; зібране — лише поповнення, ліміт не змінюється
+    var sgj = goalsOf(P).filter(function (x) { return x.id === plS.id; })[0], uj = plUntil();
+    var jb = plS.total ? termBars(P, { start: plS.isNew ? curKey(P) : goalFrom(sgj || { hist: [] }), until: uj, total: plS.total, adds: sgj && sgj.adds, jar: true }) : null;
+    m = 0;
+    if (plS.isNew) html += '<p class="plintro">Гроші, які відкладаєте окремо, — на машину, ремонт чи просто «на потім». Поповнюєте, коли зручно; ліміт на щоденні не змінюється.</p>';
+    else if (jb) html += '<div class="plprog">' + goalBarsHTML(jb) + "</div>";
+    html += '<input class="plname" id="pl-name" type="text" maxlength="60" autocomplete="off" placeholder="Назва, наприклад «Машина»" value="' + esc(plS.name) + '">';
+    html += '<p class="pllab">Скільки зібрати</p>' + amt("pl-amount", plS.total, "0") +
+      '<div class="chips plchips">' + [1000, 5000, 10000, 20000].map(function (v) { return '<button type="button" data-v="' + v + '" aria-pressed="' + (plS.total === v) + '">' + nf0.format(v) + "</button>"; }).join("") + "</div>";
+    html += dueDD(uj, spans) + (jb && uj ? '<p class="plneed">' + (jb.got >= jb.total ? "Банку вже зібрано" : "Щоб встигнути — ≈ <b>" + zr(jb.need) + "</b> на місяць") + "</p>" : "");
+  } else if (cushion) {
     // подушка: скільки зібрати (порожньо — 6 міс. витрат) і до коли; старт — перший місяць обліку
     var g = goalPlan(P), until = plUntil() || g.until, tot = plS.total || g.def, b = termBars(P, { start: g.start, until: until, total: tot, adds: g.adds });
     m = Math.round(b.need); c = planCalc(P, m + others, withC);  // сума на місяць — з нової суми й терміну
@@ -2938,8 +2972,11 @@ function plRender(keepFocus) {
   $("pl-backslot").innerHTML = plS.back ? '<button type="button" class="plback" id="pl-back">' + svgI("currentColor", '<path d="m15 6-6 6 6 6"/>', 18) + "Усі цілі</button>" : "";
   plS.m = m;
   body.innerHTML = '<h2 class="plh" aria-hidden="true">' + esc($("pl-title").textContent) + "</h2>" + html;
-  var byTotal = cushion || !!plUntil();  // у полі — сума цілі, а не на місяць
+  var byTotal = cushion || jar || !!plUntil();  // у полі — сума цілі, а не на місяць
   $("pl-save").textContent = "Зберегти"; $("pl-save").disabled = byTotal ? !(cushion || plS.total) : !m; $("pl-msg").textContent = "";
+  body.querySelectorAll("[data-kind]").forEach(function (b) { b.onclick = function () {
+    if ((plS.kind || "") === b.dataset.kind) return;
+    plS.kind = b.dataset.kind || undefined; plS.total = 0; plS.monthly = 0; plRender(); }; });
   var inp = $("pl-amount");
   if (inp) {
     var fit = function () { var mm = fitAmount.m || (fitAmount.m = document.body.appendChild(h("span", "amount-mirror"))); mm.textContent = inp.value || inp.placeholder; inp.style.width = Math.ceil(mm.getBoundingClientRect().width) + 4 + "px"; };
@@ -2960,21 +2997,27 @@ function plRender(keepFocus) {
   if ($("pl-back")) $("pl-back").onclick = function () { plS = { P: P, mode: "list" }; plRender(); };
   if ($("pl-del")) $("pl-del").onclick = plDelete;
   if ($("pl-add")) $("pl-add").onclick = function () { plS.addOpen = true; plRender(); $("pl-add-amt").focus(); };
+  if ($("pl-out")) $("pl-out").onclick = function () { plS.addOpen = "out"; plRender(); $("pl-add-amt").focus(); };
   if ($("pl-add-x")) $("pl-add-x").onclick = function () { plS.addOpen = false; plRender(); };
   if ($("pl-add-amt")) $("pl-add-amt").oninput = function () { var v = this.value.replace(/\D/g, "").slice(0, 7); if (v !== this.value) this.value = v; };
   if ($("pl-add-ok")) $("pl-add-ok").onclick = function () {
     var a = plNum("pl-add-amt"), note = $("pl-add-note").value.replace(/\s+/g, " ").trim().slice(0, 60);
     if (!a) { $("pl-add-amt").focus(); return; }
-    plAdds(P, function (list) { return list.concat([note ? { date: iso(new Date()), amount: a, note: note } : { date: iso(new Date()), amount: a }]); }, "Додано до відкладень: " + zr(a));
+    var out = plS.addOpen === "out", sgo = goalsOf(P).filter(function (x) { return x.id === plS.id; })[0], have = addsSum(sgo);
+    if (out && a > have) { $("pl-msg").textContent = "У банці лише " + zr(have); $("pl-add-amt").focus(); return; }
+    var v = out ? -a : a;
+    plAdds(P, function (list) { return list.concat([note ? { date: iso(new Date()), amount: v, note: note } : { date: iso(new Date()), amount: v }]); },
+      out ? "Взяли з банки: " + zr(a) : plS.kind === "jar" ? "Банку поповнено: " + zr(a) : "Додано до відкладень: " + zr(a));
   };
   body.querySelectorAll("[data-add]").forEach(function (b) { b.onclick = function () {
-    var i = +b.dataset.add; plAdds(P, function (list) { return list.filter(function (_, j) { return j !== i; }); }, "Внесок прибрано");
+    var i = +b.dataset.add; plAdds(P, function (list) { return list.filter(function (_, j) { return j !== i; }); }, plS.kind === "jar" ? "Запис прибрано" : "Внесок прибрано");
   }; });
 }
 // збереженої цілі: «+ Додати готівку» (сума й звідки — йде лише в «зібрано») та «Історія накопичень»:
 // за кожен період від зарплати до зарплати — скільки відкладено (дохід мінус витрати), і кожен готівковий внесок; найновіші — вгорі
 function plHist(P) {
   var sg = goalsOf(P).filter(function (x) { return x.id === plS.id; })[0]; if (!sg) return "";
+  if (sg.kind === "jar") return plJarHist(sg);
   var start = sg.kind === "cushion" ? (goalPlan(P) || {}).start : goalFrom(sg); if (!start) return "";
   var rows = [];
   payPeriods(P).forEach(function (p) { if (p.to >= start) rows.push({ d: p.from, t: "З зарплати " + ddmm(p.from) + (p.open ? " поки що лишилось" : " відкладено") + "<small>" + ddmm(p.from) + "–" + ddmm(p.to) + "</small>", v: p.saved }); });
@@ -2989,6 +3032,22 @@ function plHist(P) {
       '<div class="gaddb"><button type="button" class="gbtn" id="pl-add-x">Скасувати</button><button type="button" class="gbtn pri" id="pl-add-ok">Додати</button></div></div>'
     : '<button type="button" class="gadd" id="pl-add">' + svgI("currentColor", '<path d="M12 5v14M5 12h14"/>', 16) + "Додати готівку до відкладень</button>";
   return add + plDD("pl-hd", plS.hd, "Історія накопичень", rows.length + " " + plural(rows.length, "запис", "записи", "записів"), list);
+}
+// банка: «Поповнити» і «Взяти з банки» (сума й підпис) та історія її рухів — найновіші вгорі
+function plJarHist(sg) {
+  var adds = sg.adds || [], rows = adds.map(function (a, i) { return { a: a, i: i }; }).reverse();
+  var list = '<div class="ghist">' + rows.map(function (r) {
+    var a = r.a, out = a.amount < 0;
+    return '<div class="ghr"><span>' + esc(a.note || (out ? "Взяли з банки" : "Поповнення")) + "<small>" + dmy(a.date) + '</small></span><b' + (out ? ' class="neg"' : "") + ">" + (out ? "−" : "+") + zr(Math.abs(a.amount)) + "</b>" +
+      '<button type="button" class="ghdel" data-add="' + r.i + '" aria-label="Прибрати запис">' + svgI("currentColor", '<path d="M6 6l12 12M18 6 6 18"/>', 14) + "</button></div>";
+  }).join("") + "</div>";
+  var out = plS.addOpen === "out", add = plS.addOpen
+    ? '<div class="gaddf"><input class="plname" id="pl-add-amt" type="text" inputmode="numeric" autocomplete="off" placeholder="' + (out ? "Скільки взяли, зл" : "Скільки поклали, зл") + '">' +
+      '<input class="plname" id="pl-add-note" type="text" maxlength="60" autocomplete="off" placeholder="' + (out ? "На що, напр. «Ремонт»" : "Звідки, напр. «Премія»") + '">' +
+      '<div class="gaddb"><button type="button" class="gbtn" id="pl-add-x">Скасувати</button><button type="button" class="gbtn pri" id="pl-add-ok">' + (out ? "Взяти" : "Поповнити") + "</button></div></div>"
+    : '<div class="gjar"><button type="button" class="gadd" id="pl-add">' + svgI("currentColor", '<path d="M12 5v14M5 12h14"/>', 16) + "Поповнити</button>" +
+      (addsSum(sg) > 0 ? '<button type="button" class="gadd" id="pl-out">' + svgI("currentColor", '<path d="M5 12h14"/>', 16) + "Взяти з банки</button>" : "") + "</div>";
+  return add + (adds.length ? plDD("pl-hd", plS.hd, "Історія банки", adds.length + " " + plural(adds.length, "запис", "записи", "записів"), list) : "");
 }
 // готівковий внесок: додаємо / прибираємо одразу (без «Зберегти»), зі «Скасувати» в повідомленні
 function plAdds(P, change, msg) {
@@ -3151,23 +3210,24 @@ $("pl-save").onclick = function () {
   var P = plS.P, btn = this;
   if (plS.mode === "list") { plEditStart(P, null); plS.back = true; plRender(); return; }
   var m = plS.m, k = curKey(P), prev = storedGoals(P), list = storedGoals(P), cur = list.filter(function (g) { return g.id === plS.id; })[0];
-  var cushion = plS.kind === "cushion", until = plUntil() || (cushion ? goalPlan(P).until : "");
-  if (until ? !(cushion || plS.total) : !m) return;
+  var cushion = plS.kind === "cushion", jar = plS.kind === "jar", until = plUntil() || (cushion ? goalPlan(P).until : "");
+  if (jar ? !plS.total : until ? !(cushion || plS.total) : !m) return;
   if (!cur) { cur = { id: plS.id, hist: [] }; if (plS.kind) cur.kind = plS.kind; list.push(cur); }
   // ціль із терміном — зберігаємо суму й термін (на місяць рахується сама); запис hist — з якого місяця діє ціль
   // без терміну — сума на місяць діє з поточного місяця: у тому ж місяці — замінюємо, інакше — новий запис
   var last = cur.hist[cur.hist.length - 1];
-  if (!cushion) { if (last && last.from === k) last.monthly = m; else if (!until || !last) cur.hist.push({ from: k, monthly: m }); }
+  if (jar) { if (!last) cur.hist.push({ from: k, monthly: 0 }); }  // банка — лише з якого місяця існує
+  else if (!cushion) { if (last && last.from === k) last.monthly = m; else if (!until || !last) cur.hist.push({ from: k, monthly: m }); }
   if (cushion) { if (plS.total) cur.total = plS.total; else delete cur.total; cur.until = until; if (!cur.total) cur.total = goalPlan(P).def; }
   else {
     var name = plS.name.trim();
     if (name) cur.name = name; else delete cur.name;
     delete cur.cat;  // «На що» прибрали: назви цілі достатньо
-    if (until) { cur.until = until; cur.total = plS.total; } else { delete cur.until; delete cur.total; }
+    if (until) { cur.until = until; cur.total = plS.total; } else if (jar) { delete cur.until; cur.total = plS.total; } else { delete cur.until; delete cur.total; }
   }
   delete cur.to;
   btn.disabled = true;
-  var msg = until ? (plS.isNew ? "Ціль додано: " : "Збережено: ") + zr(cur.total) + " до " + dmy(until) : (plS.isNew ? "Ціль додано: " : "Збережено: ") + zr(m) + " на місяць";
+  var msg = jar ? (plS.isNew ? "Банку додано: " : "Збережено: ") + zr(cur.total) + (until ? " до " + dmy(until) : "") : until ? (plS.isNew ? "Ціль додано: " : "Збережено: ") + zr(cur.total) + " до " + dmy(until) : (plS.isNew ? "Ціль додано: " : "Збережено: ") + zr(m) + " на місяць";
   planPost(P, list).then(function () { btn.disabled = false; planClose(); planUndo(P, prev, msg); })
     .catch(function (err) { btn.disabled = false; $("pl-msg").textContent = err.message || "Немає звʼязку, спробуйте ще раз"; });
 };
