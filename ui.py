@@ -866,15 +866,16 @@ a.ins { color: var(--ink4); }
 .pllab { margin: 16px 0 -4px; font-size: 13px; color: var(--ink2); }
 .plneed { margin: 14px 0 0; font-size: 15px; color: var(--ink3); } .plneed b { font-weight: 500; color: var(--ink); }
 /* готівка до відкладень і історія накопичень */
-.gadd { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; margin-top: 12px; padding: 0; border: 0; background: none; font: 500 14px var(--font); color: var(--blue); cursor: pointer; }
+.gtop { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }  /* готівка — пігулками одразу під смугами */
+.gadd { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px; border: 0; border-radius: 18px; background: var(--blue-soft); font: 500 14px var(--font); color: var(--blue-txt); cursor: pointer; }
 .gaddf { display: grid; gap: 8px; margin-top: 14px; padding: 12px; border-radius: 16px; background: var(--soft); }
 .gaddf .plname { margin: 0; background: var(--card); }
 .gaddb { display: flex; justify-content: flex-end; gap: 8px; }
 .gbtn { min-height: 40px; padding: 0 16px; border: 0; border-radius: 20px; background: var(--card); font: 500 14px var(--font); color: var(--ink3); cursor: pointer; }
 .gbtn.pri { background: var(--blue); color: #fff; }
 .ghist { display: grid; }
-.plkind { margin-top: 2px; }  /* тип нової цілі — одразу під назвою шторки */
-.gjar { display: flex; gap: 20px; }
+.seg.sm.plkind { margin-top: 14px; }  /* тип нової цілі — під назвою шторки, з повітрям */
+
 .ghr { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 0; border-top: 1px solid var(--soft); font-size: 14px; color: var(--ink); }
 .ghr:first-child { border-top: 0; }
 .ghr > span { flex: 1; min-width: 0; } .ghr small { display: block; margin-top: 1px; font-size: 12px; color: var(--ink2); }
@@ -2932,7 +2933,7 @@ function plRender(keepFocus) {
     var jb = plS.total ? termBars(P, { start: plS.isNew ? curKey(P) : goalFrom(sgj || { hist: [] }), until: uj, total: plS.total, adds: sgj && sgj.adds, jar: true }) : null;
     m = 0;
     if (plS.isNew) html += '<p class="plintro">Гроші, які відкладаєте окремо, — на машину, ремонт чи просто «на потім». Поповнюєте, коли зручно; ліміт на щоденні не змінюється.</p>';
-    else if (jb) html += '<div class="plprog">' + goalBarsHTML(jb) + "</div>";
+    else if (jb) html += '<div class="plprog">' + goalBarsHTML(jb) + "</div><!--add-->";
     html += '<input class="plname" id="pl-name" type="text" maxlength="60" autocomplete="off" placeholder="Назва, наприклад «Машина»" value="' + esc(plS.name) + '">';
     html += '<p class="pllab">Скільки зібрати</p>' + amt("pl-amount", plS.total, "0") +
       '<div class="chips plchips">' + [1000, 5000, 10000, 20000].map(function (v) { return '<button type="button" data-v="' + v + '" aria-pressed="' + (plS.total === v) + '">' + nf0.format(v) + "</button>"; }).join("") + "</div>";
@@ -2941,7 +2942,7 @@ function plRender(keepFocus) {
     // подушка: скільки зібрати (порожньо — 6 міс. витрат) і до коли; старт — перший місяць обліку
     var g = goalPlan(P), until = plUntil() || g.until, tot = plS.total || g.def, b = termBars(P, { start: g.start, until: until, total: tot, adds: g.adds });
     m = Math.round(b.need); c = planCalc(P, m + others, withC);  // сума на місяць — з нової суми й терміну
-    html += '<div class="plprog">' + goalBarsHTML(b) + "</div>" +
+    html += '<div class="plprog">' + goalBarsHTML(b) + "</div><!--add-->" +
       '<p class="pllab">Скільки зібрати</p>' + amt("pl-amount", plS.total || "", String(g.def)) +
       '<div class="chips plchips">' + [3, 6].map(function (k) { var v = Math.round(k * g.avgExp / 100) * 100; return '<button type="button" data-v="' + v + '" aria-pressed="' + (tot === v) + '">' + k + " міс. витрат · " + nf0.format(v) + "</button>"; }).join("") + "</div>" +
       dueDD(until, spans.slice(1)) + need(b);
@@ -2959,7 +2960,7 @@ function plRender(keepFocus) {
     var sg0 = goalsOf(P).filter(function (x) { return x.id === plS.id; })[0];
     var tb = until && plS.total ? termBars(P, { start: plS.isNew ? curKey(P) : goalFrom(sg0 || { hist: [] }), until: until, total: plS.total, adds: sg0 && sg0.adds }) : null;
     if (until) { m = tb ? Math.round(tb.need) : 0; c = planCalc(P, m + others, withC); }
-    html += (tb && !plS.isNew ? '<div class="plprog">' + goalBarsHTML(tb) + "</div>" : "");
+    html += (tb && !plS.isNew ? '<div class="plprog">' + goalBarsHTML(tb) + "</div><!--add-->" : "");
     html += '<input class="plname" id="pl-name" type="text" maxlength="60" autocomplete="off" placeholder="Назва, наприклад «Відпустка»" value="' + esc(plS.name) + '">';
     var cur0 = until ? plS.total : m, vals = until ? [1000, 3000, 5000, 10000] : [500, 1000, 2000, 5000];
     html += '<p class="pllab">' + (until ? "Скільки зібрати" : "Відкладати щомісяця") + "</p>" + amt("pl-amount", cur0, "0") +
@@ -2968,7 +2969,11 @@ function plRender(keepFocus) {
     if (until && m && c) html += calc(m + others, "Лишається на щоденні", c.cap);
     html += plResult(c, m + others);
   }
-  if (!plS.isNew) html += plHist(P) + '<button type="button" class="pldel" id="pl-del">' + TRASH + "Видалити ціль</button>";
+  if (!plS.isNew) {
+    var addH = plAddHTML(P);
+    html = html.indexOf("<!--add-->") < 0 ? addH + html : html.replace("<!--add-->", addH);
+    html += plHist(P) + '<button type="button" class="pldel" id="pl-del">' + TRASH + "Видалити ціль</button>";
+  }
   $("pl-backslot").innerHTML = plS.back ? '<button type="button" class="plback" id="pl-back">' + svgI("currentColor", '<path d="m15 6-6 6 6 6"/>', 18) + "Усі цілі</button>" : "";
   plS.m = m;
   body.innerHTML = '<h2 class="plh" aria-hidden="true">' + esc($("pl-title").textContent) + "</h2>" + html;
@@ -3027,11 +3032,7 @@ function plHist(P) {
     return '<div class="ghr"><span>' + r.t + '</span><b' + (r.v < 0 ? ' class="neg"' : "") + ">" + (r.v > 0 ? "+" : "") + zr(r.v) + "</b>" +
       (r.i !== undefined ? '<button type="button" class="ghdel" data-add="' + r.i + '" aria-label="Прибрати внесок">' + svgI("currentColor", '<path d="M6 6l12 12M18 6 6 18"/>', 14) + "</button>" : "") + "</div>";
   }).join("") + "</div>";
-  var add = plS.addOpen
-    ? '<div class="gaddf"><input class="plname" id="pl-add-amt" type="text" inputmode="numeric" autocomplete="off" placeholder="Сума, зл"><input class="plname" id="pl-add-note" type="text" maxlength="60" autocomplete="off" placeholder="Звідки, напр. «Порадувала мама»">' +
-      '<div class="gaddb"><button type="button" class="gbtn" id="pl-add-x">Скасувати</button><button type="button" class="gbtn pri" id="pl-add-ok">Додати</button></div></div>'
-    : '<button type="button" class="gadd" id="pl-add">' + svgI("currentColor", '<path d="M12 5v14M5 12h14"/>', 16) + "Додати готівку до відкладень</button>";
-  return add + plDD("pl-hd", plS.hd, "Історія накопичень", rows.length + " " + plural(rows.length, "запис", "записи", "записів"), list);
+  return plDD("pl-hd", plS.hd, "Історія накопичень", rows.length + " " + plural(rows.length, "запис", "записи", "записів"), list);
 }
 // банка: «Поповнити» і «Взяти з банки» (сума й підпис) та історія її рухів — найновіші вгорі
 function plJarHist(sg) {
@@ -3041,13 +3042,18 @@ function plJarHist(sg) {
     return '<div class="ghr"><span>' + esc(a.note || (out ? "Взяли з банки" : "Поповнення")) + "<small>" + dmy(a.date) + '</small></span><b' + (out ? ' class="neg"' : "") + ">" + (out ? "−" : "+") + zr(Math.abs(a.amount)) + "</b>" +
       '<button type="button" class="ghdel" data-add="' + r.i + '" aria-label="Прибрати запис">' + svgI("currentColor", '<path d="M6 6l12 12M18 6 6 18"/>', 14) + "</button></div>";
   }).join("") + "</div>";
-  var out = plS.addOpen === "out", add = plS.addOpen
-    ? '<div class="gaddf"><input class="plname" id="pl-add-amt" type="text" inputmode="numeric" autocomplete="off" placeholder="' + (out ? "Скільки взяли, зл" : "Скільки поклали, зл") + '">' +
-      '<input class="plname" id="pl-add-note" type="text" maxlength="60" autocomplete="off" placeholder="' + (out ? "На що, напр. «Ремонт»" : "Звідки, напр. «Премія»") + '">' +
-      '<div class="gaddb"><button type="button" class="gbtn" id="pl-add-x">Скасувати</button><button type="button" class="gbtn pri" id="pl-add-ok">' + (out ? "Взяти" : "Поповнити") + "</button></div></div>"
-    : '<div class="gjar"><button type="button" class="gadd" id="pl-add">' + svgI("currentColor", '<path d="M12 5v14M5 12h14"/>', 16) + "Поповнити</button>" +
-      (addsSum(sg) > 0 ? '<button type="button" class="gadd" id="pl-out">' + svgI("currentColor", '<path d="M5 12h14"/>', 16) + "Взяти з банки</button>" : "") + "</div>";
-  return add + (adds.length ? plDD("pl-hd", plS.hd, "Історія банки", adds.length + " " + plural(adds.length, "запис", "записи", "записів"), list) : "");
+  return (adds.length ? plDD("pl-hd", plS.hd, "Історія банки", adds.length + " " + plural(adds.length, "запис", "записи", "записів"), list) : "");
+}
+// під смугами: пігулка «+ Додати готівку» (у банки — «+ Поповнити» і «− Взяти») або розгорнута форма суми й підпису
+function plAddHTML(P) {
+  var sg = goalsOf(P).filter(function (x) { return x.id === plS.id; })[0]; if (!sg) return "";
+  var jar = sg.kind === "jar", out = plS.addOpen === "out";
+  if (plS.addOpen) return '<div class="gaddf"><input class="plname" id="pl-add-amt" type="text" inputmode="numeric" autocomplete="off" placeholder="' + (out ? "Скільки взяли, зл" : jar ? "Скільки поклали, зл" : "Сума, зл") + '">' +
+    '<input class="plname" id="pl-add-note" type="text" maxlength="60" autocomplete="off" placeholder="' + (out ? "На що, напр. «Ремонт»" : jar ? "Звідки, напр. «Премія»" : "Звідки, напр. «Порадувала мама»") + '">' +
+    '<div class="gaddb"><button type="button" class="gbtn" id="pl-add-x">Скасувати</button><button type="button" class="gbtn pri" id="pl-add-ok">' + (out ? "Взяти" : jar ? "Поповнити" : "Додати") + "</button></div></div>";
+  var plus = svgI("currentColor", '<path d="M12 5v14M5 12h14"/>', 16);
+  return '<div class="gtop"><button type="button" class="gadd" id="pl-add">' + plus + (jar ? "Поповнити" : "Додати готівку") + "</button>" +
+    (jar && addsSum(sg) > 0 ? '<button type="button" class="gadd" id="pl-out">' + svgI("currentColor", '<path d="M5 12h14"/>', 16) + "Взяти</button>" : "") + "</div>";
 }
 // готівковий внесок: додаємо / прибираємо одразу (без «Зберегти»), зі «Скасувати» в повідомленні
 function plAdds(P, change, msg) {
