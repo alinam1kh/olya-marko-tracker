@@ -855,8 +855,8 @@ a.ins { color: var(--ink4); }
 .gbars { display: grid; gap: 6px; margin-top: 8px; white-space: nowrap; }
 .gbar { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--ink2); }
 .gbar .gbi { flex: none; display: grid; }
-.gbar .lsegs { flex: 1; width: auto; }
-.gbar .gbt { flex: none; min-width: 118px; text-align: right; font-variant-numeric: tabular-nums; }
+.gbar .lsegs { flex: 1; width: auto; order: 2; }  /* підпис — одразу біля іконки, сегменти — праворуч */
+.gbar .gbt { flex: none; min-width: 118px; text-align: left; font-variant-numeric: tabular-nums; order: 1; }
 .gbar .gbt b { font-weight: 500; color: var(--ink); }
 .gbar:not(.gm) .lsegs b { background: var(--ink2); opacity: .55; }
 .gbars.behind .gm .lsegs b { background: var(--cash); }
@@ -953,7 +953,7 @@ a.ins { color: var(--ink4); }
 /* «Усі цілі» — у шапці шторки в одному ряду з хрестиком; назва цілі — рядком нижче */
 /* порядок: ручка шторки → «Усі цілі» і хрестик → назва */
 .plback-slot { grid-column: 1; grid-row: 2; } .plback-slot:empty { display: none; }
-#pl-head:has(.plback)::before { grid-row: 1; }
+#pl-head.hasback::before { grid-row: 1; }
 #pl-close { grid-column: 3; grid-row: 2; }
 #pl-head { grid-template-columns: 1fr auto 44px; column-gap: 8px; } #pl-edit { grid-column: 2; grid-row: 2; } #pl-edit[hidden] { display: none; }
 /* підвал поточного стану: світла дія + головна синя */
@@ -964,8 +964,8 @@ a.ins { color: var(--ink4); }
 #pl-head { grid-template-rows: auto 44px; padding-bottom: 12px; }  /* вміст при прокрутці не підлазить під шапку впритул */
 .plh { margin: 0 0 4px; font-size: 18px; font-weight: 500; }
 /* без «Усі цілі» назва стоїть у шапці навпроти хрестика; рядком нижче опускається лише під «Усі цілі» */
-#pl-head:not(:has(.plback)) #pl-title { position: static; width: auto; height: auto; overflow: visible; clip: auto; grid-column: 1; grid-row: 2; }
-#v-plan:not(:has(.plback)) .plh { display: none; }
+#pl-head:not(.hasback) #pl-title { position: static; width: auto; height: auto; overflow: visible; clip: auto; grid-column: 1; grid-row: 2; }
+#v-plan:not(.hasback) .plh { display: none; }
 .sheet-head .plback { display: inline-flex; width: auto; height: auto; margin: 0 0 0 -4px; border-radius: 0; background: none; }
 /* картка ліміту: пігулка режиму «Авто / Своя сума» — відкриває «Як рахується» */
 .lhd { display: inline-flex; align-items: center; gap: 6px; }
@@ -2635,7 +2635,7 @@ function delCash(P, line, day, title, back, undo, cancel, doneMsg) {
       month = ms.indexOf(mk) >= 0 ? ms.indexOf(mk) : curMonth(D.people[person]); gkey = null;
       saved = null; reportKey = null; quiet();
       justAdded = justAdded.filter(function (s) { return !(s.day === day && s.title === title); });
-      if (back && location.hash !== back) location.hash = back; else render();
+      if (back && (location.hash || "#report") !== back) location.hash = back; else render();  // «» — це теж Головна
       // «Скасувати» записує той самий запис назад (та сама сума, категорія, опис і дата)
       toast(okMsg(doneMsg || (cancel ? "Скасовано" : "Запис видалено")), undo ? ["Скасувати", function () { restoreCash(P, undo); }] : null);
     })
@@ -2916,6 +2916,8 @@ function plMorph(fn) {
   s.classList.add("morph"); s.style.height = h1 + "px";
   clearTimeout(plMorph.t); plMorph.t = setTimeout(function () { s.classList.remove("morph"); s.style.height = ""; }, 780);
 }
+// «Усі цілі» / «Назад» у шапці є — назва рядком нижче (у тілі); немає — назва в шапці навпроти хрестика
+function plBackSync() { var on = !!$("pl-backslot").firstChild; $("pl-head").classList.toggle("hasback", on); $("v-plan").classList.toggle("hasback", on); }
 // ---------- список цілей ----------
 function plList() {
   var P = plS.P, k = curKey(P), act = goalsOf(P).filter(function (g) { return goalOn(g, k); }), total = 0, html = '<div class="gl">';
@@ -2927,7 +2929,7 @@ function plList() {
       sub + "</small></span>" + (pr ? '<span class="glsum"><b>' + nf0.format(Math.round(pr.b.got)) + "</b><small>з " + zr(pr.b.total) + "</small></span>" : "") + CHR + "</button>";
   });
   html += "</div>" + (act.filter(function (g) { return g.kind !== "jar"; }).length > 1 ? '<p class="pltot">Разом відкладати <b>' + zr(total) + "</b> на місяць</p>" : "");
-  $("pl-title").textContent = "Цілі"; $("pl-backslot").innerHTML = "";
+  $("pl-title").textContent = "Цілі"; $("pl-backslot").innerHTML = ""; plBackSync();
   $("pl-body").innerHTML = '<h2 class="plh" aria-hidden="true">Цілі</h2>' + html;
   $("pl-save").disabled = false; $("pl-save").textContent = "+ Нова ціль"; $("pl-msg").textContent = ""; $("pl-sec").hidden = $("pl-edit").hidden = true;
   $("pl-body").querySelectorAll("[data-id]").forEach(function (b) { b.onclick = function () { plMorph(function () { plEditStart(P, b.dataset.id); plRender(); }); }; });
@@ -3016,7 +3018,7 @@ function plRender(keepFocus) {
   } else html = html.replace(/<!--add-->/g, "");
   var BACK = svgI("currentColor", '<path d="m15 6-6 6 6 6"/>', 18);
   $("pl-backslot").innerHTML = plS.edit ? '<button type="button" class="plback" id="pl-vback">' + BACK + "Назад</button>"
-    : plS.back ? '<button type="button" class="plback" id="pl-back">' + BACK + "Усі цілі</button>" : "";
+    : plS.back ? '<button type="button" class="plback" id="pl-back">' + BACK + "Усі цілі</button>" : ""; plBackSync();
   plS.m = m;
   body.innerHTML = '<h2 class="plh" aria-hidden="true">' + esc($("pl-title").textContent) + "</h2>" + html;
   var byTotal = cushion || jar || !!plUntil();  // у полі — сума цілі, а не на місяць
