@@ -865,6 +865,7 @@ a.ins { color: var(--ink4); }
 .lfoot.lgoal .lft { overflow: visible; }
 .pllab { margin: 16px 0 -4px; font-size: 13px; color: var(--ink2); }
 .plsub { margin: 0; font-size: 13px; color: var(--ink2); }  /* тип цілі під назвою в поточному стані */
+.pla + .plneed { margin-top: 2px; }  /* «Відкладати …» — одразу під сумою, як її підпис */
 .plneed { margin: 14px 0 0; font-size: 15px; color: var(--ink3); } .plneed b { font-weight: 500; color: var(--ink); }
 /* готівка до відкладень і історія накопичень */
 .gadd { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px; border: 0; border-radius: 18px; background: var(--blue-soft); font: 500 14px var(--font); color: var(--blue-txt); cursor: pointer; }
@@ -2972,9 +2973,9 @@ function plRender(keepFocus) {
     // подушка: скільки зібрати (порожньо — 6 міс. витрат) і до коли; старт — перший місяць обліку
     var g = goalPlan(P), until = plUntil() || g.until, tot = plS.total || g.def, b = termBars(P, { start: g.start, until: until, total: tot, adds: g.adds });
     m = Math.round(b.need); c = planCalc(P, m + others, withC);  // сума на місяць — з нової суми й терміну
-    // порядок: скільки зібрати (поле) → скільки відкладати щомісяця → до коли → смуги й готівка
+    // порядок: скільки зібрати (поле) → скільки відкладати щомісяця → смуги → до коли
     html += '<p class="pllab">Скільки зібрати</p>' + amt("pl-amount", plS.total || "", String(g.def)) + need(b) +
-      dueDD(until, spans.slice(1)) + '<div class="plprog">' + goalBarsHTML(b) + "</div><!--add-->";
+      '<div class="plprog">' + goalBarsHTML(b) + "</div><!--add-->" + dueDD(until, spans.slice(1));
     if (c && m) {
       html += calc(m + others, "Ліміт на щоденні", c.lim);
       if (c.cap < c.floor) html += plResult(c, m + others);
