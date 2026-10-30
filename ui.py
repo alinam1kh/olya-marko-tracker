@@ -538,7 +538,7 @@ body.p-olya .liquid { --sheen: .4; }
 /* «дихаючий» mesh Paper Shaders (WebGL): розмиті поля споріднених відтінків; якщо WebGL недоступний — лишається CSS-mesh */
 .liquid .after > .pmesh { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; opacity: 0; transition: opacity 1.2s ease; }
 .liquid .after > .pmesh canvas { display: block; width: 100%; height: 100%; }
-.liquid.webgl .after > .pmesh { inset: -5%; opacity: .68; filter: blur(28px);
+.liquid.webgl .after > .pmesh { inset: -5%; opacity: .68; filter: blur(34px);
   /* під великою сумою світло приглушене: темні тони майже не змінюються, а яскраві плями там не засвічують цифри */
   -webkit-mask: radial-gradient(52% 34% at 30% 40%, rgba(0, 0, 0, .45), rgba(0, 0, 0, .7) 55%, #000 100%);
   mask: radial-gradient(52% 34% at 30% 40%, rgba(0, 0, 0, .45), rgba(0, 0, 0, .7) 55%, #000 100%); }  /* дуже розмито (як матове скло); шар трохи ширший за картку — щоб розмиття не темнило краї, але світлі плями не запливали за край */
@@ -3201,9 +3201,9 @@ Promise.all([import(V + "shader-mount.js"), import(V + "shaders/mesh-gradient.js
   function colors() { return [hex("--g2"), hex("--g3"), hex("--l2"), hex("--g2"), hex("--l4"), hex("--g1"), hex("--acc", +getComputedStyle(document.body).getPropertyValue("--acc-a") || .8), hex("--acc2", .45)]; }  // + акценти людини (у Марка бірюза прозоріша)
   var c = colors();
   var mount = new ShaderMount(box, frag, {
-    u_colors: c, u_colorsCount: c.length, u_distortion: .35, u_swirl: 0, u_grainMixer: 0, u_grainOverlay: 0,
+    u_colors: c, u_colorsCount: c.length, u_distortion: .22, u_swirl: 0, u_grainMixer: 0, u_grainOverlay: 0,
     u_fit: 2, u_scale: 1, u_rotation: 0, u_offsetX: 0, u_offsetY: 0, u_originX: .5, u_originY: .5, u_worldWidth: 0, u_worldHeight: 0
-  }, {}, .55, Math.random() * 600000, 1);
+  }, {}, .48, Math.random() * 600000, 1);
   document.getElementById("liquid").classList.add("webgl");
   // перемкнули людину — нові кольори
   var last = document.body.className;
