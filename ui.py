@@ -1656,11 +1656,12 @@ function renderPeople() {
 var calKey = null, selDay = null;
 var WD0 = function (d) { return (d.getDay() + 6) % 7; };
 function renderCal(P) {
-  var keys = P.months.map(function (m) { return m.key; }), ki = keys.indexOf(calKey);
-  if (ki < 0) { ki = month; calKey = keys[ki]; }
-  var M = P.months[ki], y = +calKey.slice(0, 4), mo = +calKey.slice(5) - 1;
+  var keys = P.months.map(function (m) { return m.key; }), ki = keys.indexOf(calKey), jan = keys[0].slice(0, 4) + "-01";
+  var none = ki < 0 && calKey && calKey >= jan && calKey < keys[0];  // місяць до початку обліку — порожній
+  if (ki < 0 && !none) { ki = month; calKey = keys[ki]; }
+  var M = none ? { ops: [], incomplete: false } : P.months[ki], y = +calKey.slice(0, 4), mo = +calKey.slice(5) - 1;
   $("cal-year").textContent = MONTHS_FULL[mo] + " " + y;
-  $("cal-prev").disabled = ki <= 0; $("cal-next").disabled = ki >= keys.length - 1;
+  $("cal-prev").disabled = calKey <= jan; $("cal-next").disabled = ki >= keys.length - 1;
   var dim = new Date(y, mo + 1, 0).getDate(), lastDay = M.incomplete ? +M.last_op.slice(0, 2) : dim;
   var withOps = {}; M.ops.forEach(function (o) { withOps[o.day] = true; });
   var today = iso(new Date()), first = new Date(y, mo, 1), start = new Date(y, mo, 1 - WD0(first));
@@ -1669,23 +1670,29 @@ function renderCal(P) {
   for (var c = 0; c < rows * 7; c++) {
     var d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + c), key = iso(d), inMonth = d.getMonth() === mo;
     var b = h("button", (withOps[key] && inMonth ? "has" : "") + (key === today ? " today" : ""), String(d.getDate()));
-    b.type = "button"; b.disabled = !inMonth || (d.getDate() > lastDay && !withOps[key] && key !== today);
+    b.type = "button"; b.disabled = none || !inMonth || (d.getDate() > lastDay && !withOps[key] && key !== today);
     b.setAttribute("aria-pressed", key === selDay || (!selDay && key === today && ki === month));
     b.setAttribute("aria-label", d.getDate() + " " + GEN[d.getMonth()] + " " + d.getFullYear() + (b.disabled ? ", даних немає" : withOps[key] ? ", є операції" : ""));
     if (!b.disabled) (function (key) { b.onclick = function () { selDay = key === today || key === selDay ? null : key; month = ki; if (view() === "journal" && jq.trim()) jqMonth = true; calOpen(false); render(); scrollToDay(key); }; })(key);
     grid.appendChild(b);
   }
   var lastM = P.months[P.months.length - 1];
-  $("cal-note").textContent = M.incomplete ? "Сірі дні — даних ще немає. Облік до " + M.last_op + "." : "";
-  $("cal-note").hidden = !M.incomplete;
+  $("cal-note").textContent = none ? "За цей місяць даних немає — облік почався з " + GEN[+keys[0].slice(5) - 1] + "." : M.incomplete ? "Сірі дні — даних ще немає. Облік до " + M.last_op + "." : "";
+  $("cal-note").hidden = !none && !M.incomplete;
 }
 function scrollToDay(key) {
   if (view() !== "journal") return;
   var el = document.querySelector('[data-day="' + key + '"]');
   if (el) requestAnimationFrame(function () { window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 12); });
 }
-$("cal-prev").onclick = function () { var P = D.people[person], k = P.months.map(function (m) { return m.key; }).indexOf(calKey); if (k > 0) { month = k - 1; calKey = P.months[month].key; selDay = null; trendMonth = null; if (view() === "journal" && jq.trim()) jqMonth = true; render(); calOpen(true); } };
-$("cal-next").onclick = function () { var P = D.people[person], k = P.months.map(function (m) { return m.key; }).indexOf(calKey); if (k < P.months.length - 1) { month = k + 1; calKey = P.months[month].key; selDay = null; trendMonth = null; if (view() === "journal" && jq.trim()) jqMonth = true; render(); calOpen(true); } };
+// порожні місяці лише переглядаємо (обраний місяць не міняється); дійшли до першого з даними — обираємо його, як завжди
+var calShift = function (key, n) { var y = +key.slice(0, 4), mo = +key.slice(5) - 1 + n; return iso(new Date(y, mo, 1)).slice(0, 7); };
+$("cal-prev").onclick = function () { var P = D.people[person], k = P.months.map(function (m) { return m.key; }).indexOf(calKey);
+  if (k <= 0) { if (!$("cal-prev").disabled) { calKey = calShift(calKey, -1); renderCal(P); } return; }
+  if (k > 0) { month = k - 1; calKey = P.months[month].key; selDay = null; trendMonth = null; if (view() === "journal" && jq.trim()) jqMonth = true; render(); calOpen(true); } };
+$("cal-next").onclick = function () { var P = D.people[person], k = P.months.map(function (m) { return m.key; }).indexOf(calKey);
+  if (k < 0) { calKey = calShift(calKey, 1); if (calKey !== P.months[0].key) { renderCal(P); return; } k = -1; }
+  if (k < P.months.length - 1) { month = k + 1; calKey = P.months[month].key; selDay = null; trendMonth = null; if (view() === "journal" && jq.trim()) jqMonth = true; render(); calOpen(true); } };
 var MENUS = { w: ["who-menu", "who-btn"], m: ["mmenu", "mcal"] };
 function popMenu(k, open) {
   if (!open) { $(MENUS[k][0]).hidden = true; $(MENUS[k][1]).setAttribute("aria-expanded", false); return; }  // закриваємо лише своє меню
@@ -2240,7 +2247,7 @@ function renderAnalytics(P) {
       // тижні — з січня року першого місяця з даними; місяці без даних — порожні пунктирні капсули
       var emptyW = [].concat.apply([], Array.apply(null, Array(pre)).map(function (_, j) {
         var dd = new Date(y0, j + 1, 0).getDate();
-        return [[1, 7], [8, 14], [15, 21], [22, dd]].map(function (b) { return { v: 0, label: b[0] + "–" + b[1], aria: b[0] + "–" + b[1] + " " + GEN[j], empty: true, nopick: true, sub: "—" }; });
+        return [[1, 7], [8, 14], [15, 21], [22, dd]].map(function (b) { return { v: 0, label: b[0] + "–" + b[1], aria: b[0] + "–" + b[1] + " " + GEN[j], empty: true, nopick: true, sub: MONTHS_FULL[j].slice(0, 3) }; });
       }));
       capsules("mbars", "mticks", emptyW.concat([].concat.apply([], WK.map(function (X, j) {
         return X.bounds.map(function (b, i) { var future = b[0] > X.last; return { v: future ? 0 : X.sums[i], label: b[0] + "–" + b[1], aria: b[0] + "–" + b[1] + " " + GEN[mi(P.months[j])], empty: future, nopick: future, sub: future ? "—" : nf0.format(X.sums[i]) + " зл" }; });
