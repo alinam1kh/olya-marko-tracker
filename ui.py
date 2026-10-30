@@ -3193,13 +3193,13 @@ Promise.all([import(V + "shader-mount.js"), import(V + "shaders/mesh-gradient.js
   var ShaderMount = m[0].ShaderMount, frag = m[1].meshGradientFragmentShader, box = document.getElementById("pmesh");
   function hex(v) { var h = getComputedStyle(document.body).getPropertyValue(v).trim().replace("#", "");
     return [parseInt(h.slice(0, 2), 16) / 255, parseInt(h.slice(2, 4), 16) / 255, parseInt(h.slice(4, 6), 16) / 255, 1]; }
-  // відтінки одного кольору людини: глибокий фон картки → середній → яскравий → лавандовий
-  function colors() { return [hex("--g2"), hex("--g1"), hex("--l2"), hex("--l4")]; }
+  // відтінки одного кольору людини; темних плям (--g3 найглибший, --g2) більше, ніж яскравих
+  function colors() { return [hex("--g3"), hex("--g2"), hex("--l2"), hex("--g3"), hex("--l4"), hex("--g2")]; }
   var c = colors();
   var mount = new ShaderMount(box, frag, {
     u_colors: c, u_colorsCount: c.length, u_distortion: .35, u_swirl: 0, u_grainMixer: 0, u_grainOverlay: 0,
     u_fit: 2, u_scale: 1, u_rotation: 0, u_offsetX: 0, u_offsetY: 0, u_originX: .5, u_originY: .5, u_worldWidth: 0, u_worldHeight: 0
-  }, {}, .35, Math.random() * 600000, 1);
+  }, {}, .55, Math.random() * 600000, 1);
   document.getElementById("liquid").classList.add("webgl");
   // перемкнули людину — нові кольори
   var last = document.body.className;
