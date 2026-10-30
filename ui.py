@@ -886,13 +886,13 @@ a.ins { color: var(--ink4); }
 .pldd-h b:has(svg), .pldd-h:has(b svg) .chev { color: var(--blue); }
 .pldd-h .chev { color: var(--ink2); transition: transform .2s; }
 .pldd.open .pldd-h .chev { transform: rotate(180deg); }
-.pldd-w { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows .5s cubic-bezier(.4, 0, .2, 1), opacity .3s ease; }
+/* розгортання — спокійне: висота плавно, вміст проявляється, без виїзду й «пружини» */
+.pldd-w { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows .3s ease-out, opacity .2s ease-out; }
 .pldd-w > div { min-height: 0; overflow: hidden; }
-.pldd-b { transform: translateY(-6px); transition: transform .5s cubic-bezier(.4, 0, .2, 1); }
-.pldd.open .pldd-w { grid-template-rows: 1fr; opacity: 1; transition: grid-template-rows .5s cubic-bezier(.4, 0, .2, 1), opacity .35s ease .08s; }
-.pldd.open .pldd-b { transform: none; }
-@media (prefers-reduced-motion: reduce) { .pldd-w, .pldd-b { transition: none; } }
-.pldd-b { padding: 6px 14px 14px; }  /* запас зверху під виїзд (translateY −6px) — чипи не зрізаються */
+.pldd.open .pldd-w { grid-template-rows: 1fr; opacity: 1; }
+.pldd .pldd-h:active { transform: none; }  /* заголовок дропдауну не «стискається» при тапі */
+@media (prefers-reduced-motion: reduce) { .pldd-w { transition: none; } }
+.pldd-b { padding: 2px 14px 14px; }  /* запас зверху — обводка чипів не зрізається */
 .pldd-b .plcal { animation: none; }  /* календар перемальовується з кожним тапом — без повторної появи */
 .pldd-s { margin: 12px 0 0; font-size: 13px; color: var(--ink3); }
 .pldd-s b { font-weight: 500; color: var(--ink); }
@@ -927,8 +927,11 @@ a.ins { color: var(--ink4); }
 /* порядок: ручка шторки → «Усі цілі» і хрестик → назва */
 .plback-slot { grid-column: 1; grid-row: 2; } .plback-slot:empty { display: none; }
 #pl-head:has(.plback)::before { grid-row: 1; }
-#pl-head:has(.plback) #pl-close { grid-column: 2; grid-row: 2; }
-#pl-head:has(.plback) h2 { grid-column: 1 / -1; grid-row: 3; margin-top: 4px; }
+#pl-close { grid-column: 2; grid-row: 2; }
+/* назва шторки цілей прокручується разом зі вмістом: у шапці лишаються ручка, «Усі цілі» й хрестик (h2 шапки — для читачів екрана) */
+#pl-title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+#pl-head { grid-template-rows: auto 44px; }
+.plh { margin: 0 0 4px; font-size: 18px; font-weight: 500; }
 .sheet-head .plback { display: inline-flex; width: auto; height: auto; margin: 0 0 0 -4px; border-radius: 0; background: none; }
 /* картка ліміту: пігулка режиму «Авто / Своя сума» — відкриває «Як рахується» */
 .lhd { display: inline-flex; align-items: center; gap: 6px; }
@@ -2865,7 +2868,7 @@ function plList() {
   });
   html += "</div>" + (act.length > 1 ? '<p class="pltot">Разом відкладати <b>' + zr(total) + "</b> на місяць</p>" : "");
   $("pl-title").textContent = "Цілі"; $("pl-backslot").innerHTML = "";
-  $("pl-body").innerHTML = html;
+  $("pl-body").innerHTML = '<h2 class="plh" aria-hidden="true">Цілі</h2>' + html;
   $("pl-save").disabled = false; $("pl-save").textContent = "+ Нова ціль"; $("pl-msg").textContent = "";
   $("pl-body").querySelectorAll("[data-id]").forEach(function (b) { b.onclick = function () { plEditStart(P, b.dataset.id); plRender(); }; });
 }
@@ -2931,7 +2934,7 @@ function plRender(keepFocus) {
   if (!plS.isNew) html += plHist(P) + '<button type="button" class="pldel" id="pl-del">' + TRASH + "Видалити ціль</button>";
   $("pl-backslot").innerHTML = plS.back ? '<button type="button" class="plback" id="pl-back">' + svgI("currentColor", '<path d="m15 6-6 6 6 6"/>', 18) + "Усі цілі</button>" : "";
   plS.m = m;
-  body.innerHTML = html;
+  body.innerHTML = '<h2 class="plh" aria-hidden="true">' + esc($("pl-title").textContent) + "</h2>" + html;
   var byTotal = cushion || !!plUntil();  // у полі — сума цілі, а не на місяць
   $("pl-save").textContent = "Зберегти"; $("pl-save").disabled = byTotal ? !(cushion || plS.total) : !m; $("pl-msg").textContent = "";
   var inp = $("pl-amount");
