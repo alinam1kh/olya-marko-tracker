@@ -538,7 +538,10 @@ body.p-olya .liquid { --sheen: .4; }
 /* «дихаючий» mesh Paper Shaders (WebGL): розмиті поля споріднених відтінків; якщо WebGL недоступний — лишається CSS-mesh */
 .liquid .after > .pmesh { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; opacity: 0; transition: opacity 1.2s ease; }
 .liquid .after > .pmesh canvas { display: block; width: 100%; height: 100%; }
-.liquid.webgl .after > .pmesh { inset: -5%; opacity: .75; filter: blur(28px); }  /* дуже розмито (як матове скло); шар трохи ширший за картку — щоб розмиття не темнило краї, але світлі плями не запливали за край */
+.liquid.webgl .after > .pmesh { inset: -5%; opacity: .68; filter: blur(28px);
+  /* під великою сумою світло приглушене: темні тони майже не змінюються, а яскраві плями там не засвічують цифри */
+  -webkit-mask: radial-gradient(52% 34% at 30% 40%, rgba(0, 0, 0, .45), rgba(0, 0, 0, .7) 55%, #000 100%);
+  mask: radial-gradient(52% 34% at 30% 40%, rgba(0, 0, 0, .45), rgba(0, 0, 0, .7) 55%, #000 100%); }  /* дуже розмито (як матове скло); шар трохи ширший за картку — щоб розмиття не темнило краї, але світлі плями не запливали за край */
 .liquid.webgl .after > .mesh { display: none; }
 body.p-olya .liquid .after { opacity: .68; }
 /* рамка в Олі — яскравіша: світло-рожевий кант у найсвітлішій точці (кант мерехтить кадрами — тож свої кадри) */
