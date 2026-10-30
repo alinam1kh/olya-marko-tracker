@@ -3005,15 +3005,12 @@ function plRender(keepFocus) {
     if (until && m && c) html += calc(m + others, "Лишається на щоденні", c.cap);
     html += plResult(c, m + others);
   }
-  // перегляд: готівка під смугами й історія; редагування: поля й «Видалити ціль»
+  // поточний стан: готівка під смугами, історія й «Видалити ціль»; редагування — лише поля
   if (view) {
     var addH = plAddHTML(P);
     html = html.indexOf("<!--add-->") < 0 ? addH + html : html.replace("<!--add-->", addH);
-    html += plHist(P);
-  } else {
-    html = html.replace(/<!--add-->/g, "");
-    if (!plS.isNew) html += '<button type="button" class="pldel" id="pl-del">' + TRASH + "Видалити ціль</button>";
-  }
+    html += plHist(P) + '<button type="button" class="pldel" id="pl-del">' + TRASH + "Видалити ціль</button>";
+  } else html = html.replace(/<!--add-->/g, "");
   var BACK = svgI("currentColor", '<path d="m15 6-6 6 6 6"/>', 18);
   $("pl-backslot").innerHTML = plS.edit ? '<button type="button" class="plback" id="pl-vback">' + BACK + "Назад</button>"
     : plS.back ? '<button type="button" class="plback" id="pl-back">' + BACK + "Усі цілі</button>" : "";
