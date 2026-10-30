@@ -926,6 +926,7 @@ a.ins { color: var(--ink4); }
 .gltx { flex: 1; min-width: 0; }
 .gltx b { display: block; font-size: 15px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .gltx small { display: block; margin-top: 2px; font-size: 12px; color: var(--ink2); }
+.glsum { flex: none; text-align: right; } .glsum b { display: block; font-size: 15px; font-weight: 500; } .glsum small { display: block; margin-top: 2px; font-size: 12px; color: var(--ink2); }
 .plprog { margin-top: 10px; }
 .plprog .gbar { font-size: 13px; }
 .glrow > svg:last-child { flex: none; color: var(--ink2); }
@@ -2885,9 +2886,10 @@ function plList() {
   var P = plS.P, k = curKey(P), act = goalsOf(P).filter(function (g) { return goalOn(g, k); }), total = 0, html = '<div class="gl">';
   act.forEach(function (g) {
     var mm = goalMonthly(g, k, P), pr = goalProgress(P, g), jar = g.kind === "jar"; total += mm;
-    var sub = jar ? "Банка" + (pr && pr.b.until && pr.b.need ? " · щоб встигнути ≈ " + zr(pr.b.need) + " на місяць" : "") : (pr ? "≈ " : "") + zr(mm) + " на місяць";
+    // рядок: іконка, назва, скільки на місяць; справа — зібрано з якої суми (смуги — лише в самій цілі)
+    var sub = jar ? (pr && pr.b.until && pr.b.need ? "≈ " + zr(pr.b.need) + " на місяць" : "Банка") : (pr ? "≈ " : "") + zr(mm) + " на місяць";
     html += '<button type="button" class="glrow" data-id="' + esc(g.id) + '"><span class="glic">' + goalIcon(g) + '</span><span class="gltx"><b>' + esc(goalName(g)) + "</b><small>" +
-      sub + "</small>" + (pr ? pr.html : "") + "</span>" + CHR + "</button>";
+      sub + "</small></span>" + (pr ? '<span class="glsum"><b>' + nf0.format(Math.round(pr.b.got)) + "</b><small>з " + zr(pr.b.total) + "</small></span>" : "") + CHR + "</button>";
   });
   html += "</div>" + (act.filter(function (g) { return g.kind !== "jar"; }).length > 1 ? '<p class="pltot">Разом відкладати <b>' + zr(total) + "</b> на місяць</p>" : "");
   $("pl-title").textContent = "Цілі"; $("pl-backslot").innerHTML = "";
