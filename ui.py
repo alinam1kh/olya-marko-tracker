@@ -456,7 +456,7 @@ a { color: inherit; text-decoration: none; }
 @property --ey { syntax: "<percentage>"; inherits: true; initial-value: 20%; }
 @property --a { syntax: "<angle>"; inherits: true; initial-value: 115deg; }
 .liquid { position: absolute; inset: 0; z-index: 0; pointer-events: none; border-radius: inherit; --sheen: .45; }
-.liquid.sheen { animation: sheen 7s linear both, edge 12s linear infinite; }
+.liquid.sheen { animation: sheen 9.5s linear both, edge 12s linear infinite; }
 body.p-olya .liquid { --sheen: .4; }
 .liquid > span { position: absolute; inset: 0; border-radius: inherit; }
 .liquid .glow, .liquid .halo, .liquid .rim { opacity: var(--sheen); }
