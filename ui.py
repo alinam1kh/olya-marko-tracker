@@ -870,6 +870,10 @@ a.ins { color: var(--ink4); }
 .gadd { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px; border: 0; border-radius: 18px; background: var(--blue-soft); font: 500 14px var(--font); color: var(--blue-txt); cursor: pointer; }
 .gaddf { display: grid; gap: 8px; margin-top: 14px; padding: 12px; border-radius: 16px; background: var(--soft); }
 .gaddf .plname { margin: 0; background: var(--card); }
+/* поява форми готівки — спокійно, як дропдауни: висота й прозорість, без зсуву */
+@keyframes gaddIn { from { opacity: 0; max-height: 0; padding-top: 0; padding-bottom: 0; } to { opacity: 1; max-height: 260px; } }
+.gaddf.in { overflow: hidden; animation: gaddIn .35s ease-out; }
+@media (prefers-reduced-motion: reduce) { .gaddf.in { animation: none; } }
 .gaddb { display: flex; justify-content: flex-end; gap: 8px; }
 .gbtn { min-height: 40px; padding: 0 16px; border: 0; border-radius: 20px; background: var(--card); font: 500 14px var(--font); color: var(--ink3); cursor: pointer; }
 .gbtn.pri { background: var(--blue); color: #fff; }
@@ -3001,8 +3005,10 @@ function plRender(keepFocus) {
   });
   if ($("pl-back")) $("pl-back").onclick = function () { plS = { P: P, mode: "list" }; plRender(); };
   if ($("pl-del")) $("pl-del").onclick = plDelete;
-  if ($("pl-add")) $("pl-add").onclick = function () { plS.addOpen = true; plRender(); $("pl-add-amt").focus(); };
-  if ($("pl-out")) $("pl-out").onclick = function () { plS.addOpen = "out"; plRender(); $("pl-add-amt").focus(); };
+  // форма розгортається плавно лише в мить відкриття (подальші перемальовування — без анімації)
+  var addOpen = function (v) { plS.addOpen = v; plS.addAnim = true; plRender(); plS.addAnim = false; $("pl-add-amt").focus({ preventScroll: true }); };
+  if ($("pl-add")) $("pl-add").onclick = function () { addOpen(true); };
+  if ($("pl-out")) $("pl-out").onclick = function () { addOpen("out"); };
   if ($("pl-add-x")) $("pl-add-x").onclick = function () { plS.addOpen = false; plRender(); };
   if ($("pl-add-amt")) $("pl-add-amt").oninput = function () { var v = this.value.replace(/\D/g, "").slice(0, 7); if (v !== this.value) this.value = v; };
   if ($("pl-add-ok")) $("pl-add-ok").onclick = function () {
@@ -3048,7 +3054,7 @@ function plJarHist(sg) {
 function plAddHTML(P) {
   var sg = goalsOf(P).filter(function (x) { return x.id === plS.id; })[0]; if (!sg) return "";
   var jar = sg.kind === "jar", out = plS.addOpen === "out";
-  if (plS.addOpen) return '<div class="gaddf"><input class="plname" id="pl-add-amt" type="text" inputmode="numeric" autocomplete="off" placeholder="' + (out ? "Скільки взяли, зл" : jar ? "Скільки поклали, зл" : "Сума, зл") + '">' +
+  if (plS.addOpen) return '<div class="gaddf' + (plS.addAnim ? " in" : "") + '"><input class="plname" id="pl-add-amt" type="text" inputmode="numeric" autocomplete="off" placeholder="' + (out ? "Скільки взяли, зл" : jar ? "Скільки поклали, зл" : "Сума, зл") + '">' +
     '<input class="plname" id="pl-add-note" type="text" maxlength="60" autocomplete="off" placeholder="' + (out ? "На що, напр. «Ремонт»" : jar ? "Звідки, напр. «Премія»" : "Звідки, напр. «Порадувала мама»") + '">' +
     '<div class="gaddb"><button type="button" class="gbtn" id="pl-add-x">Скасувати</button><button type="button" class="gbtn pri" id="pl-add-ok">' + (out ? "Взяти" : jar ? "Поповнити" : "Додати") + "</button></div></div>";
   var plus = svgI("currentColor", '<path d="M12 5v14M5 12h14"/>', 16);
