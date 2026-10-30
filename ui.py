@@ -2221,7 +2221,7 @@ function renderAnalytics(P) {
         var bb = [[1, 7], [8, 14], [15, 21], [22, dd]];
         return { dim: dd, last: ls, bounds: bb, sums: bb.map(function (b) { return m.ops.reduce(function (s, o) { var d = dayOf(o); return s + (!o.income && !o.fixed && d >= b[0] && d <= b[1] ? o.amount : 0); }, 0); }) };
       };
-      var WK = P.months.map(wk), cur = WK[month], dim = cur.dim, last = cur.last, bounds = cur.bounds, w = cur.sums;
+      var WK = P.months.map(wk), y0 = +P.months[0].key.slice(0, 4), pre = +P.months[0].key.slice(5) - 1, cur = WK[month], dim = cur.dim, last = cur.last, bounds = cur.bounds, w = cur.sums;
       var uw = avgOf(base.length ? base : allFull, function (m) { var yy = +m.key.slice(0, 4), mm = +m.key.slice(5); return m.variable * 7 / new Date(yy, mm, 0).getDate(); });
       var lw = LM ? LM.total * 7 / dim : 0;  // ліміт тижня — частка місячного
       var top = -1, axW; w.forEach(function (v, i) { if (bounds[i][0] <= last && (top < 0 || v > w[top])) top = i; });
@@ -2230,19 +2230,24 @@ function renderAnalytics(P) {
       // тап по тижню — його підсумок і категорії, як у місяцях; повторний тап — назад до місяця
       // тап по тижню іншого місяця — переходимо в той місяць і одразу на цей тиждень
       var pickW = function (i) {
-        var jj = Math.floor(i / 4), ii = i % 4, X = WK[jj]; if (X.bounds[ii][0] > X.last) return;
+        var jj = Math.floor(i / 4) - pre, ii = i % 4, X = WK[jj]; if (!X || X.bounds[ii][0] > X.last) return;
         if (jj === month) wsel = { key: M.key, i: wsel.i === ii ? -1 : ii, day: wsel.day };
         else { month = jj; wsel = { key: P.months[jj].key, i: ii }; }
         calm(render);
       };
       var allW = [].concat.apply([], WK.map(function (X) { return X.sums.filter(function (v, i) { return X.bounds[i][0] <= X.last; }); }));
       axW = niceAxis(Math.max.apply(null, allW.concat([uw || 0, lw, 1])));  // одна шкала на всю стрічку — стовпчики не стрибають між місяцями
-      capsules("mbars", "mticks", [].concat.apply([], WK.map(function (X, j) {
+      // тижні — з січня року першого місяця з даними; місяці без даних — порожні пунктирні капсули
+      var emptyW = [].concat.apply([], Array.apply(null, Array(pre)).map(function (_, j) {
+        var dd = new Date(y0, j + 1, 0).getDate();
+        return [[1, 7], [8, 14], [15, 21], [22, dd]].map(function (b) { return { v: 0, label: b[0] + "–" + b[1], aria: b[0] + "–" + b[1] + " " + GEN[j], empty: true, nopick: true, sub: "—" }; });
+      }));
+      capsules("mbars", "mticks", emptyW.concat([].concat.apply([], WK.map(function (X, j) {
         return X.bounds.map(function (b, i) { var future = b[0] > X.last; return { v: future ? 0 : X.sums[i], label: b[0] + "–" + b[1], aria: b[0] + "–" + b[1] + " " + GEN[mi(P.months[j])], empty: future, nopick: future, sub: future ? "—" : nf0.format(X.sums[i]) + " зл" }; });
-      })), axW.max, wi >= 0 ? month * 4 + wi : -1, pickW, axW.n, uw || 0,
+      }))), axW.max, wi >= 0 ? (pre + month) * 4 + wi : -1, pickW, axW.n, uw || 0,
         { avgLabel: avgTag(uw), lim: lw, paged: { per: 4, page: P.months.length - 1 - month, onPage: function (pg) {
           // доклацнули до сусіднього місяця — міняємо дані (підсумок, категорії, шапку) тихо, графік уже на місці
-          var nm = P.months.length - 1 - pg; if (nm === month) return;
+          var nm = P.months.length - 1 - pg; if (nm === month || nm < 0) return;  // порожній місяць — лишаємо дані найранішого
           month = nm; setTimeout(function () { calm(render); }, 400);
         } } });
       if (wi >= 0) {
