@@ -545,60 +545,63 @@ body.p-olya .liquid { --sheen: .4; }
 .liquid.webgl .after > .mesh { display: none; }
 body.p-olya .liquid .after { opacity: .68; }
 /* рамка в Олі — яскравіша: світло-рожевий кант у найсвітлішій точці (кант мерехтить кадрами — тож свої кадри) */
-body.p-olya .liquid .ehalo { opacity: .82; }
+body.p-olya .liquid .ehalo { opacity: .94; }
 body.p-olya .liquid .erim { animation-name: glintRo; }
-@keyframes glintRo { 0%, 100% { opacity: .65; } 50% { opacity: 1; } }  /* в Олі світлі тони яскравіші — трохи тихіше, щоб лишалась глибина */
-.liquid .ehalo { opacity: .72; } .liquid .erim { opacity: .5; }
-.liquid .ehalo { filter: blur(8px); }
+@keyframes glintRo { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }  /* в Олі світлі тони яскравіші — трохи тихіше, щоб лишалась глибина */
+.liquid .ehalo { opacity: .86; } .liquid .erim { opacity: .5; }
+/* об'єм «лінзи»: світлий верхній край і легка тінь знизу всередині картки */
+.liquid .after::before { content: ""; position: absolute; inset: 0; z-index: 1; border-radius: inherit;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22), inset 0 16px 26px -16px rgba(255, 255, 255, .16), inset 0 -18px 30px -16px rgba(0, 0, 0, .4); }
+.liquid .ehalo { filter: blur(9px); }
 .liquid .ehalo i, .liquid .erim { position: absolute; inset: 0; border-radius: inherit;
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
-.liquid .ehalo i { padding: 12px; background:
+.liquid .ehalo i { padding: 16px; background:
   radial-gradient(70% 90% at var(--ex) var(--ey), var(--l1) 0%, var(--l2) 30%, transparent 70%),
   radial-gradient(64% 86% at calc(100% - var(--ex)) calc(100% - var(--ey)), var(--acc) 0%, color-mix(in srgb, var(--acc) 70%, transparent) 38%, transparent 74%); }
-.liquid .erim { padding: 1.5px; background:
+.liquid .erim { padding: 2px; background:
   radial-gradient(55% 75% at var(--ex) var(--ey), #fff 0%, var(--l1) 25%, var(--l2) 50%, transparent 78%),
   radial-gradient(45% 65% at calc(100% - var(--ex)) calc(100% - var(--ey)), var(--l1) 0%, var(--l2) 40%, transparent 75%); }
 @keyframes edge {
   0.0% { --ex: 0.0%; --ey: 0.0%; }
-  2.5% { --ex: 7.2%; --ey: 0.0%; }
-  5.0% { --ex: 14.2%; --ey: 0.0%; }
-  7.5% { --ex: 20.9%; --ey: 0.0%; }
-  10.0% { --ex: 27.0%; --ey: 0.0%; }
-  12.5% { --ex: 32.5%; --ey: 0.0%; }
-  15.0% { --ex: 37.2%; --ey: 0.0%; }
-  17.5% { --ex: 41.0%; --ey: 0.0%; }
-  20.0% { --ex: 43.7%; --ey: 0.0%; }
-  22.5% { --ex: 45.4%; --ey: 0.0%; }
-  25.0% { --ex: 46.0%; --ey: 0.0%; }
-  27.5% { --ex: 45.4%; --ey: 0.0%; }
-  30.0% { --ex: 43.7%; --ey: 0.0%; }
-  32.5% { --ex: 41.0%; --ey: 0.0%; }
-  35.0% { --ex: 37.2%; --ey: 0.0%; }
-  37.5% { --ex: 32.5%; --ey: 0.0%; }
-  40.0% { --ex: 27.0%; --ey: 0.0%; }
-  42.5% { --ex: 20.9%; --ey: 0.0%; }
-  45.0% { --ex: 14.2%; --ey: 0.0%; }
-  47.5% { --ex: 7.2%; --ey: 0.0%; }
+  2.5% { --ex: 10.6%; --ey: 0.0%; }
+  5.0% { --ex: 21.0%; --ey: 0.0%; }
+  7.5% { --ex: 30.9%; --ey: 0.0%; }
+  10.0% { --ex: 40.0%; --ey: 0.0%; }
+  12.5% { --ex: 48.1%; --ey: 0.0%; }
+  15.0% { --ex: 55.0%; --ey: 0.0%; }
+  17.5% { --ex: 60.6%; --ey: 0.0%; }
+  20.0% { --ex: 64.7%; --ey: 0.0%; }
+  22.5% { --ex: 67.2%; --ey: 0.0%; }
+  25.0% { --ex: 68.0%; --ey: 0.0%; }
+  27.5% { --ex: 67.2%; --ey: 0.0%; }
+  30.0% { --ex: 64.7%; --ey: 0.0%; }
+  32.5% { --ex: 60.6%; --ey: 0.0%; }
+  35.0% { --ex: 55.0%; --ey: 0.0%; }
+  37.5% { --ex: 48.1%; --ey: 0.0%; }
+  40.0% { --ex: 40.0%; --ey: 0.0%; }
+  42.5% { --ex: 30.9%; --ey: 0.0%; }
+  45.0% { --ex: 21.0%; --ey: 0.0%; }
+  47.5% { --ex: 10.6%; --ey: 0.0%; }
   50.0% { --ex: 0.0%; --ey: 0.0%; }
-  52.5% { --ex: 0.0%; --ey: 12.8%; }
-  55.0% { --ex: 0.0%; --ey: 25.3%; }
-  57.5% { --ex: 0.0%; --ey: 37.2%; }
-  60.0% { --ex: 0.0%; --ey: 48.2%; }
-  62.5% { --ex: 0.0%; --ey: 58.0%; }
-  65.0% { --ex: 0.0%; --ey: 66.3%; }
-  67.5% { --ex: 0.0%; --ey: 73.1%; }
-  70.0% { --ex: 0.0%; --ey: 78.0%; }
-  72.5% { --ex: 0.0%; --ey: 81.0%; }
-  75.0% { --ex: 0.0%; --ey: 82.0%; }
-  77.5% { --ex: 0.0%; --ey: 81.0%; }
-  80.0% { --ex: 0.0%; --ey: 78.0%; }
-  82.5% { --ex: 0.0%; --ey: 73.1%; }
-  85.0% { --ex: 0.0%; --ey: 66.3%; }
-  87.5% { --ex: 0.0%; --ey: 58.0%; }
-  90.0% { --ex: 0.0%; --ey: 48.2%; }
-  92.5% { --ex: 0.0%; --ey: 37.2%; }
-  95.0% { --ex: 0.0%; --ey: 25.3%; }
-  97.5% { --ex: 0.0%; --ey: 12.8%; }
+  52.5% { --ex: 0.0%; --ey: 15.6%; }
+  55.0% { --ex: 0.0%; --ey: 30.9%; }
+  57.5% { --ex: 0.0%; --ey: 45.4%; }
+  60.0% { --ex: 0.0%; --ey: 58.8%; }
+  62.5% { --ex: 0.0%; --ey: 70.7%; }
+  65.0% { --ex: 0.0%; --ey: 80.9%; }
+  67.5% { --ex: 0.0%; --ey: 89.1%; }
+  70.0% { --ex: 0.0%; --ey: 95.1%; }
+  72.5% { --ex: 0.0%; --ey: 98.8%; }
+  75.0% { --ex: 0.0%; --ey: 100.0%; }
+  77.5% { --ex: 0.0%; --ey: 98.8%; }
+  80.0% { --ex: 0.0%; --ey: 95.1%; }
+  82.5% { --ex: 0.0%; --ey: 89.1%; }
+  85.0% { --ex: 0.0%; --ey: 80.9%; }
+  87.5% { --ex: 0.0%; --ey: 70.7%; }
+  90.0% { --ex: 0.0%; --ey: 58.8%; }
+  92.5% { --ex: 0.0%; --ey: 45.4%; }
+  95.0% { --ex: 0.0%; --ey: 30.9%; }
+  97.5% { --ex: 0.0%; --ey: 15.6%; }
   100.0% { --ex: 0.0%; --ey: 0.0%; }
 }
 /* mesh-градієнт: великі поля кольору, що перекриваються й течуть, як вода: зсуваються, розтікаються й збираються,
@@ -652,8 +655,8 @@ body.p-olya .liquid .erim { animation-name: glintRo; }
 @keyframes m4a { to { --m4a: 85%; } }
 .liquid .ehalo i { animation: glint 5s ease-in-out infinite; }
 .liquid .erim { animation: glintR 5s ease-in-out infinite; }
-@keyframes glintR { 0%, 100% { opacity: .6; } 50% { opacity: 1; } }
-@keyframes glint { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+@keyframes glintR { 0%, 100% { opacity: .42; } 50% { opacity: 1; } }
+@keyframes glint { 0%, 100% { opacity: .4; } 50% { opacity: 1; } }
 /* легка тінь під білим текстом — підпис лишається читабельним, коли блік пропливає під ним */
 .hero .lbl, .hero .num, .hero .sub, .hero .lt, .hero .lg2 b { text-shadow: 0 1px 10px rgba(5, 10, 30, .28); }
 .hero .sub .inc { color: inherit; }
