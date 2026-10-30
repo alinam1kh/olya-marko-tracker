@@ -1913,10 +1913,23 @@ function payDays(P) {
 
 // ---------- головна ----------
 // скільки місяців у плані з терміном (від місяця from до місяця until) і скільки вже відкладено з того часу (повні місяці)
-// ціль із терміном: старт → термін, сума. Час — за сьогоднішньою датою; гроші — відкладене від старту
-// (відкладене за місяць = дохід мінус витрати, PERSONA.md), разом із поточним місяцем — не чекаючи зарплати
+// ціль із терміном: старт → термін, сума. Час — за сьогоднішньою датою; гроші — відкладене від старту:
+// від зарплати до зарплати (дохід мінус витрати, PERSONA.md), разом із поточним періодом — до останніх даних
 function monthsBetween(a, b) { return Math.max(1, (+b.slice(0, 4) * 12 + +b.slice(5, 7)) - (+a.slice(0, 4) * 12 + +a.slice(5, 7))); }
-function savedSince(P, from) { return Math.max(0, P.months.reduce(function (s, m) { return s + (m.key >= from ? m.saved : 0); }, 0)); }
+// періоди «від зарплати до зарплати»: зарплата — дохід з виписки від 1 000 зл (повернення й дрібні надходження період не починають);
+// витрати до першої зарплати — з попередніх грошей, у відкладене не йдуть
+function ddmm(d) { return d.slice(8) + "." + d.slice(5, 7); }
+function payPeriods(P) {
+  var ops = [].concat.apply([], P.months.map(function (m) { return m.ops; })), days = {};
+  ops.forEach(function (o) { if (o.income && !o.cash && o.amount >= 1000) days[o.day] = 1; });
+  var S = Object.keys(days).sort(), last = ops.reduce(function (d, o) { return o.day > d ? o.day : d; }, "");
+  return S.map(function (d, i) {
+    var end = S[i + 1] ? iso(new Date(new Date(S[i + 1] + "T12:00:00") - 864e5)) : last;
+    return { from: d, to: end, open: !S[i + 1], saved: ops.reduce(function (s, o) { return o.day >= d && o.day <= end ? s + (o.income ? o.amount : -o.amount) : s; }, 0) };
+  });
+}
+// відкладене з місяця from («YYYY-MM»): усі періоди, що закінчуються в ньому чи пізніше
+function savedSince(P, from) { return Math.max(0, payPeriods(P).reduce(function (s, p) { return s + (p.to >= from ? p.saved : 0); }, 0)); }
 function addsSum(x) { return (x && x.adds || []).reduce(function (s, a) { return s + a.amount; }, 0); }  // готівка, докладена до цілі
 function goalTerm(P, g) {
   if (g.kind === "cushion") { var c = goalPlan(P); return c ? { start: c.start, until: c.until, total: c.total, adds: c.adds } : null; }
@@ -2952,12 +2965,12 @@ function plRender(keepFocus) {
   }; });
 }
 // збереженої цілі: «+ Додати готівку» (сума й звідки — йде лише в «зібрано») та «Історія накопичень»:
-// за кожен місяць від старту — скільки відкладено (дохід мінус витрати), і кожен готівковий внесок; найновіші — вгорі
+// за кожен період від зарплати до зарплати — скільки відкладено (дохід мінус витрати), і кожен готівковий внесок; найновіші — вгорі
 function plHist(P) {
   var sg = goalsOf(P).filter(function (x) { return x.id === plS.id; })[0]; if (!sg) return "";
   var start = sg.kind === "cushion" ? (goalPlan(P) || {}).start : goalFrom(sg); if (!start) return "";
   var rows = [];
-  P.months.forEach(function (m) { if (!m.ghost && m.key >= start) rows.push({ d: m.key + "-99", t: "За " + MONTHS_FULL[mi(m)].toLowerCase() + (m.incomplete ? " (поки що)" : "") + " відкладено", v: m.saved }); });
+  payPeriods(P).forEach(function (p) { if (p.to >= start) rows.push({ d: p.from, t: "З зарплати " + ddmm(p.from) + (p.open ? " поки що лишилось" : " відкладено") + "<small>" + ddmm(p.from) + "–" + ddmm(p.to) + "</small>", v: p.saved }); });
   (sg.adds || []).forEach(function (a, i) { rows.push({ d: a.date, t: esc(a.note || "Готівка") + "<small>готівка, " + dmy(a.date) + "</small>", v: a.amount, i: i }); });
   rows.sort(function (a, b) { return a.d < b.d ? 1 : -1; });
   var list = '<div class="ghist">' + rows.map(function (r) {
