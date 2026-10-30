@@ -1606,7 +1606,11 @@ function cic(name, big) {
 function arr(d) { return d > 0 ? "↗" : "↘"; }
 
 function lastFull(P) { for (var i = P.months.length - 1; i >= 0; i--) if (P.months[i].income > 0) return i; return P.months.length - 1; }
-function curMonth(P) { return P.months.length - 1; }  // Головна завжди відкривається на поточному місяці, навіть до зарплати
+function curMonth(P) { return P.months.length - 1; }
+// amon — місяць, до якого догорнули графік в Аналітиці (ключ «2026-07», можна й до початку обліку); null — як у шапці.
+// Головна й Журнал його не бачать; перейшли туди чи змінили місяць у календарі шапки — скидається
+var amon = null;
+function gMonth() { return month; }  // Головна завжди відкривається на поточному місяці, навіть до зарплати
 function toCur(P) { selDay = null; }  // переходи з Головної в Журнал — той самий місяць, що в шапці, без обраного дня
 var person = 0, month = curMonth(D.people[0]), trendMonth = null, filter = "all", amode = "month", catF = null, jq = "", jqMonth = false;  // jqMonth — пошук лише в обраному місяці  // catF — фільтр Журналу за категорією (з «Що змінилось»)
 var GOAL = { olya: { months: 6, deadline: [2027, 6], title: "Подушка безпеки" } };  // фіча 5 з роадмапу ДЗ
@@ -1648,7 +1652,7 @@ function renderPeople() {
   D.people.forEach(function (p, i) {
     var b = h("button", "opt", '<span class="av ' + p.key + '"></span><span><b>' + esc(p.name) + '</b></span><span class="radio" aria-hidden="true"></span>');
     b.type = "button"; b.setAttribute("role", "menuitemradio"); b.setAttribute("aria-checked", i === person);
-    b.onclick = function () { popMenu("w", false); if (i === person) return; person = i; month = curMonth(D.people[i]); trendMonth = null; selDay = null; render(); if (view() === "report") setTimeout(replaySheen, 250); };
+    b.onclick = function () { popMenu("w", false); if (i === person) return; person = i; month = curMonth(D.people[i]); amon = null; trendMonth = null; selDay = null; render(); if (view() === "report") setTimeout(replaySheen, 250); };
     box.appendChild(b);
   });
 }
@@ -1673,7 +1677,7 @@ function renderCal(P) {
     b.type = "button"; b.disabled = none || !inMonth || (d.getDate() > lastDay && !withOps[key] && key !== today);
     b.setAttribute("aria-pressed", key === selDay || (!selDay && key === today && ki === month));
     b.setAttribute("aria-label", d.getDate() + " " + GEN[d.getMonth()] + " " + d.getFullYear() + (b.disabled ? ", даних немає" : withOps[key] ? ", є операції" : ""));
-    if (!b.disabled) (function (key) { b.onclick = function () { selDay = key === today || key === selDay ? null : key; month = ki; if (view() === "journal" && jq.trim()) jqMonth = true; calOpen(false); render(); scrollToDay(key); }; })(key);
+    if (!b.disabled) (function (key) { b.onclick = function () { selDay = key === today || key === selDay ? null : key; month = ki; amon = null; if (view() === "journal" && jq.trim()) jqMonth = true; calOpen(false); render(); scrollToDay(key); }; })(key);
     grid.appendChild(b);
   }
   var lastM = P.months[P.months.length - 1];
@@ -1689,10 +1693,10 @@ function scrollToDay(key) {
 var calShift = function (key, n) { var y = +key.slice(0, 4), mo = +key.slice(5) - 1 + n; return iso(new Date(y, mo, 1)).slice(0, 7); };
 $("cal-prev").onclick = function () { var P = D.people[person], k = P.months.map(function (m) { return m.key; }).indexOf(calKey);
   if (k <= 0) { if (!$("cal-prev").disabled) { calKey = calShift(calKey, -1); renderCal(P); } return; }
-  if (k > 0) { month = k - 1; calKey = P.months[month].key; selDay = null; trendMonth = null; if (view() === "journal" && jq.trim()) jqMonth = true; render(); calOpen(true); } };
+  if (k > 0) { month = k - 1; amon = null; calKey = P.months[month].key; selDay = null; trendMonth = null; if (view() === "journal" && jq.trim()) jqMonth = true; render(); calOpen(true); } };
 $("cal-next").onclick = function () { var P = D.people[person], k = P.months.map(function (m) { return m.key; }).indexOf(calKey);
   if (k < 0) { calKey = calShift(calKey, 1); if (calKey !== P.months[0].key) { renderCal(P); return; } k = -1; }
-  if (k < P.months.length - 1) { month = k + 1; calKey = P.months[month].key; selDay = null; trendMonth = null; if (view() === "journal" && jq.trim()) jqMonth = true; render(); calOpen(true); } };
+  if (k < P.months.length - 1) { month = k + 1; amon = null; calKey = P.months[month].key; selDay = null; trendMonth = null; if (view() === "journal" && jq.trim()) jqMonth = true; render(); calOpen(true); } };
 var MENUS = { w: ["who-menu", "who-btn"], m: ["mmenu", "mcal"] };
 function popMenu(k, open) {
   if (!open) { $(MENUS[k][0]).hidden = true; $(MENUS[k][1]).setAttribute("aria-expanded", false); return; }  // закриваємо лише своє меню
@@ -2164,7 +2168,12 @@ function limitsFor(P, j, man) {
     spendU: avgOf(base, function (m) { return m.variable; }) };
 }
 function renderAnalytics(P) {
-  if (month >= P.months.length) month = curMonth(P);
+  // від січня року першого місяця з даними: місяці до початку обліку — порожні (нулі); номер місяця тут — свій (amon)
+  var f0 = P.months[0].key, y0 = +f0.slice(0, 4), gh = [], gm = gMonth();
+  for (var q = 0; q < +f0.slice(5) - 1; q++) gh.push({ key: y0 + "-" + ("0" + (q + 1)).slice(-2), name: MONTHS_FULL[q], ops: [], categories: [], income: 0, fixed: 0, variable: 0, expenses: 0, saved: 0, ghost: true });
+  P = Object.assign({}, P, { months: gh.concat(P.months) });
+  var month = amon ? P.months.map(function (m) { return m.key; }).indexOf(amon) : -1;
+  if (month < 0) month = Math.min(gm, P.months.length - 1 - gh.length) + gh.length;
   var seg = function (id, list, cur, set) {
     var box = $(id); box.innerHTML = "";
     list.forEach(function (x) { var b = h("button", "", x[1]); b.type = "button"; b.setAttribute("aria-pressed", x[0] === cur); b.onclick = function () { set(x[0]); render(); }; box.appendChild(b); });
@@ -2181,7 +2190,7 @@ function renderAnalytics(P) {
   $("a-title").textContent = M.name + " " + M.key.slice(0, 4);
   $("a-prev").hidden = $("a-next").hidden = !weeks;
   $("a-prev").disabled = month <= 0; $("a-next").disabled = month >= P.months.length - 1;
-  var pick = function (i) { month = i; render(); };
+  var pick = function (i) { amon = P.months[i].key; render(); };
   var avgTag = function (v) { return v ? "сер. " + nf0.format(Math.round(v)) : ""; };
   // місяці: без осі, доріжок і сум — лише назви; пунктир середнього з підписом «сер. …»
   // місяці — з січня року першого місяця з даними; без даних — порожні пунктирні капсули; сторінки по 5, найновіша праворуч
@@ -2201,7 +2210,7 @@ function renderAnalytics(P) {
       if (j === undefined) return { v: 0, label: short, aria: MONTHS_FULL[+kk.slice(5) - 1], empty: true, sub: "—", nopick: true };
       var m = P.months[j], v = vs[j], none = v === null || !m.ops.length;
       return { v: none ? 0 : Math.max(0, v), label: short, aria: m.name, part: m.incomplete, empty: none, sub: none ? "—" : (approx && m.incomplete ? "≈ " : "") + nf0.format(v) + " зл" };
-    }), ax.max, sel, function (i) { month = byKey[keys[i]]; calm(render); }, ax.n, avg || 0, { avgLabel: avgTag(avg), lim: limV || 0, paged: { per: per, page: mpage.p, onPage: function (pg) { mpage.p = pg; } } });
+    }), ax.max, sel, function (i) { amon = keys[i]; calm(render); }, ax.n, avg || 0, { avgLabel: avgTag(avg), lim: limV || 0, paged: { per: per, page: mpage.p, onPage: function (pg) { mpage.p = pg; } } });
   };
   var note = "";
   {
@@ -2224,11 +2233,11 @@ function renderAnalytics(P) {
     } else {
       // 4 тижні в місяці: 1–7, 8–14, 15–21 і 22–кінець; усі місяці — однією стрічкою, сторінка = місяць
       var wk = function (m) {
-        var dd = new Date(+m.key.slice(0, 4), +m.key.slice(5), 0).getDate(), ls = m.incomplete ? (m.last_op ? +m.last_op.slice(0, 2) : 0) : dd;
+        var dd = new Date(+m.key.slice(0, 4), +m.key.slice(5), 0).getDate(), ls = m.ghost ? 0 : m.incomplete ? (m.last_op ? +m.last_op.slice(0, 2) : 0) : dd;
         var bb = [[1, 7], [8, 14], [15, 21], [22, dd]];
         return { dim: dd, last: ls, bounds: bb, sums: bb.map(function (b) { return m.ops.reduce(function (s, o) { var d = dayOf(o); return s + (!o.income && !o.fixed && d >= b[0] && d <= b[1] ? o.amount : 0); }, 0); }) };
       };
-      var WK = P.months.map(wk), y0 = +P.months[0].key.slice(0, 4), pre = +P.months[0].key.slice(5) - 1, cur = WK[month], dim = cur.dim, last = cur.last, bounds = cur.bounds, w = cur.sums;
+      var WK = P.months.map(wk), cur = WK[month], dim = cur.dim, last = cur.last, bounds = cur.bounds, w = cur.sums;
       var uw = avgOf(base.length ? base : allFull, function (m) { var yy = +m.key.slice(0, 4), mm = +m.key.slice(5); return m.variable * 7 / new Date(yy, mm, 0).getDate(); });
       var lw = LM ? LM.total * 7 / dim : 0;  // ліміт тижня — частка місячного
       var top = -1, axW; w.forEach(function (v, i) { if (bounds[i][0] <= last && (top < 0 || v > w[top])) top = i; });
@@ -2237,25 +2246,22 @@ function renderAnalytics(P) {
       // тап по тижню — його підсумок і категорії, як у місяцях; повторний тап — назад до місяця
       // тап по тижню іншого місяця — переходимо в той місяць і одразу на цей тиждень
       var pickW = function (i) {
-        var jj = Math.floor(i / 4) - pre, ii = i % 4, X = WK[jj]; if (!X || X.bounds[ii][0] > X.last) return;
+        var jj = Math.floor(i / 4), ii = i % 4, X = WK[jj]; if (!X || X.bounds[ii][0] > X.last) return;
         if (jj === month) wsel = { key: M.key, i: wsel.i === ii ? -1 : ii, day: wsel.day };
-        else { month = jj; wsel = { key: P.months[jj].key, i: ii }; }
+        else { amon = P.months[jj].key; wsel = { key: P.months[jj].key, i: ii }; }
         calm(render);
       };
       var allW = [].concat.apply([], WK.map(function (X) { return X.sums.filter(function (v, i) { return X.bounds[i][0] <= X.last; }); }));
       axW = niceAxis(Math.max.apply(null, allW.concat([uw || 0, lw, 1])));  // одна шкала на всю стрічку — стовпчики не стрибають між місяцями
-      // тижні — з січня року першого місяця з даними; місяці без даних — порожні пунктирні капсули
-      var emptyW = [].concat.apply([], Array.apply(null, Array(pre)).map(function (_, j) {
-        var dd = new Date(y0, j + 1, 0).getDate();
-        return [[1, 7], [8, 14], [15, 21], [22, dd]].map(function (b) { return { v: 0, label: b[0] + "–" + b[1], aria: b[0] + "–" + b[1] + " " + GEN[j], empty: true, nopick: true, sub: MONTHS_FULL[j].slice(0, 3) }; });
-      }));
-      capsules("mbars", "mticks", emptyW.concat([].concat.apply([], WK.map(function (X, j) {
-        return X.bounds.map(function (b, i) { var future = b[0] > X.last; return { v: future ? 0 : X.sums[i], label: b[0] + "–" + b[1], aria: b[0] + "–" + b[1] + " " + GEN[mi(P.months[j])], empty: future, nopick: future, sub: future ? "—" : nf0.format(X.sums[i]) + " зл" }; });
-      }))), axW.max, wi >= 0 ? (pre + month) * 4 + wi : -1, pickW, axW.n, uw || 0,
+      // місяці до початку обліку — порожні пунктирні капсули з назвою місяця під ними
+      capsules("mbars", "mticks", [].concat.apply([], WK.map(function (X, j) {
+        var Mj = P.months[j];
+        return X.bounds.map(function (b, i) { var future = b[0] > X.last; return { v: future ? 0 : X.sums[i], label: b[0] + "–" + b[1], aria: b[0] + "–" + b[1] + " " + GEN[mi(Mj)], empty: future, nopick: future, sub: Mj.ghost ? Mj.name.slice(0, 3) : future ? "—" : nf0.format(X.sums[i]) + " зл" }; });
+      })), axW.max, wi >= 0 ? month * 4 + wi : -1, pickW, axW.n, uw || 0,
         { avgLabel: avgTag(uw), lim: lw, paged: { per: 4, page: P.months.length - 1 - month, onPage: function (pg) {
           // доклацнули до сусіднього місяця — міняємо дані (підсумок, категорії, шапку) тихо, графік уже на місці
-          var nm = P.months.length - 1 - pg; if (nm === month || nm < 0) return;  // порожній місяць — лишаємо дані найранішого
-          month = nm; setTimeout(function () { calm(render); }, 400);
+          var nm = P.months.length - 1 - pg; if (nm === month || nm < 0) return;
+          amon = P.months[nm].key; setTimeout(function () { calm(render); }, 400);
         } } });
       if (wi >= 0) {
         var B = bounds[wi], upTo = Math.min(B[1], last), days = upTo - B[0] + 1, wpart = upTo < B[1], wt = B[0] + "–" + B[1] + " " + GEN[k];
@@ -2273,7 +2279,8 @@ function renderAnalytics(P) {
         if (top >= 0) c.text = "Найдорожчий тиждень — " + bounds[top][0] + "–" + bounds[top][1];
       }
     }
-    if (!weeks || wi < 0) { $("a-sum").innerHTML = sumHTML("Щоденні витрати", extra, zr(M.variable), c); renderWhere(P, M, null, LM); }
+    if (M.ghost) { $("a-sum").innerHTML = sumHTML("Щоденні витрати", "", zr(0), { text: "За цей місяць даних немає — облік почався з " + GEN[+f0.slice(5) - 1] }); $("an-where").hidden = true; }
+    else if (!weeks || wi < 0) { $("a-sum").innerHTML = sumHTML("Щоденні витрати", extra, zr(M.variable), c); renderWhere(P, M, null, LM); }
     // перемикач ліміту — у шапці картки праворуч (ліворуч «Місяці / Тижні»); вмикає ліміти і на графіку, і в «Витрати за …»
     var tg = h("button", "limt", 'Ліміт<span class="sw" aria-hidden="true"><i></i></span>');  // тугл-перемикач: сірий → синій
     tg.type = "button"; tg.setAttribute("role", "switch"); tg.setAttribute("aria-checked", String(lim)); tg.setAttribute("aria-pressed", String(lim));
@@ -3107,6 +3114,9 @@ function render() {
   renderPeople();
   if (v === "add" && !P.cash) { location.replace("#report"); return; }
   var base = v === "add" ? sheetBase : v, M = P.months[month];
+  if (base !== "analytics") amon = null;
+  else if (amon && amon !== M.key) M = P.months.filter(function (m) { return m.key === amon; })[0] || { key: amon, name: MONTHS_FULL[+amon.slice(5) - 1] };
+  if (selDay && selDay.slice(0, 7) !== M.key) selDay = null;  // обраний день — лише в місяці, який зараз у шапці
   // місяць — у шапці на всіх екранах; один для Головної, Аналітики й Журналу
   $("mrange").hidden = true; $("mpick").hidden = false;
   mcalName(base, M);
