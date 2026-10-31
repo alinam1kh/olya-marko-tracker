@@ -947,8 +947,10 @@ a.ins { color: var(--ink4); }
 .glsum { flex: none; text-align: right; } .glsum b { display: block; font-size: 15px; font-weight: 500; } .glsum small { display: block; margin-top: 2px; font-size: 12px; color: var(--ink2); }
 .plprog { margin-top: 10px; }
 /* банка: сума великою, як у monobank; смуга монет під нею — без дубля підпису */
-.plbig { margin-top: 14px; } .plbig b { display: block; font-size: 32px; font-weight: 500; line-height: 1.1; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
-.plbig span { display: block; margin-top: 4px; font-size: 13px; color: var(--ink2); }
+.plbig { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 8px; margin-top: 14px; }
+.plbig b { font-size: 32px; font-weight: 500; line-height: 1.1; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.plbig span { font-size: 18px; font-weight: 500; color: var(--ink2); font-variant-numeric: tabular-nums; }
+.plout { margin: 4px 0 0; font-size: 13px; color: var(--ink2); }
 .plprog.big .gm .gbi, .plprog.big .gm .gbt { display: none; }
 .plprog .gbar { font-size: 13px; }
 .glrow > svg:last-child { flex: none; color: var(--ink2); }
@@ -969,6 +971,7 @@ a.ins { color: var(--ink4); }
 /* підвал поточного стану: світла дія + головна синя */
 .plfoot { display: flex; gap: 10px; } .plfoot .save { flex: 1; min-width: 0; } .plfoot .save[hidden] { display: none; }
 .save.sec { background: var(--blue-soft); box-shadow: none; color: var(--blue-txt); }
+.plfoot .save { display: inline-flex; align-items: center; justify-content: center; gap: 8px; } .plfoot .save svg { flex: none; }
 /* назва шторки цілей прокручується разом зі вмістом: у шапці лишаються ручка, «Усі накопичення» й хрестик (h2 шапки — для читачів екрана) */
 #pl-title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 #pl-head { grid-template-rows: auto 44px; padding-bottom: 12px; }  /* вміст при прокрутці не підлазить під шапку впритул */
@@ -2944,7 +2947,8 @@ function plList() {
     var mm = goalMonthly(g, k, P), pr = goalProgress(P, g), jar = g.kind === "jar"; total += mm;
     // рядок: іконка, назва, під нею тип і термін (суми — на Головній і в самій цілі, тут не дублюємо)
     var un = g.kind === "cushion" ? (goalPlan(P) || {}).until : g.until;
-    var sub = jar ? "Банка · " + (un ? "до " + dmy(un) : "без терміну") : "Щомісяця · " + (pr ? "≈ " : "") + zr(mm) + (un ? " · до " + dmy(un) : "");
+    var SEP = '<i class="sep" aria-hidden="true"></i>';  // роздільник — як у «Останніх операціях», не крапка
+    var sub = jar ? "Банка" + SEP + (un ? "до " + dmy(un) : "без терміну") : "Щомісяця" + SEP + (pr ? "≈ " : "") + zr(mm) + (un ? SEP + "до " + dmy(un) : "");
     html += '<button type="button" class="glrow" data-id="' + esc(g.id) + '"><span class="glic">' + goalIcon(g) + '</span><span class="gltx"><b>' + esc(goalName(g)) + "</b><small>" +
       sub + "</small></span>" + CHR + "</button>";
   });
@@ -3045,6 +3049,13 @@ function plRender(keepFocus) {
   sec.hidden = !(view && (ao || !jar || canOut));
   sec.textContent = ao ? "Скасувати" : jar ? "Зняти з банки" : "Редагувати";
   $("pl-save").textContent = !view ? "Зберегти" : ao ? (ao === "out" ? "Зняти" : jar ? "Поповнити" : "Додати") : jar ? "Поповнити банку" : "Додати готівку";
+  // поточний стан: іконки на кнопках — гроші в банку (стрілка в лоток) і з банки (стрілка з лотка), олівець і плюс
+  if (view && !ao) {
+    var ic = function (el, d) { el.insertAdjacentHTML("afterbegin", svgI("currentColor", d, 20)); };
+    var TRAY = "M4 14v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4";
+    ic($("pl-save"), jar ? TRAY + "M12 3v11M8 10l4 4 4-4" : "M12 5v14M5 12h14");
+    ic(sec, jar ? TRAY + "M12 14V3M8 7l4-4 4 4" : "M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4");
+  }
   $("pl-save").disabled = view ? false : byTotal ? !(cushion || plS.total) : !m; $("pl-msg").textContent = "";
   body.querySelectorAll("[data-kind]").forEach(function (b) { b.onclick = function () {
     if ((plS.kind || "") === b.dataset.kind) return;
@@ -3128,7 +3139,8 @@ function plViewHTML(P, sg) {
   if (LMv && LMv.on) rows += row("Ліміт на щоденні", zr(LMv.total));
   var warn = jar ? plOverlap(P) : "";
   var outS = jar ? (sg.adds || []).reduce(function (s, a) { return s + (a.amount < 0 ? -a.amount : 0); }, 0) : 0;
-  var big = jar && b ? '<div class="plbig"><b>' + zr(b.got) + "</b><span>з " + zr(b.total) + (outS ? " · знято " + zr(outS) : "") + "</span></div>" : "";
+  // в один рядок: «5 000 зл / 5 000 зл»; скільки знято — дрібно під ним, лише якщо знімали
+  var big = jar && b ? '<div class="plbig"><b>' + zr(b.got) + "</b><span>/ " + zr(b.total) + "</span></div>" + (outS ? '<p class="plout">Знято ' + zr(outS) + "</p>" : "") : "";
   return '<p class="plsub">' + (jar ? "Банка — із залишку зарплати й поповнень" : "З залишку зарплати") + "</p>" + big +
     (b ? '<div class="plprog' + (big ? " big" : "") + '">' + goalBarsHTML(b) + "</div>" : "") + "<!--add-->" + '<div class="oplist plcalc">' + rows + "</div>" + warn;
 }
