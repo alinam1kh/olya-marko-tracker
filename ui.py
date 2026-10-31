@@ -946,6 +946,10 @@ a.ins { color: var(--ink4); }
 .gtag { display: inline-flex; align-items: center; gap: 4px; margin-right: 8px; padding: 2px 8px 2px 6px; border-radius: 10px; background: var(--blue-soft); color: var(--blue-txt); font-size: 11px; font-weight: 500; line-height: 16px; vertical-align: 1px; }
 .glsum { flex: none; text-align: right; } .glsum b { display: block; font-size: 15px; font-weight: 500; } .glsum small { display: block; margin-top: 2px; font-size: 12px; color: var(--ink2); }
 .plprog { margin-top: 10px; }
+/* банка: сума великою, як у monobank; смуга монет під нею — без дубля підпису */
+.plbig { margin-top: 14px; } .plbig b { display: block; font-size: 32px; font-weight: 500; line-height: 1.1; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.plbig span { display: block; margin-top: 4px; font-size: 13px; color: var(--ink2); }
+.plprog.big .gm .gbi, .plprog.big .gm .gbt { display: none; }
 .plprog .gbar { font-size: 13px; }
 .glrow > svg:last-child { flex: none; color: var(--ink2); }
 .pltot { margin: 10px 0 0; padding-top: 12px; border-top: 1px solid var(--soft); font-size: 14px; color: var(--ink3); }
@@ -3038,8 +3042,8 @@ function plRender(keepFocus) {
   var sec = $("pl-sec"), canOut = jar && sgv && ((goalBars(P, sgv) || {}).got || 0) > 0, ao = plS.addOpen;
   $("pl-edit").hidden = !(view && jar);
   sec.hidden = !(view && (ao || !jar || canOut));
-  sec.textContent = ao ? "Скасувати" : jar ? "Взяти" : "Редагувати";
-  $("pl-save").textContent = !view ? "Зберегти" : ao ? (ao === "out" ? "Взяти" : jar ? "Поповнити" : "Додати") : jar ? "Поповнити" : "Додати готівку";
+  sec.textContent = ao ? "Скасувати" : jar ? "Зняти з банки" : "Редагувати";
+  $("pl-save").textContent = !view ? "Зберегти" : ao ? (ao === "out" ? "Зняти" : jar ? "Поповнити" : "Додати") : jar ? "Поповнити банку" : "Додати готівку";
   $("pl-save").disabled = view ? false : byTotal ? !(cushion || plS.total) : !m; $("pl-msg").textContent = "";
   body.querySelectorAll("[data-kind]").forEach(function (b) { b.onclick = function () {
     if ((plS.kind || "") === b.dataset.kind) return;
@@ -3082,7 +3086,7 @@ function plAddSubmit(P) {
   if (out && a > have) { $("pl-msg").textContent = "У банці лише " + zr(have); $("pl-add-amt").focus(); return; }
   var v = out ? -a : a;
   plAdds(P, function (list) { return list.concat([note ? { date: iso(new Date()), amount: v, note: note } : { date: iso(new Date()), amount: v }]); },
-    out ? "Взяли з банки: " + zr(a) : plS.kind === "jar" ? "Банку поповнено: " + zr(a) : "Додано до відкладень: " + zr(a));
+    out ? "Знято з банки: " + zr(a) : plS.kind === "jar" ? "Банку поповнено: " + zr(a) : "Додано до відкладень: " + zr(a));
 }
 function plToEdit() { plMorph(function () { plS.edit = true; plS.addOpen = false; plRender(); }); }
 // світла кнопка підвалу: «Скасувати» (форма готівки) / «Взяти» (банка) / «Редагувати»
@@ -3122,8 +3126,10 @@ function plViewHTML(P, sg) {
   var LMv = jar && b && b.until && !done ? LMnow(P) : null;
   if (LMv && LMv.on) rows += row("Ліміт на щоденні", zr(LMv.total));
   var warn = jar ? plOverlap(P) : "";
-  return '<p class="plsub">' + (jar ? "Банка — із залишку зарплати й поповнень" : "З залишку зарплати") + "</p>" +
-    (b ? '<div class="plprog">' + goalBarsHTML(b) + "</div>" : "") + "<!--add-->" + '<div class="oplist plcalc">' + rows + "</div>" + warn;
+  var outS = jar ? (sg.adds || []).reduce(function (s, a) { return s + (a.amount < 0 ? -a.amount : 0); }, 0) : 0;
+  var big = jar && b ? '<div class="plbig"><b>' + zr(b.got) + "</b><span>з " + zr(b.total) + (outS ? " · знято " + zr(outS) : "") + "</span></div>" : "";
+  return '<p class="plsub">' + (jar ? "Банка — із залишку зарплати й поповнень" : "З залишку зарплати") + "</p>" + big +
+    (b ? '<div class="plprog' + (big ? " big" : "") + '">' + goalBarsHTML(b) + "</div>" : "") + "<!--add-->" + '<div class="oplist plcalc">' + rows + "</div>" + warn;
 }
 // збереженої цілі: «+ Додати готівку» (сума й звідки — йде лише в «зібрано») та «Історія накопичень»:
 // за кожен період від зарплати до зарплати — скільки відкладено (дохід мінус витрати), і кожен готівковий внесок; найновіші — вгорі
@@ -3147,7 +3153,7 @@ function plJarHist(sg) {
   var adds = sg.adds || [], rows = adds.map(function (a, i) { return { a: a, i: i }; }).reverse();
   var list = '<div class="ghist">' + rows.map(function (r) {
     var a = r.a, out = a.amount < 0;
-    return '<div class="ghr"><span>' + esc(a.note || (out ? "Взяли з банки" : "Поповнення")) + "<small>" + dmy(a.date) + '</small></span><b' + (out ? ' class="neg"' : "") + ">" + (out ? "−" : "+") + zr(Math.abs(a.amount)) + "</b>" +
+    return '<div class="ghr"><span>' + esc(a.note || (out ? "Знято з банки" : "Поповнення")) + "<small>" + dmy(a.date) + '</small></span><b' + (out ? ' class="neg"' : "") + ">" + (out ? "−" : "+") + zr(Math.abs(a.amount)) + "</b>" +
       '<button type="button" class="ghdel" data-add="' + r.i + '" aria-label="Прибрати запис">' + svgI("currentColor", '<path d="M6 6l12 12M18 6 6 18"/>', 14) + "</button></div>";
   }).join("") + "</div>";
   return (adds.length ? plDD("pl-hd", plS.hd, HISTI + "Історія банки", adds.length + " " + plural(adds.length, "запис", "записи", "записів"), list) : "");
