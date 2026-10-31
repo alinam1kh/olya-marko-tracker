@@ -2999,7 +2999,7 @@ function plRender(keepFocus) {
     var sgj = goalsOf(P).filter(function (x) { return x.id === plS.id; })[0], uj = plUntil();
     var jb = plS.total ? termBars(P, { start: plS.isNew ? curKey(P) : goalFrom(sgj || { hist: [] }), until: uj, total: plS.total, adds: sgj && sgj.adds, jar: true }) : null;
     m = 0;
-    if (!plS.isNew && jb) html += '<div class="plprog">' + goalBarsHTML(jb) + "</div><!--add-->";
+    // редагування — лише поля; смуги — у поточному стані
     html += '<input class="plname" id="pl-name" type="text" maxlength="60" autocomplete="off" placeholder="Назва, наприклад «Машина»" value="' + esc(plS.name) + '">';
     html += '<p class="pllab">Скільки зібрати</p>' + amt("pl-amount", plS.total, "0") +
       '<div class="chips plchips">' + [1000, 5000, 10000, 20000].map(function (v) { return '<button type="button" data-v="' + v + '" aria-pressed="' + (plS.total === v) + '">' + nf0.format(v) + "</button>"; }).join("") + "</div>";
@@ -3020,7 +3020,7 @@ function plRender(keepFocus) {
     var sg0 = goalsOf(P).filter(function (x) { return x.id === plS.id; })[0];
     var tb = until && plS.total ? termBars(P, { start: plS.isNew ? curKey(P) : goalFrom(sg0 || { hist: [] }), until: until, total: plS.total, adds: sg0 && sg0.adds }) : null;
     if (until) { m = tb ? Math.round(tb.need) : 0; c = planCalc(P, m + others, withC); }
-    html += (tb && !plS.isNew ? '<div class="plprog">' + goalBarsHTML(tb) + "</div><!--add-->" : "");
+    // редагування — лише поля; смуги — у поточному стані
     // назва — лише в цілі з терміном (гроші збираються під щось); просто «відкладати щомісяця» — без назви. Поле з'являється плавно
     if (until) html += '<input class="plname' + (plS.nameOn === false ? " nin" : "") + '" id="pl-name" type="text" maxlength="60" autocomplete="off" placeholder="Назва, наприклад «Відпустка»" value="' + esc(plS.name) + '">';
     plS.nameOn = !!until;
