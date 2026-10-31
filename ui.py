@@ -2037,10 +2037,11 @@ function renderLimit(P) {
     foot = '<button type="button" class="lfoot" id="limc-plan"><span class="lft"><b>' + act.length + " " + plural(act.length, "ціль", "цілі", "цілей") +
       "</b>, разом " + zr(sum) + " на місяць</span>" + CHR + "</button>";
   }
+  var one = act.length === 1 ? act[0].id : null;  // одна ціль — рядок веде одразу в неї (назад — «Усі накопичення»); «Усі ›» — у список
   box.classList.toggle("gonly", !LM);
   if (!LM) {  // ліміту немає — лише цілі
     box.innerHTML = '<div class="ch"><h2>Накопичення</h2>' + (act.length ? '<a href="#report" id="limc-all">Усі' + CHR + "</a>" : "") + "</div>" + foot;
-    $("limc-plan").onclick = function () { planOpen(P); };
+    $("limc-plan").onclick = function () { planOpen(P, one); };
     if ($("limc-all")) $("limc-all").onclick = function (e) { e.preventDefault(); planOpen(P); };  // як «Журнал ›» у «Останніх операціях»
     return;
   }
@@ -2058,7 +2059,7 @@ function renderLimit(P) {
     '<div class="lbar" role="img" aria-label="Витрачено ' + nf0.format(Math.round(p)) + ' % ліміту"><b' + (left < 0 ? ' class="over"' : "") + ' data-to="' + p.toFixed(2) + '%"></b></div>' +
     '<p class="lnote">' + note + "</p></button>" + foot;
   $("limc-info").onclick = function () { limOpen(P); };
-  $("limc-plan").onclick = function () { planOpen(P); };
+  $("limc-plan").onclick = function () { planOpen(P, one); };
   grow("#limc .lbar b", "width");
 }
 function renderReport(P) {
@@ -3317,10 +3318,11 @@ document.addEventListener("keydown", function (e) { if (e.key === "Escape") limC
 window.addEventListener("hashchange", limClose);
 function LMnow(P) { return limitsFor(P, P.months.length - 1) || {}; }
 // з картки: цілей немає — одразу нова ціль; є — список
-function planOpen(P) {
+function planOpen(P, id) {
   var k = curKey(P);
   plS = { P: P, mode: "list" };
   if (!goalsOf(P).some(function (g) { return goalOn(g, k); })) { plS = null; plEditStart(P, null); }
+  else if (id) plEditStart(P, id);  // одразу ціль; зі списку — тож у шапці «Усі накопичення»
   plRender();
   var s = $("v-plan"), bg = $("pl-bg");
   s.hidden = bg.hidden = false; document.body.style.overflow = "hidden";
