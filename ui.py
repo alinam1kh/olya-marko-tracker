@@ -3035,9 +3035,12 @@ function plRender(keepFocus) {
     var cur0 = until ? plS.total : m, vals = until ? [1000, 3000, 5000, 10000] : [500, 1000, 2000, 5000];
     // щомісячна сума — ще й частка доходу блакитним у чипі (з терміном у чипах уся сума, частка від місячного доходу там не має сенсу)
     var j0 = P.months.length - 1, pm0 = P.months[j0].income > 0 ? P.months[j0] : prevWithIncome(P, j0), inc0 = !until && pm0 ? pm0.income : 0;
-    var pct = function (v) { if (!inc0) return ""; var x = v / inc0 * 100; return '<span class="pct">' + (x < 1 ? "<1" : Math.round(x)) + "%</span>"; };
+    // без терміну й з доходом — рівні частки доходу 5 / 10 / 15 / 20 % (сума округлена до 10 зл)
+    var PCT = [5, 10, 15, 20];
+    if (inc0) vals = PCT.map(function (q) { return Math.max(10, Math.round(inc0 * q / 1000) * 10); });
+    var pct = function (v, i) { return inc0 ? '<span class="pct">' + PCT[i] + "%</span>" : ""; };
     html += '<p class="pllab">' + (until ? "Скільки зібрати" : "Відкладати щомісяця") + "</p>" + amt("pl-amount", cur0, "0") +
-      '<div class="chips plchips' + (inc0 ? " wp" : "") + '">' + vals.map(function (v) { return '<button type="button" data-v="' + v + '" aria-pressed="' + (cur0 === v) + '">' + nf0.format(v) + pct(v) + "</button>"; }).join("") + "</div>";
+      '<div class="chips plchips' + (inc0 ? " wp" : "") + '">' + vals.map(function (v, i) { return '<button type="button" data-v="' + v + '" aria-pressed="' + (cur0 === v) + '">' + nf0.format(v) + pct(v, i) + "</button>"; }).join("") + "</div>";
     html += dueDD(until, spans) + (tb ? need(tb) : "");
   }
   // поточний стан: готівка під смугами й історія; редагування збереженої цілі — поля й унизу «Видалити ціль»
