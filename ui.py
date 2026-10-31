@@ -1014,7 +1014,7 @@ a.ins { color: var(--ink4); }
   display: inline-flex; align-items: center; gap: 2px; margin: 18px 0 4px; font-size: 14px; font-weight: 500; color: var(--blue-txt); }
 .lmreset { display: block; margin: 8px 0 0; padding: 10px 0; border: 0; background: none; color: var(--blue-txt); font: 500 13px var(--font); cursor: pointer; }
 .plnote { margin: 12px 2px 0; font-size: 13px; color: var(--blue-txt); }
-.plwarn { margin: 6px 2px 0; font-size: 13px; color: var(--cash); }
+.plwarn { margin: 14px 0 0; padding: 12px 14px; border-radius: 14px; background: var(--cash-bg); font-size: 13px; line-height: 1.4; color: var(--cash); }  /* блок, як .plres.warn */
 .goal .gbig { display: flex; align-items: baseline; gap: 8px; margin: 14px 0 0; }
 .goal .gbig b { font-size: 32px; font-weight: 500; line-height: 1; color: var(--blue); }
 .goal .gbig span { font-size: 16px; font-weight: 500; color: var(--ink); }
