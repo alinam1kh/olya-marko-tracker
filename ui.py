@@ -3068,7 +3068,9 @@ function plRender(keepFocus) {
     if (keepFocus) { inp.focus(); var L = inp.value.length; try { inp.setSelectionRange(L, L); } catch (e) {} }
   }
   if ($("pl-name")) $("pl-name").oninput = function () { plS.name = this.value; };
-  body.querySelectorAll("[data-v]").forEach(function (b) { b.onclick = function () { if (byTotal) plS.total = +b.dataset.v; else plS.monthly = +b.dataset.v; plRender(); }; });
+  body.querySelectorAll("[data-v]").forEach(function (b) { b.onclick = function () {
+    var v = b.getAttribute("aria-pressed") === "true" ? 0 : +b.dataset.v;  // повторний натиск знімає вибір — у полі знову плейсхолдер
+    if (byTotal) plS.total = v; else plS.monthly = v; plRender(); }; });
   body.querySelectorAll("[data-span]").forEach(function (b) { b.onclick = function () { plS.span = b.dataset.span === "null" ? null : +b.dataset.span; plRender(); }; });
   body.querySelectorAll("[data-d]").forEach(function (b) { b.onclick = function () { plS.until = b.dataset.d; plRender(); }; });
   if ($("pl-cal-prev")) $("pl-cal-prev").onclick = function () { plShift(-1); };
