@@ -952,8 +952,8 @@ a.ins { color: var(--ink4); }
 .pldel { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; margin-top: 10px; padding: 0; border: 0; background: none; font: 500 14px var(--font); color: var(--bad); cursor: pointer; }
 .pldel svg { width: 18px; height: 18px; }
 .plback { display: inline-flex; align-items: center; gap: 2px; min-height: 36px; margin: -4px 0 4px -4px; padding: 0 4px; border: 0; background: none; font: 500 14px var(--font); color: var(--blue); cursor: pointer; }
-/* «Усі цілі» — у шапці шторки в одному ряду з хрестиком; назва цілі — рядком нижче */
-/* порядок: ручка шторки → «Усі цілі» і хрестик → назва */
+/* «Усі накопичення» — у шапці шторки в одному ряду з хрестиком; назва цілі — рядком нижче */
+/* порядок: ручка шторки → «Усі накопичення» і хрестик → назва */
 .plback-slot { grid-column: 1; grid-row: 2; } .plback-slot:empty { display: none; }
 #pl-head.hasback::before { grid-row: 1; }
 #pl-close { grid-column: 3; grid-row: 2; }
@@ -961,11 +961,11 @@ a.ins { color: var(--ink4); }
 /* підвал поточного стану: світла дія + головна синя */
 .plfoot { display: flex; gap: 10px; } .plfoot .save { flex: 1; min-width: 0; } .plfoot .save[hidden] { display: none; }
 .save.sec { background: var(--blue-soft); box-shadow: none; color: var(--blue-txt); }
-/* назва шторки цілей прокручується разом зі вмістом: у шапці лишаються ручка, «Усі цілі» й хрестик (h2 шапки — для читачів екрана) */
+/* назва шторки цілей прокручується разом зі вмістом: у шапці лишаються ручка, «Усі накопичення» й хрестик (h2 шапки — для читачів екрана) */
 #pl-title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 #pl-head { grid-template-rows: auto 44px; padding-bottom: 12px; }  /* вміст при прокрутці не підлазить під шапку впритул */
 .plh { margin: 0 0 4px; font-size: 18px; font-weight: 500; }
-/* без «Усі цілі» назва стоїть у шапці навпроти хрестика; рядком нижче опускається лише під «Усі цілі» */
+/* без «Усі накопичення» назва стоїть у шапці навпроти хрестика; рядком нижче опускається лише під «Усі накопичення» */
 #pl-head:not(.hasback) #pl-title { position: static; width: auto; height: auto; overflow: visible; clip: auto; grid-column: 1; grid-row: 2; }
 #v-plan:not(.hasback) .plh { display: none; }
 .sheet-head .plback { display: inline-flex; width: auto; height: auto; margin: 0 0 0 -4px; border-radius: 0; background: none; }
@@ -2863,7 +2863,7 @@ function closeOp() {
 }
 $("op-close").onclick = closeOp; $("op-bg").onclick = closeOp;
 
-// ---------- шторка «Цілі» / «Відкладати щомісяця» ----------
+// ---------- шторка «Накопичення» / «Відкладати щомісяця» ----------
 // Цілей може бути кілька. Список — з рядка внизу картки ліміту; тап по цілі — її редагування (назва, сума, термін),
 // унизу «Видалити ціль». Іконка — за типом: відкладати щомісяця — подушка, банка — банка.
 // Ліміт рахується від суми всіх цілей: з подушкою — дохід мінус обовʼязкові й відкладення, без неї — менший з автоматичного.
@@ -2927,7 +2927,7 @@ function plMorph(fn) {
   s.classList.add("morph"); s.style.height = h1 + "px";
   clearTimeout(plMorph.t); plMorph.t = setTimeout(function () { s.classList.remove("morph"); s.style.height = ""; }, 780);
 }
-// «Усі цілі» / «Назад» у шапці є — назва рядком нижче (у тілі); немає — назва в шапці навпроти хрестика
+// «Усі накопичення» / «Назад» у шапці є — назва рядком нижче (у тілі); немає — назва в шапці навпроти хрестика
 function plBackSync() { var on = !!$("pl-backslot").firstChild; $("pl-head").classList.toggle("hasback", on); $("v-plan").classList.toggle("hasback", on); }
 // ---------- список цілей ----------
 function plList() {
@@ -2940,8 +2940,8 @@ function plList() {
       sub + "</small></span>" + (pr ? '<span class="glsum"><b>' + nf0.format(Math.round(pr.b.got)) + "</b><small>з " + zr(pr.b.total) + "</small></span>" : "") + CHR + "</button>";
   });
   html += "</div>" + (act.filter(function (g) { return g.kind !== "jar"; }).length > 1 ? '<p class="pltot">Разом відкладати <b>' + zr(total) + "</b> на місяць</p>" : "");
-  $("pl-title").textContent = "Цілі"; $("pl-backslot").innerHTML = ""; plBackSync();
-  $("pl-body").innerHTML = '<h2 class="plh" aria-hidden="true">Цілі</h2>' + html;
+  $("pl-title").textContent = "Накопичення"; $("pl-backslot").innerHTML = ""; plBackSync();
+  $("pl-body").innerHTML = '<h2 class="plh" aria-hidden="true">Накопичення</h2>' + html;
   $("pl-save").disabled = false; $("pl-save").textContent = "+ Нова ціль"; $("pl-msg").textContent = ""; $("pl-sec").hidden = $("pl-edit").hidden = true;
   $("pl-body").querySelectorAll("[data-id]").forEach(function (b) { b.onclick = function () { plMorph(function () { plEditStart(P, b.dataset.id); plRender(); }); }; });
 }
@@ -3022,7 +3022,7 @@ function plRender(keepFocus) {
   } else html = html.replace(/<!--add-->/g, "");
   var BACK = svgI("currentColor", '<path d="m15 6-6 6 6 6"/>', 18);
   $("pl-backslot").innerHTML = plS.edit ? '<button type="button" class="plback" id="pl-vback">' + BACK + "Назад</button>"
-    : plS.back ? '<button type="button" class="plback" id="pl-back">' + BACK + "Усі цілі</button>" : ""; plBackSync();
+    : plS.back ? '<button type="button" class="plback" id="pl-back">' + BACK + "Усі накопичення</button>" : ""; plBackSync();
   plS.m = m;
   body.innerHTML = '<h2 class="plh" aria-hidden="true">' + esc($("pl-title").textContent) + "</h2>" + html;
   var byTotal = cushion || jar || !!plUntil();  // у полі — сума цілі, а не на місяць
@@ -3102,7 +3102,7 @@ function plJarLimit(P, need) {
   return '<div class="plres"><b>Ліміт на щоденні — ' + zr(c.cap) + "</b><span>Звичного залишку не вистачає, тож ≈ " + zr(c.auto - c.cap) +
     " щомісяця беремо з основних грошей: на щоденні — менше, ніж зазвичай (" + zr(c.auto) + ").</span></div>";
 }
-// збережена ціль — знову поточний стан (зі свіжих даних; «Усі цілі» лишається, якщо був)
+// збережена ціль — знову поточний стан (зі свіжих даних; «Усі накопичення» лишається, якщо був)
 function plView(P, id) { var back = plS.back; plMorph(function () { plEditStart(P, id); plS.back = back; plRender(); }); }
 // поточний стан цілі: тип, смуги (і готівка під ними), скільки щомісяця й до коли
 function plViewHTML(P, sg) {
