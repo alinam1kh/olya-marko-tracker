@@ -839,7 +839,8 @@ a.ins { color: var(--ink4); }
 .lbar b { display: block; height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, #3B82F6, #1D5FE0); transition: width 2.1s var(--ease); }
 .lbar b.over { background: var(--bad); }
 .lnote { margin: 10px 0 0; font-size: 13px; color: var(--ink2); }
-.limc.gonly .lfoot { margin-top: 2px; padding-top: 4px; border-top: 0; }  /* без ліміту картка — лише «Цілі» */
+.limc.gonly .ch { min-height: 44px; }  /* без ліміту картка — лише «Накопичення»: заголовок, «Усі ›», під ними сіра лінія */
+.limc.gonly .lfoot { margin-top: 4px; padding-top: 12px; }
 .limc .lmain { display: block; width: 100%; padding: 0; border: 0; background: none; font: inherit; text-align: left; color: inherit; cursor: pointer; }
 /* тихий рядок унизу картки: до шторки «Відкладати щомісяця» */
 .lfoot { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 40px; margin-top: 12px; padding: 8px 0 0; border: 0; border-top: 1px solid var(--soft); background: transparent; font: 400 14px var(--font); color: var(--ink3); text-align: left; cursor: pointer; }
@@ -2006,7 +2007,7 @@ function progSegs(n, done) {
   return '<span class="lsegs" aria-hidden="true">' + s + "</span>";
 }
 // картка на Головній (поточний місяць): ліміт — лише коли банці з терміном бракує звичного залишку; тоді зверху ліміт, унизу цілі.
-// Ліміту немає — картка «Цілі»: «+ Нова ціль», одна ціль зі смугами чи «N цілей, разом … на місяць»
+// Ліміту немає — картка «Накопичення»: «+ Нова ціль», одна ціль зі смугами чи «N цілей, разом … на місяць»
 function renderLimit(P) {
   var box = $("limc"), j = P.months.length - 1, M = P.months[j], now = month === j && M.incomplete && !gkey, LM0 = now ? limitsFor(P, j) : null;
   box.hidden = !now; if (!now) return;
@@ -2026,8 +2027,9 @@ function renderLimit(P) {
   }
   box.classList.toggle("gonly", !LM);
   if (!LM) {  // ліміту немає — лише цілі
-    box.innerHTML = '<div class="ch"><h2>Цілі</h2></div>' + foot;
+    box.innerHTML = '<div class="ch"><h2>Накопичення</h2>' + (act.length ? '<a href="#report" id="limc-all">Усі' + CHR + "</a>" : "") + "</div>" + foot;
     $("limc-plan").onclick = function () { planOpen(P); };
+    if ($("limc-all")) $("limc-all").onclick = function (e) { e.preventDefault(); planOpen(P); };  // як «Журнал ›» у «Останніх операціях»
     return;
   }
   // обраний у календарі день — витрачене до нього включно і скільки днів лишається після нього
