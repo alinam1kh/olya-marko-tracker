@@ -976,7 +976,7 @@ a.ins { color: var(--ink4); }
 #pl-title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 #pl-head { grid-template-rows: auto 44px; padding-bottom: 12px; }  /* вміст при прокрутці не підлазить під шапку впритул */
 .plh { margin: 0 0 4px; font-size: 18px; font-weight: 500; }
-.plhi { display: inline-flex; vertical-align: -3px; margin-right: 8px; color: var(--blue); }
+.plh.wic { display: flex; align-items: center; gap: 12px; }
 /* без «Усі накопичення» назва стоїть у шапці навпроти хрестика; рядком нижче опускається лише під «Усі накопичення» */
 #pl-head:not(.hasback) #pl-title { position: static; width: auto; height: auto; overflow: visible; clip: auto; grid-column: 1; grid-row: 2; }
 #v-plan:not(.hasback) .plh { display: none; }
@@ -3032,19 +3032,22 @@ function plRender(keepFocus) {
       '<div class="chips plchips' + (inc0 ? " wp" : "") + '">' + vals.map(function (v) { return '<button type="button" data-v="' + v + '" aria-pressed="' + (cur0 === v) + '">' + nf0.format(v) + pct(v) + "</button>"; }).join("") + "</div>";
     html += dueDD(until, spans) + (tb ? need(tb) : "");
   }
-  // поточний стан: готівка під смугами, історія й «Видалити ціль»; редагування — лише поля
+  // поточний стан: готівка під смугами й історія; редагування збереженої цілі — поля й унизу «Видалити ціль»
   if (view) {
     var addH = plAddHTML(P);
     html = html.indexOf("<!--add-->") < 0 ? addH + html : html.replace("<!--add-->", addH);
-    html += plHist(P) + '<button type="button" class="pldel" id="pl-del">' + TRASH + "Видалити ціль</button>";
-  } else html = html.replace(/<!--add-->/g, "");
+    html += plHist(P);
+  } else {
+    html = html.replace(/<!--add-->/g, "");
+    if (!plS.isNew) html += '<button type="button" class="pldel" id="pl-del">' + TRASH + "Видалити ціль</button>";
+  }
   var BACK = svgI("currentColor", '<path d="m15 6-6 6 6 6"/>', 18);
   $("pl-backslot").innerHTML = plS.edit ? '<button type="button" class="plback" id="pl-vback">' + BACK + "Назад</button>"
     : plS.back ? '<button type="button" class="plback" id="pl-back">' + BACK + "Усі накопичення</button>" : ""; plBackSync();
   plS.m = m;
   // нова ціль: синя іконка типу зліва від назви — банка чи подушка «Відкладати щомісяця»
-  var hic = plS.isNew ? '<span class="plhi">' + (plS.kind === "jar" ? JAR : PILLOW).replace(/width="16" height="16"/, 'width="20" height="20"') + "</span>" : "";
-  body.innerHTML = '<h2 class="plh" aria-hidden="true">' + hic + esc($("pl-title").textContent) + "</h2>" + html;
+  var hic = plS.isNew ? '<span class="glic">' + (plS.kind === "jar" ? JAR : PILLOW) + "</span>" : "";  // той самий голубий круг, що в списку
+  body.innerHTML = '<h2 class="plh' + (hic ? " wic" : "") + '" aria-hidden="true">' + hic + esc($("pl-title").textContent) + "</h2>" + html;
   var byTotal = cushion || jar || !!plUntil();  // у полі — сума цілі, а не на місяць
   // підвал: поточний стан — «Редагувати» + «Додати готівку» (банка — «Взяти» + «Поповнити», редагувати — олівцем у шапці);
   // форма готівки відкрита — «Скасувати» + «Додати»; форма цілі — лише «Зберегти»
