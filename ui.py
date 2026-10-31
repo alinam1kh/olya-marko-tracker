@@ -939,7 +939,7 @@ a.ins { color: var(--ink4); }
 .gltx b { display: block; font-size: 15px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .gltx small { display: block; margin-top: 2px; font-size: 12px; color: var(--ink2); }
 /* позначка типу біля назви цілі на Головній: банка — блакитна пігулка з іконкою */
-.gtag { display: inline-flex; align-items: center; gap: 4px; margin-left: 8px; padding: 2px 8px 2px 6px; border-radius: 10px; background: var(--blue-soft); color: var(--blue-txt); font-size: 11px; font-weight: 500; line-height: 16px; vertical-align: 1px; }
+.gtag { display: inline-flex; align-items: center; gap: 4px; margin-right: 8px; padding: 2px 8px 2px 6px; border-radius: 10px; background: var(--blue-soft); color: var(--blue-txt); font-size: 11px; font-weight: 500; line-height: 16px; vertical-align: 1px; }
 .glsum { flex: none; text-align: right; } .glsum b { display: block; font-size: 15px; font-weight: 500; } .glsum small { display: block; margin-top: 2px; font-size: 12px; color: var(--ink2); }
 .plprog { margin-top: 10px; }
 .plprog .gbar { font-size: 13px; }
@@ -2018,7 +2018,7 @@ function renderLimit(P) {
   else if (act.length === 1) {
     var g1 = act[0], pr = goalProgress(P, g1), nm = g1.name || g1.kind === "cushion" ? esc(goalName(g1)) + ", " : "";
     foot = '<button type="button" class="lfoot' + (pr ? " lgoal" : "") + '" id="limc-plan"><span class="lft">' +
-      (pr ? "<b>" + esc(goalName(g1)) + "</b>" + (g1.kind === "jar" ? '<span class="gtag">' + JAR.replace(/width="16" height="16"/, 'width="12" height="12"') + "Банка</span>" : "") + pr.html
+      (pr ? (g1.kind === "jar" ? '<span class="gtag">' + JAR.replace(/width="16" height="16"/, 'width="12" height="12"') + "Банка</span>" : "") + "<b>" + esc(goalName(g1)) + "</b>" + pr.html
         : (nm || "Відкладаєте ") + "<b>" + zr(goalMonthly(g1, k0, P)) + "</b> на місяць") + "</span>" + CHR + "</button>";
   } else {
     var sum = act.reduce(function (s, x) { return s + goalMonthly(x, k0, P); }, 0);
