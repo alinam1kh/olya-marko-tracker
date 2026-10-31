@@ -862,7 +862,7 @@ a.ins { color: var(--ink4); }
 .gbar .gbt b { font-weight: 500; color: var(--ink); }
 .gbar:not(.gm) .lsegs b { background: var(--ink2); opacity: .55; }
 .gbars.behind .gm .lsegs b { background: var(--cash); }
-.lfoot.lgoal { align-items: flex-start; padding-top: 12px; }
+.lfoot.lgoal { align-items: center; padding-top: 12px; }  /* кругла іконка цілі, назва зі смугою й шеврон — по центру */
 .lfoot.lgoal > svg { align-self: center; }
 .lfoot.lgoal .lft { overflow: visible; }
 .pllab { margin: 16px 0 -4px; font-size: 13px; color: var(--ink2); }
@@ -895,6 +895,10 @@ a.ins { color: var(--ink4); }
 .plintro { margin: 6px 0 0; font-size: 14px; line-height: 1.45; color: var(--ink3); }
 .amount.pla { justify-content: flex-start; padding-top: 14px; }  /* у шторці плану все — від лівого краю */
 .plchips { justify-content: flex-start; margin-top: 14px; }
+/* з часткою доходу: чотири однакові чипи, сума — зверху, відсоток блакитним під нею */
+.plchips.wp { flex-wrap: nowrap; } .plchips.wp button { flex: 1; min-width: 0; min-height: 50px; padding: 0 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.2; }
+.plchips .pct { font-size: 11px; font-weight: 500; color: var(--blue); }
+.plchips [aria-pressed="true"] .pct { color: rgba(255, 255, 255, .75); }
 .pllink { display: block; min-height: 44px; margin: 8px 0 0; padding: 0; border: 0; background: none; color: var(--blue); font: 500 14px var(--font); cursor: pointer; }
 .plres { margin-top: 14px; padding: 12px 14px; border-radius: 14px; background: var(--blue-soft); font-size: 13px; line-height: 1.4; color: var(--ink3); }
 .plres b { display: block; margin-bottom: 2px; font-size: 14px; font-weight: 500; color: var(--blue-txt); }
@@ -2017,8 +2021,8 @@ function renderLimit(P) {
   if (!act.length) foot = '<button type="button" class="lfoot ladd" id="limc-plan"><span class="llink">' + svgI("currentColor", '<path d="M12 5v14M5 12h14"/>', 18) + "Нова ціль</span></button>";
   else if (act.length === 1) {
     var g1 = act[0], pr = goalProgress(P, g1), nm = g1.name || g1.kind === "cushion" ? esc(goalName(g1)) + ", " : "";
-    foot = '<button type="button" class="lfoot' + (pr ? " lgoal" : "") + '" id="limc-plan"><span class="lft">' +
-      (pr ? (g1.kind === "jar" ? '<span class="gtag">' + JAR.replace(/width="16" height="16"/, 'width="12" height="12"') + "Банка</span>" : "") + "<b>" + esc(goalName(g1)) + "</b>" + pr.html
+    foot = '<button type="button" class="lfoot' + (pr ? " lgoal" : "") + '" id="limc-plan">' + (pr ? '<span class="glic">' + goalIcon(g1) + "</span>" : "") + '<span class="lft">' +
+      (pr ? "<b>" + esc(goalName(g1)) + "</b>" + pr.html
         : (nm || "Відкладаєте ") + "<b>" + zr(goalMonthly(g1, k0, P)) + "</b> на місяць") + "</span>" + CHR + "</button>";
   } else {
     var sum = act.reduce(function (s, x) { return s + goalMonthly(x, k0, P); }, 0);
@@ -3010,8 +3014,11 @@ function plRender(keepFocus) {
     if (until) html += '<input class="plname' + (plS.nameOn === false ? " nin" : "") + '" id="pl-name" type="text" maxlength="60" autocomplete="off" placeholder="Назва, наприклад «Відпустка»" value="' + esc(plS.name) + '">';
     plS.nameOn = !!until;
     var cur0 = until ? plS.total : m, vals = until ? [1000, 3000, 5000, 10000] : [500, 1000, 2000, 5000];
+    // щомісячна сума — ще й частка доходу блакитним у чипі (з терміном у чипах уся сума, частка від місячного доходу там не має сенсу)
+    var j0 = P.months.length - 1, pm0 = P.months[j0].income > 0 ? P.months[j0] : prevWithIncome(P, j0), inc0 = !until && pm0 ? pm0.income : 0;
+    var pct = function (v) { if (!inc0) return ""; var x = v / inc0 * 100; return '<span class="pct">' + (x < 1 ? "<1" : Math.round(x)) + "%</span>"; };
     html += '<p class="pllab">' + (until ? "Скільки зібрати" : "Відкладати щомісяця") + "</p>" + amt("pl-amount", cur0, "0") +
-      '<div class="chips plchips">' + vals.map(function (v) { return '<button type="button" data-v="' + v + '" aria-pressed="' + (cur0 === v) + '">' + nf0.format(v) + "</button>"; }).join("") + "</div>";
+      '<div class="chips plchips' + (inc0 ? " wp" : "") + '">' + vals.map(function (v) { return '<button type="button" data-v="' + v + '" aria-pressed="' + (cur0 === v) + '">' + nf0.format(v) + pct(v) + "</button>"; }).join("") + "</div>";
     html += dueDD(until, spans) + (tb ? need(tb) : "");
   }
   // поточний стан: готівка під смугами, історія й «Видалити ціль»; редагування — лише поля
