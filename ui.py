@@ -971,11 +971,12 @@ a.ins { color: var(--ink4); }
 /* підвал поточного стану: світла дія + головна синя */
 .plfoot { display: flex; gap: 10px; } .plfoot .save { flex: 1; min-width: 0; } .plfoot .save[hidden] { display: none; }
 .save.sec { background: var(--blue-soft); box-shadow: none; color: var(--blue-txt); }
-.plfoot .save { display: inline-flex; align-items: center; justify-content: center; gap: 8px; } .plfoot .save svg { flex: none; }
+.plfoot .save { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0 8px; white-space: nowrap; } .plfoot .save svg { flex: none; }  /* «Поповнити банку» з іконкою — в один рядок */
 /* назва шторки цілей прокручується разом зі вмістом: у шапці лишаються ручка, «Усі накопичення» й хрестик (h2 шапки — для читачів екрана) */
 #pl-title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 #pl-head { grid-template-rows: auto 44px; padding-bottom: 12px; }  /* вміст при прокрутці не підлазить під шапку впритул */
 .plh { margin: 0 0 4px; font-size: 18px; font-weight: 500; }
+.plhi { display: inline-flex; vertical-align: -3px; margin-right: 8px; color: var(--blue); }
 /* без «Усі накопичення» назва стоїть у шапці навпроти хрестика; рядком нижче опускається лише під «Усі накопичення» */
 #pl-head:not(.hasback) #pl-title { position: static; width: auto; height: auto; overflow: visible; clip: auto; grid-column: 1; grid-row: 2; }
 #v-plan:not(.hasback) .plh { display: none; }
@@ -3040,7 +3041,9 @@ function plRender(keepFocus) {
   $("pl-backslot").innerHTML = plS.edit ? '<button type="button" class="plback" id="pl-vback">' + BACK + "Назад</button>"
     : plS.back ? '<button type="button" class="plback" id="pl-back">' + BACK + "Усі накопичення</button>" : ""; plBackSync();
   plS.m = m;
-  body.innerHTML = '<h2 class="plh" aria-hidden="true">' + esc($("pl-title").textContent) + "</h2>" + html;
+  // нова ціль: синя іконка типу зліва від назви — банка чи подушка «Відкладати щомісяця»
+  var hic = plS.isNew ? '<span class="plhi">' + (plS.kind === "jar" ? JAR : PILLOW).replace(/width="16" height="16"/, 'width="20" height="20"') + "</span>" : "";
+  body.innerHTML = '<h2 class="plh" aria-hidden="true">' + hic + esc($("pl-title").textContent) + "</h2>" + html;
   var byTotal = cushion || jar || !!plUntil();  // у полі — сума цілі, а не на місяць
   // підвал: поточний стан — «Редагувати» + «Додати готівку» (банка — «Взяти» + «Поповнити», редагувати — олівцем у шапці);
   // форма готівки відкрита — «Скасувати» + «Додати»; форма цілі — лише «Зберегти»
@@ -3051,7 +3054,7 @@ function plRender(keepFocus) {
   $("pl-save").textContent = !view ? "Зберегти" : ao ? (ao === "out" ? "Зняти" : jar ? "Поповнити" : "Додати") : jar ? "Поповнити банку" : "Додати готівку";
   // поточний стан: іконки на кнопках — гроші в банку (стрілка в лоток) і з банки (стрілка з лотка), олівець і плюс
   if (view && !ao) {
-    var ic = function (el, d) { el.insertAdjacentHTML("afterbegin", svgI("currentColor", d, 20)); };
+    var ic = function (el, d) { el.insertAdjacentHTML("afterbegin", svgI("currentColor", '<path d="' + d + '"/>', 18)); };
     var TRAY = "M4 14v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4";
     ic($("pl-save"), jar ? TRAY + "M12 3v11M8 10l4 4 4-4" : "M12 5v14M5 12h14");
     ic(sec, jar ? TRAY + "M12 14V3M8 7l4-4 4 4" : "M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4");
