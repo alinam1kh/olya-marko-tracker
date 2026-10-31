@@ -839,7 +839,7 @@ a.ins { color: var(--ink4); }
 .lbar b { display: block; height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, #3B82F6, #1D5FE0); transition: width 2.1s var(--ease); }
 .lbar b.over { background: var(--bad); }
 .lnote { margin: 10px 0 0; font-size: 13px; color: var(--ink2); }
-.limc.gonly .ch { min-height: 44px; }  /* без ліміту картка — лише «Накопичення»: заголовок, «Усі ›», під ними сіра лінія */
+.limc.gonly { padding-top: 6px; } .limc.gonly .ch { min-height: 44px; } .limc.gonly .ch a svg { color: inherit; }  /* як «Останні операції»: той самий верх, синій шеврон */  /* без ліміту картка — лише «Накопичення»: заголовок, «Усі ›», під ними сіра лінія */
 .limc.gonly .lfoot { margin-top: 4px; padding-top: 12px; }
 .limc .lmain { display: block; width: 100%; padding: 0; border: 0; background: none; font: inherit; text-align: left; color: inherit; cursor: pointer; }
 /* тихий рядок унизу картки: до шторки «Відкладати щомісяця» */
