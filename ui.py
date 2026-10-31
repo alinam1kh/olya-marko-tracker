@@ -2942,10 +2942,11 @@ function plList() {
   var P = plS.P, k = curKey(P), act = goalsOf(P).filter(function (g) { return goalOn(g, k); }), total = 0, html = '<div class="gl">';
   act.forEach(function (g) {
     var mm = goalMonthly(g, k, P), pr = goalProgress(P, g), jar = g.kind === "jar"; total += mm;
-    // рядок: іконка, назва, скільки на місяць; справа — зібрано з якої суми (смуги — лише в самій цілі)
-    var sub = jar ? (pr && pr.b.until && pr.b.need ? "≈ " + zr(pr.b.need) + " на місяць" : "Банка") : (pr ? "≈ " : "") + zr(mm) + " на місяць";
+    // рядок: іконка, назва, під нею тип і термін (суми — на Головній і в самій цілі, тут не дублюємо)
+    var un = g.kind === "cushion" ? (goalPlan(P) || {}).until : g.until;
+    var sub = jar ? "Банка · " + (un ? "до " + dmy(un) : "без терміну") : "Щомісяця · " + (pr ? "≈ " : "") + zr(mm) + (un ? " · до " + dmy(un) : "");
     html += '<button type="button" class="glrow" data-id="' + esc(g.id) + '"><span class="glic">' + goalIcon(g) + '</span><span class="gltx"><b>' + esc(goalName(g)) + "</b><small>" +
-      sub + "</small></span>" + (pr ? '<span class="glsum"><b>' + nf0.format(Math.round(pr.b.got)) + "</b><small>з " + zr(pr.b.total) + "</small></span>" : "") + CHR + "</button>";
+      sub + "</small></span>" + CHR + "</button>";
   });
   html += "</div>" + (act.filter(function (g) { return g.kind !== "jar"; }).length > 1 ? '<p class="pltot">Разом відкладати <b>' + zr(total) + "</b> на місяць</p>" : "");
   $("pl-title").textContent = "Накопичення"; $("pl-backslot").innerHTML = ""; plBackSync();
