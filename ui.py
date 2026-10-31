@@ -971,7 +971,7 @@ a.ins { color: var(--ink4); }
 /* підвал поточного стану: світла дія + головна синя */
 .plfoot { display: flex; gap: 10px; } .plfoot .save { flex: 1; min-width: 0; } .plfoot .save[hidden] { display: none; }
 .save.sec { background: var(--blue-soft); box-shadow: none; color: var(--blue-txt); }
-.plfoot .save { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0 8px; white-space: nowrap; } .plfoot .save svg { flex: none; }  /* «Поповнити банку» з іконкою — в один рядок */
+.plfoot .save { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 0 8px; white-space: nowrap; font-size: 15px; }  /* пара кнопок з іконками — як .obtn у деталях операції */ .plfoot .save svg { flex: none; }  /* «Поповнити банку» з іконкою — в один рядок */
 /* назва шторки цілей прокручується разом зі вмістом: у шапці лишаються ручка, «Усі накопичення» й хрестик (h2 шапки — для читачів екрана) */
 #pl-title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 #pl-head { grid-template-rows: auto 44px; padding-bottom: 12px; }  /* вміст при прокрутці не підлазить під шапку впритул */
