@@ -856,7 +856,7 @@ a.ins { color: var(--ink4); }
 /* дві смуги цілі: годинник — скільки часу минуло (сіра), монети — скільки зібрано (синя; відстає від часу — жовта) */
 .gbars { display: grid; gap: 6px; margin-top: 8px; white-space: nowrap; }
 .gbar { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--ink2); }
-.gbar .gbi { flex: none; display: grid; }
+.gbar .gbi { flex: none; display: grid; margin-right: -4px; }  /* іконка ближче до суми: 4px замість 8 */
 .gbar .lsegs { flex: 1; width: auto; order: 2; }  /* підпис — одразу біля іконки, сегменти — праворуч */
 .gbar .gbt { flex: none; min-width: 118px; text-align: left; font-variant-numeric: tabular-nums; order: 1; }
 .gbar .gbt b { font-weight: 500; color: var(--ink); }
